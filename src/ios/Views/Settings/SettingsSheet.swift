@@ -45,7 +45,6 @@ struct SettingsSheet: View {
     var embedded: Bool = false
     @AppStorage("appearanceMode") private var appearanceMode: Int = 0
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @ObservedObject private var deepLink = DeepLinkCoordinator.shared
     @State private var navPath = NavigationPath()
     @State private var showFeedbackDialog = false
@@ -147,21 +146,17 @@ struct SettingsSheet: View {
                                 .background(.blue, in: Circle())
                         }
                     }
-                    // iPhone reaches Soul through its own bottom tab; keep the
-                    // Settings row only where that tab bar isn't shown (iPad).
-                    if horizontalSizeClass == .regular {
-                        NavigationLink {
-                            SoulSettingsView()
-                        } label: {
-                            Label {
-                                Text("Soul")
-                            } icon: {
-                                Image(systemName: "sparkles")
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(.white)
-                                    .frame(width: 21, height: 21)
-                                    .background(.pink, in: Circle())
-                            }
+                    NavigationLink {
+                        SoulSettingsView()
+                    } label: {
+                        Label {
+                            Text("Soul")
+                        } icon: {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.white)
+                                .frame(width: 21, height: 21)
+                                .background(.pink, in: Circle())
                         }
                     }
                     NavigationLink {

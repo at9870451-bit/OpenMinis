@@ -12,7 +12,7 @@ import SwiftUI
 /// The home tabs on iPhone.
 enum HomeTab: Hashable {
     case chats
-    case soul
+    case chat
     case settings
 }
 
@@ -26,7 +26,7 @@ struct MinisFloatingTabBar: View {
     var body: some View {
         HStack(spacing: 4) {
             tab(.chats, title: "Chats", systemImage: "bubble.left.and.text.bubble.right")
-            tab(.soul, title: "Soul", systemImage: "sparkles")
+            tab(.chat, title: "Chat", systemImage: "bubble.left.and.bubble.right")
             tab(.settings, title: "Settings", systemImage: "gearshape")
         }
         .padding(5)

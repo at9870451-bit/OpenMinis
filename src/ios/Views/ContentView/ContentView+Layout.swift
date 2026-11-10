@@ -95,8 +95,8 @@ extension ContentView {
             .allowsHitTesting(homeTab == .chats)
             .accessibilityHidden(homeTab != .chats)
 
-            if homeTab == .soul {
-                SoulHomeView()
+            if homeTab == .chat {
+                ChatTabView()
                     .safeAreaInset(edge: .bottom) { tabBarInset }
                     .transition(.asymmetric(
                         insertion: .move(edge: .trailing).combined(with: .opacity),

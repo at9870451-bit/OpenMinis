@@ -699,15 +699,17 @@ final class CrashReporter: NSObject, MXMetricManagerSubscriber {
             }
         } else if lastPhase == "background" {
             // An idle app reclaimed by iOS while nothing was holding it is the
-            // ordinary lifecycle, not a crash. Sideloaded builds land here after
-            // every app switch (no keep-alive configured, no work in flight), and
-            // writing a "crash report" for it is pure noise.
+            // ordinary lifecycle, not a crash. The marker's bgTaskRemaining is
+            // stale (written at phase change), so read the heartbeat sample —
+            // the same number the classifier below uses.
+            let hbKeepAlive = heartbeat?["keepAlive"] as? [String: Any]
+            let hbRemaining = hbKeepAlive?["bgRemaining"] as? Int ?? -1
             if !runningShell,
                (activeSessionCount ?? 0) == 0,
-               bgKeepAliveIntent != true,
-               (bgTaskGrants ?? 0) == 0,
-               bgSilentAudioLeg != true,
-               let rem = bgTaskRemaining, rem > 0, rem <= 20 {
+               hbKeepAlive?["configured"] as? Bool != true,
+               hbKeepAlive?["continued"] as? Bool != true,
+               hbKeepAlive?["audioPlaying"] as? Bool != true,
+               hbRemaining >= 0, hbRemaining <= 20 {
                 logger.info("Previous run was reclaimed by iOS while idle in the background — normal termination, no crash report written.")
                 resetCrashLoopState()
                 removeLaunchMarker()
