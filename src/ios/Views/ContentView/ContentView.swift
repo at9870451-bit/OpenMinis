@@ -455,6 +455,9 @@ struct ContentView: View {
     private let isIPad = UIDevice.current.userInterfaceIdiom == .pad
     /// Whether the current window is wide enough for two-column layout.
     @State var isWideLayout = false
+
+    /// Bottom tab selection for the iPhone layout: chats or settings.
+    @State var homeTab: HomeTab = .chats
     /// Navigation path for stack (compact) layout.
     @State var navigationPath = NavigationPath()
     /// Tracks the session ID currently visible on the compact navigation stack.

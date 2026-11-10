@@ -289,7 +289,10 @@ extension ContentView {
         .overlay(alignment: .top) { folderMiniBarOverlay(scrollProxy) }
         .safeAreaInset(edge: .bottom) {
             if isSelecting { selectionToolbar }
-            else if !hidesFABForOnboarding(listIsEmpty: filteredSessions.isEmpty) { fabRow }
+            else if !hidesFABForOnboarding(listIsEmpty: filteredSessions.isEmpty) {
+                // 64pt clears the floating tab bar underneath.
+                fabRow.padding(.bottom, 64)
+            }
         }
         // [T-home-fab-keyboard-inset] Mirror of the voice panel's structural
         // immunity (604a9947 / T-voice-bg-fg-gap): with the inline search bar

@@ -40,6 +40,9 @@ private enum SettingsDestination: Hashable {
 
 struct SettingsSheet: View {
     @Binding var showTerminal: Bool
+    /// When shown as a bottom-tab page instead of a sheet, hide the Done
+    /// button — there is nothing to dismiss.
+    var embedded: Bool = false
     @AppStorage("appearanceMode") private var appearanceMode: Int = 0
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var deepLink = DeepLinkCoordinator.shared
@@ -380,8 +383,10 @@ struct SettingsSheet: View {
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                if !embedded {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Done") { dismiss() }
+                    }
                 }
             }
             .navigationDestination(for: SettingsDestination.self) { dest in

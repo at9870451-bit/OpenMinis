@@ -41,7 +41,8 @@ extension ContentView {
     // MARK: - Stack Layout (iPhone / narrow window)
 
     var stackLayout: some View {
-        NavigationStack(path: $navigationPath) {
+        ZStack(alignment: .bottom) {
+            NavigationStack(path: $navigationPath) {
             sessionList(useNavigationLinks: true)
                 .navigationDestination(for: String.self) { id in
                     // `.id(id)` mirrors detailView (iPad): navigationDestination
@@ -89,7 +90,34 @@ extension ContentView {
                             }
                     }
                 }
+            }
+            .opacity(homeTab == .chats ? 1 : 0)
+            .allowsHitTesting(homeTab == .chats)
+            .accessibilityHidden(homeTab != .chats)
+
+            if homeTab == .settings {
+                SettingsSheet(showTerminal: $showTerminal, embedded: true)
+                    .safeAreaInset(edge: .bottom) { tabBarInset }
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .trailing).combined(with: .opacity)
+                    ))
+            }
+
+            // Hidden while a conversation is pushed — it would cover the composer —
+            // and while multi-select shows its own bottom toolbar.
+            if homeTab == .chats && navigationPath.isEmpty && !isSelecting {
+                MinisFloatingTabBar(selection: $homeTab)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
+        .animation(.spring(response: 0.36, dampingFraction: 0.86), value: homeTab)
+    }
+
+    /// Room reserved at the bottom so scroll content and the FABs never sit
+    /// underneath the floating tab bar.
+    private var tabBarInset: some View {
+        Color.clear.frame(height: 66)
     }
 
     // MARK: - Detail View
