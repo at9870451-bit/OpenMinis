@@ -10,7 +10,7 @@ permissions:
 jobs:
   build:
     name: Build iOS IPA (arm64 device)
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 115
     steps:
       - name: Checkout with submodules
@@ -23,7 +23,7 @@ jobs:
           echo "Architecture: $(uname -m)"
           xcodebuild -version
           brew --version | head -1
-          go version
+          go version || true
           python3 --version
           pip3 --version
 
