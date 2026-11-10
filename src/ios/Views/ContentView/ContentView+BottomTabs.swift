@@ -9,9 +9,10 @@
 
 import SwiftUI
 
-/// The two home tabs on iPhone.
+/// The home tabs on iPhone.
 enum HomeTab: Hashable {
     case chats
+    case soul
     case settings
 }
 
@@ -25,6 +26,7 @@ struct MinisFloatingTabBar: View {
     var body: some View {
         HStack(spacing: 4) {
             tab(.chats, title: "Chats", systemImage: "bubble.left.and.text.bubble.right")
+            tab(.soul, title: "Soul", systemImage: "sparkles")
             tab(.settings, title: "Settings", systemImage: "gearshape")
         }
         .padding(5)
@@ -46,7 +48,7 @@ struct MinisFloatingTabBar: View {
                 radius: 22, x: 0, y: 10)
         .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.25 : 0.05),
                 radius: 3, x: 0, y: 1)
-        .padding(.horizontal, 52)
+        .padding(.horizontal, 28)
         .padding(.bottom, 2)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Home tabs")
@@ -63,9 +65,11 @@ struct MinisFloatingTabBar: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 15, weight: .semibold))
-                Text(title)
                     .font(.system(size: 14, weight: .semibold))
+                Text(title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
             .foregroundStyle(selected
                              ? Color.primary

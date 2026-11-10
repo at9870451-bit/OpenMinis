@@ -698,6 +698,21 @@ final class CrashReporter: NSObject, MXMetricManagerSubscriber {
                 crashType = "⚠️ FOREGROUND CRASH (SIGKILL — app was in use)"
             }
         } else if lastPhase == "background" {
+            // An idle app reclaimed by iOS while nothing was holding it is the
+            // ordinary lifecycle, not a crash. Sideloaded builds land here after
+            // every app switch (no keep-alive configured, no work in flight), and
+            // writing a "crash report" for it is pure noise.
+            if !runningShell,
+               (activeSessionCount ?? 0) == 0,
+               bgKeepAliveIntent != true,
+               (bgTaskGrants ?? 0) == 0,
+               bgSilentAudioLeg != true,
+               let rem = bgTaskRemaining, rem > 0, rem <= 20 {
+                logger.info("Previous run was reclaimed by iOS while idle in the background — normal termination, no crash report written.")
+                resetCrashLoopState()
+                removeLaunchMarker()
+                return false
+            }
             if let window = governorWindow, window >= 38 {
                 // [T-crash-heartbeat] iOS kills a background app that bills
                 // 48 CPU-s in 60 s, with no dialog and no stack. 38 is the
