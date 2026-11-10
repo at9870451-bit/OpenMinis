@@ -86,6 +86,16 @@ extension ContentView {
             }
         }
         .animation(.easeOut(duration: 0.22), value: showHistoryDrawer)
+        .sheet(item: $runtimePage) { page in
+            NavigationStack {
+                runtimeDestination(page)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { runtimePage = nil }
+                        }
+                    }
+            }
+        }
     }
 
     // MARK: - ChatGPT-style history drawer
@@ -139,6 +149,24 @@ extension ContentView {
                 .padding(.horizontal, 24)
                 .padding(.top, 22)
                 .padding(.bottom, 18)
+
+                Divider().padding(.horizontal, 24)
+
+                // Agent Runtime shortcuts, one tap from the drawer.
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach([RuntimePage.tools, .subAgents, .skills, .memory]) { page in
+                        Button {
+                            withAnimation(.easeOut(duration: 0.2)) {
+                                showHistoryDrawer = false
+                            }
+                            runtimePage = page
+                        } label: {
+                            runtimeRow(page)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, 6)
 
                 Divider().padding(.horizontal, 24)
 
@@ -209,6 +237,45 @@ extension ContentView {
 
             .background(Color(UIColor.systemBackground))
             .ignoresSafeArea(edges: .bottom)
+        }
+    }
+
+    @ViewBuilder
+    private func runtimeRow(_ page: RuntimePage) -> some View {
+        let (title, symbol, tint): (String, String, Color) = {
+            switch page {
+            case .tools:     return ("Agent Tools", "wrench.and.screwdriver.fill", .indigo)
+            case .subAgents: return ("Sub Agents", HelperAccent.glyph, HelperAccent.color)
+            case .skills:    return ("Skills", "puzzlepiece.extension", .blue)
+            case .memory:    return ("Memory", "brain.head.profile", .purple)
+            }
+        }()
+        return HStack(spacing: 12) {
+            Image(systemName: symbol)
+                .font(.system(size: 9))
+                .foregroundStyle(.white)
+                .frame(width: 21, height: 21)
+                .background(tint, in: Circle())
+            Text(title)
+                .font(.system(size: 16))
+                .foregroundStyle(.primary)
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 10)
+        .contentShape(Rectangle())
+    }
+
+    @ViewBuilder
+    private func runtimeDestination(_ page: RuntimePage) -> some View {
+        switch page {
+        case .tools:     ToolsSettingsView()
+        case .subAgents: HelperSettingsView()
+        case .skills:    SkillsManagementView()
+        case .memory:    MemoryManagementView()
         }
     }
 

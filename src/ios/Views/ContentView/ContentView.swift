@@ -70,6 +70,15 @@ import SwiftUI
 private let shareLog = AppLogger(category: "Share")
 private let draftLog = AppLogger(category: "DraftSession")
 
+/// Agent Runtime pages reachable from the history drawer.
+enum RuntimePage: String, Identifiable {
+    case tools
+    case subAgents
+    case skills
+    case memory
+    var id: String { rawValue }
+}
+
 /// Sheets triggered from the toolbar menu, consolidated into a single `.sheet(item:)`.
 enum ToolSheet: String, Identifiable {
     case settings
@@ -460,6 +469,8 @@ struct ContentView: View {
     @State var homeSessionId: String? = nil
     @State var homeDraftId: String = "__new__home"
     @State var showHistoryDrawer = false
+    /// Agent Runtime page opened from the history drawer.
+    @State var runtimePage: RuntimePage?
 
     /// Navigation path for stack (compact) layout.
     @State var navigationPath = NavigationPath()
