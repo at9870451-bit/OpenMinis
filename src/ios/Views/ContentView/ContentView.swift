@@ -473,6 +473,7 @@ struct ContentView: View {
     @State var drawerDragProgress: CGFloat? = nil
     @State var drawerSearch = ""
     @State var showDrawerSearch = false
+    @FocusState var drawerSearchFocused: Bool
     /// Agent Runtime page opened from the history drawer.
     @State var runtimePage: RuntimePage?
 

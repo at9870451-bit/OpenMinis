@@ -47,6 +47,20 @@ extension AIChatView {
                 Button { showDocumentPicker = true } label: { Label("Add File", systemImage: "doc") }
                 Divider()
                 Button {
+                    if !vm.showMentionMenu {
+                        vm.showMentionMenu = true
+                        vm.updateMentionMenuState()
+                    }
+                    inputFocused = true
+                } label: { Label("Mention a File", systemImage: "at") }
+                Button {
+                    if !vm.showMentionMenu {
+                        vm.showMentionMenu = true
+                        vm.updateMentionMenuState()
+                    }
+                    inputFocused = true
+                } label: { Label("Mention a File", systemImage: "at") }
+                Button {
                     vm.showSlashMenuOverInput()
                     inputFocused = true
                 } label: { Label("Slash Commands", systemImage: "slash.circle") }
@@ -86,7 +100,6 @@ extension AIChatView {
         AnyView(
             HStack(spacing: 2) {
                 attachmentMenuButton
-                mentionButton
             }
             .padding(.bottom, 2)
         )
@@ -104,28 +117,6 @@ extension AIChatView {
             }
             .padding(.bottom, 2)
         )
-    }
-
-    /// Bottom toolbar under the text field (+ / edit-exit / mic / send).
-    /// Returns AnyView to keep `inputBar`'s generic type compact; SwiftUI
-    /// runtime demangle chokes on deep nested types otherwise.
-    var inputBottomRow: AnyView {
-        let row = HStack(spacing: 12) {
-            attachmentMenuButton
-            mentionButton
-            if vm.editingMessageIndex != nil { editExitButton }
-            Spacer()
-            // Mutually exclusive with editExitButton: while editing a past
-            // message the exit capsule owns this row — showing both capsules
-            // overflows the row and they render overlapped.
-            if voiceInputActive, vm.editingMessageIndex == nil {
-                readAloudToolbarToggle
-                Spacer()
-            }
-            micButton
-            sendButton
-        }
-        return AnyView(row)
     }
 
     /// [T-ios-de-voice-toolbar] Fixed controls in `inputBottomRow`: two 34pt

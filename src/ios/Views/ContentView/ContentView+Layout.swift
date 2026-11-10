@@ -95,7 +95,6 @@ extension ContentView {
             }
             .clipShape(RoundedRectangle(cornerRadius: 26 * p, style: .continuous))
             .scaleEffect(1 - 0.05 * p, anchor: .leading)
-            .offset(x: drawerWidth * p)
             .overlay {
                 // Dim the page a little while the drawer is showing, keeping
                 // the glass readable rather than hiding it.
@@ -121,6 +120,10 @@ extension ContentView {
                 }
             }
             .shadow(color: .black.opacity(0.28 * p), radius: 24, x: -10, y: 0)
+            // MUST be last: an offset applied before the overlays leaves them
+            // covering the pre-offset (full-screen) frame, which swallowed
+            // every tap meant for the drawer's search field and gear.
+            .offset(x: drawerWidth * p)
             .zIndex(1)
         }
         .animation(.spring(response: 0.34, dampingFraction: 0.86), value: drawerProgress)
@@ -168,6 +171,7 @@ extension ContentView {
                         withAnimation(.easeOut(duration: 0.18)) {
                             showDrawerSearch.toggle()
                             if !showDrawerSearch { drawerSearch = "" }
+                            if showDrawerSearch { drawerSearchFocused = true }
                         }
                     } label: {
                         Image(systemName: "magnifyingglass")
@@ -224,7 +228,7 @@ extension ContentView {
                     .padding(.bottom, 10)
 
                 // MARK: Recent chats
-                Text("Recent")
+                Text(AppLocalized("Recent"))
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.45))
                     .padding(.horizontal, 22)
@@ -234,7 +238,7 @@ extension ContentView {
                     LazyVStack(spacing: 1) {
                         let visible = filteredDrawerSessions
                         if visible.isEmpty {
-                            Text("No conversations yet")
+                            Text(AppLocalized("No conversations yet"))
                                 .font(.system(size: 14))
                                 .foregroundStyle(.white.opacity(0.4))
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -260,7 +264,7 @@ extension ContentView {
                         HStack(spacing: 8) {
                             Image(systemName: "square.and.pencil")
                                 .font(.system(size: 15, weight: .semibold))
-                            Text("Chat")
+                            Text(AppLocalized("Chat"))
                                 .font(.system(size: 16, weight: .semibold))
                         }
                         .foregroundStyle(.white)
@@ -279,7 +283,9 @@ extension ContentView {
                         withAnimation(.easeOut(duration: 0.2)) {
                             showHistoryDrawer = false
                         }
-                        activeToolSheet = .settings
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+                            activeToolSheet = .settings
+                        }
                     } label: {
                         Image(systemName: "gearshape")
                             .font(.system(size: 17, weight: .medium))
@@ -297,7 +303,12 @@ extension ContentView {
             }
             .frame(maxWidth: .infinity)
             .frame(maxHeight: .infinity)
-            .background(Color.black.ignoresSafeArea())
+            .background(
+                Color(UIColor { $0.userInterfaceStyle == .dark
+                    ? UIColor(white: 0.07, alpha: 1)
+                    : UIColor(white: 0.96, alpha: 1) })
+                    .ignoresSafeArea()
+            )
         }
         .preferredColorScheme(.dark)
     }
@@ -317,10 +328,10 @@ extension ContentView {
     private func drawerNavRow(_ page: RuntimePage) -> some View {
         let meta: (title: String, symbol: String) = {
             switch page {
-            case .tools:     return ("Agent Tools", "wrench.and.screwdriver")
-            case .subAgents: return ("Sub Agents", "person.2")
-            case .skills:    return ("Skills", "puzzlepiece.extension")
-            case .memory:    return ("Memory", "brain.head.profile")
+            case .tools:     return (AppLocalized("Agent Tools"), "wrench.and.screwdriver")
+            case .subAgents: return (AppLocalized("Sub Agents"), "person.2")
+            case .skills:    return (AppLocalized("Skills"), "puzzlepiece.extension")
+            case .memory:    return (AppLocalized("Memory"), "brain.head.profile")
             }
         }()
         Button {

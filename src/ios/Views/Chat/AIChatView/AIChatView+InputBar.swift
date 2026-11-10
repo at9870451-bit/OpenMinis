@@ -119,8 +119,12 @@ extension AIChatView {
                 // the middle, voice/send on the right, all on one baseline.
                 HStack(alignment: .bottom, spacing: 6) {
                     composerLeadingButtons
+                        .fixedSize()
                     inputFieldOrWaveform
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .layoutPriority(1)
                     composerTrailingButtons
+                        .fixedSize()
                 }
                 .onGeometryChange(for: CGFloat.self) { proxy in
                     proxy.size.width
