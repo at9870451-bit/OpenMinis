@@ -30,7 +30,7 @@ jobs:
       - name: Install build dependencies
         run: |
           brew update >/dev/null 2>&1 || true
-          brew install ninja llvm libarchive pkg-config go meson >/dev/null
+          brew install ninja llvm lld libarchive pkg-config go meson >/dev/null
           meson --version
 
       - name: Provider customization config
@@ -41,6 +41,8 @@ jobs:
       - name: Build native dependencies
         run: |
           set -e
+          export PATH="/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH"
+          echo "ld.lld: $(which ld.lld || echo missing)"
           echo "=== build_lame.sh ==="
           ./deps/build_lame.sh
           echo "=== build_ffmpeg.sh ==="
