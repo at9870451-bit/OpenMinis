@@ -41,55 +41,134 @@ extension ContentView {
     // MARK: - Stack Layout (iPhone / narrow window)
 
     var stackLayout: some View {
-        NavigationStack(path: $navigationPath) {
-            sessionList(useNavigationLinks: true)
-                .navigationDestination(for: String.self) { id in
-                    // `.id(id)` mirrors detailView (iPad): navigationDestination
-                    // views are identified by stack depth, not path value, so
-                    // replacing the top element in place (menu "New Chat" swaps
-                    // [current] → [draft]) would otherwise reuse the old view's
-                    // @StateObject vm and nothing visibly changes.
-                    if id.hasPrefix("remote:") {
-                        let parts = id.split(separator: ":", maxSplits: 2)
-                        if parts.count == 3 {
-                            AIChatView(sessionId: String(parts[2]), remoteDeviceId: String(parts[1]))
-                                .id(id)
-                        }
-                    } else {
-                        AIChatView(sessionId: Self.isNewSessionId(id) ? nil : id, draftId: Self.isNewSessionId(id) ? id : nil, initialGroupId: Self.extractGroupId(from: id))
+        ZStack(alignment: .leading) {
+            NavigationStack {
+                Group {
+                    if let id = homeSessionId {
+                        AIChatView(sessionId: id)
                             .id(id)
-                            .onAppear {
-                                if currentStackSessionId != id {
-                                    currentStackSessionId = id
-                                    // [T-ios-stacknav-transition-attributegraph-race]
-                                    // Keep the outgoing-id tracker in lockstep.
-                                    // This branch fires exactly when the two
-                                    // have DIVERGED — the "swallowed push left
-                                    // currentStackSessionId set to a target
-                                    // that never appeared" case documented on
-                                    // the .moveInputToSession handler — and it
-                                    // mounts a chat WITHOUT a navigationPath
-                                    // change, so the observer that normally
-                                    // maintains previousStackSessionId does not
-                                    // run. Left unsynced, the next real
-                                    // transition would suspend whichever id the
-                                    // last observer pass recorded instead of
-                                    // the vm actually on screen: the wrong vm
-                                    // stalls and the real outgoing one keeps
-                                    // publishing into its teardown.
-                                    previousStackSessionId = id
-                                }
-                                SessionBadgeStore.shared.remove(.unread, for: id)
-                                shareLog.info("🔄SESSION stackNav APPEAR id=\(id)")
-                                HangDetector.mark("chat appear")  // [T-main-stall-marks]
-                            }
-                            .onDisappear {
-                                shareLog.info("🔄SESSION stackNav DISAPPEAR id=\(id)")
-                                HangDetector.mark("chat disappear")  // [T-main-stall-marks]
-                            }
+                    } else {
+                        AIChatView(sessionId: nil, draftId: homeDraftId)
+                            .id(homeDraftId)
                     }
                 }
+                .navigationDestination(for: String.self) { id in
+                    AIChatView(sessionId: Self.isNewSessionId(id) ? nil : id,
+                               draftId: Self.isNewSessionId(id) ? id : nil,
+                               initialGroupId: Self.extractGroupId(from: id))
+                        .id(id)
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                            startHomeChat()
+                        } label: {
+                            Image(systemName: "square.and.pencil")
+                        }
+                        .accessibilityLabel(Text("New Chat"))
+                    }
+                }
+            }
+            .contentShape(Rectangle())
+            .simultaneousGesture(historyDrawerGesture)
+
+            if showHistoryDrawer {
+                historyDrawer
+                    .transition(.move(edge: .leading))
+                    .zIndex(1)
+            }
         }
+        .animation(.easeOut(duration: 0.22), value: showHistoryDrawer)
+    }
+
+    // MARK: - ChatGPT-style history drawer
+
+    private var historyDrawerGesture: some Gesture {
+        DragGesture(minimumDistance: 24)
+            .onEnded { value in
+                if !showHistoryDrawer,
+                   value.startLocation.x < 28,
+                   value.translation.width > 60 {
+                    withAnimation { showHistoryDrawer = true }
+                } else if showHistoryDrawer, value.translation.width < -60 {
+                    withAnimation { showHistoryDrawer = false }
+                }
+            }
+    }
+
+    @ViewBuilder
+    private var historyDrawer: some View {
+        ZStack(alignment: .leading) {
+            Color.black.opacity(0.22)
+                .ignoresSafeArea()
+                .onTapGesture { withAnimation { showHistoryDrawer = false } }
+
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Chats")
+                        .font(.title2.weight(.bold))
+                    Spacer()
+                    Button {
+                        withAnimation { showHistoryDrawer = false }
+                        startHomeChat()
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                            .font(.system(size: 17, weight: .semibold))
+                    }
+                }
+                .padding(.horizontal, 18)
+                .padding(.top, 16)
+                .padding(.bottom, 10)
+
+                List {
+                    ForEach(sessions) { session in
+                        Button {
+                            withAnimation { showHistoryDrawer = false }
+                            homeSessionId = session.id
+                        } label: {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(session.title?.isEmpty == false ? session.title! : "New Chat")
+                                    .font(.system(size: 16, weight: .medium))
+                                    .foregroundStyle(.primary)
+                                    .lineLimit(1)
+                                Text(session.updatedAt, style: .relative)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .listRowBackground(homeSessionId == session.id
+                                           ? Color.primary.opacity(0.08)
+                                           : Color.clear)
+                    }
+                }
+                .listStyle(.plain)
+
+                Divider()
+                Button {
+                    withAnimation { showHistoryDrawer = false }
+                    activeToolSheet = .settings
+                } label: {
+                    Label("Settings", systemImage: "gearshape")
+                        .font(.system(size: 16, weight: .medium))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+            .frame(width: min(UIScreen.main.bounds.width * 0.84, 340))
+            .background(.regularMaterial)
+            .ignoresSafeArea(edges: .bottom)
+        }
+    }
+
+    private func startHomeChat() {
+        homeSessionId = nil
+        homeDraftId = "__new__" + UUID().uuidString
     }
 
     // MARK: - Detail View

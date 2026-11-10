@@ -456,6 +456,11 @@ struct ContentView: View {
     /// Whether the current window is wide enough for two-column layout.
     @State var isWideLayout = false
 
+    /// ChatGPT-style home: the chat shown full-screen, and its history drawer.
+    @State var homeSessionId: String? = nil
+    @State var homeDraftId: String = "__new__home"
+    @State var showHistoryDrawer = false
+
     /// Navigation path for stack (compact) layout.
     @State var navigationPath = NavigationPath()
     /// Tracks the session ID currently visible on the compact navigation stack.
