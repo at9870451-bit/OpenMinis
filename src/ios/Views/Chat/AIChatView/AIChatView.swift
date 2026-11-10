@@ -1804,27 +1804,6 @@ struct AIChatView: View {
                 // [T-keyboard-on-tap-only] Never raise the keyboard on a
                 // finished reply; only an explicit tap on the composer does.
                 return
-                if GCKeyboard.coalesced != nil {
-                    AppLogger(category: "ContextUsageHint").info("[AutoFocus] immediate (hardware keyboard) → inputFocused=true")
-                    inputFocused = true
-                } else {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        guard !hasOverlayPresented, canRunDelayedComposerFocus("after-reply") else { return }
-                        guard !vm.isProcessing, vm.promptQueue.isEmpty else { return }
-                        // Re-check: a retry started during the 1.5s window would
-                        // otherwise be focused by this older timer.
-                        guard !vm.turnStartedByRetry else { return }
-                        // Likewise a sub agent callback that landed in the gap.
-                        guard !vm.isProcessing, !vm.turnWasSilentProgrammatic else { return }
-                        let lastAssistantLength = vm.messages.last.flatMap {
-                            $0.role == .assistant ? $0.blocks.reduce(0) { $0 + $1.content.count } : nil
-                        } ?? 0
-                        if lastAssistantLength < 600 {
-                            AppLogger(category: "ContextUsageHint").info("[AutoFocus] +1.5s → inputFocused=true (lastAssistantLength=\(lastAssistantLength))")
-                            inputFocused = true
-                        }
-                    }
-                }
             }
         }
         // [T-ios-retry-hide-when-processing] Inject the view model so deep
