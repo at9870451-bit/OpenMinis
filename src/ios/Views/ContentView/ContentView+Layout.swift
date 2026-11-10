@@ -251,7 +251,7 @@ extension ContentView {
                 .padding(.bottom, 6)
                 .background(Color.black)
             }
-            .frame(width: UIScreen.main.bounds.width * 0.78)
+            .frame(width: UIScreen.main.bounds.width * 0.52)
             .frame(maxHeight: .infinity)
             .background(Color.black.ignoresSafeArea())
         }

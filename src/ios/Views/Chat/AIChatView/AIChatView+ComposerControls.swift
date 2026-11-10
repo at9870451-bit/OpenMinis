@@ -32,9 +32,9 @@ extension AIChatView {
         // iOS 17 Menu branch and the iOS 16 confirmationDialog branch below
         // announce the same thing; otherwise VoiceOver reads "plus".
         let icon = Image(systemName: "plus")
-            .font(.system(size: 18, weight: .medium))
+            .font(.system(size: 17, weight: .medium))
             .foregroundStyle(ChatColors.secondaryText)
-            .frame(width: 34, height: 34)
+            .frame(width: 32, height: 32)
             .accessibilityLabel(Text("Add attachment", comment: "VoiceOver label for the attachment button"))
             .background(ChatColors.inputIconBg)
             .clipShape(Circle())
@@ -79,6 +79,31 @@ extension AIChatView {
                 }
             }
         }
+    }
+
+    /// Leading controls of the ChatGPT-style capsule (+ and @).
+    var composerLeadingButtons: AnyView {
+        AnyView(
+            HStack(spacing: 2) {
+                attachmentMenuButton
+                mentionButton
+            }
+            .padding(.bottom, 2)
+        )
+    }
+
+    /// Trailing control: voice until there is something to send, then Send.
+    var composerTrailingButtons: AnyView {
+        AnyView(
+            Group {
+                if canSend || canEnqueue {
+                    sendButton
+                } else {
+                    micButton
+                }
+            }
+            .padding(.bottom, 2)
+        )
     }
 
     /// Bottom toolbar under the text field (+ / edit-exit / mic / send).
@@ -521,9 +546,9 @@ extension AIChatView {
                 field.fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, topPadding)
-        .padding(.bottom, 10)
+        .padding(.horizontal, 4)
+        .padding(.top, max(6, topPadding - 10))
+        .padding(.bottom, 2)
         .overlay(alignment: .top) {
             if composerResizeEnabled { composerResizeHandle }
         }

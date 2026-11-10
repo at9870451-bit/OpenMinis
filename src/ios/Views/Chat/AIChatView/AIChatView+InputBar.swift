@@ -115,26 +115,21 @@ extension AIChatView {
                     .padding(.top, 8)
                 }
 
-                inputFieldOrWaveform
-
-                inputBottomRow
-                    // [T-ios-de-voice-toolbar] Measure the row so the
-                    // read-aloud toggle can decide whether its label fits.
-                    // `onGeometryChange`, NOT a GeometryReader background —
-                    // [T-ios-geometry-observer-crash] traced an async-renderer
-                    // SIGTRAP to that scaffold, and this file already
-                    // standardised on the observer for exactly that reason.
-                    .onGeometryChange(for: CGFloat.self) { proxy in
-                        proxy.size.width
-                    } action: { w in
-                        guard w > 0, abs(w - inputBottomRowWidth) > 0.5 else { return }
-                        inputBottomRowWidth = w
-                    }
-                    // Padding applied AFTER the observer, so the measured
-                    // width is the row's own usable space and needs no
-                    // constant subtracted back out of it.
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 10)
+                // ChatGPT-style single capsule: + on the left, the text in
+                // the middle, voice/send on the right, all on one baseline.
+                HStack(alignment: .bottom, spacing: 6) {
+                    composerLeadingButtons
+                    inputFieldOrWaveform
+                    composerTrailingButtons
+                }
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.width
+                } action: { w in
+                    guard w > 0, abs(w - inputBottomRowWidth) > 0.5 else { return }
+                    inputBottomRowWidth = w
+                }
+                .padding(.horizontal, 8)
+                .padding(.bottom, 8)
             })
             .contentShape(RoundedRectangle(cornerRadius: 20))
             .onTapGesture { inputFocused = true }
