@@ -1,0 +1,88 @@
+name: Build iOS IPA
+on:
+  push:
+    branches: [feat/ios-build]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build iOS IPA (arm64 device)
+    runs-on: macos-15
+    timeout-minutes: 115
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Environment info
+        run: |
+          echo "Architecture: $(uname -m)"
+          xcodebuild -version
+          brew --version | head -1
+          go version
+          python3 --version
+          pip3 --version
+
+      - name: Install build dependencies
+        run: |
+          brew update >/dev/null 2>&1 || true
+          brew install ninja llvm libarchive pkg-config go >/dev/null
+          pip3 install meson >/dev/null 2>&1 || python3 -m pip install meson >/dev/null
+
+      - name: Provider customization config
+        run: |
+          cp src/ios/Configs/ProviderCustomization.xcconfig.example \
+             src/ios/Configs/ProviderCustomization.xcconfig
+
+      - name: Build native dependencies
+        run: |
+          set -e
+          echo "=== build_lame.sh ==="
+          ./deps/build_lame.sh
+          echo "=== build_ffmpeg.sh ==="
+          ./deps/build_ffmpeg.sh
+          echo "=== build_ish.sh ==="
+          ./deps/build_ish.sh
+          echo "=== prepare_alpine_rootfs.sh ==="
+          ./deps/prepare_alpine_rootfs.sh
+          echo "=== build_rclone_ios.sh ==="
+          ./deps/build_rclone_ios.sh
+
+      - name: Build Minis app
+        run: |
+          set -o pipefail
+          xcodebuild -project src/ios/Minis.xcodeproj \
+            -scheme Minis \
+            -configuration Release \
+            -derivedDataPath build \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tee build.log
+
+      - name: Package IPA
+        run: |
+          set -e
+          APP=$(find build -name "Minis.app" -maxdepth 5 | head -1)
+          if [ -z "$APP" ] || [ ! -d "$APP" ]; then
+            echo "ERROR: Minis.app not found in build output"
+            exit 1
+          fi
+          echo "Found: $APP"
+          rm -rf Payload
+          mkdir -p Payload
+          cp -r "$APP" Payload/
+          zip -r -y Minis.ipa Payload
+          echo "IPA size: $(du -h Minis.ipa)"
+          cp Minis.ipa ./Minis-Release.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: minis-ios-ipa
+          path: Minis-Release.ipa
+          if-no-files-found: error
+          retention-days: 7
