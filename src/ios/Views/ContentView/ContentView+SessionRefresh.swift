@@ -72,7 +72,7 @@ extension ContentView {
         Task(priority: .utility) { @MainActor in
             // [T-p1-delegate-task] Hidden child sessions never reach the
             // sidebar; they are entered from their parent's helper block.
-            sessions = await ChatStore.shared.listSessions().filter { !$0.isChild && !ChatTabRegistry.hiddenIds.contains($0.id) }
+            sessions = await ChatStore.shared.listSessions().filter { !$0.isChild }
             // [T-ios-moveto-seed] Keep the picker's seed current: this refresh
             // runs on every list-affecting change, so the snapshot tracks the
             // sidebar rather than going stale after the first load.
