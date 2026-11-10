@@ -456,8 +456,6 @@ struct ContentView: View {
     /// Whether the current window is wide enough for two-column layout.
     @State var isWideLayout = false
 
-    /// Bottom tab selection for the iPhone layout: chats or settings.
-    @State var homeTab: HomeTab = .chats
     /// Navigation path for stack (compact) layout.
     @State var navigationPath = NavigationPath()
     /// Tracks the session ID currently visible on the compact navigation stack.
@@ -579,15 +577,6 @@ struct ContentView: View {
                     ForceSyncToastBanner(text: toast)
                         .transition(.move(edge: .top).combined(with: .opacity))
                         .padding(.top, 8)
-                }
-            }
-            // Global floating tab bar: it must stay visible on the Settings
-            // page too, otherwise there is no way back to Chats.
-            .overlay(alignment: .bottom) {
-                if !wide, !isSelecting,
-                   homeTab == .settings || navigationPath.isEmpty {
-                    MinisFloatingTabBar(selection: $homeTab)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
             .animation(.easeInOut(duration: 0.25), value: forceSyncToast)

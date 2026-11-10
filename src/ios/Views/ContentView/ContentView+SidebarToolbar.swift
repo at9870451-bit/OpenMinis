@@ -343,9 +343,7 @@ extension ContentView {
                     isSelecting = false
                     selectedIds.removeAll()
                 }
-            } else if isWideLayout {
-                // iPhone reaches Settings through the bottom tab bar now;
-                // keep the gear only where that bar isn't shown (iPad / wide).
+            } else {
                 Button {
                     activeToolSheet = .settings
                 } label: {

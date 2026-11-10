@@ -41,8 +41,7 @@ extension ContentView {
     // MARK: - Stack Layout (iPhone / narrow window)
 
     var stackLayout: some View {
-        ZStack(alignment: .bottom) {
-            NavigationStack(path: $navigationPath) {
+        NavigationStack(path: $navigationPath) {
             sessionList(useNavigationLinks: true)
                 .navigationDestination(for: String.self) { id in
                     // `.id(id)` mirrors detailView (iPad): navigationDestination
@@ -90,27 +89,7 @@ extension ContentView {
                             }
                     }
                 }
-            }
-            .opacity(homeTab == .chats ? 1 : 0)
-            .allowsHitTesting(homeTab == .chats)
-            .accessibilityHidden(homeTab != .chats)
-
-            if homeTab == .settings {
-                SettingsSheet(showTerminal: $showTerminal, embedded: true)
-                    .safeAreaInset(edge: .bottom) { tabBarInset }
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .trailing).combined(with: .opacity)
-                    ))
-            }
         }
-        .animation(.spring(response: 0.36, dampingFraction: 0.86), value: homeTab)
-    }
-
-    /// Room reserved at the bottom so scroll content and the FABs never sit
-    /// underneath the floating tab bar.
-    private var tabBarInset: some View {
-        Color.clear.frame(height: 66)
     }
 
     // MARK: - Detail View
