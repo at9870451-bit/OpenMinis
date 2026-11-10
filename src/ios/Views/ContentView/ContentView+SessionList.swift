@@ -23,16 +23,7 @@ extension ContentView {
                 splitList
             }
         }
-        // Hardware ⌘F → focus search, available while the session list is on
-        // screen (iPad/Mac keyboards). A zero-opacity button carries the
-        // shortcut without affecting layout; it lives in the list's view tree so
-        // the command only fires when the list is visible, not inside a chat.
-        .background {
-            Button(action: focusSearch) { EmptyView() }
-                .keyboardShortcut("f", modifiers: .command)
-                .opacity(0)
-                .accessibilityHidden(true)
-        }
+        // Search was removed from the home screen (use the list directly).
         // [T-ios-migration-timer-toolbar-uaf-crash / T-ios-migration-timer-sessionlist-uaf-crash]
         // Own the migration-subtitle refresh driver here, on the stable sidebar list
         // body, instead of on the churny toolbar principal item (see `titleLabel`).
@@ -288,10 +279,11 @@ extension ContentView {
         .overlay { if didInitialLoad, filteredSessions.isEmpty, !isSearching { emptyState } }
         .overlay(alignment: .top) { folderMiniBarOverlay(scrollProxy) }
         .safeAreaInset(edge: .bottom) {
-            if isSelecting { selectionToolbar }
-            else if !hidesFABForOnboarding(listIsEmpty: filteredSessions.isEmpty) {
-                // 64pt clears the floating tab bar underneath.
-                fabRow.padding(.bottom, 64)
+            if isSelecting {
+                selectionToolbar
+            } else {
+                // Room for the floating tab bar so the last row clears it.
+                Color.clear.frame(height: 66)
             }
         }
         // [T-home-fab-keyboard-inset] Mirror of the voice panel's structural
@@ -384,7 +376,6 @@ extension ContentView {
         .overlay(alignment: .top) { folderMiniBarOverlay(scrollProxy) }
         .safeAreaInset(edge: .bottom) {
             if isSelecting { selectionToolbar }
-            else if !hidesFABForOnboarding(listIsEmpty: displaySessions.isEmpty) { fabRow }
         }
         // [T-home-fab-keyboard-inset] Same structural immunity as the compact
         // list above — see that call site for the full rationale. On iPad the

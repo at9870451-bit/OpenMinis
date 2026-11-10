@@ -354,6 +354,17 @@ extension ContentView {
             }
         }
         ToolbarItem(placement: .topBarTrailing) {
+            if !isSelecting {
+                // The floating new-chat button is gone; keep the action in the
+                // nav bar so starting a conversation is still one tap away.
+                Button {
+                    handleNewChatRequest()
+                } label: {
+                    Image(systemName: "square.and.pencil")
+                }
+            }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
             if isSelecting {
                 Button(selectedIds.count == sessions.count ? "Deselect All" : "Select All") {
                     if selectedIds.count == sessions.count {

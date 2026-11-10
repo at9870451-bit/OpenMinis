@@ -103,13 +103,6 @@ extension ContentView {
                         removal: .move(edge: .trailing).combined(with: .opacity)
                     ))
             }
-
-            // Hidden while a conversation is pushed — it would cover the composer —
-            // and while multi-select shows its own bottom toolbar.
-            if homeTab == .chats && navigationPath.isEmpty && !isSelecting {
-                MinisFloatingTabBar(selection: $homeTab)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
         }
         .animation(.spring(response: 0.36, dampingFraction: 0.86), value: homeTab)
     }

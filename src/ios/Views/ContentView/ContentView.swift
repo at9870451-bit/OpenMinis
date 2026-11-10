@@ -367,8 +367,8 @@ struct ContentView: View {
     /// Controls sidebar visibility on iPad (automatic handles iPhone collapse).
     @State var columnVisibility: NavigationSplitViewVisibility = .automatic
 
-    /// Launch screen preference: 0=Auto, 1=Last Session, 2=New Chat.
-    @AppStorage("launchScreen") private var launchScreen: Int = 0
+    /// Launch screen preference: 0=Auto, 1=Last Session, 2=New Chat, 3=Home.
+    @AppStorage("launchScreen") private var launchScreen: Int = 3
     /// FAB position preference: false = right (default), true = left.
     @AppStorage("fabOnLeft") var fabOnLeft = false
     /// Mirror of `SyncV2Bootstrap.isEnabled` so SwiftUI re-evaluates
@@ -579,6 +579,15 @@ struct ContentView: View {
                     ForceSyncToastBanner(text: toast)
                         .transition(.move(edge: .top).combined(with: .opacity))
                         .padding(.top, 8)
+                }
+            }
+            // Global floating tab bar: it must stay visible on the Settings
+            // page too, otherwise there is no way back to Chats.
+            .overlay(alignment: .bottom) {
+                if !wide, !isSelecting,
+                   homeTab == .settings || navigationPath.isEmpty {
+                    MinisFloatingTabBar(selection: $homeTab)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
             .animation(.easeInOut(duration: 0.25), value: forceSyncToast)
@@ -1089,13 +1098,11 @@ struct ContentView: View {
                 case 3:
                     break
                 default:
-                    if !sessions.isEmpty,
-                       let latest = sessions.first,
-                       Date().timeIntervalSince(latest.updatedAt) > 15 * 60 {
-                        var tx = Transaction()
-                        tx.disablesAnimations = true
-                        withTransaction(tx) { openSession(Self.makeNewSessionId()) }
-                    } else if isWideLayout, let latest = sessions.first {
+                    // Auto: land on the session list on iPhone — no forced
+                    // new chat and no auto-restore of the last conversation.
+                    // iPad keeps restoring the latest session into the detail
+                    // pane, which is what its split layout expects.
+                    if isWideLayout, let latest = sessions.first {
                         var tx = Transaction()
                         tx.disablesAnimations = true
                         withTransaction(tx) { openSession(latest.id) }
