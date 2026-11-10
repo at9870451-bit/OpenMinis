@@ -117,7 +117,7 @@ extension AIChatView {
 
                 // ChatGPT-style single capsule: + on the left, the text in
                 // the middle, voice/send on the right, all on one baseline.
-                HStack(alignment: .bottom, spacing: 6) {
+                HStack(alignment: composerIsEmpty ? .center : .bottom, spacing: 6) {
                     composerLeadingButtons
                         .fixedSize()
                     inputFieldOrWaveform

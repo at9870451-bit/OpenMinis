@@ -103,7 +103,7 @@ extension ContentView {
             }
             .overlay {
                 if p > 0.001 {
-                    Color.clear
+                    Color.white.opacity(0.001)
                         .contentShape(Rectangle())
                         .onTapGesture { snapDrawer(open: false) }
                         .gesture(
@@ -160,7 +160,7 @@ extension ContentView {
             VStack(alignment: .leading, spacing: 0) {
                 // MARK: Header
                 HStack(alignment: .center, spacing: 12) {
-                    Text("Minis")
+                    Text("Amore")
                         .font(.system(size: 27, weight: .bold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
@@ -303,12 +303,15 @@ extension ContentView {
             }
             .frame(maxWidth: .infinity)
             .frame(maxHeight: .infinity)
-            .background(
-                Color(UIColor { $0.userInterfaceStyle == .dark
-                    ? UIColor(white: 0.07, alpha: 1)
-                    : UIColor(white: 0.96, alpha: 1) })
-                    .ignoresSafeArea()
-            )
+            .background {
+                // Frosted glass, so the drawer reads as a separate, slightly
+                // lifted surface next to the opaque conversation card.
+                ZStack {
+                    Rectangle().fill(.ultraThinMaterial)
+                    Color.black.opacity(0.45)
+                }
+                .ignoresSafeArea()
+            }
         }
         .preferredColorScheme(.dark)
     }

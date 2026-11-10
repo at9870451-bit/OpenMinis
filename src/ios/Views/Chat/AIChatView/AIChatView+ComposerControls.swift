@@ -95,6 +95,12 @@ extension AIChatView {
         }
     }
 
+    /// True while the capsule has no text and no attachments: the row is a
+    /// single line, so its buttons centre instead of sitting on the baseline.
+    var composerIsEmpty: Bool {
+        vm.inputText.isEmpty && vm.attachments.isEmpty && vm.loadingVideoCount == 0
+    }
+
     /// Leading controls of the ChatGPT-style capsule (+ and @).
     var composerLeadingButtons: AnyView {
         AnyView(
