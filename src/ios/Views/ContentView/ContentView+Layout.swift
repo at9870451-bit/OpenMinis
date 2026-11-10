@@ -41,7 +41,18 @@ extension ContentView {
     // MARK: - Stack Layout (iPhone / narrow window)
 
     var stackLayout: some View {
-        ZStack(alignment: .leading) {
+        let drawerWidth = UIScreen.main.bounds.width * 0.78
+        let p = min(1, max(0, drawerProgress))
+
+        return ZStack(alignment: .leading) {
+            // Bottom layer: the drawer itself, full height, pinned left.
+            historyDrawer
+                .frame(width: drawerWidth)
+                .frame(maxHeight: .infinity)
+                .zIndex(0)
+
+            // Top layer: the conversation, sliding right and shrinking into a
+            // floating card. Entire page moves — nav bar included.
             NavigationStack {
                 Group {
                     if let id = homeSessionId {
@@ -71,21 +82,48 @@ extension ContentView {
             }
             .background {
                 // System screen-edge pan: works over the UIKit message list.
-                EdgeSwipeCatcher {
-                    withAnimation(.easeOut(duration: 0.22)) {
-                        showHistoryDrawer = true
+                EdgeSwipeCatcher(
+                    onProgress: { fraction in
+                        drawerDragProgress = fraction
+                    },
+                    onEnd: { fraction, velocity in
+                        let shouldOpen = fraction > 0.5 || velocity > 500
+                        snapDrawer(open: shouldOpen)
                     }
-                }
+                )
                 .allowsHitTesting(false)
             }
-
-            if showHistoryDrawer {
-                historyDrawer
-                    .transition(.move(edge: .leading))
-                    .zIndex(1)
+            .clipShape(RoundedRectangle(cornerRadius: 26 * p, style: .continuous))
+            .scaleEffect(1 - 0.05 * p, anchor: .leading)
+            .offset(x: drawerWidth * p)
+            .overlay {
+                // Dim the page a little while the drawer is showing, keeping
+                // the glass readable rather than hiding it.
+                Color.black.opacity(0.18 * p)
+                    .allowsHitTesting(false)
             }
+            .overlay {
+                if p > 0.001 {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .onTapGesture { snapDrawer(open: false) }
+                        .gesture(
+                            DragGesture(minimumDistance: 12)
+                                .onChanged { value in
+                                    let fraction = 1 + value.translation.width / drawerWidth
+                                    drawerDragProgress = min(1, max(0, fraction))
+                                }
+                                .onEnded { value in
+                                    let projected = 1 + value.predictedEndTranslation.width / drawerWidth
+                                    snapDrawer(open: projected > 0.5)
+                                }
+                        )
+                }
+            }
+            .shadow(color: .black.opacity(0.28 * p), radius: 24, x: -10, y: 0)
+            .zIndex(1)
         }
-        .animation(.easeOut(duration: 0.22), value: showHistoryDrawer)
+        .animation(.spring(response: 0.34, dampingFraction: 0.86), value: drawerProgress)
         .sheet(item: $runtimePage) { page in
             NavigationStack {
                 runtimeDestination(page)
@@ -98,18 +136,24 @@ extension ContentView {
         }
     }
 
+    /// Live drawer position: follows the finger while dragging, otherwise
+    /// snaps to 0 (closed) or 1 (open).
+    var drawerProgress: CGFloat {
+        drawerDragProgress ?? (showHistoryDrawer ? 1 : 0)
+    }
+
+    func snapDrawer(open: Bool) {
+        drawerDragProgress = nil
+        withAnimation(.spring(response: 0.34, dampingFraction: 0.86)) {
+            showHistoryDrawer = open
+        }
+    }
+
     // MARK: - ChatGPT-style history drawer
 
     @ViewBuilder
     private var historyDrawer: some View {
         ZStack(alignment: .leading) {
-            // Dimmed conversation behind the panel; tap to close.
-            Color.black.opacity(0.25)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    withAnimation(.easeOut(duration: 0.22)) { showHistoryDrawer = false }
-                }
-
             VStack(alignment: .leading, spacing: 0) {
                 // MARK: Header
                 HStack(alignment: .center, spacing: 12) {
@@ -251,7 +295,7 @@ extension ContentView {
                 .padding(.bottom, 6)
                 .background(Color.black)
             }
-            .frame(width: UIScreen.main.bounds.width * 0.52)
+            .frame(maxWidth: .infinity)
             .frame(maxHeight: .infinity)
             .background(Color.black.ignoresSafeArea())
         }

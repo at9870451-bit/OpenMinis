@@ -14,10 +14,14 @@ import SwiftUI
 import UIKit
 
 struct EdgeSwipeCatcher: UIViewControllerRepresentable {
-    /// Called when a left-edge pan is recognised.
-    var onSwipe: () -> Void
+    /// Live progress 0…1 while the finger moves (fraction of drawer width).
+    var onProgress: (CGFloat) -> Void
+    /// Final progress and horizontal velocity when the finger lifts.
+    var onEnd: (CGFloat, CGFloat) -> Void
 
-    func makeCoordinator() -> Coordinator { Coordinator(onSwipe: onSwipe) }
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onProgress: onProgress, onEnd: onEnd)
+    }
 
     func makeUIViewController(context: Context) -> CatcherViewController {
         let vc = CatcherViewController()
@@ -26,7 +30,8 @@ struct EdgeSwipeCatcher: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ vc: CatcherViewController, context: Context) {
-        context.coordinator.onSwipe = onSwipe
+        context.coordinator.onProgress = onProgress
+        context.coordinator.onEnd = onEnd
         vc.coordinator = context.coordinator
         vc.attachIfPossible()
     }
@@ -59,12 +64,18 @@ struct EdgeSwipeCatcher: UIViewControllerRepresentable {
     }
 
     final class Coordinator: NSObject {
-        var onSwipe: () -> Void
+        var onProgress: (CGFloat) -> Void
+        var onEnd: (CGFloat, CGFloat) -> Void
         private weak var installedWindow: UIWindow?
         private var recognizer: UIScreenEdgePanGestureRecognizer?
+        /// Drawer width the progress is normalised against, refreshed from the
+        /// window bounds on each gesture.
+        private var drawerWidth: CGFloat = 320
 
-        init(onSwipe: @escaping () -> Void) {
-            self.onSwipe = onSwipe
+        init(onProgress: @escaping (CGFloat) -> Void,
+             onEnd: @escaping (CGFloat, CGFloat) -> Void) {
+            self.onProgress = onProgress
+            self.onEnd = onEnd
         }
 
         func attach(to window: UIWindow) {
@@ -81,11 +92,20 @@ struct EdgeSwipeCatcher: UIViewControllerRepresentable {
         }
 
         @objc private func handle(_ g: UIScreenEdgePanGestureRecognizer) {
-            guard g.state == .ended else { return }
-            let translation = g.translation(in: g.view).x
-            let velocity = g.velocity(in: g.view).x
-            guard translation > 40 || velocity > 400 else { return }
-            onSwipe()
+            let view = g.view
+            drawerWidth = max(240, (view?.bounds.width ?? 390) * 0.78)
+            let translation = max(0, g.translation(in: view).x)
+            let progress = min(1, translation / drawerWidth)
+
+            switch g.state {
+            case .changed:
+                onProgress(progress)
+            case .ended, .cancelled:
+                let velocity = g.velocity(in: view).x
+                onEnd(progress, velocity)
+            default:
+                break
+            }
         }
     }
 }
