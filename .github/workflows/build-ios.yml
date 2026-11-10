@@ -30,8 +30,8 @@ jobs:
       - name: Install build dependencies
         run: |
           brew update >/dev/null 2>&1 || true
-          brew install ninja llvm libarchive pkg-config go >/dev/null
-          pip3 install meson >/dev/null 2>&1 || python3 -m pip install meson >/dev/null
+          brew install ninja llvm libarchive pkg-config go meson >/dev/null
+          meson --version
 
       - name: Provider customization config
         run: |
