@@ -1455,11 +1455,8 @@ struct AIChatView: View {
                 }
             } else {
                 minisLogger.info("🔄SESSION AIChatView.onAppear nil sessionId — draft mode")
-                // Draft session — auto-focus input for immediate typing
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                    guard !hasOverlayPresented, canRunDelayedComposerFocus("draft") else { return }
-                    inputFocused = true
-                }
+                // Keyboard only appears when the user taps the field (or the
+                // search bar) — no auto-focus on a fresh draft.
             }
             minisLogger.info("[Share] AIChatView.onAppear: sessionId=\(sessionId ?? "nil") bufferVersion=\(shareCoordinator.bufferVersion) hasBuffer=\(shareCoordinator.pendingShareBuffer != nil)")
             injectPendingShareIfNeeded()
@@ -1804,6 +1801,9 @@ struct AIChatView: View {
                 let wasSilent = vm.turnWasSilentProgrammatic
                 vm.turnWasSilentProgrammatic = false
                 guard !wasSilent else { return }
+                // [T-keyboard-on-tap-only] Never raise the keyboard on a
+                // finished reply; only an explicit tap on the composer does.
+                return
                 if GCKeyboard.coalesced != nil {
                     AppLogger(category: "ContextUsageHint").info("[AutoFocus] immediate (hardware keyboard) → inputFocused=true")
                     inputFocused = true

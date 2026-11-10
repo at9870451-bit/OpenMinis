@@ -45,6 +45,17 @@ extension AIChatView {
                 Button { showCamera = true } label: { Label("Take Photo", systemImage: "camera") }
                 Button { showPhotoPicker = true } label: { Label("Choose Photos & Videos", systemImage: "photo.on.rectangle") }
                 Button { showDocumentPicker = true } label: { Label("Add File", systemImage: "doc") }
+                Divider()
+                Button {
+                    vm.showSlashMenuOverInput()
+                    inputFocused = true
+                } label: { Label("Slash Commands", systemImage: "slash.circle") }
+                Button {
+                    toggleVoiceInput()
+                } label: {
+                    Label(voiceInputActive ? "Keyboard Input" : "Voice Input",
+                          systemImage: voiceInputActive ? "keyboard" : "mic")
+                }
             } label: {
                 icon
             }
@@ -56,6 +67,16 @@ extension AIChatView {
                 Button { showCamera = true } label: { Label("Take Photo", systemImage: "camera") }
                 Button { showPhotoPicker = true } label: { Label("Choose Photos & Videos", systemImage: "photo.on.rectangle") }
                 Button { showDocumentPicker = true } label: { Label("Add File", systemImage: "doc") }
+                Button {
+                    vm.showSlashMenuOverInput()
+                    inputFocused = true
+                } label: { Label("Slash Commands", systemImage: "slash.circle") }
+                Button {
+                    toggleVoiceInput()
+                } label: {
+                    Label(voiceInputActive ? "Keyboard Input" : "Voice Input",
+                          systemImage: voiceInputActive ? "keyboard" : "mic")
+                }
             }
         }
     }
@@ -65,8 +86,8 @@ extension AIChatView {
     /// runtime demangle chokes on deep nested types otherwise.
     var inputBottomRow: AnyView {
         let row = HStack(spacing: 12) {
+            // Everything except sending lives in the + menu now.
             attachmentMenuButton
-            slashMenuButton
             if vm.editingMessageIndex != nil { editExitButton }
             Spacer()
             // Mutually exclusive with editExitButton: while editing a past
@@ -76,7 +97,6 @@ extension AIChatView {
                 readAloudToolbarToggle
                 Spacer()
             }
-            micButtonContainer
             sendButton
         }
         return AnyView(row)
@@ -263,26 +283,18 @@ extension AIChatView {
     }
 
     /// Mic button plus the attached language-picker sheet.
-    private var micButtonContainer: some View {
-        MicButton(speechManager: speechManager, inputFocused: $inputFocused, onTap: {
-            if voiceInputActive {
-                // Already in voice mode — the "T" button switches back to text.
-                // [T-ios-voice-keyboard-text-carry] Keep the transcript: the
-                // composer mirrors it, so clearing here would empty the input
-                // box and lose the dictated text on the way back to keyboard.
-                voiceVM.reset(clearTranscript: false)
-                withAnimation(.easeInOut(duration: 0.2)) { voiceInputActive = false }
-            } else {
-                // Mark the composition as voice-assisted (committed to the
-                // "voice" input-mode preference only at send time). Switch the
-                // composer into inline voice mode — the single voice entry point.
-                vm.voiceUsedInComposition = true
-                // Switching text→voice opens the panel expanded this one time;
-                // afterwards it resumes the remembered expand/compact state.
-                VoiceModePreference.shared.enteredFromText = true
-                withAnimation(.easeInOut(duration: 0.2)) { voiceInputActive = true }
-            }
-        }, isVoiceActive: voiceInputActive)
+    /// Voice mode toggle, now driven from the + menu instead of a mic button.
+    func toggleVoiceInput() {
+        if voiceInputActive {
+            // Keep the transcript: the composer mirrors it, so clearing here
+            // would lose the dictated text on the way back to the keyboard.
+            voiceVM.reset(clearTranscript: false)
+            withAnimation(.easeInOut(duration: 0.2)) { voiceInputActive = false }
+        } else {
+            vm.voiceUsedInComposition = true
+            VoiceModePreference.shared.enteredFromText = true
+            withAnimation(.easeInOut(duration: 0.2)) { voiceInputActive = true }
+        }
     }
 
     /// Send / Enqueue / Stop circular button.

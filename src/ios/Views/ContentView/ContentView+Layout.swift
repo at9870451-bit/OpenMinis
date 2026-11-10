@@ -102,9 +102,13 @@ extension ContentView {
 
     @ViewBuilder
     private var historyDrawer: some View {
-        ZStack(alignment: .bottom) {
-            // Pure black, no gradients.
-            Color.black.ignoresSafeArea()
+        ZStack(alignment: .leading) {
+            // Dimmed conversation behind the panel; tap to close.
+            Color.black.opacity(0.25)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation(.easeOut(duration: 0.22)) { showHistoryDrawer = false }
+                }
 
             VStack(alignment: .leading, spacing: 0) {
                 // MARK: Header
@@ -242,6 +246,9 @@ extension ContentView {
                 .padding(.bottom, 6)
                 .background(Color.black)
             }
+            .frame(width: UIScreen.main.bounds.width * 0.86)
+            .frame(maxHeight: .infinity)
+            .background(Color.black.ignoresSafeArea())
         }
         .preferredColorScheme(.dark)
     }
