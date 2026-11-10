@@ -388,21 +388,6 @@ struct MinisApp: App {
                     // which is bind-mounted into the guest at /var/minis/shared
                     // and is itself the Shared Files backup category. Move any
                     // leftovers out of the agent-visible workspace.
-                    BackupDelivery.migrateLegacySharedBackups()
-                    // [T-ios-backup-rollback-persistence] If a restore was
-                    // killed mid-flight, put back whatever snapshot survived
-                    // and log it — previously nothing knew a restore had even
-                    // been interrupted.
-                    BackupRestoreJournal.reconcileAtLaunch()
-                    // [review I6] Remove staging trees no marker points at.
-                    // `defer` cleanup only runs when the process survives, so
-                    // an export killed mid-flight used to leave hundreds of MB
-                    // in tmp/ that nothing ever swept.
-                    BackupExportJournal.sweepAbandoned()
-                    // A run still marked .running means the app died mid
-                    // backup; without this the list shows a spinner forever
-                    // for something that will never finish.
-                    BackupHistory.shared.reconcileInterrupted()
                     // NOTE: deliberately NOT releasing the backup keep-alive
                     // here. It looks like useful belt-and-braces and is
                     // actually all downside:
@@ -419,8 +404,6 @@ struct MinisApp: App {
                     // in BackupRunController.finished(token:).
                     // Migrate legacy provider config on first launch after upgrade
                     ProviderMigration.migrateIfNeeded(store: ProviderConfigStore.shared)
-                    // Refresh model lists once per day to keep them current
-                    ProviderConfigStore.shared.refreshAllModelsIfNeeded()
                     // [T-mimo-shadow-voice] One-time upgrade fix: force-refresh
                     // mixed-modality providers (MiMo/DashScope) mis-classified by
                     // the old voice-only whitelist, so their text models + shadow
@@ -437,25 +420,42 @@ struct MinisApp: App {
                     BackgroundKeepAliveManager.shared.setup()
                     // Monitor network changes to keep iSH DNS up to date
                     NetworkMonitor.shared.start()
-                    // [T-provider-quota] Foreground-only upstream quota refresh.
-                    QuotaStore.shared.start()
-                    // Register FileProvider domain for shared files
-                    Self.registerFileProviderDomain()
-                    // Migrate legacy shared dir to App Group container
-                    Self.migrateSharedDirToAppGroup()
-                    // Trace the resolved AppGroup paths so we can confirm the
-                    // main app, FileProvider extension, and iSH bind mount all
-                    // agree on which directory holds the user's shared files.
-                    Self.logFPSyncTracePaths()
-                    // Start watching shared/skills/memory subtrees so iSH writes
-                    // and FileBrowserView mutations propagate to the Files app.
-                    AppGroupChangeWatcher.shared.start()
-                    // Activate security scopes for user-mounted external folders
-                    // (e.g. Obsidian vault in iCloud Drive). Held for app lifetime.
-                    MountedFoldersManager.shared.activateAll()
-                    // Create /var/minis/mounts/<name> symlinks in the fakefs now
-                    // that the rootfs exists and mounts are active.
-                    AIChatViewModel.refreshMountedFolderSymlinks()
+                    // [perf] The rest of the launch chores touch the disk,
+                    // the network or ExtensionKit and used to run inline in
+                    // `onAppear`, where they lengthened the first-frame hitch
+                    // (MainStall showed 100-170 ms spans right after the list
+                    // pass). Everything below is idempotent and none of it is
+                    // needed to draw the session list, so give the first
+                    // frame the main thread and run it right after.
+                    Task { @MainActor in
+                        try? await Task.sleep(nanoseconds: 600_000_000)
+                        // Journal sweeps + interrupted-backup reconciliation
+                        BackupDelivery.migrateLegacySharedBackups()
+                        BackupRestoreJournal.reconcileAtLaunch()
+                        BackupExportJournal.sweepAbandoned()
+                        BackupHistory.shared.reconcileInterrupted()
+                        // Refresh model lists once per day to keep them current
+                        ProviderConfigStore.shared.refreshAllModelsIfNeeded()
+                        // [T-provider-quota] Foreground-only upstream quota refresh.
+                        QuotaStore.shared.start()
+                        // Register FileProvider domain for shared files
+                        Self.registerFileProviderDomain()
+                        // Migrate legacy shared dir to App Group container
+                        Self.migrateSharedDirToAppGroup()
+                        // Trace the resolved AppGroup paths so we can confirm the
+                        // main app, FileProvider extension, and iSH bind mount all
+                        // agree on which directory holds the user's shared files.
+                        Self.logFPSyncTracePaths()
+                        // Start watching shared/skills/memory subtrees so iSH writes
+                        // and FileBrowserView mutations propagate to the Files app.
+                        AppGroupChangeWatcher.shared.start()
+                        // Activate security scopes for user-mounted external folders
+                        // (e.g. Obsidian vault in iCloud Drive). Held for app lifetime.
+                        MountedFoldersManager.shared.activateAll()
+                        // Create /var/minis/mounts/<name> symlinks in the fakefs now
+                        // that the rootfs exists and mounts are active.
+                        AIChatViewModel.refreshMountedFolderSymlinks()
+                    }
                     // Start iCloud sync engine. v2 takes precedence when its
                     // feature flag is on (see SyncV2Bootstrap); v1 stays
                     // paused while v2 is active. When v2 is off, v1 boots

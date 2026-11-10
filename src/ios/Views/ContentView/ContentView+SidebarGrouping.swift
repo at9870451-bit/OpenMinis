@@ -765,7 +765,14 @@ enum HomeListPerf {
 
     private static let logger = AppLogger(category: "HomeListPerf")
     /// Line sink and window timer; replaced by the standalone test.
-    nonisolated(unsafe) static var emit: (String) -> Void = { logger.info($0) }
+    nonisolated(unsafe) static var emit: (String) -> Void = {
+        // [perf] Release builds keep the counters but skip the per-window
+        // string formatting + os_log write; the diagnostics are only worth
+        // their cost while developing.
+        #if DEBUG
+        logger.info($0)
+        #endif
+    }
     nonisolated(unsafe) static var schedule: (Double, @escaping () -> Void) -> Void = { delay, work in
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
     }

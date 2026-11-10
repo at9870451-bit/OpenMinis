@@ -42,10 +42,10 @@ struct MinisFloatingTabBar: View {
                 )
         }
         // Soft, wide shadow keeps the bar floating above the list.
-        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.45 : 0.12),
-                radius: 22, x: 0, y: 10)
-        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.25 : 0.05),
-                radius: 3, x: 0, y: 1)
+        // One soft shadow only — a second shadow doubled the offscreen
+        // blur cost of a bar that floats over a scrolling list.
+        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.40 : 0.10),
+                radius: 14, x: 0, y: 8)
         .padding(.horizontal, 28)
         .padding(.bottom, 2)
         .accessibilityElement(children: .contain)
