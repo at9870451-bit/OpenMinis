@@ -61,7 +61,7 @@ enum FileProviderBootHealth {
     /// costs nothing, while a genuine loop is caught within three app launches.
     static let tripThreshold = 3
 
-    private static let appGroupId = "group.com.openminis.app"
+    private static let appGroupId = "group.com.openAmroe.app"
     private static let fileName = "fp-boot-health.plist"
 
     private struct State: Codable {
@@ -88,7 +88,7 @@ enum FileProviderBootHealth {
     /// This is NOT cross-process locking: the app writes at launch and the
     /// appex writes at boot, and the worst case of an interleave is one
     /// miscounted attempt, which the threshold already tolerates.
-    private static let queue = DispatchQueue(label: "com.openminis.app.fpBootHealth")
+    private static let queue = DispatchQueue(label: "com.openAmroe.app.fpBootHealth")
 
     private static func loadState() -> State? {
         guard let url = fileURL, let data = try? Data(contentsOf: url) else { return nil }

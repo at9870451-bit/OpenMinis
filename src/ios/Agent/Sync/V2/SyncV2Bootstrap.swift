@@ -141,6 +141,13 @@ enum SyncV2Bootstrap {
             logger.debug("[SyncCore] v2 disabled (flag off) — staying on v1")
             return
         }
+        // Sideloaded builds carry no iCloud entitlement; CKContainer(identifier:)
+        // raises an NSException there (the transport's init builds one eagerly,
+        // a few lines below), which would take launch down. Stay off instead.
+        guard FileManager.default.ubiquityIdentityToken != nil else {
+            logger.warning("[SyncCore] iCloud unavailable (no entitlement or signed out) — v2 stays off")
+            return
+        }
         guard #available(iOS 17.0, *) else {
             logger.warning("[SyncCore] v2 requires iOS 17+ — disabling")
             return

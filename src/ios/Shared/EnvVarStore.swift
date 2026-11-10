@@ -124,7 +124,7 @@ final class EnvVarStore: ObservableObject {
     @Published private(set) var stateBook = EnvVarStateBook()
 
     private let fileURL: URL
-    nonisolated private static let keychainService = "com.openminis.app.envvar"
+    nonisolated private static let keychainService = "com.openAmroe.app.envvar"
 
     /// [T-envvar-disable] env-vars-state.json, beside env-vars.json.
     nonisolated static var stateFileURL: URL {

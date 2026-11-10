@@ -2345,7 +2345,7 @@ extension BackgroundKeepAliveManager {
     enum ContinuedMode: String { case off, preferred, fallback }
 
     static let continuedModeKey = "bka.continuedProcessingMode"
-    static let continuedIdPrefix = "com.openminis.app.continued."
+    static let continuedIdPrefix = "com.openAmroe.app.continued."
 
     /// The settings switch wins: off (the default) means never. When it is on,
     /// a DEBUG override (bka.continuedProcessingMode) may pick another mode;

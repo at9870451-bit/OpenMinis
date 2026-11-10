@@ -187,7 +187,7 @@ class StorageManagementViewModel: ObservableObject {
     ///     open file handle so logging continues into a fresh file;
     ///   * URLCache and WebKit's disk/fetch caches through their own APIs
     ///     (cookies, local storage and logins are other data types and stay);
-    ///   * the app's own regenerable caches (`com.openminis.app.*`: model
+    ///   * the app's own regenerable caches (`com.openAmroe.app.*`: model
     ///     lists, models.dev), which are refetched on demand.
     @MainActor
     func clearLogsAndCaches() async {
@@ -204,7 +204,7 @@ class StorageManagementViewModel: ObservableObject {
             let fm = FileManager.default
             let caches = fm.urls(for: .cachesDirectory, in: .userDomainMask)[0]
             let children = (try? fm.contentsOfDirectory(at: caches, includingPropertiesForKeys: nil)) ?? []
-            for url in children where url.lastPathComponent.hasPrefix("com.openminis.app.") {
+            for url in children where url.lastPathComponent.hasPrefix("com.openAmroe.app.") {
                 try? fm.removeItem(at: url)
             }
         }.value

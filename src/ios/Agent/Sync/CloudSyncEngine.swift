@@ -232,7 +232,7 @@ final class PendingRecordChanges: @unchecked Sendable {
 final class CloudSyncEngine: ObservableObject {
     static let shared = CloudSyncEngine()
 
-    private lazy var container = CKContainer(identifier: "iCloud.com.openminis.app")
+    private lazy var container = CKContainer(identifier: "iCloud.com.openAmroe.app")
     private let devicesZoneName = "devices"
 
     private var syncEngine: CKSyncEngine?
@@ -545,6 +545,15 @@ final class CloudSyncEngine: ObservableObject {
             return
         }
         guard syncEngine == nil else { return }
+
+        // Sideloaded builds carry no iCloud entitlement; CKContainer(identifier:)
+        // raises an NSException in that case, which would kill the app. Refuse
+        // to start instead of crashing — the toggle simply stays off.
+        guard FileManager.default.ubiquityIdentityToken != nil else {
+            syncStatus = .disabled
+            logger.info("[CloudSync] iCloud unavailable (no entitlement or signed out) — sync stays off")
+            return
+        }
 
         // [T-ios-reboot-keychain-identity-rotation] Refuse to start on a
         // provisional identity. `start()` is reached from the scenePhase→.active

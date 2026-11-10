@@ -95,7 +95,7 @@ final class MCPOAuthController: NSObject, ObservableObject {
 
     // MARK: - Keychain (non-synchronizable — secrets never ride iCloud)
 
-    nonisolated private static let keychainService = "com.openminis.app.mcp-oauth"
+    nonisolated private static let keychainService = "com.openAmroe.app.mcp-oauth"
 
     nonisolated private static func keychainSet(_ data: Data, account: String) {
         let match: [String: Any] = [

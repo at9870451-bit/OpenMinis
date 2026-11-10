@@ -179,7 +179,7 @@ enum ResourceDiagnostics {
 
     private static let sampleInterval: TimeInterval = 60
     nonisolated(unsafe) private static var timer: DispatchSourceTimer?
-    private static let timerQueue = DispatchQueue(label: "com.openminis.resourcediag", qos: .utility)
+    private static let timerQueue = DispatchQueue(label: "com.openAmroe.resourcediag", qos: .utility)
     private static let started = ManagedAtomic()
     private static let startTime = Date()
     /// Warn once per crossing, not once per sample — a sustained high count

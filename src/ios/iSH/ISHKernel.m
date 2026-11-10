@@ -2604,7 +2604,7 @@ static void gov_tick(void) {
 - (void)beginBackgroundCPUGovernor {
     if (g_gov_timer) return;  // idempotent
     if (!g_gov_queue)
-        g_gov_queue = dispatch_queue_create("com.openminis.ish.cpugovernor",
+        g_gov_queue = dispatch_queue_create("com.openAmroe.ish.cpugovernor",
             dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_UTILITY, 0));
 
     g_gov_head = 0;
@@ -2882,7 +2882,7 @@ void ish_cpu_top_start(void) {
     // pthread_main_thread_np() is not in the iOS SDK; the main queue always
     // runs on the main thread, so capture its port from there.
     dispatch_async(dispatch_get_main_queue(), ^{ g_cputop_main_port = pthread_mach_thread_np(pthread_self()); });
-    dispatch_queue_t q = dispatch_queue_create("com.openminis.ish.cputop",
+    dispatch_queue_t q = dispatch_queue_create("com.openAmroe.ish.cputop",
         dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_UTILITY, 0));
     g_cputop_timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, q);
     dispatch_source_set_timer(g_cputop_timer, dispatch_time(DISPATCH_TIME_NOW, CPUTOP_INTERVAL_NS),

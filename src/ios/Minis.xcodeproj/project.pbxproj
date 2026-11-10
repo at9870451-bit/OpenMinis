@@ -3748,7 +3748,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -3768,7 +3768,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -3815,7 +3815,7 @@
 					"$(inherited)",
 					"$(BUILT_PRODUCTS_DIR)/Minis.app/Minis.debug.dylib",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -3859,7 +3859,7 @@
 					"$(inherited)",
 					"$(BUILT_PRODUCTS_DIR)/Minis.app/Minis.debug.dylib",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -4048,7 +4048,7 @@
 					"$(ISH_LIBS_DIR)/libish_aot.a",
 				);
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/MinisApp-Bridging-Header.h";
@@ -4107,7 +4107,7 @@
 					"$(ISH_LIBS_DIR)/libish_aot.a",
 				);
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/MinisApp-Bridging-Header.h";
@@ -4134,7 +4134,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.15;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.ShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4161,7 +4161,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.15;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.ShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4188,7 +4188,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.15;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.FileProvider;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.FileProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4215,7 +4215,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.15;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.FileProvider;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.FileProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4242,7 +4242,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.15;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.AgentWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.AgentWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4269,7 +4269,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.15;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.AgentWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.AgentWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4294,7 +4294,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisTestHost;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisTestHost;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -4319,7 +4319,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisTestHost;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisTestHost;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;

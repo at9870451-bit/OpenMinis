@@ -3,7 +3,7 @@ import Foundation
 /// Reads and writes PendingShare data to the App Group shared container.
 /// Compiled into both the main app target and the Share Extension target.
 enum SharedContainerStore {
-    static let appGroupID = "group.com.openminis.app"
+    static let appGroupID = "group.com.openAmroe.app"
 
     private static let pendingShareKey = "pendingShare"
 
@@ -16,6 +16,26 @@ enum SharedContainerStore {
         FileManager.default
             .containerURL(forSecurityApplicationGroupIdentifier: appGroupID)?
             .appendingPathComponent("ShareExtension", isDirectory: true)
+    }
+
+    /// App Group container URL with a private fallback.
+    ///
+    /// Sideloaded builds are signed with certificates that usually carry no
+    /// App Group capability, so `containerURL(forSecurityApplicationGroupIdentifier:)`
+    /// returns nil there. Force-unwrapping it (as the app did before) kills the
+    /// process on first launch. Fall back to a private Application Support
+    /// directory with the same layout: everything keeps working except the
+    /// Files app / widget / share-extension handoff, which needs the real group.
+    static var containerURL: URL {
+        if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) {
+            return url
+        }
+        let fm = FileManager.default
+        let base = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? fm.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let url = base.appendingPathComponent(appGroupID, isDirectory: true)
+        try? fm.createDirectory(at: url, withIntermediateDirectories: true)
+        return url
     }
 
     // MARK: - Write (called by Share Extension)

@@ -441,7 +441,7 @@ if !drift.isEmpty {
 // A7: nothing lifted may reach the real app containers.
 for (name, text) in [("scenario", scenarioReal), ("equivOld", equivOld), ("equivNew", equivNew)] {
     let code = text.components(separatedBy: "\n").filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }.joined(separator: "\n")
-    let hits = ["libraryDirectory", "cachesDirectory", "applicationSupportDirectory", "group.com.openminis", "containerURL(forSecurityApplicationGroupIdentifier"]
+    let hits = ["libraryDirectory", "cachesDirectory", "applicationSupportDirectory", "group.com.openAmroe", "containerURL(forSecurityApplicationGroupIdentifier"]
         .filter { code.contains($0) }
     check("A7 storage isolation: \(name) program touches no real container path \(hits.isEmpty ? "" : "(found \(hits))")", hits.isEmpty)
 }

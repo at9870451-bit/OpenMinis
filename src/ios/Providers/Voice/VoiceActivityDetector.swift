@@ -76,7 +76,7 @@ final class VoiceActivityDetector: NSObject {
     /// re-entering a chat built a new panel → new engine → working mic, while
     /// staying put reused the poisoned one forever.
     private var audioEngine = AVAudioEngine()
-    private let vadQueue = DispatchQueue(label: "com.openminis.app.vad", qos: .userInteractive)
+    private let vadQueue = DispatchQueue(label: "com.openAmroe.app.vad", qos: .userInteractive)
     private var vad: VADWrapper?
 
     // MARK: - Adaptive gain (noise-aware AGC)

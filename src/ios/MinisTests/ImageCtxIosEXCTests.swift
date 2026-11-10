@@ -22,7 +22,7 @@ import UniformTypeIdentifiers
 /// it pass - remove the wrapper then.
 ///
 /// Do NOT run this on a Mac whose test host is the real Minis install: the
-/// hosted runner starts the app (bundle com.openminis.app) and its launch path
+/// hosted runner starts the app (bundle com.openAmroe.app) and its launch path
 /// reads and writes the real containers. Type-check only:
 ///   swiftc ... -typecheck src/ios/MinisTests/ImageCtxIosEXCTests.swift
 @MainActor
