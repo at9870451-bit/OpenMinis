@@ -231,22 +231,27 @@ extension ContentView {
 
                     Spacer(minLength: 0)
 
-                    Circle()
-                        .fill(Color.white.opacity(0.12))
-                        .frame(width: 40, height: 40)
-                        .overlay(
-                            Text(drawerAvatarInitial)
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(.white)
-                        )
-                        .accessibilityHidden(true)
+                    Button {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            showHistoryDrawer = false
+                        }
+                        activeToolSheet = .settings
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .font(.system(size: 17, weight: .medium))
+                            .foregroundStyle(.white)
+                            .frame(width: 40, height: 40)
+                            .background(Circle().fill(Color.white.opacity(0.12)))
+                    }
+                    .buttonStyle(DrawerIconButtonStyle())
+                    .accessibilityLabel(Text("Settings"))
                 }
                 .padding(.horizontal, 22)
                 .padding(.top, 10)
                 .padding(.bottom, 6)
                 .background(Color.black)
             }
-            .frame(width: UIScreen.main.bounds.width * 0.86)
+            .frame(width: UIScreen.main.bounds.width * 0.78)
             .frame(maxHeight: .infinity)
             .background(Color.black.ignoresSafeArea())
         }
@@ -262,12 +267,6 @@ extension ContentView {
             ($0.title ?? "").localizedCaseInsensitiveContains(query)
                 || ($0.lastMessage ?? "").localizedCaseInsensitiveContains(query)
         }
-    }
-
-    private var drawerAvatarInitial: String {
-        let name = soulName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let first = name.first else { return "M" }
-        return String(first).uppercased()
     }
 
     @ViewBuilder

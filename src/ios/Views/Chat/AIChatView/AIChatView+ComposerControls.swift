@@ -86,8 +86,8 @@ extension AIChatView {
     /// runtime demangle chokes on deep nested types otherwise.
     var inputBottomRow: AnyView {
         let row = HStack(spacing: 12) {
-            // Everything except sending lives in the + menu now.
             attachmentMenuButton
+            mentionButton
             if vm.editingMessageIndex != nil { editExitButton }
             Spacer()
             // Mutually exclusive with editExitButton: while editing a past
@@ -97,6 +97,7 @@ extension AIChatView {
                 readAloudToolbarToggle
                 Spacer()
             }
+            micButton
             sendButton
         }
         return AnyView(row)
@@ -283,7 +284,45 @@ extension AIChatView {
     }
 
     /// Mic button plus the attached language-picker sheet.
-    /// Voice mode toggle, now driven from the + menu instead of a mic button.
+    /// Circular `@` button: focuses the composer and opens the file-mention
+    /// picker (the same menu that typing `@` raises).
+    private var mentionButton: some View {
+        Button {
+            if !vm.showMentionMenu {
+                vm.showMentionMenu = true
+                vm.updateMentionMenuState()
+            }
+            inputFocused = true
+        } label: {
+            Image(systemName: "at")
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(ChatColors.secondaryText)
+                .frame(width: 34, height: 34)
+                .background(ChatColors.inputIconBg)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
+        }
+        .accessibilityLabel(Text("Mention a file"))
+    }
+
+    /// Microphone control, back in the bottom row. Toggles the inline voice
+    /// panel on/off; the + menu offers the same action.
+    private var micButton: some View {
+        Button {
+            toggleVoiceInput()
+        } label: {
+            Image(systemName: voiceInputActive ? "keyboard" : "mic")
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(voiceInputActive ? ChatColors.accent : ChatColors.secondaryText)
+                .frame(width: 34, height: 34)
+                .background(ChatColors.inputIconBg)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
+        }
+        .accessibilityLabel(Text(voiceInputActive ? "Switch to keyboard" : "Voice input"))
+    }
+
+    /// Voice mode toggle, shared by the mic button and the + menu.
     func toggleVoiceInput() {
         if voiceInputActive {
             // Keep the transcript: the composer mirrors it, so clearing here
