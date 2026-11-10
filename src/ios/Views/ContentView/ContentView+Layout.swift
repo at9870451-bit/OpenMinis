@@ -69,8 +69,15 @@ extension ContentView {
                     }
                 }
             }
-            .contentShape(Rectangle())
-            .simultaneousGesture(historyDrawerGesture)
+            .background {
+                // System screen-edge pan: works over the UIKit message list.
+                EdgeSwipeCatcher {
+                    withAnimation(.easeOut(duration: 0.22)) {
+                        showHistoryDrawer = true
+                    }
+                }
+                .allowsHitTesting(false)
+            }
 
             if showHistoryDrawer {
                 historyDrawer
@@ -103,65 +110,104 @@ extension ContentView {
                 .ignoresSafeArea()
                 .onTapGesture { withAnimation { showHistoryDrawer = false } }
 
-            VStack(spacing: 0) {
-                HStack {
-                    Text("Chats")
-                        .font(.title2.weight(.bold))
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .firstTextBaseline) {
+                    Button {
+                        withAnimation(.easeOut(duration: 0.22)) {
+                            showHistoryDrawer = false
+                        }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityLabel(Text("Close"))
+                    Text(soulName.first?.isEmpty == false ? soulName : "Minis")
+                        .font(.system(size: 34, weight: .bold))
+                        .lineLimit(1)
                     Spacer()
                     Button {
                         withAnimation { showHistoryDrawer = false }
-                        startHomeChat()
+                        activeToolSheet = .settings
                     } label: {
-                        Image(systemName: "square.and.pencil")
-                            .font(.system(size: 17, weight: .semibold))
+                        Image(systemName: "gearshape")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundStyle(.secondary)
                     }
+                    .accessibilityLabel(Text("Settings"))
                 }
-                .padding(.horizontal, 18)
-                .padding(.top, 16)
-                .padding(.bottom, 10)
+                .padding(.horizontal, 24)
+                .padding(.top, 22)
+                .padding(.bottom, 18)
 
-                List {
-                    ForEach(sessions) { session in
-                        Button {
-                            withAnimation { showHistoryDrawer = false }
-                            homeSessionId = session.id
-                        } label: {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(session.title?.isEmpty == false ? session.title! : "New Chat")
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundStyle(.primary)
-                                    .lineLimit(1)
-                                Text(session.updatedAt, style: .relative)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                Divider().padding(.horizontal, 24)
+
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        ForEach(sessions) { session in
+                            Button {
+                                withAnimation { showHistoryDrawer = false }
+                                homeSessionId = session.id
+                            } label: {
+                                HStack(spacing: 10) {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(session.title?.isEmpty == false ? session.title! : "New Chat")
+                                            .font(.system(size: 16, weight: .regular))
+                                            .foregroundStyle(.primary)
+                                            .lineLimit(1)
+                                        Text(session.updatedAt, style: .relative)
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer(minLength: 0)
+                                }
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 11)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
+                                .background(
+                                    homeSessionId == session.id
+                                    ? Color.primary.opacity(0.08)
+                                    : Color.clear
+                                )
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .contentShape(Rectangle())
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
-                        .listRowBackground(homeSessionId == session.id
-                                           ? Color.primary.opacity(0.08)
-                                           : Color.clear)
-                    }
-                }
-                .listStyle(.plain)
 
-                Divider()
+                        if sessions.isEmpty {
+                            Text("No conversations yet")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 24)
+                                .padding(.top, 16)
+                        }
+                    }
+                    .padding(.top, 8)
+                }
+
+                Divider().padding(.horizontal, 24)
+
+                // ChatGPT-style bottom action pill.
                 Button {
                     withAnimation { showHistoryDrawer = false }
-                    activeToolSheet = .settings
+                    startHomeChat()
                 } label: {
-                    Label("Settings", systemImage: "gearshape")
-                        .font(.system(size: 16, weight: .medium))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 16)
-                        .contentShape(Rectangle())
+                    Label("Chat", systemImage: "square.and.pencil")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 22)
+                        .padding(.vertical, 13)
+                        .background(Color.accentColor, in: Capsule())
                 }
                 .buttonStyle(.plain)
+                .padding(.horizontal, 24)
+                .padding(.top, 14)
+                .padding(.bottom, 26)
             }
-            .frame(width: min(UIScreen.main.bounds.width * 0.84, 340))
-            .background(.regularMaterial)
+            .frame(width: UIScreen.main.bounds.width)
+            .frame(maxHeight: .infinity)
+
+            .background(Color(UIColor.systemBackground))
             .ignoresSafeArea(edges: .bottom)
         }
     }
