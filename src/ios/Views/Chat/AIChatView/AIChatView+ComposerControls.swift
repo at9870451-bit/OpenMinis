@@ -111,11 +111,18 @@ extension AIChatView {
         )
     }
 
-    /// Trailing control: voice until there is something to send, then Send.
+    /// Trailing control: voice when the capsule is empty, Send as soon as
+    /// there is anything to send (text, attachment, pasted chunk). Gated on
+    /// content presence, NOT on canSend — with no model selected canSend is
+    /// false even with typed text, and the send button must still appear.
     var composerTrailingButtons: AnyView {
-        AnyView(
+        let hasContent = !vm.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || !vm.attachments.isEmpty
+            || vm.loadingVideoCount > 0
+            || !vm.pastedTexts.isEmpty
+        return AnyView(
             Group {
-                if canSend || canEnqueue {
+                if hasContent {
                     sendButton
                 } else {
                     micButton

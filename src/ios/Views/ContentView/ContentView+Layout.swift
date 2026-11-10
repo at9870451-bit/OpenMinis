@@ -45,14 +45,7 @@ extension ContentView {
         let p = min(1, max(0, drawerProgress))
 
         return ZStack(alignment: .leading) {
-            // Bottom layer: the drawer itself, full height, pinned left.
-            historyDrawer
-                .frame(width: drawerWidth)
-                .frame(maxHeight: .infinity)
-                .zIndex(0)
-
-            // Top layer: the conversation, sliding right and shrinking into a
-            // floating card. Entire page moves — nav bar included.
+            // Conversation: scaled back so it reads as a layer behind the panel.
             NavigationStack {
                 Group {
                     if let id = homeSessionId {
@@ -81,50 +74,50 @@ extension ContentView {
                 }
             }
             .background {
-                // System screen-edge pan: works over the UIKit message list.
                 EdgeSwipeCatcher(
                     onProgress: { fraction in
                         drawerDragProgress = fraction
                     },
                     onEnd: { fraction, velocity in
-                        let shouldOpen = fraction > 0.5 || velocity > 500
-                        snapDrawer(open: shouldOpen)
+                        snapDrawer(open: fraction > 0.5 || velocity > 500)
                     }
                 )
                 .allowsHitTesting(false)
             }
             .clipShape(RoundedRectangle(cornerRadius: 26 * p, style: .continuous))
-            .scaleEffect(1 - 0.05 * p, anchor: .leading)
-            .overlay {
-                // Dim the page a little while the drawer is showing, keeping
-                // the glass readable rather than hiding it.
-                Color.black.opacity(0.18 * p)
-                    .allowsHitTesting(false)
+            .scaleEffect(1 - 0.06 * p, anchor: .center)
+            .offset(x: 18 * p)
+            .shadow(color: .black.opacity(0.3 * p), radius: 24, x: 0, y: 0)
+            .zIndex(0)
+
+            // Tap / drag anywhere that is not the panel closes it. Below the
+            // drawer, so its own controls still receive taps.
+            if p > 0.001 {
+                Color.white.opacity(0.001)
+                    .ignoresSafeArea()
+                    .contentShape(Rectangle())
+                    .onTapGesture { snapDrawer(open: false) }
+                    .gesture(
+                        DragGesture(minimumDistance: 12)
+                            .onChanged { value in
+                                let fraction = 1 + value.translation.width / drawerWidth
+                                drawerDragProgress = min(1, max(0, fraction))
+                            }
+                            .onEnded { value in
+                                let projected = 1 + value.predictedEndTranslation.width / drawerWidth
+                                snapDrawer(open: projected > 0.5)
+                            }
+                    )
+                    .zIndex(1)
             }
-            .overlay {
-                if p > 0.001 {
-                    Color.white.opacity(0.001)
-                        .contentShape(Rectangle())
-                        .onTapGesture { snapDrawer(open: false) }
-                        .gesture(
-                            DragGesture(minimumDistance: 12)
-                                .onChanged { value in
-                                    let fraction = 1 + value.translation.width / drawerWidth
-                                    drawerDragProgress = min(1, max(0, fraction))
-                                }
-                                .onEnded { value in
-                                    let projected = 1 + value.predictedEndTranslation.width / drawerWidth
-                                    snapDrawer(open: projected > 0.5)
-                                }
-                        )
-                }
-            }
-            .shadow(color: .black.opacity(0.28 * p), radius: 24, x: -10, y: 0)
-            // MUST be last: an offset applied before the overlays leaves them
-            // covering the pre-offset (full-screen) frame, which swallowed
-            // every tap meant for the drawer's search field and gear.
-            .offset(x: drawerWidth * p)
-            .zIndex(1)
+
+            // Panel on TOP: the only arrangement where .ultraThinMaterial has
+            // real content behind it to blur, which is what makes it read as
+            // glass rather than flat dark grey.
+            historyDrawer
+                .frame(width: drawerWidth)
+                .frame(maxHeight: .infinity)
+                .zIndex(2)
         }
         .animation(.spring(response: 0.34, dampingFraction: 0.86), value: drawerProgress)
         .sheet(item: $runtimePage) { page in
