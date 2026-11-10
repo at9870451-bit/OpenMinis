@@ -100,173 +100,245 @@ extension ContentView {
 
     // MARK: - ChatGPT-style history drawer
 
-    private var historyDrawerGesture: some Gesture {
-        DragGesture(minimumDistance: 24)
-            .onEnded { value in
-                if !showHistoryDrawer,
-                   value.startLocation.x < 28,
-                   value.translation.width > 60 {
-                    withAnimation { showHistoryDrawer = true }
-                } else if showHistoryDrawer, value.translation.width < -60 {
-                    withAnimation { showHistoryDrawer = false }
-                }
-            }
-    }
-
     @ViewBuilder
     private var historyDrawer: some View {
-        ZStack(alignment: .leading) {
-            Color.black.opacity(0.22)
-                .ignoresSafeArea()
-                .onTapGesture { withAnimation { showHistoryDrawer = false } }
+        ZStack(alignment: .bottom) {
+            // Pure black, no gradients.
+            Color.black.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .firstTextBaseline) {
-                    Button {
-                        withAnimation(.easeOut(duration: 0.22)) {
-                            showHistoryDrawer = false
-                        }
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(.secondary)
-                    }
-                    .accessibilityLabel(Text("Close"))
-                    Text(soulName.first?.isEmpty == false ? soulName : "Minis")
-                        .font(.system(size: 34, weight: .bold))
+                // MARK: Header
+                HStack(alignment: .center, spacing: 12) {
+                    Text("Minis")
+                        .font(.system(size: 27, weight: .bold))
+                        .foregroundStyle(.white)
                         .lineLimit(1)
-                    Spacer()
+
+                    Spacer(minLength: 8)
+
                     Button {
-                        withAnimation { showHistoryDrawer = false }
-                        activeToolSheet = .settings
-                    } label: {
-                        Image(systemName: "gearshape")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundStyle(.secondary)
-                    }
-                    .accessibilityLabel(Text("Settings"))
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 22)
-                .padding(.bottom, 18)
-
-                Divider().padding(.horizontal, 24)
-
-                // Agent Runtime shortcuts, one tap from the drawer.
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach([RuntimePage.tools, .subAgents, .skills, .memory]) { page in
-                        Button {
-                            withAnimation(.easeOut(duration: 0.2)) {
-                                showHistoryDrawer = false
-                            }
-                            runtimePage = page
-                        } label: {
-                            runtimeRow(page)
+                        withAnimation(.easeOut(duration: 0.18)) {
+                            showDrawerSearch.toggle()
+                            if !showDrawerSearch { drawerSearch = "" }
                         }
-                        .buttonStyle(.plain)
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 40, height: 40)
+                            .background(Circle().fill(Color.white.opacity(0.10)))
                     }
+                    .buttonStyle(DrawerIconButtonStyle())
+                    .accessibilityLabel(Text("Search"))
                 }
-                .padding(.vertical, 6)
+                .padding(.horizontal, 22)
+                .padding(.top, 16)
+                .padding(.bottom, 14)
 
-                Divider().padding(.horizontal, 24)
+                if showDrawerSearch {
+                    HStack(spacing: 8) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.45))
+                        TextField("Search chats", text: $drawerSearch)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 16))
+                            .foregroundStyle(.white)
+                            .tint(.white)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                    }
+                    .padding(.horizontal, 14)
+                    .frame(height: 42)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color.white.opacity(0.08))
+                    )
+                    .padding(.horizontal, 22)
+                    .padding(.bottom, 12)
+                }
+
+                // MARK: Runtime navigation
+                VStack(spacing: 1) {
+                    drawerNavRow(.tools)
+                    drawerNavRow(.subAgents)
+                    drawerNavRow(.skills)
+                    drawerNavRow(.memory)
+                }
+                .padding(.horizontal, 10)
+                .padding(.bottom, 8)
+
+                // MARK: Hairline
+                Rectangle()
+                    .fill(Color.white.opacity(0.10))
+                    .frame(height: 0.5)
+                    .padding(.horizontal, 22)
+                    .padding(.bottom, 10)
+
+                // MARK: Recent chats
+                Text("Recent")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.45))
+                    .padding(.horizontal, 22)
+                    .padding(.bottom, 4)
 
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(sessions) { session in
-                            Button {
-                                withAnimation { showHistoryDrawer = false }
-                                homeSessionId = session.id
-                            } label: {
-                                HStack(spacing: 10) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(session.title?.isEmpty == false ? session.title! : "New Chat")
-                                            .font(.system(size: 16, weight: .regular))
-                                            .foregroundStyle(.primary)
-                                            .lineLimit(1)
-                                        Text(session.updatedAt, style: .relative)
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    Spacer(minLength: 0)
-                                }
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 11)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .contentShape(Rectangle())
-                                .background(
-                                    homeSessionId == session.id
-                                    ? Color.primary.opacity(0.08)
-                                    : Color.clear
-                                )
-                            }
-                            .buttonStyle(.plain)
-                        }
-
-                        if sessions.isEmpty {
+                    LazyVStack(spacing: 1) {
+                        let visible = filteredDrawerSessions
+                        if visible.isEmpty {
                             Text("No conversations yet")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 24)
-                                .padding(.top, 16)
+                                .font(.system(size: 14))
+                                .foregroundStyle(.white.opacity(0.4))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 22)
+                                .padding(.top, 14)
+                        } else {
+                            ForEach(visible) { session in
+                                drawerSessionRow(session)
+                            }
                         }
                     }
-                    .padding(.top, 8)
+                    .padding(.bottom, 10)
                 }
 
-                Divider().padding(.horizontal, 24)
-
-                // ChatGPT-style bottom action pill.
-                Button {
-                    withAnimation { showHistoryDrawer = false }
-                    startHomeChat()
-                } label: {
-                    Label("Chat", systemImage: "square.and.pencil")
-                        .font(.system(size: 16, weight: .semibold))
+                // MARK: Fixed bottom bar
+                HStack(spacing: 12) {
+                    Button {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            showHistoryDrawer = false
+                        }
+                        startHomeChat()
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "square.and.pencil")
+                                .font(.system(size: 15, weight: .semibold))
+                            Text("Chat")
+                                .font(.system(size: 16, weight: .semibold))
+                        }
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 22)
-                        .padding(.vertical, 13)
-                        .background(Color.accentColor, in: Capsule())
-                }
-                .buttonStyle(.plain)
-                .padding(.horizontal, 24)
-                .padding(.top, 14)
-                .padding(.bottom, 26)
-            }
-            .frame(width: UIScreen.main.bounds.width)
-            .frame(maxHeight: .infinity)
+                        .padding(.horizontal, 20)
+                        .frame(height: 46)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(Color(red: 0.04, green: 0.52, blue: 1.0))
+                        )
+                    }
+                    .buttonStyle(DrawerPillButtonStyle())
 
-            .background(Color(UIColor.systemBackground))
-            .ignoresSafeArea(edges: .bottom)
+                    Spacer(minLength: 0)
+
+                    Circle()
+                        .fill(Color.white.opacity(0.12))
+                        .frame(width: 40, height: 40)
+                        .overlay(
+                            Text(drawerAvatarInitial)
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(.white)
+                        )
+                        .accessibilityHidden(true)
+                }
+                .padding(.horizontal, 22)
+                .padding(.top, 10)
+                .padding(.bottom, 6)
+                .background(Color.black)
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    // MARK: Drawer pieces
+
+    private var filteredDrawerSessions: [ChatSession] {
+        let query = drawerSearch.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return sessions }
+        return sessions.filter {
+            ($0.title ?? "").localizedCaseInsensitiveContains(query)
+                || ($0.lastMessage ?? "").localizedCaseInsensitiveContains(query)
         }
     }
 
+    private var drawerAvatarInitial: String {
+        let name = soulName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let first = name.first else { return "M" }
+        return String(first).uppercased()
+    }
+
     @ViewBuilder
-    private func runtimeRow(_ page: RuntimePage) -> some View {
-        let (title, symbol, tint): (String, String, Color) = {
+    private func drawerNavRow(_ page: RuntimePage) -> some View {
+        let meta: (title: String, symbol: String) = {
             switch page {
-            case .tools:     return ("Agent Tools", "wrench.and.screwdriver.fill", .indigo)
-            case .subAgents: return ("Sub Agents", HelperAccent.glyph, HelperAccent.color)
-            case .skills:    return ("Skills", "puzzlepiece.extension", .blue)
-            case .memory:    return ("Memory", "brain.head.profile", .purple)
+            case .tools:     return ("Agent Tools", "wrench.and.screwdriver")
+            case .subAgents: return ("Sub Agents", "person.2")
+            case .skills:    return ("Skills", "puzzlepiece.extension")
+            case .memory:    return ("Memory", "brain.head.profile")
             }
         }()
-        return HStack(spacing: 12) {
-            Image(systemName: symbol)
-                .font(.system(size: 9))
-                .foregroundStyle(.white)
-                .frame(width: 21, height: 21)
-                .background(tint, in: Circle())
-            Text(title)
-                .font(.system(size: 16))
-                .foregroundStyle(.primary)
-            Spacer(minLength: 0)
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.tertiary)
+        Button {
+            withAnimation(.easeOut(duration: 0.2)) {
+                showHistoryDrawer = false
+            }
+            runtimePage = page
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: meta.symbol)
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundStyle(.white.opacity(0.92))
+                    .frame(width: 24, alignment: .center)
+                Text(meta.title)
+                    .font(.system(size: 16.5, weight: .regular))
+                    .foregroundStyle(.white)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 12)
+            .frame(height: 46)
+            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 10)
-        .contentShape(Rectangle())
+        .buttonStyle(DrawerRowButtonStyle())
+    }
+
+    @ViewBuilder
+    private func drawerSessionRow(_ session: ChatSession) -> some View {
+        let selected = homeSessionId == session.id
+        Button {
+            withAnimation(.easeOut(duration: 0.2)) {
+                showHistoryDrawer = false
+            }
+            homeSessionId = session.id
+        } label: {
+            HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(session.title?.isEmpty == false ? session.title! : "New Chat")
+                        .font(.system(size: 15.5, weight: .regular))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    Text(session.updatedAt, style: .relative)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.white.opacity(0.4))
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 9)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(selected ? Color.white.opacity(0.08) : Color.clear)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(DrawerRowButtonStyle())
+        .padding(.horizontal, 8)
+        .contextMenu {
+            Button(role: .destructive) {
+                withAnimation(.easeOut(duration: 0.2)) {
+                    showHistoryDrawer = false
+                }
+                sessionToDelete = session
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
     }
 
     @ViewBuilder

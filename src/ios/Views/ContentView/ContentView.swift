@@ -469,6 +469,8 @@ struct ContentView: View {
     @State var homeSessionId: String? = nil
     @State var homeDraftId: String = "__new__home"
     @State var showHistoryDrawer = false
+    @State var drawerSearch = ""
+    @State var showDrawerSearch = false
     /// Agent Runtime page opened from the history drawer.
     @State var runtimePage: RuntimePage?
 
