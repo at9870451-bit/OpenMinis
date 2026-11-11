@@ -299,11 +299,14 @@ extension ContentView {
             .background {
                 // Frosted glass, so the drawer reads as a separate, slightly
                 // lifted surface next to the opaque conversation card.
+                // IMPORTANT: only vertical safe-area bleed. `.ignoresSafeArea()`
+                // without edges also stretched the panel across the full screen
+                // width, which made the drawer look like a global overlay.
                 ZStack {
                     Rectangle().fill(.ultraThinMaterial)
                     Color.black.opacity(0.45)
                 }
-                .ignoresSafeArea()
+                .ignoresSafeArea(edges: .vertical)
             }
         }
         .preferredColorScheme(.dark)
