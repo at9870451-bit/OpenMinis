@@ -93,7 +93,6 @@ extension AIChatView {
             HStack(spacing: 2) {
                 attachmentMenuButton
             }
-            .padding(.bottom, 2)
         )
     }
 
@@ -114,7 +113,6 @@ extension AIChatView {
                     micButton
                 }
             }
-            .padding(.bottom, 2)
         )
     }
 
@@ -537,8 +535,7 @@ extension AIChatView {
             }
         }
         .padding(.horizontal, 4)
-        .padding(.top, max(6, topPadding - 10))
-        .padding(.bottom, 2)
+        .padding(.vertical, 2)
         .overlay(alignment: .top) {
             if composerResizeEnabled { composerResizeHandle }
         }
