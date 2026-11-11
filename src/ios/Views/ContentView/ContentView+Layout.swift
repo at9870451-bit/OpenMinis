@@ -156,7 +156,7 @@ extension ContentView {
                 HStack(alignment: .center, spacing: 12) {
                     Text("Amore")
                         .font(.system(size: 27, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(AmoreTheme.textPrimary)
                         .lineLimit(1)
 
                     Spacer(minLength: 8)
@@ -170,9 +170,9 @@ extension ContentView {
                     } label: {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(AmoreTheme.textPrimary)
                             .frame(width: 40, height: 40)
-                            .background(Circle().fill(Color.white.opacity(0.10)))
+                            .background(Circle().fill(Color.black.opacity(0.05)))
                     }
                     .buttonStyle(DrawerIconButtonStyle())
                     .accessibilityLabel(Text("Search"))
@@ -185,11 +185,11 @@ extension ContentView {
                     HStack(spacing: 8) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.45))
+                            .foregroundStyle(AmoreTheme.textSecondary)
                         TextField("Search chats", text: $drawerSearch)
                             .textFieldStyle(.plain)
                             .font(.system(size: 16))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(AmoreTheme.textPrimary)
                             .tint(.white)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
@@ -198,7 +198,7 @@ extension ContentView {
                     .frame(height: 42)
                     .background(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(Color.white.opacity(0.08))
+                            .fill(Color.black.opacity(0.04))
                     )
                     .padding(.horizontal, 22)
                     .padding(.bottom, 12)
@@ -216,7 +216,7 @@ extension ContentView {
 
                 // MARK: Hairline
                 Rectangle()
-                    .fill(Color.white.opacity(0.10))
+                    .fill(Color.black.opacity(0.05))
                     .frame(height: 0.5)
                     .padding(.horizontal, 22)
                     .padding(.bottom, 10)
@@ -224,7 +224,7 @@ extension ContentView {
                 // MARK: Recent chats
                 Text(AppLocalized("Recent"))
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.45))
+                    .foregroundStyle(AmoreTheme.textSecondary)
                     .padding(.horizontal, 22)
                     .padding(.bottom, 4)
 
@@ -234,7 +234,7 @@ extension ContentView {
                         if visible.isEmpty {
                             Text(AppLocalized("No conversations yet"))
                                 .font(.system(size: 14))
-                                .foregroundStyle(.white.opacity(0.4))
+                                .foregroundStyle(AmoreTheme.textSecondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal, 22)
                                 .padding(.top, 14)
@@ -261,12 +261,12 @@ extension ContentView {
                             Text(AppLocalized("Chat"))
                                 .font(.system(size: 16, weight: .semibold))
                         }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(AmoreTheme.textPrimary)
                         .padding(.horizontal, 20)
                         .frame(height: 46)
                         .background(
                             Capsule(style: .continuous)
-                                .fill(Color(red: 0.04, green: 0.52, blue: 1.0))
+                                .fill(AmoreTheme.accent)
                         )
                     }
                     .buttonStyle(DrawerPillButtonStyle())
@@ -283,9 +283,9 @@ extension ContentView {
                     } label: {
                         Image(systemName: "gearshape")
                             .font(.system(size: 17, weight: .medium))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(AmoreTheme.textPrimary)
                             .frame(width: 40, height: 40)
-                            .background(Circle().fill(Color.white.opacity(0.12)))
+                            .background(Circle().fill(Color.black.opacity(0.06)))
                     }
                     .buttonStyle(DrawerIconButtonStyle())
                     .accessibilityLabel(Text("Settings"))
@@ -293,7 +293,6 @@ extension ContentView {
                 .padding(.horizontal, 22)
                 .padding(.top, 10)
                 .padding(.bottom, 6)
-                .background(Color.black)
             }
             .frame(maxWidth: .infinity)
             .frame(maxHeight: .infinity)
@@ -305,13 +304,12 @@ extension ContentView {
                 // width, which made the drawer look like a global overlay.
                 ZStack {
                     Rectangle().fill(.ultraThinMaterial)
-                    Color.black.opacity(0.45)
+                    AmoreTheme.glassFill(0.82)
                 }
                 .ignoresSafeArea(edges: .vertical)
             }
         }
-        .preferredColorScheme(.dark)
-    }
+            }
 
     // MARK: Drawer pieces
 
@@ -343,11 +341,11 @@ extension ContentView {
             HStack(spacing: 14) {
                 Image(systemName: meta.symbol)
                     .font(.system(size: 17, weight: .regular))
-                    .foregroundStyle(.white.opacity(0.92))
+                    .foregroundStyle(AmoreTheme.textPrimary)
                     .frame(width: 24, alignment: .center)
                 Text(meta.title)
                     .font(.system(size: 16.5, weight: .regular))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(AmoreTheme.textPrimary)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 12)
@@ -370,12 +368,12 @@ extension ContentView {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(session.title?.isEmpty == false ? session.title! : "New Chat")
                         .font(.system(size: 15.5, weight: .regular))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(AmoreTheme.textPrimary)
                         .lineLimit(1)
                         .truncationMode(.tail)
                     Text(session.updatedAt, style: .relative)
                         .font(.system(size: 12))
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(AmoreTheme.textSecondary)
                 }
                 Spacer(minLength: 0)
             }
