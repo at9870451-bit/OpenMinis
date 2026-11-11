@@ -117,7 +117,7 @@ extension AIChatView {
 
                 // ChatGPT-style single capsule: + on the left, the text in
                 // the middle, voice/send on the right, all on one baseline.
-                HStack(alignment: composerIsEmpty ? .center : .bottom, spacing: 6) {
+                HStack(alignment: .center, spacing: 6) {
                     composerLeadingButtons
                         .fixedSize()
                     inputFieldOrWaveform
@@ -133,7 +133,7 @@ extension AIChatView {
                     inputBottomRowWidth = w
                 }
                 .padding(.horizontal, 8)
-                .padding(.bottom, 8)
+                .padding(.vertical, 6)
             })
             .contentShape(RoundedRectangle(cornerRadius: 20))
             .onTapGesture { inputFocused = true }
