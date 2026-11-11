@@ -41,7 +41,7 @@ extension ContentView {
     // MARK: - Stack Layout (iPhone / narrow window)
 
     var stackLayout: some View {
-        let drawerWidth = UIScreen.main.bounds.width * 0.78
+        let drawerWidth = UIScreen.main.bounds.width * 0.40
         let p = min(1, max(0, drawerProgress))
 
         return ZStack(alignment: .leading) {
