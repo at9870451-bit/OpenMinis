@@ -86,11 +86,13 @@ extension ContentView {
                 )
                 .allowsHitTesting(false)
             }
-            .clipShape(RoundedRectangle(cornerRadius: 28 * p, style: .continuous))
-            .scaleEffect(1 - 0.10 * p, anchor: .center)
-            .offset(x: drawerWidth * p)
-            .overlay(Color.black.opacity(0.22 * p))
-            .shadow(color: Color.black.opacity(0.35 * p), radius: 26, x: -14, y: 0)
+            .clipShape(RoundedRectangle(cornerRadius: 24 * p, style: .continuous))
+            .scaleEffect(1 - 0.06 * p, anchor: .center)
+            // A small shift (not a full drawer-width one) keeps the page's
+            // trailing rounded corner on screen, which is what reads as depth.
+            .offset(x: UIScreen.main.bounds.width * 0.10 * p)
+            .overlay(Color.black.opacity(0.18 * p))
+            .shadow(color: Color.black.opacity(0.22 * p), radius: 22, x: 6, y: 0)
             .zIndex(0)
 
             // Close catcher: tap/drag anywhere on the conversation closes the
@@ -119,6 +121,8 @@ extension ContentView {
             historyDrawer
                 .frame(width: drawerWidth)
                 .frame(maxHeight: .infinity)
+                // Parked off-screen when closed; slides in with the gesture.
+                .offset(x: -drawerWidth * (1 - p))
                 .zIndex(2)
         }
         .animation(.spring(response: 0.34, dampingFraction: 0.86), value: drawerProgress)
@@ -297,17 +301,37 @@ extension ContentView {
             .frame(maxWidth: .infinity)
             .frame(maxHeight: .infinity)
             .background {
-                // Frosted glass, so the drawer reads as a separate, slightly
-                // lifted surface next to the opaque conversation card.
-                // IMPORTANT: only vertical safe-area bleed. `.ignoresSafeArea()`
-                // without edges also stretched the panel across the full screen
-                // width, which made the drawer look like a global overlay.
+                // Real frosted glass: the material does the blurring, the tint
+                // stays light enough that content behind shows through. A heavy
+                // white fill (0.82) used to flatten it into a solid panel.
                 ZStack {
                     Rectangle().fill(.ultraThinMaterial)
-                    AmoreTheme.glassFill(0.82)
+                    AmoreTheme.glassFill(0.55)
                 }
                 .ignoresSafeArea(edges: .vertical)
             }
+            // Rounded only on the trailing edge: the panel slides out from the
+            // screen edge, so the leading corners must stay square.
+            .clipShape(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 0,
+                    bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 24,
+                    topTrailingRadius: 24,
+                    style: .continuous
+                )
+            )
+            .overlay {
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 0,
+                    bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 24,
+                    topTrailingRadius: 24,
+                    style: .continuous
+                )
+                .strokeBorder(Color.white.opacity(0.5), lineWidth: 0.5)
+            }
+            .shadow(color: Color.black.opacity(0.18), radius: 22, x: 8, y: 0)
         }
             }
 
