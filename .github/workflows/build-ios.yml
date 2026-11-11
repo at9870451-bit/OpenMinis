@@ -7,6 +7,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ios-build
+  cancel-in-progress: false
+
 jobs:
   build:
     name: Build iOS IPA (arm64 device)
