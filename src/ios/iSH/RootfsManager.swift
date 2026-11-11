@@ -177,12 +177,19 @@ class RootfsManager {
             return
         }
 
-        guard let zipURL = Bundle.main.url(forResource: "alpine-rootfs", withExtension: "zip") else {
-            throw NSError(
-                domain: "RootfsManager",
-                code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "alpine-rootfs.zip not found in bundle"]
-            )
+        // The rootfs is normally downloaded on first launch instead of being
+        // shipped inside the .ipa: bundling it made every build slower and the
+        // payload bigger even though the zip never changes between builds.
+        // A bundle copy still wins when present (dev builds / older IPAs).
+        let zipURL: URL
+        // A tiny bundle entry is a build-time placeholder (the CI ships a stub
+        // so the Xcode file reference resolves); only a real image counts.
+        if let bundled = Bundle.main.url(forResource: "alpine-rootfs", withExtension: "zip"),
+           let size = try? bundled.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+           size > 1_000_000 {
+            zipURL = bundled
+        } else {
+            zipURL = try downloadedRootfsURL()
         }
 
         logger.info("[Rootfs] installing from \(zipURL.path)")
@@ -211,6 +218,79 @@ class RootfsManager {
         UserDefaults.standard.set(true, forKey: "rootfs.freshInstall")
 
         logger.info("[Rootfs] installation complete (\(currentArch)) at \(rootfsPath.path)")
+    }
+
+    // MARK: - Remote rootfs (download once, install locally)
+
+    /// Prebuilt Alpine rootfs published as a release asset. Bump the tag when
+    /// the image itself changes; the file is content-stable between app builds.
+    static let remoteRootfsURL = URL(string: "https://github.com/at9870451-bit/amore-ios/releases/download/rootfs-v1/alpine-rootfs.zip")!
+
+    private var downloadedRootfsFile: URL {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        return docs.appendingPathComponent("alpine-rootfs-download.zip")
+    }
+
+    /// Returns a local zip, downloading it on first use. Synchronous on
+    /// purpose: `installIfNeeded()` is called from the boot path, and this only
+    /// runs once per install (the result is cached on disk and reused).
+    private func downloadedRootfsURL() throws -> URL {
+        let fm = FileManager.default
+        let dest = downloadedRootfsFile
+        let expected = 3_984_116
+
+        if fm.fileExists(atPath: dest.path),
+           let size = try? dest.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+           size > expected / 2 {
+            logger.info("[Rootfs] reusing downloaded zip at \(dest.path) (\(size) bytes)")
+            return dest
+        }
+
+        logger.info("[Rootfs] downloading rootfs from \(Self.remoteRootfsURL.absoluteString)")
+        let sem = DispatchSemaphore(value: 0)
+        var failure: Error?
+        var downloaded: URL?
+
+        let task = URLSession.shared.downloadTask(with: Self.remoteRootfsURL) { tmp, response, error in
+            defer { sem.signal() }
+            if let error { failure = error; return }
+            if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+                failure = NSError(domain: "RootfsManager", code: 2, userInfo: [
+                    NSLocalizedDescriptionKey: "Rootfs download failed with HTTP \(http.statusCode)"
+                ])
+                return
+            }
+            guard let tmp else {
+                failure = NSError(domain: "RootfsManager", code: 3, userInfo: [
+                    NSLocalizedDescriptionKey: "Rootfs download produced no file"
+                ])
+                return
+            }
+            do {
+                try? fm.removeItem(at: dest)
+                try fm.moveItem(at: tmp, to: dest)
+                downloaded = dest
+            } catch {
+                failure = error
+            }
+        }
+        task.resume()
+        // 90 s ceiling: the asset is ~4 MB, so a slower transfer means the
+        // network is unusable and the caller should surface a retry.
+        if sem.wait(timeout: .now() + 90) == .timedOut {
+            task.cancel()
+            throw NSError(domain: "RootfsManager", code: 4, userInfo: [
+                NSLocalizedDescriptionKey: "Rootfs download timed out"
+            ])
+        }
+        if let failure { throw failure as Error }
+        guard let downloaded else {
+            throw NSError(domain: "RootfsManager", code: 5, userInfo: [
+                NSLocalizedDescriptionKey: "Rootfs download failed"
+            ])
+        }
+        logger.info("[Rootfs] downloaded rootfs to \(downloaded.path)")
+        return downloaded
     }
 
     /// Reset (delete) the rootfs, forcing a fresh install on next launch
