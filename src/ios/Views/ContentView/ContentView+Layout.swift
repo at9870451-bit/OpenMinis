@@ -45,7 +45,9 @@ extension ContentView {
         let p = min(1, max(0, drawerProgress))
 
         return ZStack(alignment: .leading) {
-            // Conversation: scaled back so it reads as a layer behind the panel.
+            // Conversation panel: recedes behind the drawer as it opens,
+            // shrinking and shifting right so the glass panel reads as a
+            // foreground layer with real depth.
             NavigationStack {
                 Group {
                     if let id = homeSessionId {
@@ -84,14 +86,15 @@ extension ContentView {
                 )
                 .allowsHitTesting(false)
             }
-            .clipShape(RoundedRectangle(cornerRadius: 26 * p, style: .continuous))
-            .scaleEffect(1 - 0.06 * p, anchor: .center)
-            .offset(x: 18 * p)
-            .shadow(color: .black.opacity(0.3 * p), radius: 24, x: 0, y: 0)
+            .clipShape(RoundedRectangle(cornerRadius: 28 * p, style: .continuous))
+            .scaleEffect(1 - 0.10 * p, anchor: .center)
+            .offset(x: drawerWidth * p)
+            .overlay(Color.black.opacity(0.22 * p))
+            .shadow(color: Color.black.opacity(0.35 * p), radius: 26, x: -14, y: 0)
             .zIndex(0)
 
-            // Tap / drag anywhere that is not the panel closes it. Below the
-            // drawer, so its own controls still receive taps.
+            // Close catcher: tap/drag anywhere on the conversation closes the
+            // drawer. Drawn under the panel so drawer controls stay tappable.
             if p > 0.001 {
                 Color.white.opacity(0.001)
                     .ignoresSafeArea()
@@ -111,9 +114,8 @@ extension ContentView {
                     .zIndex(1)
             }
 
-            // Panel on TOP: the only arrangement where .ultraThinMaterial has
-            // real content behind it to blur, which is what makes it read as
-            // glass rather than flat dark grey.
+            // Drawer panel on TOP: glass material blurs the conversation behind
+            // it, giving a true floating surface rather than flat overlay.
             historyDrawer
                 .frame(width: drawerWidth)
                 .frame(maxHeight: .infinity)
@@ -131,7 +133,6 @@ extension ContentView {
             }
         }
     }
-
     /// Live drawer position: follows the finger while dragging, otherwise
     /// snaps to 0 (closed) or 1 (open).
     var drawerProgress: CGFloat {
