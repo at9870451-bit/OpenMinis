@@ -46,7 +46,10 @@ workflows:
           ./deps/build_lame.sh
           ./deps/build_ffmpeg.sh
           ./deps/build_ish.sh
-          ./deps/prepare_alpine_rootfs.sh
+          # Rootfs downloads on first launch; ship a stub so the
+          # Xcode file reference still resolves.
+          mkdir -p deps/resources
+          printf "placeholder" > deps/resources/alpine-rootfs.zip
           ./deps/build_rclone_ios.sh
 
       - name: Build app
