@@ -47,20 +47,6 @@ extension AIChatView {
                 Button { showDocumentPicker = true } label: { Label("Add File", systemImage: "doc") }
                 Divider()
                 Button {
-                    if !vm.showMentionMenu {
-                        vm.showMentionMenu = true
-                        vm.updateMentionMenuState()
-                    }
-                    inputFocused = true
-                } label: { Label("Mention a File", systemImage: "at") }
-                Button {
-                    if !vm.showMentionMenu {
-                        vm.showMentionMenu = true
-                        vm.updateMentionMenuState()
-                    }
-                    inputFocused = true
-                } label: { Label("Mention a File", systemImage: "at") }
-                Button {
                     vm.showSlashMenuOverInput()
                     inputFocused = true
                 } label: { Label("Slash Commands", systemImage: "slash.circle") }
