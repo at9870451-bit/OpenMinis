@@ -1,9 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:amore/src/rust/frb_generated.dart';
 import 'package:amore/src/rust/api/simple.dart';
 
-/// This is the stage-1 acceptance test: it only passes if the Dart -> Rust
-/// bridge is genuinely generated, linked and callable.
+/// Stage-1 acceptance test: passes only if the Dart -> Rust bridge is really
+/// generated, linked and callable on this machine.
 void main() {
+  setUpAll(() async {
+    // Loads the native library (libamore_core.dylib on macOS) and initialises
+    // the frb dispatcher.
+    await RustLib.init();
+  });
+
   test('greet round-trips through Rust', () {
     expect(greet(name: 'Amore'), 'Hello, Amore! — from Rust');
   });
