@@ -12,8 +12,13 @@ Flutter app can host the Linux sandbox without editing the Xcode project file.
   s.source           = { :path => '.' }
 
   s.ios.deployment_target = '15.0'
-  s.source_files          = '*.{h,c}'
+  # Kernel wrappers (copied in by CI) + the Flutter plugin + stubs.
+  s.source_files          = '*.{h,c,m,swift}', 'stubs/*.{h,m}'
   s.public_header_files   = '*.h'
+  s.swift_version         = '5.0'
+  s.preserve_paths        = '*.a'
+  s.frameworks            = 'Foundation', 'UIKit'
+  s.dependency              'Flutter'
   s.vendored_libraries    = 'libish.a', 'libish_emu.a', 'libfakefs.a'
   s.libraries              = 'c++', 'z', 'sqlite3', 'iconv'
 
@@ -22,6 +27,11 @@ Flutter app can host the Linux sandbox without editing the Xcode project file.
   # _gadget_* symbols. Its objects are referenced anyway, so plain linking works.
   s.pod_target_xcconfig = {
     'OTHER_LDFLAGS' => '-force_load "${PODS_TARGET_SRCROOT}/libish.a"',
+    # iSH public headers land in deps/include by deps/build_ish.sh.
+    'HEADER_SEARCH_PATHS' => '"${PODS_TARGET_SRCROOT}/../../../deps/include" ' \
+                             '"${PODS_TARGET_SRCROOT}/../../../deps/ish" ' \
+                             '"${PODS_TARGET_SRCROOT}/stubs"',
+    'SWIFT_OBJC_BRIDGING_HEADER' => '"${PODS_TARGET_SRCROOT}/ISHHost-Bridging-Header.h"',
     'CLANG_CXX_LANGUAGE_STANDARD' => 'gnu++17',
     'GCC_ENABLE_CPP_EXCEPTIONS' => 'NO',
     'GCC_ENABLE_CPP_RTTI' => 'NO',
