@@ -20,6 +20,18 @@ class ChatMessage {
 
   bool get isUser => role == 'user';
 
+  /// Clone into a (possibly new) session with an explicit sort order — used
+  /// when a draft chat is first persisted.
+  ChatMessage copyWithSession(String sid, int order) => ChatMessage(
+        id: id,
+        sessionId: sid,
+        role: role,
+        text: text,
+        createdAt: createdAt,
+        sortOrder: order,
+        streaming: streaming,
+      );
+
   ChatMessage copyWith({String? text, bool? streaming}) => ChatMessage(
         id: id,
         sessionId: sessionId,
