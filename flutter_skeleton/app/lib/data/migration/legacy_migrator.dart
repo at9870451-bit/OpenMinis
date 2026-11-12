@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:drift/drift.dart' show Variable;
 import 'package:sqlite3/sqlite3.dart' as sq;
 
 import '../db/app_database.dart';
