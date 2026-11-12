@@ -112,9 +112,14 @@ class ChatRepository {
     var j = start + 1;
     while (j < partsJson.length) {
       final c = partsJson[j];
-      if (c == r'\') {
-        j += 2;
-        continue;
+      if (c == '\\') {
+        // Decode the escapes we actually emit (and tolerate the rest).
+        if (j + 1 < partsJson.length) {
+          final n = partsJson[j + 1];
+          buf.write(n == 'n' ? '\n' : n == 't' ? '\t' : n);
+          j += 2;
+          continue;
+        }
       }
       if (c == '"') break;
       buf.write(c);
