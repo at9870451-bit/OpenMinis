@@ -116,6 +116,8 @@ workflows:
           cd flutter_skeleton/app
           flutter create --platforms=ios --org com.openamroe . > create.log 2>&1
           flutter pub get > pubget.log 2>&1
+          # frb canonicalises dart_output before writing; the directory must exist.
+          mkdir -p lib/src/rust
           flutter_rust_bridge_codegen generate > frb.log 2>&1
           RC=$?
           echo "=== codegen exit: $RC ==="
