@@ -3,9 +3,18 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 
+/// Transport contract. The app uses [SseChatTransport]; tests inject a fake so
+/// streaming behaviour can be asserted without a network.
+abstract class ChatTransport {
+  Stream<String> stream({
+    required List<Map<String, String>> messages,
+    CancelToken? cancelToken,
+  });
+}
+
 /// Real SSE transport for OpenAI-compatible `/chat/completions` streaming.
 /// No fake data: if no endpoint/key is configured the caller surfaces an error.
-class SseChatTransport {
+class SseChatTransport implements ChatTransport {
   SseChatTransport({
     required this.baseUrl,
     required this.apiKey,
@@ -21,6 +30,7 @@ class SseChatTransport {
   /// Emits content deltas as they arrive. Throwing on HTTP/transport failure is
   /// deliberate — the UI turns it into a retryable message, never a silent
   /// empty answer.
+  @override
   Stream<String> stream({
     required List<Map<String, String>> messages,
     CancelToken? cancelToken,
