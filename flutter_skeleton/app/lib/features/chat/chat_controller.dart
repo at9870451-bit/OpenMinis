@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/chat_models.dart';
+import '../../data/chat_repository.dart';
 import '../../data/chat_transport.dart';
 
 /// Holds the conversation currently on screen and owns the streaming state.
@@ -36,14 +37,36 @@ class ChatState {
 }
 
 class ChatController extends StateNotifier<ChatState> {
-  ChatController({ChatTransport? transport})
+  ChatController({ChatTransport? transport, ChatRepository? repository})
       : _transport = transport,
+        _repository = repository,
         super(ChatState());
 
   ChatTransport? _transport;
+  ChatRepository? _repository;
   CancelTokenHolder? _cancel;
 
+  /// Currently opened session (null = a brand new, unsaved chat).
+  String? sessionId;
+
   void configure(ChatTransport transport) => _transport = transport;
+
+  void attachRepository(ChatRepository repository) => _repository = repository;
+
+  /// Load a conversation from the database.
+  Future<void> openSession(String id) async {
+    sessionId = id;
+    final repo = _repository;
+    if (repo == null) return;
+    final loaded = await repo.messages(id);
+    state = ChatState(messages: loaded);
+  }
+
+  /// Start a fresh conversation (no row written until the first message).
+  void newChat() {
+    sessionId = null;
+    state = ChatState();
+  }
 
   Future<void> send(String text) async {
     if (text.trim().isEmpty || state.streaming) return;
@@ -65,6 +88,16 @@ class ChatController extends StateNotifier<ChatState> {
       createdAt: now,
       streaming: true,
     );
+
+    final repo = _repository;
+    var sid = sessionId;
+    if (repo != null) {
+      sid ??= 's-${now.microsecondsSinceEpoch}';
+      sessionId = sid;
+      await repo.createSession(sid, title: text.trim());
+      await repo.upsertMessage(userMsg.copyWithSession(sid, 0));
+      await repo.upsertMessage(assistantMsg.copyWithSession(sid, 1));
+    }
 
     state = state.copyWith(
       messages: [...state.messages, userMsg, assistantMsg],
@@ -121,6 +154,13 @@ class ChatController extends StateNotifier<ChatState> {
         if (m.id == id) m.copyWith(streaming: false) else m,
     ];
     state = state.copyWith(messages: next, streaming: false);
+    final repo = _repository;
+    final sid = sessionId;
+    if (repo != null && sid != null) {
+      final msg = next.firstWhere((m) => m.id == id, orElse: () => next.last);
+      unawaited(repo.upsertMessage(msg));
+      unawaited(repo.touchSession(sid));
+    }
   }
 
   void _fail(String id, String message) {
