@@ -115,6 +115,9 @@ workflows:
           source "$HOME/.cargo/env"
           cd flutter_skeleton/app
           flutter create --platforms=ios --org com.openamroe . > create.log 2>&1
+          # flutter create drops its own counter widget test, which knows
+          # nothing about the bridge and would fail the run.
+          rm -f test/widget_test.dart
           flutter pub get > pubget.log 2>&1
           # frb canonicalises dart_output before writing; the directory must exist.
           mkdir -p lib/src/rust
