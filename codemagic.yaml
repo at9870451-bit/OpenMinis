@@ -184,7 +184,25 @@ workflows:
           echo "=== xcodebuild exit: $RC ==="
           tail -60 iosbuild.log || true
           exit $RC
+
+      - name: Package IPA
+        script: |
+          set -e
+          cd flutter_skeleton/app
+          APP=$(find build/ios/Build/Products/Release-iphoneos -maxdepth 1 -name "*.app" | head -1)
+          if [ -z "$APP" ] || [ ! -d "$APP" ]; then
+            echo "ERROR: Runner.app not found"
+            exit 1
+          fi
+          echo "Found: $APP"
+          rm -rf Payload
+          mkdir -p Payload
+          cp -r "$APP" Payload/
+          zip -r -y Amore-Flutter.ipa Payload
+          ls -lh Amore-Flutter.ipa
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist" || true
     artifacts:
+      - flutter_skeleton/app/Amore-Flutter.ipa
       - flutter_skeleton/app/build/ios/Build/Products/Release-iphoneos/*.app
       - flutter_skeleton/app/frb.log
       - flutter_skeleton/app/pubget.log
