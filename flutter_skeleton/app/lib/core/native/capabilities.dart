@@ -25,7 +25,9 @@ const List<Capability> kCapabilities = [
   Capability('Camera', CapabilityLayer.plugin, note: 'image_picker'),
   Capability('Photo library', CapabilityLayer.plugin, note: 'image_picker'),
   Capability('File picker', CapabilityLayer.plugin, note: 'file_picker'),
-  Capability('Microphone / recording', CapabilityLayer.plugin, note: 'record'),
+  Capability('Microphone / recording', CapabilityLayer.nativeBridge,
+      note: 'AVAudioRecorder in the retained native project; the record plugin '
+          'family currently ships an incompatible record_linux 0.7.2'),
   Capability('Audio playback', CapabilityLayer.plugin, note: 'just_audio (stage 6)'),
   Capability('Clipboard', CapabilityLayer.plugin, note: 'Flutter services'),
   Capability('Share sheet', CapabilityLayer.plugin, note: 'share_plus'),
