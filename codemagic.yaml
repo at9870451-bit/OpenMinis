@@ -122,6 +122,11 @@ workflows:
           # frb canonicalises dart_output before writing; the directory must exist.
           mkdir -p lib/src/rust
           flutter_rust_bridge_codegen generate > frb.log 2>&1
+          # Drift tables need generated code before anything can compile.
+          dart run build_runner build --delete-conflicting-outputs > build_runner.log 2>&1
+          RC2=$?
+          tail -40 build_runner.log || true
+          if [ $RC2 -ne 0 ]; then exit $RC2; fi
           RC=$?
           echo "=== codegen exit: $RC ==="
           tail -60 frb.log || true
@@ -154,3 +159,4 @@ workflows:
       - flutter_skeleton/app/pubget.log
       - flutter_skeleton/app/create.log
       - flutter_skeleton/app/test.log
+      - flutter_skeleton/app/build_runner.log
