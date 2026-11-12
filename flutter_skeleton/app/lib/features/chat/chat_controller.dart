@@ -36,14 +36,14 @@ class ChatState {
 }
 
 class ChatController extends StateNotifier<ChatState> {
-  ChatController({SseChatTransport? transport})
+  ChatController({ChatTransport? transport})
       : _transport = transport,
         super(ChatState());
 
-  SseChatTransport? _transport;
+  ChatTransport? _transport;
   CancelTokenHolder? _cancel;
 
-  void configure(SseChatTransport transport) => _transport = transport;
+  void configure(ChatTransport transport) => _transport = transport;
 
   Future<void> send(String text) async {
     if (text.trim().isEmpty || state.streaming) return;
