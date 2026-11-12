@@ -118,6 +118,8 @@ workflows:
 
       - name: Build iSH static libraries
         script: |
+          set -e
+          brew install ninja llvm lld libarchive pkg-config meson >/dev/null 2>&1 || true
           chmod -R +x deps scripts 2>/dev/null || true
           export PATH="/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH"
           ./deps/build_ish.sh > ish_build.log 2>&1
