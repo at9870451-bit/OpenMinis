@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/amore_theme.dart';
 import '../data/chat_models.dart';
+import '../data/chat_repository.dart';
 import '../features/chat/chat_controller.dart';
 import '../features/chat/chat_page.dart';
 import '../features/settings/settings_page.dart';
@@ -13,13 +14,23 @@ import '../main.dart' show chatControllerProvider;
 /// slides in from the left. Progress `p` drives every layer, so the drag is
 /// frame-synced rather than a binary animation.
 class HomeShell extends ConsumerStatefulWidget {
-  const HomeShell({super.key, this.sessions = const []});
-
-  final List<ChatSessionSummary> sessions;
+  const HomeShell({super.key});
 
   @override
   ConsumerState<HomeShell> createState() => _HomeShellState();
 }
+
+/// Opened once per app run; the same instance is shared by the sidebar and the
+/// chat controller so a saved message is visible in both immediately.
+final repositoryProvider = FutureProvider<ChatRepository>((ref) async {
+  return openRepository();
+});
+
+/// Sessions for the sidebar, refreshed after every chat.
+final sessionsProvider = FutureProvider<List<ChatSessionSummary>>((ref) async {
+  final repo = await ref.watch(repositoryProvider.future);
+  return repo.sessions();
+});
 
 class _HomeShellState extends ConsumerState<HomeShell> {
   static const double _drawerFraction = 0.78;
@@ -42,6 +53,14 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final size = MediaQuery.of(context).size;
     final drawerWidth = size.width * _drawerFraction;
     final chat = ref.watch(chatControllerProvider);
+    final sessions = ref.watch(sessionsProvider);
+
+    // Attach the repository to the controller once it is ready, so messages
+    // are persisted and history can be reopened.
+    ref.listen(repositoryProvider, (previous, next) {
+      next.whenData((repo) =>
+          ref.read(chatControllerProvider.notifier).attachRepository(repo));
+    });
 
     return Scaffold(
       backgroundColor: AmoreTheme.background,
@@ -64,8 +83,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                     ChatPage(
                       messages: chat.messages,
                       streaming: chat.streaming,
-                      onSend: (t) =>
-                          ref.read(chatControllerProvider.notifier).send(t),
+                      onSend: (t) async {
+                        await ref.read(chatControllerProvider.notifier).send(t);
+                        ref.invalidate(sessionsProvider);
+                      },
                       onOpenSidebar: _openDrawer,
                     ),
                     if (_p > 0)
@@ -105,12 +126,20 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 0,
               ),
               child: SidebarDrawer(
-                sessions: widget.sessions,
-                selectedId: null,
-                onSelect: (id) => _closeDrawer(),
+                sessions: sessions.valueOrNull ?? const [],
+                selectedId: ref.read(chatControllerProvider).messages.isEmpty
+                    ? null
+                    : null,
+                onSelect: (id) async {
+                  _closeDrawer();
+                  final repo = await ref.read(repositoryProvider.future);
+                  final controller = ref.read(chatControllerProvider.notifier);
+                  controller.attachRepository(repo);
+                  await controller.openSession(id);
+                },
                 onNewChat: () {
                   _closeDrawer();
-                  ref.read(chatControllerProvider.notifier).stop();
+                  ref.read(chatControllerProvider.notifier).newChat();
                 },
                 onSettings: () {
                   _closeDrawer();
