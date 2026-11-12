@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/amore_theme.dart';
+import '../../core/native/ish_probe.dart';
 import '../../data/agent_store.dart';
 import '../agent/agent_pages.dart';
 import 'appearance_page.dart';
@@ -98,8 +99,14 @@ class SettingsPage extends ConsumerWidget {
             ),
           ]),
           _section(context, 'About', [
-            _row(context, icon: Icons.info_outline, title: 'Amore',
-                subtitle: 'Flutter + Rust · 1.15'),
+            _row(
+              context,
+              icon: Icons.info_outline,
+              title: 'Amore',
+              subtitle: IshProbe.isLinked
+                  ? 'Flutter + Rust · iSH kernel linked'
+                  : 'Flutter + Rust · 1.15',
+            ),
           ]),
         ],
       ),
