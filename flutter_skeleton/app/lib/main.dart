@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'src/rust/api/simple.dart';
+import 'src/rust/frb_generated.dart';
 
 /// Stage-1 shell: proves the Dart -> Rust -> Dart path inside a real widget,
 /// with the Apple-White tokens that later stages will extend.
-void main() => runApp(const ProviderScope(child: AmoreApp()));
+Future<void> main() async {
+  await RustLib.init();
+  runApp(const ProviderScope(child: AmoreApp()));
+}
 
 class AmoreApp extends StatelessWidget {
   const AmoreApp({super.key});
