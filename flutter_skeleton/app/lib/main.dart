@@ -39,12 +39,14 @@ class BridgeProbePage extends StatefulWidget {
 class _BridgeProbePageState extends State<BridgeProbePage> {
   String _result = 'Tap to call Rust';
 
-  void _callRust() {
-    // Synchronous FFI call into the Rust core.
+  Future<void> _callRust() async {
+    // frb generates async wrappers for non-sync functions; greet() is marked
+    // #[frb(sync)] so it stays a plain call.
     final greeting = greet(name: 'Amore');
-    final digest = digestSession(
+    final digest = await digestSession(
       json: '{"title":"迁移测试","messages":[{"content":"你好"},{"content":"hello"}]}',
     );
+    if (!mounted) return;
     setState(() {
       _result = '$greeting\n'
           'digest: ${digest.title} / ${digest.messageCount} msgs / '
