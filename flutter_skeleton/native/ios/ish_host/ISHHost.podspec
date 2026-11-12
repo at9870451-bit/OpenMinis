@@ -8,9 +8,8 @@ Pod::Spec.new do |s|
   s.author           = { 'Amore' => 'noreply@example.com' }
   s.source           = { :path => '.' }
   s.platform         = :ios, '15.0'
-  s.source_files     = '*.h', '*.c', '*.m', '*.swift', 'stubs/*.h', 'stubs/*.m'
-  s.public_header_files = '*.h'
-  s.swift_version    = '5.0'
+  s.source_files     = '*.h', '*.c', '*.m', 'stubs/*.h', 'stubs/*.m'
+  s.public_header_files = 'AmoreNativePlugin.h', 'ISHHost.h'
   s.frameworks       = 'Foundation', 'UIKit'
   s.libraries        = 'c++', 'z', 'sqlite3', 'iconv'
   s.vendored_libraries = 'libish.a', 'libish_emu.a', 'libfakefs.a'
@@ -18,6 +17,6 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig = {
     'OTHER_LDFLAGS' => '-force_load "${PODS_TARGET_SRCROOT}/libish.a"',
     'HEADER_SEARCH_PATHS' => '"${PODS_TARGET_SRCROOT}/../../../deps/include" "${PODS_TARGET_SRCROOT}/../../../deps/ish" "${PODS_TARGET_SRCROOT}/stubs"',
-    'SWIFT_OBJC_BRIDGING_HEADER' => '${PODS_TARGET_SRCROOT}/ISHHost-Bridging-Header.h'
+    'CLANG_ENABLE_MODULES' => 'YES'
   }
 end
