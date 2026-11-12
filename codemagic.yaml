@@ -110,15 +110,22 @@ workflows:
           cd flutter_skeleton/rust
           cargo test -- --nocapture
 
-      - name: Build iSH static libraries
+      - name: Checkout submodules
         script: |
           set -e
+          git submodule update --init --recursive
+          ls deps/ish | head -3
+
+      - name: Build iSH static libraries
+        script: |
           chmod -R +x deps scripts 2>/dev/null || true
           export PATH="/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH"
           ./deps/build_ish.sh > ish_build.log 2>&1
-          echo "--- iSH archives ---"
-          ls -lh deps/libs/*.a || true
-          ls -lh deps/resources/libvdso.so.elf 2>/dev/null || true
+          RC=$?
+          echo "=== build_ish exit: $RC ==="
+          tail -40 ish_build.log || true
+          ls -lh deps/libs/*.a 2>/dev/null || true
+          exit $RC
 
       - name: Generate bridge
         script: |
@@ -230,3 +237,4 @@ workflows:
       - flutter_skeleton/app/test.log
       - flutter_skeleton/app/build_runner.log
       - flutter_skeleton/app/iosbuild.log
+      - ish_build.log
