@@ -8,8 +8,8 @@ void main() {
     expect(greet(name: 'Amore'), 'Hello, Amore! — from Rust');
   });
 
-  test('digest_session parses JSON in Rust', () {
-    final d = digestSession(
+  test('digest_session parses JSON in Rust', () async {
+    final d = await digestSession(
       json: '{"title":"迁移测试","messages":[{"content":"你好"},{"content":"hello"}]}',
     );
     expect(d.title, '迁移测试');
