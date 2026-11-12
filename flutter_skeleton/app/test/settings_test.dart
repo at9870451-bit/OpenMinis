@@ -14,15 +14,23 @@ void main() {
       MaterialApp(theme: AmoreTheme.theme(), home: const SettingsPage()),
     );
 
+    // Sections above the fold.
     for (final label in [
       'Providers & API Keys',
       'Theme & Text Size',
       'Storage',
-      'Agent Tools',
-      'Skills',
-      'Memory',
-      'Amore',
     ]) {
+      expect(find.text(label), findsOneWidget, reason: 'missing $label');
+    }
+
+    // The rest lives further down the list; scroll it into the viewport before
+    // asserting, exactly as a user would.
+    await tester.scrollUntilVisible(
+      find.text('Amore'),
+      240,
+      scrollable: find.byType(Scrollable).first,
+    );
+    for (final label in ['Agent Tools', 'Skills', 'Memory', 'Amore']) {
       expect(find.text(label), findsOneWidget, reason: 'missing $label');
     }
   });
