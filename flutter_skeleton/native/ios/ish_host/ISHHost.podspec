@@ -1,0 +1,23 @@
+Pod::Spec.new do |s|
+  s.name             = 'ISHHost'
+  s.version          = '0.1.0'
+  s.summary          = 'iSH kernel host for the Flutter runner.'
+  s.description      = 'Vendors libish/libish_emu/libfakefs and exposes the sandbox over the amore/native channel.'
+  s.homepage         = 'https://github.com/OpenMinis/OpenMinis'
+  s.license          = { :type => 'GPL-3.0' }
+  s.author           = { 'Amore' => 'noreply@example.com' }
+  s.source           = { :path => '.' }
+  s.platform         = :ios, '15.0'
+  s.source_files     = '*.h', '*.c', '*.m', '*.swift', 'stubs/*.h', 'stubs/*.m'
+  s.public_header_files = '*.h'
+  s.swift_version    = '5.0'
+  s.frameworks       = 'Foundation', 'UIKit'
+  s.libraries        = 'c++', 'z', 'sqlite3', 'iconv'
+  s.vendored_libraries = 'libish.a', 'libish_emu.a', 'libfakefs.a'
+  s.dependency 'Flutter'
+  s.pod_target_xcconfig = {
+    'OTHER_LDFLAGS' => '-force_load "${PODS_TARGET_SRCROOT}/libish.a"',
+    'HEADER_SEARCH_PATHS' => '"${PODS_TARGET_SRCROOT}/../../../deps/include" "${PODS_TARGET_SRCROOT}/../../../deps/ish" "${PODS_TARGET_SRCROOT}/stubs"',
+    'SWIFT_OBJC_BRIDGING_HEADER' => '${PODS_TARGET_SRCROOT}/ISHHost-Bridging-Header.h'
+  }
+end
