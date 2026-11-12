@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/amore_theme.dart';
 import '../../data/chat_models.dart';
+import 'markdown_message.dart';
 
 /// User messages are right-aligned light-grey bubbles; assistant messages are
 /// plain text on the page background (ChatGPT behaviour).
@@ -40,14 +41,11 @@ class MessageBubble extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            message.text.isEmpty && message.streaming ? '…' : message.text,
-            style: const TextStyle(
-              fontSize: 16,
-              height: 1.45,
-              color: AmoreTheme.textPrimary,
-            ),
-          ),
+          if (message.text.isEmpty && message.streaming)
+            const Text('…',
+                style: TextStyle(fontSize: 16, color: AmoreTheme.textSecondary))
+          else
+            MarkdownMessage(text: message.text),
           if (message.streaming)
             const Padding(
               padding: EdgeInsets.only(top: 6),
