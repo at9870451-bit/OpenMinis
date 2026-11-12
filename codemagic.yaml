@@ -163,14 +163,29 @@ workflows:
 
       - name: Build iOS runner
         script: |
+          set -o pipefail
           cd flutter_skeleton/app
-          flutter build ios --no-codesign > iosbuild.log 2>&1
+          # CocoaPods (needed by the plugin set) makes `flutter build ios
+          # --no-codesign` demand a Development Team. Generate the config +
+          # pods, then drive xcodebuild directly with signing disabled — the
+          # same approach the Swift app uses.
+          flutter build ios --config-only --no-codesign > iosbuild.log 2>&1 || true
+          (cd ios && pod install >> ../iosbuild.log 2>&1) || true
+          xcodebuild -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/ios \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build >> iosbuild.log 2>&1
           RC=$?
-          echo "=== ios build exit: $RC ==="
-          tail -80 iosbuild.log || true
+          echo "=== xcodebuild exit: $RC ==="
+          tail -60 iosbuild.log || true
           exit $RC
     artifacts:
-      - flutter_skeleton/app/build/ios/iphoneos/*.app
+      - flutter_skeleton/app/build/ios/Build/Products/Release-iphoneos/*.app
       - flutter_skeleton/app/frb.log
       - flutter_skeleton/app/pubget.log
       - flutter_skeleton/app/create.log
