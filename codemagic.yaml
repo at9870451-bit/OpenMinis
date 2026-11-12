@@ -132,7 +132,13 @@ workflows:
           cargo build --release
           cd ../app
           cp ../rust/target/release/libamore_core.dylib . 2>/dev/null || true
-          DYLD_LIBRARY_PATH="$PWD:../rust/target/release" flutter test -r expanded
+          DYLD_LIBRARY_PATH="$PWD:../rust/target/release" \
+            DYLD_FALLBACK_LIBRARY_PATH="$PWD:../rust/target/release" \
+            flutter test -r expanded > test.log 2>&1
+          RC=$?
+          echo "=== flutter test exit: $RC ==="
+          tail -60 test.log || true
+          exit $RC
 
       - name: Build iOS runner
         script: |
@@ -144,3 +150,4 @@ workflows:
       - flutter_skeleton/app/frb.log
       - flutter_skeleton/app/pubget.log
       - flutter_skeleton/app/create.log
+      - flutter_skeleton/app/test.log
