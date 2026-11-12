@@ -64,11 +64,12 @@ class _StoragePageState extends State<StoragePage> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: AmoreTheme.background,
+                Material(
+                  color: AmoreTheme.background,
+                  clipBehavior: Clip.antiAlias,
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AmoreTheme.rCard),
-                    border: Border.all(color: AmoreTheme.separator, width: 0.5),
+                    side: const BorderSide(color: AmoreTheme.separator, width: 0.5),
                   ),
                   child: Column(
                     children: [
