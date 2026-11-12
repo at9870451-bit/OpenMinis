@@ -112,14 +112,15 @@ workflows:
 
       - name: Generate bridge
         script: |
-          set -e
           source "$HOME/.cargo/env"
           cd flutter_skeleton/app
-          flutter create --platforms=ios --org com.openamroe .
-          flutter pub get
-          flutter_rust_bridge_codegen generate
-          echo "--- generated Dart (first 40 lines) ---"
-          sed -n '1,40p' lib/src/rust/api/simple.dart
+          flutter create --platforms=ios --org com.openamroe . > create.log 2>&1
+          flutter pub get > pubget.log 2>&1
+          flutter_rust_bridge_codegen generate > frb.log 2>&1
+          RC=$?
+          echo "=== codegen exit: $RC ==="
+          tail -60 frb.log || true
+          exit $RC
 
       - name: Flutter tests
         script: |
@@ -138,3 +139,6 @@ workflows:
           flutter build ios --no-codesign
     artifacts:
       - flutter_skeleton/app/build/ios/iphoneos/*.app
+      - flutter_skeleton/app/frb.log
+      - flutter_skeleton/app/pubget.log
+      - flutter_skeleton/app/create.log
