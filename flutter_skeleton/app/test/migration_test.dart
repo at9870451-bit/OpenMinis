@@ -59,7 +59,7 @@ void main() {
     expect(counts['messages'], 2);
 
     // Cross-check in Rust — the same verification the app will run on device.
-    final report = verifyMigration(
+    final report = await verifyMigration(
       counts: [
         TableCount(table: 'sessions', legacy: 1, migrated: counts['sessions']!),
         TableCount(table: 'messages', legacy: 2, migrated: counts['messages']!),
