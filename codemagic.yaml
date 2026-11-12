@@ -110,6 +110,16 @@ workflows:
           cd flutter_skeleton/rust
           cargo test -- --nocapture
 
+      - name: Build iSH static libraries
+        script: |
+          set -e
+          chmod -R +x deps scripts 2>/dev/null || true
+          export PATH="/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH"
+          ./deps/build_ish.sh > ish_build.log 2>&1
+          echo "--- iSH archives ---"
+          ls -lh deps/libs/*.a || true
+          ls -lh deps/resources/libvdso.so.elf 2>/dev/null || true
+
       - name: Generate bridge
         script: |
           source "$HOME/.cargo/env"
@@ -118,6 +128,16 @@ workflows:
           # flutter create drops its own counter widget test, which knows
           # nothing about the bridge and would fail the run.
           rm -f test/widget_test.dart
+          # Vendor the freshly built iSH archives into a local pod so they are
+          # linked without touching project.pbxproj.
+          mkdir -p ios/ish_host
+          cp ../../deps/libs/libish.a ../../deps/libs/libish_emu.a \
+             ../../deps/libs/libfakefs.a ios/ish_host/ 2>/dev/null || true
+          cp ../../flutter_skeleton/native/ios/ish_host/* ios/ish_host/ 2>/dev/null || true
+          cp ../native/ios/ish_host/* ios/ish_host/ 2>/dev/null || true
+          if ! grep -q "ISHHost" ios/Podfile; then
+            echo "  pod 'ISHHost', :path => './ish_host'" >> ios/Podfile
+          fi
           # Camera / photos / mic / files all need usage strings or iOS kills
           # the app the first time each is touched.
           PLIST=ios/Runner/Info.plist
