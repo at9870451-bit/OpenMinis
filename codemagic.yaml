@@ -163,9 +163,12 @@ workflows:
 
       - name: Build iOS runner
         script: |
-          set -e
           cd flutter_skeleton/app
-          flutter build ios --no-codesign
+          flutter build ios --no-codesign > iosbuild.log 2>&1
+          RC=$?
+          echo "=== ios build exit: $RC ==="
+          tail -80 iosbuild.log || true
+          exit $RC
     artifacts:
       - flutter_skeleton/app/build/ios/iphoneos/*.app
       - flutter_skeleton/app/frb.log
@@ -173,3 +176,4 @@ workflows:
       - flutter_skeleton/app/create.log
       - flutter_skeleton/app/test.log
       - flutter_skeleton/app/build_runner.log
+      - flutter_skeleton/app/iosbuild.log
