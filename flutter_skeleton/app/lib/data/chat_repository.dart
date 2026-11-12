@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart' show Variable;
+import 'package:drift/drift.dart' show UpdateKind, Variable;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
