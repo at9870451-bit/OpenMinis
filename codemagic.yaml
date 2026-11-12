@@ -114,10 +114,12 @@ workflows:
         script: |
           set -e
           source "$HOME/.cargo/env"
-          cd flutter_skeleton
+          cd flutter_skeleton/app
+          flutter create --platforms=ios --org com.openamroe .
+          flutter pub get
           flutter_rust_bridge_codegen generate
           echo "--- generated Dart (first 40 lines) ---"
-          sed -n '1,40p' app/lib/src/rust/api/simple.dart
+          sed -n '1,40p' lib/src/rust/api/simple.dart
 
       - name: Flutter tests
         script: |
@@ -126,10 +128,8 @@ workflows:
           cd flutter_skeleton/rust
           cargo build --release
           cd ../app
-          flutter create --platforms=ios --org com.openamroe .
-          flutter pub get
           cp ../rust/target/release/libamore_core.dylib . 2>/dev/null || true
-          flutter test -r expanded
+          DYLD_LIBRARY_PATH="$PWD:../rust/target/release" flutter test -r expanded
 
       - name: Build iOS runner
         script: |
