@@ -16,9 +16,10 @@ void main() {
     )));
     await tester.pumpAndSettle();
 
-    expect(find.text('Title'), findsOneWidget);
-    expect(find.text('one'), findsOneWidget);
-    expect(find.text('bold'), findsOneWidget);
+    // flutter_markdown renders into RichText, so finders must look inside it.
+    expect(find.text('Title', findRichText: true), findsOneWidget);
+    expect(find.text('one', findRichText: true), findsOneWidget);
+    expect(find.textContaining('bold', findRichText: true), findsOneWidget);
   });
 
   testWidgets('renders a fenced code block with its language label',
@@ -29,7 +30,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('dart'), findsOneWidget);
-    expect(find.textContaining('void main'), findsOneWidget);
+    expect(find.textContaining('void main', findRichText: true), findsOneWidget);
   });
 
   testWidgets('renders inline and display math without falling back to raw text',
@@ -40,6 +41,6 @@ void main() {
     await tester.pumpAndSettle();
 
     // Math.tex renders a widget; the raw dollar syntax must be gone.
-    expect(find.textContaining(r'$E=mc^2$'), findsNothing);
+    expect(find.textContaining(r'$E=mc^2$', findRichText: true), findsNothing);
   });
 }
