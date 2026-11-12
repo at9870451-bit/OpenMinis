@@ -118,6 +118,19 @@ workflows:
           # flutter create drops its own counter widget test, which knows
           # nothing about the bridge and would fail the run.
           rm -f test/widget_test.dart
+          # Camera / photos / mic / files all need usage strings or iOS kills
+          # the app the first time each is touched.
+          PLIST=ios/Runner/Info.plist
+          add_perm() { /usr/libexec/PlistBuddy -c "Add :$1 string \"$2\"" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Set :$1 \"$2\"" "$PLIST"; }
+          add_perm NSCameraUsageDescription "Amore uses the camera to attach photos to your messages."
+          add_perm NSPhotoLibraryUsageDescription "Amore needs access to your photos to attach them to messages."
+          add_perm NSPhotoLibraryAddUsageDescription "Amore saves images you export from a chat."
+          add_perm NSMicrophoneUsageDescription "Amore records voice input for chat."
+          add_perm NSSpeechRecognitionUsageDescription "Amore transcribes your voice into text."
+          add_perm NSFaceIDUsageDescription "Amore can lock the app with Face ID."
+          add_perm NSLocalNetworkUsageDescription "Amore reaches local model servers and devices on your network."
+          echo "--- Info.plist permissions ---"
+          /usr/libexec/PlistBuddy -c "Print" "$PLIST" | grep -E "NSCamera|NSMicrophone|NSPhotoLibrary|NSFaceID" || true
           flutter pub get > pubget.log 2>&1
           # frb canonicalises dart_output before writing; the directory must exist.
           mkdir -p lib/src/rust
