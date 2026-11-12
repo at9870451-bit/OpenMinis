@@ -5,6 +5,7 @@ import '../core/theme/amore_theme.dart';
 import '../data/chat_models.dart';
 import '../features/chat/chat_controller.dart';
 import '../features/chat/chat_page.dart';
+import '../features/settings/settings_page.dart';
 import '../features/sidebar/sidebar_drawer.dart';
 import '../main.dart' show chatControllerProvider;
 
@@ -111,7 +112,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                   _closeDrawer();
                   ref.read(chatControllerProvider.notifier).stop();
                 },
-                onSettings: _closeDrawer,
+                onSettings: () {
+                  _closeDrawer();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SettingsPage()),
+                  );
+                },
               ),
             ),
           ),
