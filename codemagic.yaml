@@ -82,3 +82,59 @@ workflows:
     artifacts:
       - Amore.ipa
       - build/Build/Products/Release-iphoneos/*.app
+
+  # ---------------------------------------------------------------
+  # Stage 1 of the Flutter + Rust migration: proves the toolchain,
+  # the codegen and the Rust core all work in a real macOS build.
+  # ---------------------------------------------------------------
+  flutter-bridge:
+    name: Flutter + Rust bridge
+    instance_type: mac_mini_m2
+    max_build_duration: 75
+    environment:
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Rust toolchain
+        script: |
+          set -e
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+          source "$HOME/.cargo/env"
+          rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+          cargo install flutter_rust_bridge_codegen --version 2.7.0 --locked
+
+      - name: Rust unit tests
+        script: |
+          set -e
+          source "$HOME/.cargo/env"
+          cd flutter_skeleton/rust
+          cargo test -- --nocapture
+
+      - name: Generate bridge
+        script: |
+          set -e
+          source "$HOME/.cargo/env"
+          cd flutter_skeleton
+          flutter_rust_bridge_codegen generate
+          echo "--- generated Dart (first 40 lines) ---"
+          sed -n '1,40p' app/lib/src/rust/api/simple.dart
+
+      - name: Flutter tests
+        script: |
+          set -e
+          source "$HOME/.cargo/env"
+          cd flutter_skeleton/rust
+          cargo build --release
+          cd ../app
+          flutter create --platforms=ios --org com.openamroe .
+          flutter pub get
+          cp ../rust/target/release/libamore_core.dylib . 2>/dev/null || true
+          flutter test -r expanded
+
+      - name: Build iOS runner
+        script: |
+          set -e
+          cd flutter_skeleton/app
+          flutter build ios --no-codesign
+    artifacts:
+      - flutter_skeleton/app/build/ios/iphoneos/*.app
