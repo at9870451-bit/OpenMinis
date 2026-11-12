@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.dependency 'Flutter'
   s.pod_target_xcconfig = {
     'OTHER_LDFLAGS' => '-force_load "${PODS_TARGET_SRCROOT}/libish.a"',
-    'HEADER_SEARCH_PATHS' => '"${PODS_TARGET_SRCROOT}/../../../deps/include" "${PODS_TARGET_SRCROOT}/../../../deps/ish" "${PODS_TARGET_SRCROOT}/stubs"',
+    'HEADER_SEARCH_PATHS' => '"${PODS_TARGET_SRCROOT}/../../../../deps/include" "${PODS_TARGET_SRCROOT}/../../../../deps/ish" "${PODS_TARGET_SRCROOT}/stubs"',
     'CLANG_ENABLE_MODULES' => 'YES'
   }
 end
