@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/amore_theme.dart';
+import '../../data/agent_store.dart';
+import '../agent/agent_pages.dart';
 import 'appearance_page.dart';
 import 'providers_page.dart';
 import 'storage_page.dart';
 
+/// One AgentStore per app run; pages share it so a toggle is visible elsewhere.
+final agentStoreProvider = FutureProvider<AgentStore>((ref) => AgentStore.open());
+
 /// Settings root, mirroring the section order of the SwiftUI app.
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
+  Future<void> _openAgentPage(
+    BuildContext context,
+    WidgetRef ref,
+    Widget Function(AgentStore) build,
+  ) async {
+    final store = await ref.read(agentStoreProvider.future);
+    if (!context.mounted) return;
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => build(store)));
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AmoreTheme.groupedBackground,
       appBar: AppBar(
@@ -56,10 +72,30 @@ class SettingsPage extends StatelessWidget {
                 subtitle: 'Native bridge (stage 5)'),
             _row(context, icon: Icons.people_outline, title: 'Sub Agents',
                 subtitle: 'Native bridge (stage 5)'),
-            _row(context, icon: Icons.extension_outlined, title: 'Skills',
-                subtitle: 'Stage 5+'),
-            _row(context, icon: Icons.memory_outlined, title: 'Memory',
-                subtitle: 'Stage 5+'),
+            _row(
+              context,
+              icon: Icons.extension_outlined,
+              title: 'Skills',
+              subtitle: 'Reads var/minis/skills',
+              onTap: () => _openAgentPage(
+                  context, ref, (store) => SkillsPage(store: store)),
+            ),
+            _row(
+              context,
+              icon: Icons.memory_outlined,
+              title: 'Memory',
+              subtitle: 'Reads var/minis/memory',
+              onTap: () => _openAgentPage(
+                  context, ref, (store) => MemoryPage(store: store)),
+            ),
+            _row(
+              context,
+              icon: Icons.hub_outlined,
+              title: 'MCP Servers',
+              subtitle: 'Reads mcp-servers/servers.json',
+              onTap: () => _openAgentPage(
+                  context, ref, (store) => McpPage(store: store)),
+            ),
           ]),
           _section(context, 'About', [
             _row(context, icon: Icons.info_outline, title: 'Amore',
