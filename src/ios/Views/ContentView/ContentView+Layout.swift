@@ -355,6 +355,7 @@ extension ContentView {
             case .subAgents: return (AppLocalized("Sub Agents"), "person.2")
             case .skills:    return (AppLocalized("Skills"), "puzzlepiece.extension")
             case .memory:    return (AppLocalized("Memory"), "brain.head.profile")
+            case .localBot:  return ("SnowLuma + QQBot", "antenna.radiowaves.left.and.right")
             }
         }()
         Button {
