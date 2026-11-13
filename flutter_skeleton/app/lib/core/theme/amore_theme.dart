@@ -16,6 +16,7 @@ class AmoreTheme {
   // Lines / accent
   static const separator = Color(0xFFE5E5EA);
   static const accent = Color(0xFF007AFF);
+  static const warning = Color(0xFFFF9500);
   static const danger = Color(0xFFFF3B30);
 
   // Radii
