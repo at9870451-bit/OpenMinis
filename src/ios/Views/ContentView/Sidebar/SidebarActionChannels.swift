@@ -62,5 +62,7 @@ enum SessionMenuAction {
     case forcePull(String)
     case select(String)
     case moveToFolder(String)
+    case archive(String)
+    case restore(String)
     case delete(String)
 }
