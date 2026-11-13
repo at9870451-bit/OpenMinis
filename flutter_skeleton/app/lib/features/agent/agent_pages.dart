@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/i18n/app_strings.dart';
 import '../../core/theme/amore_theme.dart';
 import '../../data/agent_store.dart';
 import '../chat/markdown_message.dart';
@@ -70,13 +71,13 @@ class _SkillsPageState extends State<SkillsPage> {
   @override
   Widget build(BuildContext context) {
     final skills = _skills;
+    final str = AppStrings.of(context);
     return _AgentScaffold(
-      title: 'Skills',
+      title: str.skills,
       child: skills == null
           ? const Center(child: CircularProgressIndicator())
           : skills.isEmpty
-              ? _empty('No skills installed.\n\nDrop a folder with SKILL.md into '
-                  'var/minis/skills to add one.')
+              ? _empty(str.noSkillsInstalled)
               : ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: skills.length,
@@ -145,12 +146,13 @@ class _MemoryPageState extends State<MemoryPage> {
   @override
   Widget build(BuildContext context) {
     final entries = _entries;
+    final str = AppStrings.of(context);
     return _AgentScaffold(
-      title: 'Memory',
+      title: str.memory,
       child: entries == null
           ? const Center(child: CircularProgressIndicator())
           : entries.isEmpty
-              ? _empty('No memory files yet.')
+              ? _empty(str.noMemoryFiles)
               : ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: entries.length,
@@ -232,13 +234,13 @@ class _McpPageState extends State<McpPage> {
   @override
   Widget build(BuildContext context) {
     final servers = _servers;
+    final str = AppStrings.of(context);
     return _AgentScaffold(
-      title: 'MCP Servers',
+      title: str.mcpServers,
       child: servers == null
           ? const Center(child: CircularProgressIndicator())
           : servers.isEmpty
-              ? _empty('No MCP servers configured.\n\n'
-                  'Add entries to var/minis/mcp-servers/servers.json.')
+              ? _empty(str.noMcpServers)
               : ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: servers.length,
@@ -314,7 +316,7 @@ class _DocumentPage extends StatelessWidget {
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: body.trim().isEmpty
-            ? _empty('This file is empty.')
+            ? _empty(AppStrings.of(context).emptyFile)
             : MarkdownMessage(text: body),
       ),
     );
