@@ -91,7 +91,7 @@ struct SessionStackRow: View {
         .contextMenu {
             // [T-ios-crash-contextmenu-uaf] Value-only menu view, no closure captures.
             SessionContextMenu(
-                key: MenuKey(sid: session.id, pinned: session.isPinned, title: session.title, filed: session.isFiled),
+                key: MenuKey(sid: session.id, pinned: session.isPinned, title: session.title, filed: session.isFiled, archived: false),
                 actions: menuActions
             )
             .equatable()
