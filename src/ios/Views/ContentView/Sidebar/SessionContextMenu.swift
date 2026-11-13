@@ -90,6 +90,19 @@ struct SessionContextMenu: View, Equatable {
         } label: {
             Label("Duplicate", systemImage: "doc.on.doc")
         }
+        if key.archived {
+            Button {
+                actions.send(.restore(key.sid))
+            } label: {
+                Label("Restore from Archive", systemImage: "tray.and.arrow.up")
+            }
+        } else {
+            Button {
+                actions.send(.archive(key.sid))
+            } label: {
+                Label("Archive", systemImage: "archivebox")
+            }
+        }
         // Single Button that opens the shared folder-picker sheet. Deliberately
         // NOT an inline submenu of folder names: this menu body is the
         // [T-ios-contextmenu-localized-mainthread-hang] site, and listing N
@@ -156,14 +169,14 @@ struct MenuKey: Equatable {
     let sid: String
     let pinned: Bool
     let title: String?
-    /// Whether the session currently belongs to a group. Drives the
-    /// "Move to Group" / "Change Group" wording.
-    ///
-    /// Carried in the KEY rather than read from a store inside `body`: the menu
-    /// is `.equatable()` precisely so `body` is skipped while the key is
-    /// unchanged, so a value the label depends on must participate in equality
-    /// or the wording would go stale after a move. It is also a plain `Bool`,
-    /// keeping this a pure value type — see the type comment above about the
-    /// use-after-free that closures/reference captures caused here.
     let filed: Bool
+    let archived: Bool
+
+    init(sid: String, pinned: Bool, title: String?, filed: Bool, archived: Bool = false) {
+        self.sid = sid
+        self.pinned = pinned
+        self.title = title
+        self.filed = filed
+        self.archived = archived
+    }
 }
