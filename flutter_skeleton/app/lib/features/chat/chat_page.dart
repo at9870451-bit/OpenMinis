@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../../core/i18n/app_strings.dart';
 import '../../core/theme/amore_theme.dart';
 import '../../data/chat_models.dart';
 import 'message_bubble.dart';
@@ -11,14 +13,18 @@ class ChatPage extends StatefulWidget {
     required this.messages,
     required this.onSend,
     required this.onOpenSidebar,
-    this.placeholder = 'Message Amore',
+    this.onRegenerate,
+    this.onEdit,
+    this.placeholder,
     this.streaming = false,
   });
 
   final List<ChatMessage> messages;
   final ValueChanged<String> onSend;
   final VoidCallback onOpenSidebar;
-  final String placeholder;
+  final VoidCallback? onRegenerate;
+  final ValueChanged<String>? onEdit;
+  final String? placeholder;
   final bool streaming;
 
   @override
@@ -48,6 +54,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final str = AppStrings.of(context);
     return Scaffold(
       backgroundColor: AmoreTheme.background,
       body: SafeArea(
@@ -61,8 +68,11 @@ class _ChatPageState extends State<ChatPage> {
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                       itemCount: widget.messages.length,
-                      itemBuilder: (context, i) =>
-                          MessageBubble(message: widget.messages[i]),
+                      itemBuilder: (context, i) => GestureDetector(
+                        onLongPress: () =>
+                            _showActions(context, widget.messages[i]),
+                        child: MessageBubble(message: widget.messages[i]),
+                      ),
                     ),
             ),
             _composer(),
@@ -90,9 +100,9 @@ class _ChatPageState extends State<ChatPage> {
             tooltip: 'History',
           ),
           const Spacer(),
-          const Text(
-            'Amore',
-            style: TextStyle(
+          Text(
+            str.appName,
+            style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w600,
               color: AmoreTheme.textPrimary,
@@ -121,18 +131,19 @@ class _ChatPageState extends State<ChatPage> {
                 size: 28, color: AmoreTheme.accent),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'How can I help?',
-            style: TextStyle(
+          Text(
+            str.howCanIHelp,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w600,
               color: AmoreTheme.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Ask anything, attach a file, or start with @',
-            style: TextStyle(fontSize: 14, color: AmoreTheme.textSecondary),
+          Text(
+            str.emptySubtitle,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, color: AmoreTheme.textSecondary),
           ),
         ],
       ),
@@ -171,13 +182,13 @@ class _ChatPageState extends State<ChatPage> {
                 textInputAction: TextInputAction.newline,
                 style: const TextStyle(
                     fontSize: 16, color: AmoreTheme.textPrimary),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   isDense: true,
                   border: InputBorder.none,
-                  hintText: 'Message Amore',
-                  hintStyle: TextStyle(
+                  hintText: widget.placeholder ?? str.messageHint,
+                  hintStyle: const TextStyle(
                       fontSize: 16, color: AmoreTheme.textSecondary),
-                  contentPadding: EdgeInsets.symmetric(vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -185,6 +196,62 @@ class _ChatPageState extends State<ChatPage> {
             _hasText
                 ? _sendButton()
                 : _circle(Icons.mic_none, onTap: () {}),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Long-press actions, mirroring the SwiftUI message menu.
+  void _showActions(BuildContext context, ChatMessage message) {
+    final str = AppStrings.of(context);
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AmoreTheme.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheet) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.copy_outlined, size: 20),
+              title: Text(str.copy),
+              onTap: () async {
+                await Clipboard.setData(ClipboardData(text: message.text));
+                if (sheet.mounted) Navigator.of(sheet).pop();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(str.copied),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                }
+              },
+            ),
+            if (message.isUser && widget.onEdit != null)
+              ListTile(
+                leading: const Icon(Icons.edit_outlined, size: 20),
+                title: Text(str.edit),
+                onTap: () {
+                  Navigator.of(sheet).pop();
+                  _controller.text = message.text;
+                  setState(() {});
+                  _focus.requestFocus();
+                  widget.onEdit!(message.text);
+                },
+              ),
+            if (!message.isUser && widget.onRegenerate != null)
+              ListTile(
+                leading: const Icon(Icons.refresh, size: 20),
+                title: Text(str.regenerate),
+                onTap: () {
+                  Navigator.of(sheet).pop();
+                  widget.onRegenerate!();
+                },
+              ),
           ],
         ),
       ),
