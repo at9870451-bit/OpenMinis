@@ -41,7 +41,7 @@ extension ContentView {
     // MARK: - Stack Layout (iPhone / narrow window)
 
     var stackLayout: some View {
-        let drawerWidth = UIScreen.main.bounds.width * 0.52
+        let drawerWidth = UIScreen.main.bounds.width * 0.88
         let p = min(1, max(0, drawerProgress))
 
         return ZStack(alignment: .leading) {
@@ -90,7 +90,7 @@ extension ContentView {
             .scaleEffect(1 - 0.06 * p, anchor: .center)
             // A small shift (not a full drawer-width one) keeps the page's
             // trailing rounded corner on screen, which is what reads as depth.
-            .offset(x: UIScreen.main.bounds.width * 0.10 * p)
+            .offset(x: drawerWidth * 0.14 * p)
             .overlay(Color.black.opacity(0.18 * p))
             .shadow(color: Color.black.opacity(0.22 * p), radius: 22, x: 6, y: 0)
             .zIndex(0)
@@ -156,21 +156,42 @@ extension ContentView {
     private var historyDrawer: some View {
         ZStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 0) {
-                // MARK: Header
-                HStack(alignment: .center, spacing: 12) {
-                    Text("Amore")
-                        .font(.system(size: 27, weight: .bold))
-                        .foregroundStyle(AmoreTheme.textPrimary)
-                        .lineLimit(1)
-
-                    Spacer(minLength: 8)
-
+                // ChatGPT-style header: brand mark, compose, and search.
+                HStack(alignment: .center, spacing: 10) {
+                    HStack(spacing: 9) {
+                        Image("AmoreLogo")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 32, height: 32)
+                            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                    .strokeBorder(Color.white.opacity(0.22), lineWidth: 0.5)
+                            }
+                        Text("Amore")
+                            .font(.system(size: 25, weight: .bold))
+                            .foregroundStyle(AmoreTheme.textPrimary)
+                            .lineLimit(1)
+                    }
+                    Spacer(minLength: 4)
+                    Button {
+                        snapDrawer(open: false)
+                        startHomeChat()
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                            .font(.system(size: 17, weight: .medium))
+                            .foregroundStyle(AmoreTheme.textPrimary)
+                            .frame(width: 40, height: 40)
+                            .background(Circle().fill(Color.black.opacity(0.05)))
+                    }
+                    .buttonStyle(DrawerIconButtonStyle())
+                    .accessibilityLabel(Text("New Chat"))
                     Button {
                         withAnimation(.easeOut(duration: 0.18)) {
                             showDrawerSearch.toggle()
                             if !showDrawerSearch { drawerSearch = "" }
-                            if showDrawerSearch { drawerSearchFocused = true }
                         }
+                        if showDrawerSearch { drawerSearchFocused = true }
                     } label: {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 16, weight: .semibold))
@@ -181,9 +202,9 @@ extension ContentView {
                     .buttonStyle(DrawerIconButtonStyle())
                     .accessibilityLabel(Text("Search"))
                 }
-                .padding(.horizontal, 22)
-                .padding(.top, 16)
-                .padding(.bottom, 14)
+                .padding(.horizontal, 18)
+                .padding(.top, 14)
+                .padding(.bottom, 10)
 
                 if showDrawerSearch {
                     HStack(spacing: 8) {
@@ -194,7 +215,7 @@ extension ContentView {
                             .textFieldStyle(.plain)
                             .font(.system(size: 16))
                             .foregroundStyle(AmoreTheme.textPrimary)
-                            .tint(.white)
+                            .tint(AmoreTheme.accent)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
                     }
@@ -208,7 +229,7 @@ extension ContentView {
                     .padding(.bottom, 12)
                 }
 
-                // MARK: Runtime navigation
+                // Runtime shortcuts remain above the history, like ChatGPT's utility entries.
                 VStack(spacing: 1) {
                     drawerNavRow(.tools)
                     drawerNavRow(.subAgents)
@@ -217,86 +238,129 @@ extension ContentView {
                     localBotNavRow
                 }
                 .padding(.horizontal, 10)
-                .padding(.bottom, 8)
+                .padding(.bottom, 6)
 
-                // MARK: Hairline
                 Rectangle()
-                    .fill(Color.black.opacity(0.05))
+                    .fill(AmoreTheme.separator)
                     .frame(height: 0.5)
-                    .padding(.horizontal, 22)
-                    .padding(.bottom, 10)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 8)
 
-                // MARK: Recent chats
-                Text(AppLocalized("Recent"))
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(AmoreTheme.textSecondary)
-                    .padding(.horizontal, 22)
-                    .padding(.bottom, 4)
+                HStack {
+                    Text(showArchivedDrawerSessions ? "Archived" : "Recent")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(AmoreTheme.textSecondary)
+                    Spacer()
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            showArchivedDrawerSessions.toggle()
+                        }
+                    } label: {
+                        Image(systemName: showArchivedDrawerSessions ? "bubble.left.and.bubble.right" : "archivebox")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(AmoreTheme.textSecondary)
+                            .frame(width: 34, height: 34)
+                    }
+                    .buttonStyle(DrawerIconButtonStyle())
+                    .accessibilityLabel(showArchivedDrawerSessions ? "Show recent chats" : "Show archived chats")
+                }
+                .padding(.horizontal, 18)
+                .padding(.bottom, 2)
 
                 ScrollView {
-                    LazyVStack(spacing: 1) {
-                        let visible = filteredDrawerSessions
-                        if visible.isEmpty {
-                            Text(AppLocalized("No conversations yet"))
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        let groups = groupedDrawerSessions
+                        if groups.isEmpty {
+                            Text(showArchivedDrawerSessions ? "No archived chats" : AppLocalized("No conversations yet"))
                                 .font(.system(size: 14))
                                 .foregroundStyle(AmoreTheme.textSecondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, 22)
+                                .padding(.horizontal, 20)
                                 .padding(.top, 14)
                         } else {
-                            ForEach(visible) { session in
-                                drawerSessionRow(session)
+                            ForEach(groups, id: \.label) { group in
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(group.label)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundStyle(AmoreTheme.textSecondary)
+                                        .padding(.horizontal, 20)
+                                        .padding(.top, 6)
+                                    ForEach(group.sessions) { session in
+                                        drawerSessionRow(session)
+                                    }
+                                }
                             }
                         }
                     }
                     .padding(.bottom, 10)
                 }
 
-                // MARK: Fixed bottom bar
-                HStack(spacing: 12) {
+                Rectangle()
+                    .fill(AmoreTheme.separator)
+                    .frame(height: 0.5)
+                    .padding(.horizontal, 18)
+
+                // Fixed account/profile area; independent of the history scroll.
+                HStack(spacing: 10) {
                     Button {
-                        withAnimation(.easeOut(duration: 0.2)) {
-                            showHistoryDrawer = false
-                        }
-                        startHomeChat()
+                        showDrawerAccountMenu = true
                     } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "square.and.pencil")
-                                .font(.system(size: 15, weight: .semibold))
-                            Text(AppLocalized("Chat"))
-                                .font(.system(size: 16, weight: .semibold))
+                        HStack(spacing: 10) {
+                            Group {
+                                if SoulStore.cachedMetadata.iconIsImage,
+                                   let image = SoulIconImage.decode(SoulStore.cachedMetadata.icon) {
+                                    Image(uiImage: image).resizable().scaledToFill()
+                                } else {
+                                    Text(SoulStore.cachedMetadata.displayIcon)
+                                        .font(.system(size: 20))
+                                }
+                            }
+                            .frame(width: 38, height: 38)
+                            .background(Circle().fill(AmoreTheme.secondaryBackground))
+                            .clipShape(Circle())
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(soulName.isEmpty ? "Amore" : soulName)
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundStyle(AmoreTheme.textPrimary)
+                                    .lineLimit(1)
+                                Text("Personal account")
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(AmoreTheme.textSecondary)
+                                    .lineLimit(1)
+                            }
+                            Spacer(minLength: 0)
                         }
-                        .foregroundStyle(AmoreTheme.textPrimary)
-                        .padding(.horizontal, 20)
-                        .frame(height: 46)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(AmoreTheme.accent)
-                        )
+                        .contentShape(Rectangle())
                     }
-                    .buttonStyle(DrawerPillButtonStyle())
-
-                    Spacer(minLength: 0)
-
+                    .buttonStyle(DrawerRowButtonStyle())
+                    .confirmationDialog("Account", isPresented: $showDrawerAccountMenu, titleVisibility: .visible) {
+                        Button("Settings") {
+                            snapDrawer(open: false)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) { activeToolSheet = .settings }
+                        }
+                        Button("Personalize Amore") {
+                            snapDrawer(open: false)
+                            runtimePage = .soul
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("Personal account · Free")
+                    }
                     Button {
-                        withAnimation(.easeOut(duration: 0.2)) {
-                            showHistoryDrawer = false
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
-                            activeToolSheet = .settings
-                        }
+                        snapDrawer(open: false)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) { activeToolSheet = .settings }
                     } label: {
                         Image(systemName: "gearshape")
                             .font(.system(size: 17, weight: .medium))
                             .foregroundStyle(AmoreTheme.textPrimary)
                             .frame(width: 40, height: 40)
-                            .background(Circle().fill(Color.black.opacity(0.06)))
+                            .background(Circle().fill(Color.black.opacity(0.05)))
                     }
                     .buttonStyle(DrawerIconButtonStyle())
                     .accessibilityLabel(Text("Settings"))
                 }
-                .padding(.horizontal, 22)
-                .padding(.top, 10)
+                .padding(.horizontal, 18)
+                .padding(.top, 8)
                 .padding(.bottom, 6)
             }
             .frame(maxWidth: .infinity)
@@ -334,17 +398,46 @@ extension ContentView {
             }
             .shadow(color: Color.black.opacity(0.18), radius: 22, x: 8, y: 0)
         }
-            }
+    }
 
     // MARK: Drawer pieces
 
     private var filteredDrawerSessions: [ChatSession] {
+        let archived = archivedDrawerSessionIDs
+        let source = showArchivedDrawerSessions
+            ? sessions.filter { archived.contains($0.id) }
+            : sessions.filter { !archived.contains($0.id) }
         let query = drawerSearch.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return sessions }
-        return sessions.filter {
+        guard !query.isEmpty else { return source }
+        return source.filter {
             ($0.title ?? "").localizedCaseInsensitiveContains(query)
                 || ($0.lastMessage ?? "").localizedCaseInsensitiveContains(query)
         }
+    }
+
+    private var groupedDrawerSessions: [(label: String, sessions: [ChatSession])] {
+        let calendar = Calendar.current
+        let now = Date()
+        var pinned: [ChatSession] = []
+        var today: [ChatSession] = []
+        var yesterday: [ChatSession] = []
+        var lastSevenDays: [ChatSession] = []
+        var earlier: [ChatSession] = []
+        for session in filteredDrawerSessions {
+            if session.isPinned {
+                pinned.append(session)
+            } else if calendar.isDateInToday(session.updatedAt) {
+                today.append(session)
+            } else if calendar.isDateInYesterday(session.updatedAt) {
+                yesterday.append(session)
+            } else if session.updatedAt >= (calendar.date(byAdding: .day, value: -7, to: now) ?? now) {
+                lastSevenDays.append(session)
+            } else {
+                earlier.append(session)
+            }
+        }
+        return [("Pinned", pinned), ("Today", today), ("Yesterday", yesterday), ("Last 7 Days", lastSevenDays), ("Earlier", earlier)]
+            .filter { !$0.sessions.isEmpty }
     }
 
     @ViewBuilder
@@ -356,6 +449,7 @@ extension ContentView {
             case .skills:    return (AppLocalized("Skills"), "puzzlepiece.extension")
             case .memory:    return (AppLocalized("Memory"), "brain.head.profile")
             case .localBot:  return ("SnowLuma + QQBot", "antenna.radiowaves.left.and.right")
+            case .soul:      return ("Personalize Amore", "sparkles")
             }
         }()
         Button {
@@ -439,14 +533,11 @@ extension ContentView {
         .buttonStyle(DrawerRowButtonStyle())
         .padding(.horizontal, 8)
         .contextMenu {
-            Button(role: .destructive) {
-                withAnimation(.easeOut(duration: 0.2)) {
-                    showHistoryDrawer = false
-                }
-                sessionToDelete = session
-            } label: {
-                Label("Delete", systemImage: "trash")
-            }
+            SessionContextMenu(
+                key: MenuKey(sid: session.id, pinned: session.isPinned, title: session.title, filed: session.isFiled, archived: showArchivedDrawerSessions),
+                actions: menuActions
+            )
+            .equatable()
         }
     }
 
@@ -458,6 +549,7 @@ extension ContentView {
         case .skills:    SkillsManagementView()
         case .memory:    MemoryManagementView()
         case .localBot:  LocalBotDeploymentView(showTerminal: $showTerminal, localBotCommand: $localBotCommand)
+        case .soul:      SoulSettingsView()
         }
     }
 
