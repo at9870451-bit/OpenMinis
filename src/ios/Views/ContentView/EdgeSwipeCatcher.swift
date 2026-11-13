@@ -93,7 +93,7 @@ struct EdgeSwipeCatcher: UIViewControllerRepresentable {
 
         @objc private func handle(_ g: UIScreenEdgePanGestureRecognizer) {
             let view = g.view
-            drawerWidth = max(240, (view?.bounds.width ?? 390) * 0.78)
+            drawerWidth = max(280, (view?.bounds.width ?? 390) * 0.88)
             let translation = max(0, g.translation(in: view).x)
             let progress = min(1, translation / drawerWidth)
 
