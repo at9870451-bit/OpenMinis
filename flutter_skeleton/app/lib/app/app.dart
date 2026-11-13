@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/i18n/app_strings.dart';
 import '../core/theme/amore_theme.dart';
 import '../features/settings/appearance_page.dart';
 import 'home_shell.dart';
@@ -8,15 +10,23 @@ import 'home_shell.dart';
 class AmoreApp extends ConsumerWidget {
   const AmoreApp({super.key, this.rustError});
 
-  /// Non-null when the Rust core failed to load. The UI still runs; the banner
-  /// tells the user which engine is missing instead of showing a blank screen.
+  /// Non-null when the Rust core failed to load. The UI still runs; the screen
+  /// explains which engine is missing instead of showing a blank window.
   final Object? rustError;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(themeModeProvider);
     return MaterialApp(
-      title: 'Amore',
+      // No `locale` is set: the whole app follows the system language. Adding
+      // the delegates lets Material/Cupertino widgets localise too.
+      onGenerateTitle: (ctx) => AppStrings.of(ctx).appName,
+      supportedLocales: AppStrings.supportedLocales,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       debugShowCheckedModeBanner: false,
       theme: AmoreTheme.theme(),
       darkTheme: AmoreTheme.theme(),
@@ -28,8 +38,6 @@ class AmoreApp extends ConsumerWidget {
   }
 }
 
-/// Shown only when the native core did not load. Keeps the app usable and makes
-/// the problem diagnosable instead of hiding everything behind a white screen.
 class _RustFailureScreen extends StatelessWidget {
   const _RustFailureScreen({required this.error});
 
@@ -37,6 +45,7 @@ class _RustFailureScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = AppStrings.of(context);
     return Scaffold(
       backgroundColor: AmoreTheme.background,
       body: SafeArea(
@@ -48,19 +57,19 @@ class _RustFailureScreen extends StatelessWidget {
             children: [
               const Icon(Icons.memory, size: 40, color: AmoreTheme.warning),
               const SizedBox(height: 16),
-              const Text(
-                'Native core unavailable',
-                style: TextStyle(
+              Text(
+                s.nativeCoreUnavailable,
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
                   color: AmoreTheme.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'The Rust engine did not load, so chat and the sandbox are '
-                'disabled. The UI below still works.',
-                style: TextStyle(fontSize: 14, color: AmoreTheme.textSecondary),
+              Text(
+                s.nativeCoreDetail,
+                style: const TextStyle(
+                    fontSize: 14, color: AmoreTheme.textSecondary),
               ),
               const SizedBox(height: 16),
               Container(
@@ -77,18 +86,6 @@ class _RustFailureScreen extends StatelessWidget {
                     fontSize: 11,
                     color: AmoreTheme.textSecondary,
                   ),
-                ),
-              ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AmoreTheme.accent,
-                    minimumSize: const Size.fromHeight(48),
-                  ),
-                  onPressed: () {},
-                  child: const Text('Retry later'),
                 ),
               ),
             ],
