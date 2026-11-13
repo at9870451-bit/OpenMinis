@@ -83,6 +83,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                     ChatPage(
                       messages: chat.messages,
                       streaming: chat.streaming,
+                      onRegenerate: () => ref
+                          .read(chatControllerProvider.notifier)
+                          .regenerateLast(),
                       onSend: (t) async {
                         await ref.read(chatControllerProvider.notifier).send(t);
                         ref.invalidate(sessionsProvider);
