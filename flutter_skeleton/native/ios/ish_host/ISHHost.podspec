@@ -12,10 +12,11 @@ Pod::Spec.new do |s|
   s.public_header_files = 'AmoreNativePlugin.h', 'ISHHost.h'
   s.frameworks       = 'Foundation', 'UIKit'
   s.libraries        = 'c++', 'z', 'sqlite3', 'iconv', 'resolv'
-  s.vendored_libraries = 'libish.a', 'libish_emu.a', 'libfakefs.a'
+  s.vendored_libraries = 'libish.a', 'libish_emu.a', 'libfakefs.a', 'libamore_core.a'
   s.dependency 'Flutter'
   s.pod_target_xcconfig = {
-    'OTHER_LDFLAGS' => '-force_load "${PODS_TARGET_SRCROOT}/libish.a"',
+    'OTHER_LDFLAGS' => '-force_load "${PODS_TARGET_SRCROOT}/libish.a" ' \
+                       '-force_load "${PODS_TARGET_SRCROOT}/libamore_core.a"',
     'HEADER_SEARCH_PATHS' => '"${PODS_TARGET_SRCROOT}/../../../../deps/include" "${PODS_TARGET_SRCROOT}/../../../../deps/ish" "${PODS_TARGET_SRCROOT}/stubs"',
     'CLANG_ENABLE_MODULES' => 'YES',
     # iSH's internal headers (fs/fake.h) refuse to be included without this.
