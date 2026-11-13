@@ -1,0 +1,27 @@
+account:
+  uin: 0
+  token: ''
+  max_reconnect_time: 0
+  reconnect_interval: 0
+  use_sso_address: false
+  sign_servers: []
+  heartbeat_interval: 5
+  rate_limit_interval: 0
+  post_message_format: string
+  debug: false
+  log_level: info
+servers:
+  - http:
+      host: 127.0.0.1
+      port: 5700
+      timeout: 5
+      post_urls: {}
+      token: ''
+      debug: false
+  - ws:
+      host: 127.0.0.1
+      port: 3001
+      timeout: 5
+      token: ''
+      post_urls: {}
+      debug: false

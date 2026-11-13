@@ -214,6 +214,7 @@ extension ContentView {
                     drawerNavRow(.subAgents)
                     drawerNavRow(.skills)
                     drawerNavRow(.memory)
+                    localBotNavRow
                 }
                 .padding(.horizontal, 10)
                 .padding(.bottom, 8)
@@ -379,6 +380,30 @@ extension ContentView {
         .buttonStyle(DrawerRowButtonStyle())
     }
 
+    private var localBotNavRow: some View {
+        Button {
+            withAnimation(.easeOut(duration: 0.2)) {
+                showHistoryDrawer = false
+            }
+            runtimePage = .localBot
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "qrcode.viewfinder")
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundStyle(AmoreTheme.textPrimary)
+                    .frame(width: 24, alignment: .center)
+                Text("SnowLuma + QQBot")
+                    .font(.system(size: 16.5, weight: .regular))
+                    .foregroundStyle(AmoreTheme.textPrimary)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 12)
+            .frame(height: 46)
+            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(DrawerRowButtonStyle())
+    }
+
     @ViewBuilder
     private func drawerSessionRow(_ session: ChatSession) -> some View {
         let selected = homeSessionId == session.id
@@ -431,6 +456,7 @@ extension ContentView {
         case .subAgents: HelperSettingsView()
         case .skills:    SkillsManagementView()
         case .memory:    MemoryManagementView()
+        case .localBot:  LocalBotDeploymentView(showTerminal: $showTerminal, localBotCommand: $localBotCommand)
         }
     }
 

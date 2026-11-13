@@ -76,6 +76,7 @@ enum RuntimePage: String, Identifiable {
     case subAgents
     case skills
     case memory
+    case localBot
     var id: String { rawValue }
 }
 
@@ -323,6 +324,7 @@ struct ContentView: View {
     @State var remoteDeviceSessions: [(device: SyncDevice, sessions: [ChatSession])] = []
     // showSettings consolidated into activeToolSheet (.settings)
     @State var showTerminal = false
+    @State var localBotCommand = ""
     @State var showAlarmList = false
     @State var hasAlarms = false
     @State var activeToolSheet: ToolSheet?
@@ -794,7 +796,7 @@ struct ContentView: View {
         }
         .fullScreenCover(isPresented: $showTerminal) {
             NavigationStack {
-                ISHTerminalView(showCloseButton: true)
+                ISHTerminalView(showCloseButton: true, initCommand: localBotCommand.isEmpty ? nil : localBotCommand)
             }
         }
         // [T-crash-breadcrumbs] Toolbar sheets and the terminal cover: which
@@ -806,6 +808,7 @@ struct ContentView: View {
         .onChange(of: showTerminal) { shown in
             CrashBreadcrumbs.record(shown ? "sheet.show" : "sheet.hide", detail: "terminal")
             CrashBreadcrumbs.setSlot("sheet", value: shown ? "terminal" : "none")
+            if !shown { localBotCommand = "" }
         }
         .sheet(isPresented: $showAlarmList, onDismiss: { fetchAlarmsIfNeeded() }) {
             AlarmListView()

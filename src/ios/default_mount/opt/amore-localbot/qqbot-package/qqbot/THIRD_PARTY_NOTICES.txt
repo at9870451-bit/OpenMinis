@@ -1,0 +1,4 @@
+SnowLuma QQBot core Python source: derived from the public at9870451-bit/snowluma-app repository at the user's request. That repository does not declare an SPDX license in its metadata; do not redistribute this source outside this app without confirming the rightsholder's terms.
+
+go-cqhttp binary: Mrs4s/go-cqhttp v1.2.0, GNU Affero General Public License v3. Source/license: https://github.com/Mrs4s/go-cqhttp.
+No credentials, API keys, access tokens, user databases, chat history, logs, or backup configs are bundled. The on-device config defaults to loopback only, with AI/plugins/auto-reply disabled.
