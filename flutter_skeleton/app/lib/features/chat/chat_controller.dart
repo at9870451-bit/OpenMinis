@@ -131,6 +131,20 @@ class ChatController extends StateNotifier<ChatState> {
     }
   }
 
+  /// Drops the trailing assistant reply (and its question) and asks again —
+  /// the behaviour of the SwiftUI "重新生成" action.
+  Future<void> regenerateLast() async {
+    if (state.streaming) return;
+    final msgs = [...state.messages];
+    while (msgs.isNotEmpty && msgs.last.role == 'assistant') {
+      msgs.removeLast();
+    }
+    if (msgs.isEmpty || msgs.last.role != 'user') return;
+    final question = msgs.removeLast().text;
+    state = state.copyWith(messages: msgs);
+    await send(question);
+  }
+
   void stop() {
     _cancel?.cancel();
     _cancel = null;
