@@ -83,6 +83,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _navBar() {
+    final str = AppStrings.of(context);
     return Container(
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 12),
