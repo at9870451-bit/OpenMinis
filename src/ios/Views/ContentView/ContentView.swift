@@ -77,6 +77,7 @@ enum RuntimePage: String, Identifiable {
     case skills
     case memory
     case localBot
+    case soul
     var id: String { rawValue }
 }
 
@@ -475,6 +476,9 @@ struct ContentView: View {
     @State var drawerDragProgress: CGFloat? = nil
     @State var drawerSearch = ""
     @State var showDrawerSearch = false
+    @State var showArchivedDrawerSessions = false
+    @State var archivedDrawerSessionIDs: Set<String> = Set(UserDefaults.standard.stringArray(forKey: "amore.drawer.archivedSessionIDs") ?? [])
+    @State var showDrawerAccountMenu = false
     @FocusState var drawerSearchFocused: Bool
     /// Agent Runtime page opened from the history drawer.
     @State var runtimePage: RuntimePage?
