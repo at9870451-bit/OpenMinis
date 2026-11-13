@@ -130,11 +130,12 @@ class SidebarDrawer extends StatelessWidget {
                   color: AmoreTheme.accent,
                   borderRadius: BorderRadius.circular(23),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.edit_outlined, size: 17, color: Colors.white),
-                    SizedBox(width: 8),
+                    const Icon(Icons.edit_outlined,
+                        size: 17, color: Colors.white),
+                    const SizedBox(width: 8),
                     Text(
                       str.chat,
                       style: const TextStyle(
