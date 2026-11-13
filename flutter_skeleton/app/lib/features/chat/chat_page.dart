@@ -116,6 +116,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _emptyState() {
+    final str = AppStrings.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -151,6 +152,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _composer() {
+    final str = AppStrings.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       color: AmoreTheme.background,
