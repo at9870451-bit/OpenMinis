@@ -131,6 +131,12 @@ extension ContentView {
                 let filed = sessions.first(where: { $0.id == sid })?.isFiled ?? false
                 folderPickerRequest = FolderPickerRequest(
                     sessionIds: [sid], fromMultiSelect: false, anyFiled: filed)
+            case .archive(let sid):
+                archivedDrawerSessionIDs.insert(sid)
+                UserDefaults.standard.set(Array(archivedDrawerSessionIDs), forKey: "amore.drawer.archivedSessionIDs")
+            case .restore(let sid):
+                archivedDrawerSessionIDs.remove(sid)
+                UserDefaults.standard.set(Array(archivedDrawerSessionIDs), forKey: "amore.drawer.archivedSessionIDs")
             case .delete(let sid):
                 print("[DELETE] Context menu tapped for session: \(sid)")
                 Task { @MainActor in
