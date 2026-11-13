@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../core/i18n/app_strings.dart';
 import '../../core/theme/amore_theme.dart';
 import '../../data/chat_models.dart';
 
@@ -60,13 +61,14 @@ class SidebarDrawer extends StatelessWidget {
   }
 
   Widget _header(BuildContext context) {
+    final str = AppStrings.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 14, 12, 12),
       child: Row(
         children: [
-          const Text(
-            'Amore',
-            style: TextStyle(
+          Text(
+            str.appName,
+            style: const TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w700,
               color: AmoreTheme.textPrimary,
@@ -84,12 +86,13 @@ class SidebarDrawer extends StatelessWidget {
   }
 
   Widget _sessionList(BuildContext context) {
+    final str = AppStrings.of(context);
     if (sessions.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.fromLTRB(20, 18, 20, 0),
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
         child: Text(
-          'No conversations yet',
-          style: TextStyle(fontSize: 14, color: AmoreTheme.textSecondary),
+          str.noConversations,
+          style: const TextStyle(fontSize: 14, color: AmoreTheme.textSecondary),
         ),
       );
     }
@@ -109,6 +112,7 @@ class SidebarDrawer extends StatelessWidget {
   }
 
   Widget _bottomBar(BuildContext context) {
+    final str = AppStrings.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       decoration: const BoxDecoration(
@@ -132,8 +136,8 @@ class SidebarDrawer extends StatelessWidget {
                     Icon(Icons.edit_outlined, size: 17, color: Colors.white),
                     SizedBox(width: 8),
                     Text(
-                      'Chat',
-                      style: TextStyle(
+                      str.chat,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
