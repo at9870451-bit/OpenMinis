@@ -20,12 +20,6 @@ class AppStrings {
     Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
   ];
 
-  static const localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    DefaultMaterialLocalizations.delegate,
-    DefaultWidgetsLocalizations.delegate,
-    DefaultCupertinoLocalizations.delegate,
-  ];
-
   static AppStrings of(BuildContext context) =>
       AppStrings.fromLocale(Localizations.localeOf(context));
 
