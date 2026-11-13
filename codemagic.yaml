@@ -56,13 +56,18 @@ workflows:
           set -e
           cp src/ios/Configs/ProviderCustomization.xcconfig.example \
              src/ios/Configs/ProviderCustomization.xcconfig
+          set -o pipefail
           xcodebuild -project src/ios/Minis.xcodeproj \
             -scheme Minis \
             -configuration Release \
             -derivedDataPath build \
             -destination 'generic/platform=iOS' \
             CODE_SIGNING_ALLOWED=NO \
-            build
+            build > xcodebuild.log 2>&1 || { \
+              rg -n -C 3 'error:|SwiftCompile|fatal error:' xcodebuild.log | tail -120 || true; \
+              tail -60 xcodebuild.log; \
+              exit 1; \
+            }
 
       - name: Package IPA
         script: |
@@ -82,6 +87,7 @@ workflows:
     artifacts:
       - Amore.ipa
       - build/Build/Products/Release-iphoneos/*.app
+      - xcodebuild.log
 
   # ---------------------------------------------------------------
   # Stage 1 of the Flutter + Rust migration: proves the toolchain,
