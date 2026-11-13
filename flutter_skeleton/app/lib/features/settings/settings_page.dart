@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/i18n/app_strings.dart';
 import '../../core/theme/amore_theme.dart';
 import '../../core/native/ish_probe.dart';
 import '../../data/agent_store.dart';
@@ -28,81 +29,82 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final str = AppStrings.of(context);
     return Scaffold(
       backgroundColor: AmoreTheme.groupedBackground,
       appBar: AppBar(
         backgroundColor: AmoreTheme.groupedBackground,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Settings',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+        title: Text(str.settings,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          _section(context, 'Models', [
+          _section(context, str.models, [
             _row(
               context,
               icon: Icons.key_outlined,
-              title: 'Providers & API Keys',
-              subtitle: 'Catalog served by the Rust core',
+              title: str.providersApiKeys,
+              subtitle: str.providersSubtitle,
               onTap: () => _push(context, const ProvidersPage()),
             ),
           ]),
-          _section(context, 'Appearance', [
+          _section(context, str.appearance, [
             _row(
               context,
               icon: Icons.contrast,
-              title: 'Theme & Text Size',
-              subtitle: 'Light, dark or follow the system',
+              title: str.themeTextSize,
+              subtitle: str.themeSubtitle,
               onTap: () => _push(context, const AppearancePage()),
             ),
           ]),
-          _section(context, 'Data', [
+          _section(context, str.data, [
             _row(
               context,
               icon: Icons.storage_outlined,
-              title: 'Storage',
-              subtitle: 'Chat database and cache',
+              title: str.storage,
+              subtitle: str.storageSubtitle,
               onTap: () => _push(context, const StoragePage()),
             ),
           ]),
-          _section(context, 'Agent Runtime', [
-            _row(context, icon: Icons.build_outlined, title: 'Agent Tools',
+          _section(context, str.agentRuntime, [
+            _row(context, icon: Icons.build_outlined, title: str.agentTools,
                 subtitle: 'Native bridge (stage 5)'),
-            _row(context, icon: Icons.people_outline, title: 'Sub Agents',
+            _row(context, icon: Icons.people_outline, title: str.subAgents,
                 subtitle: 'Native bridge (stage 5)'),
             _row(
               context,
               icon: Icons.extension_outlined,
-              title: 'Skills',
-              subtitle: 'Reads var/minis/skills',
+              title: str.skills,
+              subtitle: 'var/minis/skills',
               onTap: () => _openAgentPage(
                   context, ref, (store) => SkillsPage(store: store)),
             ),
             _row(
               context,
               icon: Icons.memory_outlined,
-              title: 'Memory',
-              subtitle: 'Reads var/minis/memory',
+              title: str.memory,
+              subtitle: 'var/minis/memory',
               onTap: () => _openAgentPage(
                   context, ref, (store) => MemoryPage(store: store)),
             ),
             _row(
               context,
               icon: Icons.hub_outlined,
-              title: 'MCP Servers',
-              subtitle: 'Reads mcp-servers/servers.json',
+              title: str.mcpServers,
+              subtitle: 'mcp-servers/servers.json',
               onTap: () => _openAgentPage(
                   context, ref, (store) => McpPage(store: store)),
             ),
           ]),
-          _section(context, 'About', [
+          _section(context, str.about, [
             _row(
               context,
               icon: Icons.info_outline,
-              title: 'Amore',
+              title: str.appName,
               subtitle: IshProbe.isLinked
                   ? 'Flutter + Rust · iSH kernel linked'
                   : 'Flutter + Rust · 1.15',
