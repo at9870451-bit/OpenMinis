@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/i18n/app_strings.dart';
 import '../../core/theme/amore_theme.dart';
 
 /// Theme mode is app-level state so the whole MaterialApp reacts to it.
@@ -12,6 +13,7 @@ class AppearancePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(themeModeProvider);
+    final str = AppStrings.of(context);
 
     return Scaffold(
       backgroundColor: AmoreTheme.groupedBackground,
@@ -19,8 +21,8 @@ class AppearancePage extends ConsumerWidget {
         backgroundColor: AmoreTheme.groupedBackground,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Appearance',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+        title: Text(str.appearance,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
       ),
       body: ListView(
@@ -35,10 +37,10 @@ class AppearancePage extends ConsumerWidget {
             ),
             child: Column(
               children: [
-                for (final entry in const [
-                  (ThemeMode.system, 'Follow System', Icons.brightness_auto),
-                  (ThemeMode.light, 'Light', Icons.light_mode_outlined),
-                  (ThemeMode.dark, 'Dark', Icons.dark_mode_outlined),
+                for (final entry in [
+                  (ThemeMode.system, str.followSystem, Icons.brightness_auto),
+                  (ThemeMode.light, str.light, Icons.light_mode_outlined),
+                  (ThemeMode.dark, str.dark, Icons.dark_mode_outlined),
                 ])
                   RadioListTile<ThemeMode>(
                     value: entry.$1,
@@ -58,14 +60,7 @@ class AppearancePage extends ConsumerWidget {
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(4, 12, 4, 0),
-            child: Text(
-              'Apple White is the default. Dark mode uses the same geometry '
-              'with inverted surfaces — never gradients.',
-              style: TextStyle(fontSize: 12, color: AmoreTheme.textSecondary),
-            ),
-          ),
+
         ],
       ),
     );
