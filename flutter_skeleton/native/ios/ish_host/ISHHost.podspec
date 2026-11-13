@@ -17,6 +17,8 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig = {
     'OTHER_LDFLAGS' => '-force_load "${PODS_TARGET_SRCROOT}/libish.a"',
     'HEADER_SEARCH_PATHS' => '"${PODS_TARGET_SRCROOT}/../../../../deps/include" "${PODS_TARGET_SRCROOT}/../../../../deps/ish" "${PODS_TARGET_SRCROOT}/stubs"',
-    'CLANG_ENABLE_MODULES' => 'YES'
+    'CLANG_ENABLE_MODULES' => 'YES',
+    # iSH's internal headers (fs/fake.h) refuse to be included without this.
+    'GCC_PREPROCESSOR_DEFINITIONS' => 'ISH_INTERNAL=1'
   }
 end
