@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.source_files     = '*.h', '*.c', '*.m', 'stubs/*.h', 'stubs/*.m'
   s.public_header_files = 'AmoreNativePlugin.h', 'ISHHost.h'
   s.frameworks       = 'Foundation', 'UIKit'
-  s.libraries        = 'c++', 'z', 'sqlite3', 'iconv'
+  s.libraries        = 'c++', 'z', 'sqlite3', 'iconv', 'resolv'
   s.vendored_libraries = 'libish.a', 'libish_emu.a', 'libfakefs.a'
   s.dependency 'Flutter'
   s.pod_target_xcconfig = {
