@@ -177,7 +177,7 @@ struct SettingsSheet: View {
                         ContextCompressionSettingsView()
                     } label: {
                         Label {
-                            Text("Context Compression")
+                            Text(AppLocalized("Context Compression"))
                         } icon: {
                             Image(systemName: "arrow.down.right.and.arrow.up.left")
                                 .font(.system(size: 9))
@@ -673,8 +673,8 @@ struct ContextCompressionSettingsView: View {
                 Toggle(isOn: $autoCompact) {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Auto-compress long chats")
-                            Text("Summarise older turns before the model runs out of context")
+                            Text(AppLocalized("Auto-compress long chats"))
+                            Text(AppLocalized("Summarise older turns before the model runs out of context"))
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
                         }
@@ -683,13 +683,13 @@ struct ContextCompressionSettingsView: View {
                     }
                 }
             } footer: {
-                Text("When a conversation approaches the model's context window, Amore replaces older turns with a rolling summary and keeps the last few turns verbatim. Turning this off keeps full history; if the window still fills up, old tool output may be collapsed rather than summarised.")
+                Text(AppLocalized("When a conversation approaches the model's context window, Amore replaces older turns with a rolling summary and keeps the last few turns verbatim. Turning this off keeps full history; if the window still fills up, old tool output may be collapsed rather than summarised."))
             }
 
             Section {
                 Stepper(value: $keepRecent, in: 1...10) {
                     HStack {
-                        Text("Keep recent turns")
+                        Text(AppLocalized("Keep recent turns"))
                         Spacer()
                         Text("\(keepRecent)")
                             .foregroundStyle(.secondary)
@@ -698,34 +698,45 @@ struct ContextCompressionSettingsView: View {
                 }
                 .disabled(!autoCompact)
             } header: {
-                Text("Detail")
+                Text(AppLocalized("Detail"))
             } footer: {
-                Text("How many of the newest turns survive compaction verbatim. When the context is critically tight, Amore always keeps at least one turn regardless of this setting.")
+                Text(AppLocalized("How many of the newest turns survive compaction verbatim. When the context is critically tight, Amore always keeps at least one turn regardless of this setting."))
             }
 
             Section {
-                LabeledContent("Under 32K", value: "Manual only")
-                LabeledContent("32K – 64K", value: "Offload at 10K left")
-                LabeledContent("64K – 128K", value: "Compress at 10K left")
-                LabeledContent("128K and up", value: "Compress at 20K left")
-                LabeledContent("User-capped group", value: "Compress at 85%")
+                thresholdRow("Under 32K", "Manual only")
+                thresholdRow("32K – 64K", "Offload at 10K left")
+                thresholdRow("64K – 128K", "Compress at 10K left")
+                thresholdRow("128K and up", "Compress at 20K left")
+                thresholdRow("User-capped group", "Compress at 85%")
             } header: {
-                Text("How thresholds work")
+                Text(AppLocalized("How thresholds work"))
             } footer: {
-                Text("Thresholds follow the active model's context window. Smaller windows keep more headroom because the summary itself has to fit.")
+                Text(AppLocalized("Thresholds follow the active model's context window. Smaller windows keep more headroom because the summary itself has to fit."))
             }
 
             Section {
-                Button("Restore Defaults") {
+                Button(AppLocalized("Restore Defaults")) {
                     autoCompact = true
                     keepRecent = ContextCompressionSettings.defaultKeepRecentIterations
                 }
             } footer: {
-                Text("You can still compress a conversation by hand: long-press a message and choose “Compact Above”.")
+                Text(AppLocalized("You can still compress a conversation by hand: long-press a message and choose “Compact Above”."))
             }
         }
-        .navigationTitle("Context Compression")
+        .navigationTitle(AppLocalized("Context Compression"))
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// Both sides go through AppLocalized: `LabeledContent(_:value:)` treats the
+    /// value as a plain String, so a literal there would never be translated.
+    private func thresholdRow(_ label: StaticString, _ value: StaticString) -> some View {
+        HStack {
+            Text(AppLocalized(label))
+            Spacer()
+            Text(AppLocalized(value))
+                .foregroundStyle(.secondary)
+        }
     }
 }
 
