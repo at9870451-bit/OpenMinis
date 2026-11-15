@@ -433,3 +433,456 @@ struct AmoreInstalledPlugins {
         .sorted { $0.manifest.name < $1.manifest.name }
     }
 }
+// MARK: - Plugin installation (Ed25519 verified, installed.json)
+//
+// A plugin is a *directory* (imported through Files / share sheet). Installing
+// never unzips anything inside the app, so there is no zip-slip surface at all.
+// The directory is hashed deterministically, the digest is checked against the
+// registry value, and the digest itself must carry a valid Ed25519 signature
+// from the publisher key.
+
+import CryptoKit
+
+enum AmorePluginInstallError: LocalizedError {
+    case notADirectory
+    case missingManifest
+    case unsupportedSchema(Int)
+    case badIdentifier(String)
+    case badVersion(String)
+    case permissionNotAllowed(String)
+    case digestMismatch
+    case signatureInvalid
+    case idMismatch(expected: String, found: String)
+    case versionMismatch(expected: String, found: String)
+    case toolNameInvalid(String)
+    case alreadyInstalling
+
+    var errorDescription: String? {
+        switch self {
+        case .notADirectory: return AppLocalized("Plugin package must be a folder")
+        case .missingManifest: return AppLocalized("manifest.json is missing")
+        case .unsupportedSchema(let v): return "\\(AppLocalized("Unsupported schemaVersion")): \\(v)"
+        case .badIdentifier(let id): return "\\(AppLocalized("Invalid plugin id")): \\(id)"
+        case .badVersion(let v): return "\\(AppLocalized("Invalid version")): \\(v)"
+        case .permissionNotAllowed(let p): return "\\(AppLocalized("Permission not allowed")): \\(p)"
+        case .digestMismatch: return AppLocalized("Package digest does not match the registry")
+        case .signatureInvalid: return AppLocalized("Signature check failed")
+        case .idMismatch(let e, let f): return "\\(AppLocalized("Plugin id mismatch")): \\(e) / \\(f)"
+        case .versionMismatch(let e, let f): return "\\(AppLocalized("Version mismatch")): \\(e) / \\(f)"
+        case .toolNameInvalid(let n): return "\\(AppLocalized("Invalid tool name")): \\(n)"
+        case .alreadyInstalling: return AppLocalized("Another install is in progress")
+        }
+    }
+}
+
+struct AmoreInstalledPlugin: Codable, Equatable {
+    var id: String
+    var version: String
+    var enabled: Bool
+    var installedAt: Date
+    var previousVersion: String?
+    var permissions: [String]
+}
+
+@MainActor
+final class AmorePluginInstaller {
+    static let shared = AmorePluginInstaller()
+
+    private let fm = FileManager.default
+    private var isBusy = false
+
+    var pluginsRoot: URL {
+        let base = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSTemporaryDirectory())
+        return base.appendingPathComponent("Amore/Plugins", isDirectory: true)
+    }
+
+    private var installedFile: URL {
+        pluginsRoot.deletingLastPathComponent().appendingPathComponent("installed.json")
+    }
+
+    // MARK: Read / write installed.json
+
+    func installedPlugins() -> [AmoreInstalledPlugin] {
+        guard let data = try? Data(contentsOf: installedFile),
+              let list = try? JSONDecoder().decode([AmoreInstalledPlugin].self, from: data)
+        else { return [] }
+        return list.sorted { $0.id < $1.id }
+    }
+
+    private func writeInstalled(_ list: [AmoreInstalledPlugin]) throws {
+        let dir = installedFile.deletingLastPathComponent()
+        try fm.createDirectory(at: dir, withIntermediateDirectories: true)
+        let data = try JSONEncoder().encode(list)
+        try data.write(to: installedFile, options: .atomic)
+    }
+
+    // MARK: Digest
+
+    /// Deterministic digest over (relative path, file bytes) in sorted order,
+    /// so the same tree always hashes the same on any machine.
+    func digest(ofDirectory dir: URL) throws -> Data {
+        guard let walker = fm.enumerator(at: dir, includingPropertiesForKeys: [.isRegularFileKey]) else {
+            throw AmorePluginInstallError.notADirectory
+        }
+        var files: [String] = []
+        for case let url as URL in walker {
+            let rel = url.path.replacingOccurrences(of: dir.path, with: "").trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            if rel.isEmpty { continue }
+            if rel.hasPrefix(".git") || rel.hasSuffix(".DS_Store") { continue }
+            files.append(rel)
+        }
+        var hasher = SHA256()
+        for rel in files.sorted() {
+            hasher.update(data: Data(rel.utf8))
+            let fileURL = dir.appendingPathComponent(rel)
+            if let handle = try? FileHandle(forReadingFrom: fileURL) {
+                defer { try? handle.close() }
+                while autoreleasepool(invoking: { () -> Bool in
+                    guard let chunk = try? handle.read(upToCount: 1 << 16), !chunk.isEmpty else { return false }
+                    hasher.update(data: chunk)
+                    return true
+                }) {}
+            }
+        }
+        return Data(hasher.finalize())
+    }
+
+    func digestHex(ofDirectory dir: URL) throws -> String {
+        try digest(ofDirectory: dir).map { String(format: "%02x", $0) }.joined()
+    }
+
+    // MARK: Signature
+
+    /// Verifies an Ed25519 signature over the *raw digest bytes*.
+    func verifyEd25519(signatureBase64: String, digest: Data, publicKeyBase64: String) -> Bool {
+        guard let sigData = Data(base64Encoded: signatureBase64),
+              let keyData = Data(base64Encoded: publicKeyBase64),
+              let key = try? Curve25519.Signing.PublicKey(rawRepresentation: keyData)
+        else { return false }
+        return key.isValidSignature(sigData, for: digest)
+    }
+
+    // MARK: Install
+
+    @discardableResult
+    func install(sourceDirectory: URL,
+                 expectedID: String,
+                 expectedVersion: String,
+                 expectedDigestHex: String,
+                 signatureBase64: String,
+                 publicKeyBase64: String,
+                 approvedPermissions: [String]) throws -> AmoreInstalledPlugin {
+        guard !isBusy else { throw AmorePluginInstallError.alreadyInstalling }
+        isBusy = true
+        defer { isBusy = false }
+
+        var isDir: ObjCBool = false
+        guard fm.fileExists(atPath: sourceDirectory.path, isDirectory: &isDir), isDir.boolValue else {
+            throw AmorePluginInstallError.notADirectory
+        }
+
+        let manifestURL = sourceDirectory.appendingPathComponent("manifest.json")
+        guard let manifestData = try? Data(contentsOf: manifestURL) else {
+            throw AmorePluginInstallError.missingManifest
+        }
+        guard let manifest = try? JSONDecoder().decode(AmorePluginManifest.self, from: manifestData) else {
+            throw AmorePluginInstallError.missingManifest
+        }
+        guard manifest.schemaVersion == 1 else {
+            throw AmorePluginInstallError.unsupportedSchema(manifest.schemaVersion)
+        }
+        guard manifest.id == expectedID else {
+            throw AmorePluginInstallError.idMismatch(expected: expectedID, found: manifest.id)
+        }
+        guard manifest.version == expectedVersion else {
+            throw AmorePluginInstallError.versionMismatch(expected: expectedVersion, found: manifest.version)
+        }
+        _ = try AmorePluginValidation.validate(manifest)
+        for permission in manifest.permissions {
+            guard AmorePluginValidation.isAllowed(permission) else {
+                throw AmorePluginInstallError.permissionNotAllowed(permission)
+            }
+            guard approvedPermissions.contains(permission) else {
+                throw AmorePluginInstallError.permissionNotAllowed(permission)
+            }
+        }
+
+        let digest = try digest(ofDirectory: sourceDirectory)
+        let actualHex = digest.map { String(format: "%02x", $0) }.joined()
+        guard actualHex.caseInsensitiveCompare(expectedDigestHex) == .orderedSame else {
+            throw AmorePluginInstallError.digestMismatch
+        }
+        guard verifyEd25519(signatureBase64: signatureBase64, digest: digest, publicKeyBase64: publicKeyBase64) else {
+            throw AmorePluginInstallError.signatureInvalid
+        }
+
+        // Atomic move into Plugins/<id>/<version>, keeping the previous version.
+        let idDir = pluginsRoot.appendingPathComponent(manifest.id, isDirectory: true)
+        let target = idDir.appendingPathComponent(manifest.version, isDirectory: true)
+        try fm.createDirectory(at: idDir, withIntermediateDirectories: true)
+
+        var previous: String?
+        if let existing = installedPlugins().first(where: { $0.id == manifest.id }) {
+            previous = existing.version
+        }
+        if fm.fileExists(atPath: target.path) {
+            try fm.removeItem(at: target)
+        }
+        try fm.copyItem(at: sourceDirectory, to: target)
+
+        var list = installedPlugins().filter { $0.id != manifest.id }
+        let record = AmoreInstalledPlugin(id: manifest.id,
+                                          version: manifest.version,
+                                          enabled: false,
+                                          installedAt: Date(),
+                                          previousVersion: previous,
+                                          permissions: manifest.permissions)
+        list.append(record)
+        try writeInstalled(list)
+        return record
+    }
+
+    func setEnabled(_ enabled: Bool, id: String) throws {
+        var list = installedPlugins()
+        guard let index = list.firstIndex(where: { $0.id == id }) else { return }
+        list[index].enabled = enabled
+        try writeInstalled(list)
+    }
+
+    func uninstall(id: String) throws {
+        let list = installedPlugins().filter { $0.id != id }
+        try writeInstalled(list)
+        let idDir = pluginsRoot.appendingPathComponent(id, isDirectory: true)
+        if fm.fileExists(atPath: idDir.path) {
+            try fm.removeItem(at: idDir)
+        }
+    }
+}
+
+// MARK: - JS sandbox (JavaScriptCore)
+
+import JavaScriptCore
+
+enum AmoreJSPluginError: LocalizedError {
+    case notLoaded
+    case toolNotFound(String)
+    case permissionDenied(String)
+    case timedOut
+    case disabledAfterTimeouts
+    case thrown(String)
+    case badResult
+
+    var errorDescription: String? {
+        switch self {
+        case .notLoaded: return AppLocalized("Plugin is not loaded")
+        case .toolNotFound(let n): return "\\(AppLocalized("Plugin has no tool named")): \\(n)"
+        case .permissionDenied(let p): return "\\(AppLocalized("Permission denied")): \\(p)"
+        case .timedOut: return AppLocalized("Plugin timed out")
+        case .disabledAfterTimeouts: return AppLocalized("Plugin disabled after repeated timeouts")
+        case .thrown(let m): return m
+        case .badResult: return AppLocalized("Plugin returned an unexpected value")
+        }
+    }
+}
+
+/// One VM + one context per plugin. `eval`/`Function` are removed before the
+/// plugin body runs, and the host object exposes only what the manifest asked
+/// for. Calls are main-actor bound because JSContext is not thread safe.
+@MainActor
+final class AmoreJSPluginHost {
+    struct Limits {
+        var callTimeout: TimeInterval = 30
+        var maxConsecutiveTimeouts = 3
+        var maxHTTPBodyBytes = 5 * 1024 * 1024
+    }
+
+    let pluginID: String
+    private let permissions: Set<String>
+    private let limits: Limits
+    private let vm = JSVirtualMachine()
+    private var context: JSContext?
+    private(set) var consecutiveTimeouts = 0
+    private(set) var isDisabled = false
+
+    init(pluginID: String, permissions: [String], limits: Limits = Limits()) {
+        self.pluginID = pluginID
+        self.permissions = Set(permissions)
+        self.limits = limits
+    }
+
+    /// Loads the IIFE bundle. Returns the tool names it declared.
+    @discardableResult
+    func load(source: String) throws -> [String] {
+        guard let ctx = JSContext(virtualMachine: vm) else { throw AmoreJSPluginError.notLoaded }
+        ctx.exceptionHandler = { _, exception in
+            NSLog("[plugin:%@] uncaught: %@", self.pluginID as NSString, (exception?.toString() ?? "?") as NSString)
+        }
+        // Sandbox hardening: no dynamic code execution.
+        ctx.evaluateScript("""
+        delete globalThis.eval;
+        delete globalThis.Function;
+        globalThis.amore = globalThis.amore || {};
+        """)
+        installHostBridge(into: ctx)
+        ctx.evaluateScript(source)
+        if let exception = ctx.exception {
+            throw AmoreJSPluginError.thrown(exception.toString() ?? "load failed")
+        }
+        context = ctx
+        let names = ctx.evaluateScript("Object.keys(globalThis.plugin && globalThis.plugin.tools || {})")
+        return names?.toArray() as? [String] ?? []
+    }
+
+    func call(tool: String, argumentsJSON: String) throws -> String {
+        guard !isDisabled else { throw AmoreJSPluginError.disabledAfterTimeouts }
+        guard let ctx = context else { throw AmoreJSPluginError.notLoaded }
+        guard let tools = ctx.evaluateScript("Object.keys(globalThis.plugin && globalThis.plugin.tools || {})")?.toArray() as? [String],
+              tools.contains(tool) else {
+            throw AmoreJSPluginError.toolNotFound(tool)
+        }
+
+        let started = Date()
+        ctx.setObject(argumentsJSON as NSString, forKeyedSubscript: "__amore_args" as NSString)
+        ctx.setObject(tool as NSString, forKeyedSubscript: "__amore_tool" as NSString)
+        let result = ctx.evaluateScript("""
+        (function () {
+          var plugin = globalThis.plugin;
+          if (!plugin || !plugin.tools || !plugin.tools[__amore_tool]) { throw new Error("missing tool"); }
+          var args = JSON.parse(__amore_args || "{}");
+          var out = plugin.tools[__amore_tool](args, { pluginId: "\(pluginID)" });
+          return JSON.stringify(out === undefined ? null : out);
+        })()
+        """)
+        let elapsed = Date().timeIntervalSince(started)
+        if elapsed > limits.callTimeout {
+            // JS cannot be preempted from Swift; drop the VM so the runaway
+            // script can never run again, and count it as a timeout.
+            context = nil
+            consecutiveTimeouts += 1
+            if consecutiveTimeouts >= limits.maxConsecutiveTimeouts {
+                isDisabled = true
+            }
+            throw AmoreJSPluginError.timedOut
+        }
+        consecutiveTimeouts = 0
+        if let exception = ctx.exception {
+            throw AmoreJSPluginError.thrown(exception.toString() ?? "runtime error")
+        }
+        guard let value = result?.toString() else { throw AmoreJSPluginError.badResult }
+        return value
+    }
+
+    // MARK: Host bridge
+
+    private func installHostBridge(into ctx: JSContext) {
+        // log
+        let logBlock: @convention(block) (String, String) -> Void = { level, message in
+            NSLog("[plugin:%@][%@] %@", self.pluginID as NSString, level as NSString, message as NSString)
+        }
+        ctx.setObject(logBlock, forKeyedSubscript: "__amore_log" as NSString)
+        ctx.evaluateScript("""
+        globalThis.amore = globalThis.amore || {};
+        globalThis.amore.log = {
+          info: function (m) { __amore_log("info", String(m)); },
+          error: function (m) { __amore_log("error", String(m)); }
+        };
+        """)
+
+        // storage (isolated per plugin, 1 MB quota)
+        let storageDir = AmorePluginInstaller.shared.pluginsRoot
+            .appendingPathComponent(pluginID, isDirectory: true)
+            .appendingPathComponent("storage", isDirectory: true)
+        let storageBlock: @convention(block) (String, String, String) -> String = { op, key, value in
+            AmoreJSPluginStorage.perform(op: op, key: key, value: value, directory: storageDir)
+        }
+        ctx.setObject(storageBlock, forKeyedSubscript: "__amore_storage" as NSString)
+        ctx.evaluateScript("""
+        globalThis.amore.storage = {
+          get: function (k) { return __amore_storage("get", String(k), ""); },
+          set: function (k, v) { return __amore_storage("set", String(k), String(v)); },
+          remove: function (k) { return __amore_storage("remove", String(k), ""); }
+        };
+        """)
+
+        // network: https only, host must be in network:<host> allow-list
+        let allowedHosts = permissions.compactMap { permission -> String? in
+            guard permission.hasPrefix("network:") else { return nil }
+            return String(permission.dropFirst("network:".count)).lowercased()
+        }
+        let netBlock: @convention(block) (String) -> String = { urlString in
+            guard let url = URL(string: urlString),
+                  url.scheme?.lowercased() == "https",
+                  let host = url.host?.lowercased(),
+                  allowedHosts.contains(host)
+            else { return "" }
+            return AmoreJSPluginHTTP.fetchSync(url: url, maxBytes: 5 * 1024 * 1024)
+        }
+        ctx.setObject(netBlock, forKeyedSubscript: "__amore_fetch" as NSString)
+        ctx.evaluateScript("""
+        globalThis.amore.http = {
+          fetch: function (url) {
+            var body = __amore_fetch(String(url));
+            if (!body) { throw new Error("network denied or empty response"); }
+            return body;
+          }
+        };
+        """)
+    }
+}
+
+/// Key/value store for plugin data: one JSON file per plugin, hard-capped.
+enum AmoreJSPluginStorage {
+    static let maxBytes = 1024 * 1024
+
+    static func perform(op: String, key: String, value: String, directory: URL) -> String {
+        guard !key.isEmpty else { return "" }
+        let fm = FileManager.default
+        let file = directory.appendingPathComponent("store.json")
+        var dict: [String: String] = [:]
+        if let data = try? Data(contentsOf: file),
+           let decoded = try? JSONDecoder().decode([String: String].self, from: data) {
+            dict = decoded
+        }
+        switch op {
+        case "get":
+            return dict[key] ?? ""
+        case "set":
+            var candidate = dict
+            candidate[key] = value
+            let encoded = (try? JSONEncoder().encode(candidate)) ?? Data()
+            guard encoded.count <= maxBytes else { return "" }
+            try? fm.createDirectory(at: directory, withIntermediateDirectories: true)
+            try? encoded.write(to: file, options: .atomic)
+            dict = candidate
+            return "ok"
+        case "remove":
+            dict.removeValue(forKey: key)
+            if let encoded = try? JSONEncoder().encode(dict) {
+                try? encoded.write(to: file, options: .atomic)
+            }
+            return "ok"
+        default:
+            return ""
+        }
+    }
+}
+
+/// Minimal synchronous HTTPS GET used by the JS bridge.
+enum AmoreJSPluginHTTP {
+    static func fetchSync(url: URL, maxBytes: Int) -> String {
+        var payload: String = ""
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 15
+        request.httpMethod = "GET"
+        let semaphore = DispatchSemaphore(value: 0)
+        URLSession.shared.dataTask(with: request) { data, _, _ in
+            defer { semaphore.signal() }
+            guard let data, data.count <= maxBytes,
+                  let text = String(data: data, encoding: .utf8) else { return }
+            payload = text
+        }.resume()
+        _ = semaphore.wait(timeout: .now() + 20)
+        return payload
+    }
+}
