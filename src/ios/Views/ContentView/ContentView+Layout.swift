@@ -11,6 +11,15 @@
 
 import SwiftUI
 
+/// One date bucket in the sidebar. A struct (not a tuple) so it can live in
+/// `@State` and be compared cheaply by SwiftUI.
+struct DrawerSessionGroup: Identifiable, Equatable {
+    let label: String
+    let sessions: [ChatSession]
+    var id: String { label }
+}
+
+
 private let shareLog = AppLogger(category: "Share")
 private let draftLog = AppLogger(category: "DraftSession")
 
@@ -269,8 +278,8 @@ extension ContentView {
 
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 8) {
-                        let groups = groupedDrawerSessions
-                        if groups.isEmpty {
+                        let groups = drawerGroups
+                        if groups.isEmpty && filteredDrawerSessions.isEmpty {
                             Text(showArchivedDrawerSessions ? "No archived chats" : AppLocalized("No conversations yet"))
                                 .font(.system(size: 14))
                                 .foregroundStyle(AmoreTheme.textSecondary)
@@ -397,6 +406,11 @@ extension ContentView {
                 .strokeBorder(Color.white.opacity(0.5), lineWidth: 0.5)
             }
             .shadow(color: Color.black.opacity(0.18), radius: 22, x: 8, y: 0)
+            .onAppear { rebuildDrawerGroups() }
+            .onChange(of: sessions) { _ in rebuildDrawerGroups() }
+            .onChange(of: drawerSearch) { _ in rebuildDrawerGroups() }
+            .onChange(of: showArchivedDrawerSessions) { _ in rebuildDrawerGroups() }
+            .onChange(of: archivedDrawerSessionIDs) { _ in rebuildDrawerGroups() }
         }
     }
 
@@ -415,7 +429,12 @@ extension ContentView {
         }
     }
 
-    private var groupedDrawerSessions: [(label: String, sessions: [ChatSession])] {
+    /// Only called when the inputs actually change — never per drag frame.
+    private func rebuildDrawerGroups() {
+        drawerGroups = groupedDrawerSessions
+    }
+
+    private var groupedDrawerSessions: [DrawerSessionGroup] {
         let calendar = Calendar.current
         let now = Date()
         var pinned: [ChatSession] = []
@@ -436,7 +455,11 @@ extension ContentView {
                 earlier.append(session)
             }
         }
-        return [("Pinned", pinned), ("Today", today), ("Yesterday", yesterday), ("Last 7 Days", lastSevenDays), ("Earlier", earlier)]
+        return [DrawerSessionGroup(label: "Pinned", sessions: pinned),
+                DrawerSessionGroup(label: "Today", sessions: today),
+                DrawerSessionGroup(label: "Yesterday", sessions: yesterday),
+                DrawerSessionGroup(label: "Last 7 Days", sessions: lastSevenDays),
+                DrawerSessionGroup(label: "Earlier", sessions: earlier)]
             .filter { !$0.sessions.isEmpty }
     }
 
