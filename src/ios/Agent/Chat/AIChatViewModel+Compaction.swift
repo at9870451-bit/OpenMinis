@@ -286,7 +286,9 @@ extension AIChatViewModel {
 
     /// False for the exhausted-only tiers (windows under 64K), where a model
     /// summary never runs automatically and the ladder may collapse at once.
+    /// Also false when the user turned auto-compression off in Settings.
     func contextPolicyAllowsAutoCompact() -> Bool {
+        guard ContextCompressionSettings.autoCompactEnabled else { return false }
         guard let policy = currentContextPolicy()?.policy else { return false }
         return !policy.exhaustedOnly && policy.compactThreshold > 0
     }
@@ -377,7 +379,7 @@ extension AIChatViewModel {
         if collapse { trimCollapseUnlock = .init(sessionId: sessionId, markerId: cachedLatestMarker?.id) }
         let options = ContextTrimPlanner.Options(stripReasoning: contextEchoesReasoning,
                                                  reasoningFloor: tight ? 0 : 1,
-                                                 keepRecentIterations: tight ? 1 : 3,
+                                                 keepRecentIterations: tight ? 1 : ContextCompressionSettings.keepRecentIterations,
                                                  allowCollapse: collapse)
         // In the log: `current` is the request as it stood under the old plan
         // (what crossed the trigger); `before` is the same history with no trim
