@@ -24,6 +24,7 @@ private enum SettingsDestination: Hashable {
     // [T-tools-master-switch]
     case tools
     case memory
+    case contextCompression
     case storage
     case mountedFolders
     case sharedFolders
@@ -170,6 +171,19 @@ struct SettingsSheet: View {
                                 .foregroundStyle(.white)
                                 .frame(width: 21, height: 21)
                                 .background(.purple, in: Circle())
+                        }
+                    }
+                    NavigationLink {
+                        ContextCompressionSettingsView()
+                    } label: {
+                        Label {
+                            Text("Context Compression")
+                        } icon: {
+                            Image(systemName: "arrow.down.right.and.arrow.up.left")
+                                .font(.system(size: 9))
+                                .foregroundStyle(.white)
+                                .frame(width: 21, height: 21)
+                                .background(.orange, in: Circle())
                         }
                     }
                     NavigationLink {
@@ -409,6 +423,8 @@ struct SettingsSheet: View {
                     ToolsSettingsView()
                 case .memory:
                     MemoryManagementView()
+                case .contextCompression:
+                    ContextCompressionSettingsView()
                 case .storage:
                     StorageManagementView()
                 case .mountedFolders:
@@ -640,6 +656,76 @@ struct SettingsSheet: View {
             }
         }
         return id.isEmpty ? UIDevice.current.model : id
+    }
+}
+
+// MARK: - Context Compression Settings
+
+struct ContextCompressionSettingsView: View {
+    @AppStorage(ContextCompressionSettings.autoCompactKey)
+    private var autoCompact = true
+    @AppStorage(ContextCompressionSettings.keepRecentIterationsKey)
+    private var keepRecent = ContextCompressionSettings.defaultKeepRecentIterations
+
+    var body: some View {
+        List {
+            Section {
+                Toggle(isOn: $autoCompact) {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Auto-compress long chats")
+                            Text("Summarise older turns before the model runs out of context")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "arrow.down.right.and.arrow.up.left")
+                    }
+                }
+            } footer: {
+                Text("When a conversation approaches the model's context window, Amore replaces older turns with a rolling summary and keeps the last few turns verbatim. Turning this off keeps full history; if the window still fills up, old tool output may be collapsed rather than summarised.")
+            }
+
+            Section {
+                Stepper(value: $keepRecent, in: 1...10) {
+                    HStack {
+                        Text("Keep recent turns")
+                        Spacer()
+                        Text("\(keepRecent)")
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+                }
+                .disabled(!autoCompact)
+            } header: {
+                Text("Detail")
+            } footer: {
+                Text("How many of the newest turns survive compaction verbatim. When the context is critically tight, Amore always keeps at least one turn regardless of this setting.")
+            }
+
+            Section {
+                LabeledContent("Under 32K", value: "Manual only")
+                LabeledContent("32K – 64K", value: "Offload at 10K left")
+                LabeledContent("64K – 128K", value: "Compress at 10K left")
+                LabeledContent("128K and up", value: "Compress at 20K left")
+                LabeledContent("User-capped group", value: "Compress at 85%")
+            } header: {
+                Text("How thresholds work")
+            } footer: {
+                Text("Thresholds follow the active model's context window. Smaller windows keep more headroom because the summary itself has to fit.")
+            }
+
+            Section {
+                Button("Restore Defaults") {
+                    autoCompact = true
+                    keepRecent = ContextCompressionSettings.defaultKeepRecentIterations
+                }
+            } footer: {
+                Text("You can still compress a conversation by hand: long-press a message and choose “Compact Above”.")
+            }
+        }
+        .navigationTitle("Context Compression")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
