@@ -198,11 +198,13 @@ extension ContentView {
                 SettingsSheet(showTerminal: $showTerminal, embedded: true)
             } else if activeTab != .chat {
                 NavigationStack {
-                    switch activeTab {
-                    case .agent:   HelperSettingsView()
-                    case .tasks:   TasksCenterView()
-                    case .memory:  MemoryManagementView()
-                    case .chat, .profile: EmptyView()
+                    Group {
+                        switch activeTab {
+                        case .agent:   HelperSettingsView()
+                        case .tasks:   TasksCenterView()
+                        case .memory:  MemoryManagementView()
+                        case .chat, .profile: EmptyView()
+                        }
                     }
                     .navigationTitle(activeTab.title)
                 }
