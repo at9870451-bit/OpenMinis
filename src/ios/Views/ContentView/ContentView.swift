@@ -475,6 +475,11 @@ struct ContentView: View {
     /// Non-nil only while a drawer drag is in flight; drives live follow.
     @State var drawerDragProgress: CGFloat? = nil
     @State var drawerSearch = ""
+    /// Cached Today/Yesterday/… buckets. Grouping is Calendar work over every
+    /// session; computing it inside the drawer body meant it re-ran on every
+    /// drag frame (drawerProgress changes each frame), which showed up as a
+    /// stutter when opening the sidebar. Recomputed only when its inputs change.
+    @State var drawerGroups: [DrawerSessionGroup] = []
     @State var showDrawerSearch = false
     @State var showArchivedDrawerSessions = false
     @State var archivedDrawerSessionIDs: Set<String> = Set(UserDefaults.standard.stringArray(forKey: "amore.drawer.archivedSessionIDs") ?? [])
