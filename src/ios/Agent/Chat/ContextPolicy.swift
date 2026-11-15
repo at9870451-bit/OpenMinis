@@ -1184,3 +1184,28 @@ enum ContextTrimPlanner {
         return Result(state: stateOf(extent), messages: current, before: before, after: after, target: target, steps: steps)
     }
 }
+
+// MARK: - Context Compression Settings
+
+/// User-tunable knobs for the automatic context-compaction ladder.
+///
+/// Read by `AIChatViewModel.contextPolicyAllowsAutoCompact()` and by the trim
+/// planner, so changing these through Settings alters real behavior — they are
+/// not display-only preferences.
+enum ContextCompressionSettings {
+    static let autoCompactKey = "context.autoCompact"
+    static let keepRecentIterationsKey = "context.keepRecentIterations"
+    static let defaultKeepRecentIterations = 3
+
+    static var autoCompactEnabled: Bool {
+        UserDefaults.standard.object(forKey: autoCompactKey) as? Bool ?? true
+    }
+
+    /// Clamped so a stored value can never make the planner keep nothing (0)
+    /// or keep so much that compaction cannot free anything.
+    static var keepRecentIterations: Int {
+        let stored = UserDefaults.standard.object(forKey: keepRecentIterationsKey) as? Int
+            ?? defaultKeepRecentIterations
+        return min(max(stored, 1), 10)
+    }
+}
