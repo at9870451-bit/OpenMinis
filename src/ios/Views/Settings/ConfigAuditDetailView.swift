@@ -179,9 +179,9 @@ struct ConfigAuditStatusBadge: View {
 
     private var color: Color {
         switch status {
-        case .applied: return PokiTheme.primaryButton
+        case .applied: return PokiTheme.green
         case .rejected: return PokiTheme.secondaryText
-        case .timeout: return .orange
+        case .timeout: return PokiTheme.amber
         case .reverted: return PokiTheme.primaryButton
         }
     }

@@ -528,8 +528,8 @@ struct BackupHistoryRow: View {
     static func statusColour(_ s: BackupHistory.Status) -> Color {
         switch s {
         case .running: return PokiTheme.primaryButton
-        case .succeeded: return PokiTheme.primaryButton
-        case .completedWithIssues: return .orange
+        case .succeeded: return PokiTheme.green
+        case .completedWithIssues: return PokiTheme.amber
         case .failed: return PokiTheme.danger
         }
     }

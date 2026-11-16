@@ -116,7 +116,10 @@ final class AmorePluginImportStore: ObservableObject {
         case .tooManyFiles: return AppLocalized("Plugin package exceeds 500 files.")
         case .unsafePath(let path): return AppLocalized("Unsafe path in plugin package") + ": " + path
         case .checksum(let path): return AppLocalized("ZIP checksum failed") + ": " + path
-        case .invalid(let detail): return AppLocalized("Invalid plugin package") + ": " + detail
+        case .invalid(let detail):
+            if detail == "Selected file is not a ZIP archive" { return AppLocalized("Selected file is not a ZIP archive") }
+            if detail == "Choose a ZIP file or a plugin folder" { return AppLocalized("Choose a ZIP file or a plugin folder") }
+            return AppLocalized("Invalid plugin package") + ": " + detail
         }
     }
 }

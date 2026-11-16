@@ -163,7 +163,8 @@ struct ChatSendButton: View {
                 }) {
                     Image(systemName: "stop.circle.fill")
                         .font(.system(size: 34))
-                        .foregroundStyle(.red)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(PokiTheme.onSolid, PokiTheme.solid)
                 }
                 // Hosted here rather than on the chat root: this button owns the
                 // decision, and the existing "Task Running" alert up there belongs

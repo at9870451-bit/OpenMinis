@@ -384,11 +384,6 @@ extension ContentView {
             if !isSelecting {
                 Menu {
                     Button {
-                        showTerminal = true
-                    } label: {
-                        Label("Shell Terminal", systemImage: "terminal")
-                    }
-                    Button {
                         activeToolSheet = .rootfsManagement
                     } label: {
                         Label("Rootfs Management", systemImage: "externaldrive")
@@ -430,7 +425,8 @@ extension ContentView {
                     // already correct — which is why only this one broke.
                     // A pre-scaled UIImage makes the intrinsic size 24pt at the
                     // source, independent of SwiftUI layout.
-                    Image(uiImage: Self.terminalCircleIcon)
+                    Image(systemName: "ellipsis.circle")
+                        .foregroundStyle(PokiTheme.blueText)
                 }
             }
         }

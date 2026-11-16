@@ -85673,7 +85673,7 @@
       }
     },
     "Earlier": {
-      "extractionState": "stale",
+      "extractionState": "manual",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -168825,7 +168825,7 @@
       }
     },
     "Pinned": {
-      "extractionState": "stale",
+      "extractionState": "manual",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -168926,13 +168926,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "置顶"
+            "value": "已收藏"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "置頂"
+            "value": "已收藏"
           }
         }
       }
@@ -179708,7 +179708,7 @@
       }
     },
     "Recent": {
-      "extractionState": "stale",
+      "extractionState": "manual",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -179809,13 +179809,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "最近"
+            "value": "最近会话"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "最近"
+            "value": "最近對話"
           }
         }
       }
@@ -245723,7 +245723,7 @@
       }
     },
     "Today": {
-      "extractionState": "stale",
+      "extractionState": "manual",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -269476,7 +269476,7 @@
       }
     },
     "Yesterday": {
-      "extractionState": "stale",
+      "extractionState": "manual",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -284043,6 +284043,259 @@
           "stringUnit": {
             "state": "translated",
             "value": "要求顯示本機通知的權限。"
+          }
+        }
+      }
+    },
+    "New Conversation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Conversation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建会话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新增對話"
+          }
+        }
+      }
+    },
+    "Close conversations": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close conversations"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返回会话面板"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返回對話面板"
+          }
+        }
+      }
+    },
+    "Search chats": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search chats"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索会话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜尋對話"
+          }
+        }
+      }
+    },
+    "Personalize Amore": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalize Amore"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "个性化 Amore"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "個人化 Amore"
+          }
+        }
+      }
+    },
+    "Choose a ZIP file or a plugin folder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a ZIP file or a plugin folder"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请选择 ZIP 文件或插件文件夹"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請選取 ZIP 檔案或外掛資料夾"
+          }
+        }
+      }
+    },
+    "Selected file is not a ZIP archive": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selected file is not a ZIP archive"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选文件不是有效的 ZIP 压缩包"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選取的檔案不是有效的 ZIP 壓縮檔"
+          }
+        }
+      }
+    },
+    "Last 7 Days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last 7 Days"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近七天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近七天"
+          }
+        }
+      }
+    },
+    "Archived": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archived"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已封存"
+          }
+        }
+      }
+    },
+    "No archived chats": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No archived chats"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无归档会话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無封存對話"
+          }
+        }
+      }
+    },
+    "Show recent chats": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show recent chats"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示最近会话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示最近對話"
+          }
+        }
+      }
+    },
+    "Show archived chats": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show archived chats"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示归档会话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示封存對話"
           }
         }
       }

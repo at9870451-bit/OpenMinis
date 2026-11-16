@@ -6,7 +6,7 @@ import UniformTypeIdentifiers
 
 @MainActor
 final class PokiComponentTests: XCTestCase {
-    func testPokiPageAndSidebarColorsResolveInBothModes() {
+    func testPokiPageAndSidebarColorsResolveInBothModes() async {
         check(PokiTheme.uiBackground, light: 0xF5F8FC, dark: 0x05070D)
         check(PokiTheme.uiSidebar, light: 0xEFF4FC, dark: 0x081329)
         check(PokiTheme.uiBlue, light: 0x0177FD, dark: 0x0177FD)
@@ -15,13 +15,13 @@ final class PokiComponentTests: XCTestCase {
         check(PokiTheme.uiDanger, light: 0xE5484D, dark: 0xF2555A)
     }
 
-    func testDrawerUsesPokiTravelNotFullScreenOverlay() {
+    func testDrawerUsesPokiTravelNotFullScreenOverlay() async {
         XCTAssertEqual(PokiDrawerMetrics.travel(for: 390), 304)
         XCTAssertEqual(PokiDrawerMetrics.travel(for: 430), 335)
         XCTAssertEqual(PokiDrawerMetrics.travel(for: 1024), 420)
     }
 
-    func testZIPPickerAcceptsMislabelledPublicItems() {
+    func testZIPPickerAcceptsMislabelledPublicItems() async {
         XCTAssertEqual(AmorePluginDocumentPicker.contentTypes(folder: false), [.item])
         XCTAssertEqual(AmorePluginDocumentPicker.contentTypes(folder: true), [.folder])
         let zip = URL(fileURLWithPath: "/tmp/evans-repo.zip")
@@ -38,7 +38,7 @@ final class PokiComponentTests: XCTestCase {
         XCTAssertTrue(cancelled)
     }
 
-    func testThemeReferenceComponentsLightAndDark() throws {
+    func testThemeReferenceComponentsLightAndDark() async throws {
         for style in [UIUserInterfaceStyle.light, .dark] {
             let scheme: ColorScheme = style == .dark ? .dark : .light
             let view = ThemeReference().environment(\.colorScheme, scheme)

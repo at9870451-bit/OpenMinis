@@ -82,10 +82,10 @@ struct TasksCenterView: View {
     private func stateColor(_ state: AgentJobState) -> Color {
         switch state {
         case .running:            return PokiTheme.tagText
-        case .done:               return .green
+        case .done:               return PokiTheme.green
         case .failed, .timeout:   return PokiTheme.danger
         case .cancelled:          return PokiTheme.secondaryText
-        case .pending:            return .orange
+        case .pending:            return PokiTheme.amber
         }
     }
 }
@@ -347,7 +347,7 @@ extension ContentView {
                 }
 
                 // Runtime shortcuts remain above the history, like ChatGPT's utility entries.
-                VStack(spacing: 1) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 2) {
                     drawerNavRow(.tools)
                     drawerNavRow(.subAgents)
                     drawerNavRow(.skills)
@@ -365,7 +365,7 @@ extension ContentView {
                     .padding(.bottom, 8)
 
                 HStack {
-                    Text(showArchivedDrawerSessions ? "Archived" : "Recent")
+                    Text(showArchivedDrawerSessions ? AppLocalized("Archived") : AppLocalized("Recent"))
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(PokiTheme.secondaryText)
                     Spacer()
@@ -380,7 +380,7 @@ extension ContentView {
                             .frame(width: 34, height: 34)
                     }
                     .buttonStyle(DrawerIconButtonStyle())
-                    .accessibilityLabel(showArchivedDrawerSessions ? "Show recent chats" : "Show archived chats")
+                    .accessibilityLabel(showArchivedDrawerSessions ? AppLocalized("Show recent chats") : AppLocalized("Show archived chats"))
                 }
                 .padding(.horizontal, 18)
                 .padding(.bottom, 2)
@@ -389,7 +389,7 @@ extension ContentView {
                     LazyVStack(alignment: .leading, spacing: 8) {
                         let groups = drawerGroups
                         if groups.isEmpty && filteredDrawerSessions.isEmpty {
-                            Text(showArchivedDrawerSessions ? "No archived chats" : AppLocalized("No conversations yet"))
+                            Text(showArchivedDrawerSessions ? AppLocalized("No archived chats") : AppLocalized("No conversations yet"))
                                 .font(.system(size: 14))
                                 .foregroundStyle(PokiTheme.secondaryText)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -531,23 +531,22 @@ extension ContentView {
             }
         }()
         Button {
-            withAnimation(.easeOut(duration: 0.2)) {
-                showHistoryDrawer = false
-            }
+            guard !drawerIsSliding else { return }
+            snapDrawer(open: false)
             runtimePage = page
         } label: {
             HStack(spacing: 14) {
                 Image(systemName: meta.symbol)
-                    .font(.system(size: 17, weight: .regular))
-                    .foregroundStyle(PokiTheme.primaryText)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(PokiTheme.blueText)
                     .frame(width: 24, alignment: .center)
                 Text(meta.title)
-                    .font(.system(size: 16.5, weight: .regular))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(PokiTheme.primaryText)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 12)
-            .frame(height: 46)
+            .frame(height: 42)
             .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .buttonStyle(DrawerRowButtonStyle())
@@ -555,23 +554,22 @@ extension ContentView {
 
     private var localBotNavRow: some View {
         Button {
-            withAnimation(.easeOut(duration: 0.2)) {
-                showHistoryDrawer = false
-            }
+            guard !drawerIsSliding else { return }
+            snapDrawer(open: false)
             runtimePage = .localBot
         } label: {
             HStack(spacing: 14) {
                 Image(systemName: "qrcode.viewfinder")
-                    .font(.system(size: 17, weight: .regular))
-                    .foregroundStyle(PokiTheme.primaryText)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(PokiTheme.blueText)
                     .frame(width: 24, alignment: .center)
                 Text("SnowLuma + QQBot")
-                    .font(.system(size: 16.5, weight: .regular))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(PokiTheme.primaryText)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 12)
-            .frame(height: 46)
+            .frame(height: 42)
             .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .buttonStyle(DrawerRowButtonStyle())

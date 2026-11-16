@@ -44,6 +44,6 @@ struct PokiConversationCover: View {
         .accessibilityElement()
         .accessibilityLabel(Text(AppLocalized("Close conversations")))
         .accessibilityAddTraits(.isButton)
-        .accessibilityAction(onClose)
+        .accessibilityAction { onClose() }
     }
 }
