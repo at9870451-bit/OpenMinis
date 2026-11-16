@@ -598,13 +598,13 @@ struct AIChatHeaderAvatar: View {
             Image(systemName: "sparkles")
                 .font(.system(size: 18, weight: .medium))
                 .foregroundStyle(.primary.opacity(0.85))
-                .symbolEffect(.pulse, isActive: isThinking)
+                .opacity(isThinking ? (pulse ? 1.0 : 0.55) : 1.0)
         }
         .scaleEffect(isThinking && pulse ? 1.04 : 1.0)
         .shadow(color: Color.black.opacity(isThinking ? 0.10 : 0.05), radius: isThinking ? 10 : 6, y: 2)
         .animation(isThinking ? .easeInOut(duration: 1.1).repeatForever(autoreverses: true) : .easeOut(duration: 0.25), value: pulse)
         .onAppear { pulse = isThinking }
-        .onChange(of: isThinking) { _, now in pulse = now }
+        .onChange(of: isThinking) { now in pulse = now }
         .accessibilityLabel(Text(AppLocalized("AI assistant")))
     }
 }
