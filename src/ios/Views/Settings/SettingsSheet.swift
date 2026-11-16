@@ -897,6 +897,7 @@ struct AmoreMarketplaceView: View {
                 Text(AppLocalized("Local plugins"))
             } footer: {
                 Text(AppLocalized("ZIP import works without starting Terminal or downloading a Linux image. Maximum 10 MB and 500 files."))
+                Text(AppLocalized("Amore scans JSON configuration files in the package. Compatible Amore JSON can have any filename; Node.js and Cordis packages need a port."))
             }
 
             Section(AppLocalized("Installed plugins")) {
@@ -983,6 +984,11 @@ struct AmoreMarketplaceView: View {
                 pickerMode = nil
             })
             .id(mode.id)
+        }
+        .sheet(item: $importer.configurations, onDismiss: { importer.configurationDismissed() }) { selection in
+            AmorePluginConfigurationPicker(selection: selection,
+                onChoose: { importer.chooseConfiguration($0) },
+                onCancel: { importer.cancelConfiguration() })
         }
         .sheet(item: $importer.pending, onDismiss: { importer.confirmationDismissed() }) { selection in
             AmorePluginImportConfirmation(selection: selection,

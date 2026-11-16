@@ -10,6 +10,7 @@ public enum PluginArchiveError: LocalizedError, Sendable {
     case missingManifest
     case multipleManifests
     case checksum(String)
+    case unsupportedPackage(name: String, runtime: String)
 
     public var errorDescription: String? {
         switch self {
@@ -20,6 +21,8 @@ public enum PluginArchiveError: LocalizedError, Sendable {
         case .missingManifest: return "No manifest.json found. Select a plugin ZIP, not a source-only archive."
         case .multipleManifests: return "The package contains multiple plugins. Import one plugin at a time."
         case .checksum(let path): return "ZIP checksum failed: \(path)"
+        case .unsupportedPackage(let name, let runtime):
+            return "Package \(name) requires \(runtime). It is not an Amore JavaScriptCore plugin."
         }
     }
 }
@@ -29,6 +32,7 @@ public struct PreparedPluginArchive: Sendable {
     public let workspace: URL
     public let pluginDirectory: URL
     public let manifestData: Data
+    public let configurationFileName: String
 }
 
 /// ZIP/folder importer; never boots a Linux guest and never runs plugin code.
@@ -39,6 +43,19 @@ public enum PluginArchive {
     /// Copies a security-scoped selection to private staging and validates all paths.
     /// Call from an actor or a detached task, never a View's synchronous callback.
     public static func prepare(from selected: URL, folder: Bool = false) throws -> PreparedPluginArchive {
+        let inspected = try inspect(from: selected, folder: folder)
+        do {
+            guard inspected.candidates.count == 1, let candidate = inspected.candidates.first else {
+                throw PluginArchiveError.multipleManifests
+            }
+            return try prepare(inspected, configuration: candidate)
+        } catch {
+            discard(inspected)
+            throw error
+        }
+    }
+
+    public static func inspect(from selected: URL, folder: Bool = false) throws -> InspectedPluginArchive {
         let fm = FileManager.default
         let workspace = fm.temporaryDirectory.appendingPathComponent("amore-plugin-import-" + UUID().uuidString)
         try fm.createDirectory(at: workspace, withIntermediateDirectories: true)
@@ -70,17 +87,37 @@ public enum PluginArchive {
             } else {
                 try extract(snapshot, to: output)
             }
-            let plugin = try locateManifest(in: output)
-            try validateDirectory(plugin)
-            let manifest = plugin.appendingPathComponent("manifest.json")
-            let size = try manifest.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-            guard size <= 256 * 1024 else { throw PluginArchiveError.tooLarge }
-            return PreparedPluginArchive(workspace: workspace, pluginDirectory: plugin,
-                                         manifestData: try Data(contentsOf: manifest))
+            let candidates = try PluginConfigurationDiscovery.candidates(in: output)
+            return InspectedPluginArchive(workspace: workspace, contentsDirectory: output,
+                                          candidates: candidates)
         } catch {
             try? fm.removeItem(at: workspace)
             throw error
         }
+    }
+
+    /// Chooses only an inspected candidate. JSON is read as data, never executed.
+    public static func prepare(_ inspected: InspectedPluginArchive,
+                               configuration candidate: PluginConfigurationCandidate) throws -> PreparedPluginArchive {
+        guard inspected.candidates.contains(candidate) else {
+            throw PluginArchiveError.invalid("Configuration was not found in the inspected package")
+        }
+        let file = try destination(candidate.relativePath, under: inspected.contentsDirectory)
+        let info = try file.resourceValues(forKeys: [.fileSizeKey, .isRegularFileKey, .isSymbolicLinkKey])
+        guard info.isRegularFile == true, info.isSymbolicLink != true else {
+            throw PluginArchiveError.unsafePath(candidate.relativePath)
+        }
+        guard (info.fileSize ?? 0) <= PluginConfigurationDiscovery.maximumJSONBytes else {
+            throw PluginArchiveError.tooLarge
+        }
+        let plugin = file.deletingLastPathComponent()
+        try validateDirectory(plugin)
+        return PreparedPluginArchive(workspace: inspected.workspace, pluginDirectory: plugin,
+            manifestData: try Data(contentsOf: file), configurationFileName: file.lastPathComponent)
+    }
+
+    public static func discard(_ inspected: InspectedPluginArchive) {
+        try? FileManager.default.removeItem(at: inspected.workspace)
     }
 
     /// Removes only the unique staging directory owned by this operation.
@@ -218,25 +255,6 @@ public enum PluginArchive {
         }
         if let coordinationError { throw coordinationError }
         if let copyError { throw copyError }
-    }
-
-    private static func locateManifest(in root: URL) throws -> URL {
-        let fm = FileManager.default
-        var candidates: [URL] = []
-        guard let walker = fm.enumerator(at: root, includingPropertiesForKeys: [.isRegularFileKey],
-                                         options: []) else {
-            throw PluginArchiveError.missingManifest
-        }
-        for case let file as URL in walker {
-            if file.pathComponents.contains("__MACOSX") { continue }
-            if file.lastPathComponent == "manifest.json",
-               try file.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true {
-                candidates.append(file.deletingLastPathComponent())
-            }
-        }
-        guard !candidates.isEmpty else { throw PluginArchiveError.missingManifest }
-        guard candidates.count == 1, let only = candidates.first else { throw PluginArchiveError.multipleManifests }
-        return only
     }
 
     private static func validateDirectory(_ root: URL) throws {

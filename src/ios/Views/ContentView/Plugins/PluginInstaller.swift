@@ -52,6 +52,7 @@ struct AmoreInstalledPlugin: Codable, Equatable, Sendable {
     var installedAt: Date
     var previousVersion: String?
     var permissions: [String]
+    var configurationFileName: String? = nil
 }
 
 actor AmorePluginInstaller {
@@ -301,12 +302,16 @@ actor AmorePluginInstaller {
         let record = AmoreInstalledPlugin(id: manifest.id, version: manifest.version,
             enabled: false, installedAt: Date(),
             previousVersion: existing?.version == manifest.version ? existing?.previousVersion : existing?.version,
-            permissions: manifest.permissions)
+            permissions: manifest.permissions, configurationFileName: prepared.configurationFileName)
         let journal = InstallJournal(record: record, stagingName: staging.lastPathComponent,
             backupName: backup.lastPathComponent, hadPrevious: fm.fileExists(atPath: target.path))
         let marker = idRoot.appendingPathComponent(".install-transaction.json")
         do {
             try fm.copyItem(at: prepared.pluginDirectory, to: staging)
+            // Normalize only a configuration already decoded and fully validated
+            // as Amore. Never convert npm/Cordis metadata by renaming it.
+            let canonical = staging.appendingPathComponent("manifest.json")
+            try prepared.manifestData.write(to: canonical, options: .atomic)
             try JSONEncoder().encode(journal).write(to: marker, options: .atomic)
             if fm.fileExists(atPath: target.path) {
                 try fm.moveItem(at: target, to: backup)

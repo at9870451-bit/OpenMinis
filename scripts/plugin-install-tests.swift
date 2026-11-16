@@ -24,6 +24,47 @@ final class InstallerTests: XCTestCase {
         XCTAssertEqual(remaining.count, 0)
     }
 
+    func testRenamedJSONIsInstalledAndCanonicalManifestCanBeLoaded() async throws {
+        let zip = try XCTUnwrap(Bundle.module.url(forResource: "renamed-config", withExtension: "zip"))
+        let prepared = try PluginArchive.prepare(from: zip)
+        defer { PluginArchive.discard(prepared) }
+        XCTAssertEqual(prepared.configurationFileName, "configuration.json")
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let installer = AmorePluginInstaller(rootDirectory: root.appendingPathComponent("Plugins"))
+        let record = try await installer.installPrepared(prepared, approvedPermissions: [])
+        XCTAssertEqual(record.configurationFileName, "configuration.json")
+        let installed = root.appendingPathComponent("Plugins/io.amore.echo/1.0.0")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: installed.appendingPathComponent("configuration.json").path))
+        let json = try Data(contentsOf: installed.appendingPathComponent("manifest.json"))
+        let manifest = try JSONDecoder().decode(AmorePluginManifest.self, from: json)
+        XCTAssertEqual(manifest.id, record.id)
+        XCTAssertEqual(manifest.entry, "index.js")
+        let records = try await installer.installedPlugins()
+        XCTAssertEqual(records.first?.configurationFileName, "configuration.json")
+    }
+
+    @MainActor
+    func testJSONConfigurationEntryLoadsInActualJavaScriptCoreHost() async throws {
+        let zip = try XCTUnwrap(Bundle.module.url(forResource: "renamed-config", withExtension: "zip"))
+        let prepared = try PluginArchive.prepare(from: zip)
+        defer { PluginArchive.discard(prepared) }
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let installer = AmorePluginInstaller(rootDirectory: root.appendingPathComponent("Plugins"))
+        let record = try await installer.installPrepared(prepared, approvedPermissions: [])
+        let base = root.appendingPathComponent("Plugins/io.amore.echo/1.0.0")
+        let manifest = try JSONDecoder().decode(AmorePluginManifest.self,
+            from: Data(contentsOf: base.appendingPathComponent("manifest.json")))
+        let entry = try XCTUnwrap(manifest.entry)
+        let source = try String(contentsOf: PluginArchive.destination(entry, under: base), encoding: .utf8)
+        let host = AmoreJSPluginHost(pluginID: record.id, permissions: record.permissions)
+        XCTAssertEqual(try host.load(source: source), ["echo"])
+        let output = try host.call(tool: "echo", argumentsJSON: "{\"text\":\"JSON entry works\"}")
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(output.utf8)) as? [String: String])
+        XCTAssertEqual(object["text"], "JSON entry works")
+    }
+
     func testCorruptRegistryIsNotOverwritten() async throws {
         let zip = try XCTUnwrap(Bundle.module.url(forResource: "echo", withExtension: "zip"))
         let prepared = try PluginArchive.prepare(from: zip)

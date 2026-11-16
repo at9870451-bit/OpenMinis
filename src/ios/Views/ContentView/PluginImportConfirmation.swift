@@ -15,6 +15,14 @@ struct AmorePluginImportConfirmation: View {
                     Text(selection.manifest.id + " · " + selection.manifest.version)
                         .font(.caption).foregroundStyle(PokiTheme.secondaryText)
                     Text(selection.manifest.description).font(.callout)
+                    LabeledContent(AppLocalized("Plugin configuration JSON")) {
+                        Text(selection.prepared.configurationFileName).font(.caption.monospaced())
+                    }
+                    if let entry = selection.manifest.entry {
+                        LabeledContent(AppLocalized("JavaScript entry")) {
+                            Text(entry).font(.caption.monospaced())
+                        }
+                    }
                 }.listRowBackground(PokiTheme.surface)
                 Section {
                     Label(AppLocalized("Local package · signature not verified"), systemImage: "exclamationmark.shield")
@@ -36,7 +44,6 @@ struct AmorePluginImportConfirmation: View {
                         .tint(PokiTheme.tagText)
                 }.listRowBackground(PokiTheme.surface)
             }
-            .pokiScreen()
             .pokiScreen()
             .navigationTitle(AppLocalized("Install plugin"))
             .navigationBarTitleDisplayMode(.inline)

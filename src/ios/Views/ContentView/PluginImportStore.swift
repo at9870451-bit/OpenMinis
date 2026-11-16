@@ -8,16 +8,23 @@ struct AmorePendingPluginImport: Identifiable, Sendable {
     let manifest: AmorePluginManifest
 }
 
-/// Owns the import's effects; Views only present the picker and permission sheet.
+struct AmorePluginConfigurationSelection: Identifiable, Sendable {
+    let id = UUID()
+    let inspected: InspectedPluginArchive
+}
+
+/// Owns import effects. JSON is configuration data, not executable JavaScript.
 @MainActor
 final class AmorePluginImportStore: ObservableObject {
     @Published private(set) var isWorking = false
     @Published private(set) var phaseText = ""
     @Published private(set) var installed: [AmoreInstalledPlugin] = []
+    @Published var configurations: AmorePluginConfigurationSelection?
     @Published var pending: AmorePendingPluginImport?
     @Published var resultMessage: String?
     @Published private(set) var failed = false
     private var importTask: Task<Void, Never>?
+    private var chosenConfiguration: (InspectedPluginArchive, PluginConfigurationCandidate)?
     private var confirmedSelection: AmorePendingPluginImport?
 
     func selected(_ url: URL, folder: Bool) {
@@ -28,22 +35,56 @@ final class AmorePluginImportStore: ObservableObject {
         importTask = Task { [weak self] in
             guard let self else { return }
             do {
-                let prepared = try await Task.detached(priority: .userInitiated) {
-                    try PluginArchive.prepare(from: url, folder: folder)
+                let inspected = try await Task.detached(priority: .userInitiated) {
+                    try PluginArchive.inspect(from: url, folder: folder)
                 }.value
-                do {
-                    let manifest = try JSONDecoder().decode(AmorePluginManifest.self, from: prepared.manifestData)
-                    _ = try AmorePluginValidation.validate(manifest)
-                    self.pending = AmorePendingPluginImport(prepared: prepared, manifest: manifest)
-                } catch {
-                    await Task.detached { PluginArchive.discard(prepared) }.value
-                    throw error
+                if inspected.candidates.count > 1 {
+                    configurations = AmorePluginConfigurationSelection(inspected: inspected)
+                } else if let candidate = inspected.candidates.first {
+                    await prepareConfiguration(inspected, candidate: candidate)
+                } else {
+                    await Task.detached { PluginArchive.discard(inspected) }.value
+                    throw PluginArchiveError.missingManifest
                 }
-            } catch {
-                failed = true
-                resultMessage = Self.userMessage(for: error)
-            }
+            } catch { report(error) }
             isWorking = false
+        }
+    }
+
+    func chooseConfiguration(_ candidate: PluginConfigurationCandidate) {
+        guard let selection = configurations, !isWorking else { return }
+        chosenConfiguration = (selection.inspected, candidate)
+        configurations = nil
+    }
+
+    func configurationDismissed() {
+        guard let (inspected, candidate) = chosenConfiguration else { return }
+        chosenConfiguration = nil
+        isWorking = true
+        Task {
+            await prepareConfiguration(inspected, candidate: candidate)
+            isWorking = false
+        }
+    }
+
+    func cancelConfiguration() {
+        guard let selection = configurations else { return }
+        configurations = nil
+        Task { await Task.detached { PluginArchive.discard(selection.inspected) }.value }
+    }
+
+    private func prepareConfiguration(_ inspected: InspectedPluginArchive,
+                                      candidate: PluginConfigurationCandidate) async {
+        do {
+            let prepared = try await Task.detached(priority: .userInitiated) {
+                try PluginArchive.prepare(inspected, configuration: candidate)
+            }.value
+            let manifest = try JSONDecoder().decode(AmorePluginManifest.self, from: prepared.manifestData)
+            _ = try AmorePluginValidation.validate(manifest)
+            pending = AmorePendingPluginImport(prepared: prepared, manifest: manifest)
+        } catch {
+            await Task.detached { PluginArchive.discard(inspected) }.value
+            report(error)
         }
     }
 
@@ -66,10 +107,7 @@ final class AmorePluginImportStore: ObservableObject {
                 failed = false
                 resultMessage = AppLocalized("Installed") + ": " + record.id + " " + record.version
                     + "\n" + AppLocalized("Installed disabled. No plugin code was executed.")
-            } catch {
-                failed = true
-                resultMessage = Self.userMessage(for: error)
-            }
+            } catch { report(error) }
             await Task.detached { PluginArchive.discard(selection.prepared) }.value
             isWorking = false
         }
@@ -81,14 +119,11 @@ final class AmorePluginImportStore: ObservableObject {
         Task { await Task.detached { PluginArchive.discard(selection.prepared) }.value }
     }
 
-    func pickerFailed(_ error: Error) {
-        failed = true
-        resultMessage = error.localizedDescription
-    }
+    func pickerFailed(_ error: Error) { report(error) }
 
     func refreshInstalled() async {
         do { installed = try await AmorePluginInstaller.shared.installedPlugins() }
-        catch { failed = true; resultMessage = error.localizedDescription }
+        catch { report(error) }
     }
 
     func uninstall(_ record: AmoreInstalledPlugin) {
@@ -96,22 +131,30 @@ final class AmorePluginImportStore: ObservableObject {
             do {
                 try await AmorePluginInstaller.shared.uninstall(id: record.id)
                 await refreshInstalled()
-            } catch {
-                failed = true
-                resultMessage = error.localizedDescription
-            }
+            } catch { report(error) }
         }
     }
 
-    private static func userMessage(for error: Error) -> String {
+    private func report(_ error: Error) {
+        failed = true
+        resultMessage = Self.userMessage(for: error)
+    }
+
+    static func userMessage(for error: Error) -> String {
         if case DecodingError.keyNotFound(let key, _) = error {
-            return AppLocalized("Invalid manifest.json. Missing field") + ": " + key.stringValue
+            return AppLocalized("Invalid plugin JSON. Missing field") + ": " + key.stringValue
         }
-        if error is DecodingError { return AppLocalized("manifest.json does not match the Amore plugin format.") }
+        if error is DecodingError { return AppLocalized("The selected JSON does not match the Amore plugin format.") }
         guard let archive = error as? PluginArchiveError else { return error.localizedDescription }
         switch archive {
-        case .missingManifest: return AppLocalized("No manifest.json found in this plugin package.")
-        case .multipleManifests: return AppLocalized("Multiple plugins found. Import one plugin package at a time.")
+        case .unsupportedPackage(let name, let runtime):
+            return AppLocalized("Incompatible plugin package") + ": " + name + "\n"
+                + AppLocalized("Required host or runtime") + ": " + runtime + "\n"
+                + AppLocalized("Amore JavaScriptCore cannot run Node.js, Cordis or browser plugins. An Amore port is required.")
+        case .missingManifest:
+            return AppLocalized("No compatible plugin configuration was found among the JSON files.")
+        case .multipleManifests:
+            return AppLocalized("Multiple plugin configurations found. Choose one to continue.")
         case .tooLarge: return AppLocalized("Plugin package exceeds 10 MB.")
         case .tooManyFiles: return AppLocalized("Plugin package exceeds 500 files.")
         case .unsafePath(let path): return AppLocalized("Unsafe path in plugin package") + ": " + path

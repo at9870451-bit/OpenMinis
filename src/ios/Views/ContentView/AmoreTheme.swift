@@ -42,6 +42,13 @@ enum PokiTheme {
     static let uiDanger = pair(0xE5484D, 0xF2555A)
     static let uiRedSoft = pair(0xFDECEC, 0x3A1517)
     static let uiRedInk = pair(0x8C1D22, 0xFFA3A6)
+    // Utility icon accents are independent of the blue primary-action colour.
+    static let uiToolOrange = pair(0xB85C00, 0xFFB66B)
+    static let uiAgentPurple = pair(0x7954D6, 0xB69CFF)
+    static let uiSkillTeal = pair(0x087C6F, 0x5ED8C8)
+    static let uiMemoryRose = pair(0xB94278, 0xF399C2)
+    static let uiRootfsIndigo = pair(0x4D59BE, 0xA5ACFF)
+    static let uiBotCyan = pair(0x087DA5, 0x70D5F3)
     // Compatibility tokens now keep real colour instead of flattening every
     // action/status into label black or label white.
     static let uiAIAccent = uiPortrait
@@ -72,6 +79,12 @@ enum PokiTheme {
     static let danger = Color(uiDanger)
     static let redSoft = Color(uiRedSoft)
     static let redInk = Color(uiRedInk)
+    static let toolOrange = Color(uiToolOrange)
+    static let agentPurple = Color(uiAgentPurple)
+    static let skillTeal = Color(uiSkillTeal)
+    static let memoryRose = Color(uiMemoryRose)
+    static let rootfsIndigo = Color(uiRootfsIndigo)
+    static let botCyan = Color(uiBotCyan)
     static let solid = Color(uiPrimaryText)
     static let onSolid = Color(UIColor.systemBackground)
     static let aiAccent = portrait

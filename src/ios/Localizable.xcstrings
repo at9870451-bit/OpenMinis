@@ -284299,6 +284299,282 @@
           }
         }
       }
+    },
+    "Choose plugin JSON": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose plugin JSON"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择插件 JSON"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇插件 JSON"
+          }
+        }
+      }
+    },
+    "Choose which plugin configuration to install. JSON files are configuration, not executable code.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose which plugin configuration to install. JSON files are configuration, not executable code."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发现多个插件配置，请选择要安装的一项。JSON 是配置文件，不会作为代码执行。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "發現多個外掛配置，請選擇要安裝的一項。JSON 是配置檔案，不會作為程式碼執行。"
+          }
+        }
+      }
+    },
+    "Plugin configuration JSON": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plugin configuration JSON"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "插件配置 JSON"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外掛配置 JSON"
+          }
+        }
+      }
+    },
+    "JavaScript entry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript entry"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript 入口"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript 入口"
+          }
+        }
+      }
+    },
+    "Invalid plugin JSON. Missing field": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid plugin JSON. Missing field"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "插件 JSON 无效，缺少字段"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外掛 JSON 無效，缺少欄位"
+          }
+        }
+      }
+    },
+    "The selected JSON does not match the Amore plugin format.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The selected JSON does not match the Amore plugin format."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选 JSON 不符合 Amore 插件格式。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所選 JSON 不符合 Amore 外掛格式。"
+          }
+        }
+      }
+    },
+    "Incompatible plugin package": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incompatible plugin package"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "插件包不兼容"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外掛套件不相容"
+          }
+        }
+      }
+    },
+    "Required host or runtime": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Required host or runtime"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要的宿主或运行环境"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要的宿主或執行環境"
+          }
+        }
+      }
+    },
+    "Amore JavaScriptCore cannot run Node.js, Cordis or browser plugins. An Amore port is required.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore JavaScriptCore cannot run Node.js, Cordis or browser plugins. An Amore port is required."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 的 JavaScriptCore 不能运行 Node.js、Cordis 或浏览器插件。需要提供适配 Amore 的版本，不能仅重命名或补一个 JSON 清单。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 的 JavaScriptCore 不能執行 Node.js、Cordis 或瀏覽器外掛。需要提供適配 Amore 的版本，不能僅重新命名或補一個 JSON 清單。"
+          }
+        }
+      }
+    },
+    "No compatible plugin configuration was found among the JSON files.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No compatible plugin configuration was found among the JSON files."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已检查包内 JSON 文件，未找到兼容的 Amore 插件配置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已檢查套件內 JSON 檔案，未找到相容的 Amore 外掛配置。"
+          }
+        }
+      }
+    },
+    "Multiple plugin configurations found. Choose one to continue.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Multiple plugin configurations found. Choose one to continue."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发现多个插件 JSON 配置，请选择一项继续。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "發現多個外掛 JSON 配置，請選擇一項繼續。"
+          }
+        }
+      }
+    },
+    "Amore scans JSON configuration files in the package. Compatible Amore JSON can have any filename; Node.js and Cordis packages need a port.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore scans JSON configuration files in the package. Compatible Amore JSON can have any filename; Node.js and Cordis packages need a port."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 会自动识别包内 JSON 配置，不限制文件名。Node.js、Cordis 等其他宿主的插件需要适配。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 會自動識別套件內 JSON 配置，不限制檔名。Node.js、Cordis 等其他宿主的外掛需要適配。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

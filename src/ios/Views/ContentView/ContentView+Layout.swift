@@ -156,7 +156,6 @@ extension ContentView {
         GeometryReader { geometry in
             let drawerWidth = PokiDrawerMetrics.travel(for: geometry.size.width)
             let progress = min(1, max(0, drawerProgress))
-            let radius = min(1, progress / 0.15) * max(34, max(geometry.safeAreaInsets.top, geometry.safeAreaInsets.bottom))
             ZStack(alignment: .leading) {
                 PokiTheme.sidebar.ignoresSafeArea()
                 historyDrawer
@@ -167,49 +166,32 @@ extension ContentView {
                     .accessibilityHidden(!showHistoryDrawer)
                     .zIndex(drawerReduceMotion ? 2 : 0)
 
-                chatStack
-                    .accessibilityHidden(showHistoryDrawer)
-                    .background {
-                        EdgeSwipeCatcher(enabled: !showHistoryDrawer && runtimePage == nil && activeToolSheet == nil,
-                            onProgress: { fraction in
-                                drawerCleanupTask?.cancel()
-                                drawerPresentationActive = true
-                                drawerIsSliding = true
-                                drawerDragProgress = fraction
-                            }, onEnd: { fraction, velocity in
-                                drawerIsSliding = false
-                                let projected = fraction + velocity / max(1, drawerWidth) / 6
-                                snapDrawer(open: projected > 0.45)
-                            })
-                            .allowsHitTesting(false)
-                    }
-                    .overlay {
-                        if drawerPresentationActive {
-                            PokiConversationCover(progress: progress) { snapDrawer(open: false) }
-                                .ignoresSafeArea()
+                PokiDrawerConversationPanel(
+                    containerSize: geometry.size,
+                    safeAreaInsets: geometry.safeAreaInsets,
+                    drawerWidth: drawerWidth,
+                    progress: progress,
+                    presentationActive: drawerPresentationActive,
+                    reduceMotion: drawerReduceMotion,
+                    onClose: { snapDrawer(open: false) }
+                ) {
+                    chatStack
+                        .background {
+                            EdgeSwipeCatcher(enabled: !showHistoryDrawer && runtimePage == nil && activeToolSheet == nil,
+                                onProgress: { fraction in
+                                    drawerCleanupTask?.cancel()
+                                    drawerPresentationActive = true
+                                    drawerIsSliding = true
+                                    drawerDragProgress = fraction
+                                }, onEnd: { fraction, velocity in
+                                    drawerIsSliding = false
+                                    let projected = fraction + velocity / max(1, drawerWidth) / 6
+                                    snapDrawer(open: projected > 0.45)
+                                })
+                                .allowsHitTesting(false)
                         }
-                    }
-                    .overlay {
-                        if drawerPresentationActive && !drawerReduceMotion {
-                            PokiConversationCorners(radius: radius)
-                                .fill(PokiTheme.sidebar, style: FillStyle(eoFill: true))
-                                .ignoresSafeArea().allowsHitTesting(false)
-                            RoundedRectangle(cornerRadius: radius, style: .continuous)
-                                .strokeBorder(PokiTheme.divider, lineWidth: 0.5)
-                                .ignoresSafeArea().allowsHitTesting(false)
-                        }
-                    }
-                    .background {
-                        if drawerPresentationActive && !drawerReduceMotion {
-                            RoundedRectangle(cornerRadius: radius, style: .continuous)
-                                .fill(PokiTheme.background)
-                                .shadow(color: .black.opacity(drawerColorScheme == .dark ? 0.22 : 0.07),
-                                        radius: 20, x: -2, y: 0)
-                                .ignoresSafeArea()
-                        }
-                    }
-                    .offset(x: drawerReduceMotion ? 0 : drawerWidth * progress)
-                    .zIndex(1)
+                }
+                .zIndex(1)
             }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 16, coordinateSpace: .global)
@@ -280,6 +262,9 @@ extension ContentView {
     @ViewBuilder
     private var historyDrawer: some View {
         ZStack(alignment: .leading) {
+            Rectangle()
+                .fill(PokiTheme.sidebar)
+                .ignoresSafeArea()
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 12) {
                     Button { showDrawerAccountMenu = true } label: {
@@ -519,15 +504,15 @@ extension ContentView {
 
     @ViewBuilder
     private func drawerNavRow(_ page: RuntimePage) -> some View {
-        let meta: (title: String, symbol: String) = {
+        let meta: (title: String, symbol: String, color: Color) = {
             switch page {
-            case .tools:     return (AppLocalized("Agent Tools"), "wrench.and.screwdriver")
-            case .subAgents: return (AppLocalized("Sub Agents"), "person.2")
-            case .skills:    return (AppLocalized("Skills"), "puzzlepiece.extension")
-            case .memory:    return (AppLocalized("Memory"), "brain.head.profile")
-            case .localBot:  return ("SnowLuma + QQBot", "antenna.radiowaves.left.and.right")
-            case .soul:      return ("Personalize Amore", "sparkles")
-            case .rootfs:    return (AppLocalized("Rootfs"), "externaldrive")
+            case .tools: return (AppLocalized("Agent Tools"), "wrench.and.screwdriver", PokiTheme.toolOrange)
+            case .subAgents: return (AppLocalized("Sub Agents"), "person.2", PokiTheme.agentPurple)
+            case .skills: return (AppLocalized("Skills"), "puzzlepiece.extension", PokiTheme.skillTeal)
+            case .memory: return (AppLocalized("Memory"), "brain.head.profile", PokiTheme.memoryRose)
+            case .localBot: return ("SnowLuma + QQBot", "qrcode.viewfinder", PokiTheme.botCyan)
+            case .soul: return (AppLocalized("Personalize Amore"), "sparkles", PokiTheme.agentPurple)
+            case .rootfs: return (AppLocalized("Rootfs"), "externaldrive", PokiTheme.rootfsIndigo)
             }
         }()
         Button {
@@ -535,19 +520,7 @@ extension ContentView {
             snapDrawer(open: false)
             runtimePage = page
         } label: {
-            HStack(spacing: 14) {
-                Image(systemName: meta.symbol)
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(PokiTheme.blueText)
-                    .frame(width: 24, alignment: .center)
-                Text(meta.title)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(PokiTheme.primaryText)
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 12)
-            .frame(height: 42)
-            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            DrawerShortcutLabel(title: meta.title, symbol: meta.symbol, accent: meta.color)
         }
         .buttonStyle(DrawerRowButtonStyle())
     }
@@ -558,19 +531,7 @@ extension ContentView {
             snapDrawer(open: false)
             runtimePage = .localBot
         } label: {
-            HStack(spacing: 14) {
-                Image(systemName: "qrcode.viewfinder")
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(PokiTheme.blueText)
-                    .frame(width: 24, alignment: .center)
-                Text("SnowLuma + QQBot")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(PokiTheme.primaryText)
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 12)
-            .frame(height: 42)
-            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            DrawerShortcutLabel(title: "SnowLuma + QQBot", symbol: "qrcode.viewfinder", accent: PokiTheme.botCyan)
         }
         .buttonStyle(DrawerRowButtonStyle())
     }

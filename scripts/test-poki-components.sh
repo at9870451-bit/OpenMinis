@@ -6,6 +6,7 @@ mkdir -p "$HOST/App" "$HOST/Tests"
 cp "$ROOT/src/ios/Views/ContentView/AmoreTheme.swift" "$HOST/App/"
 cp "$ROOT/src/ios/Views/ContentView/PokiDrawerMotion.swift" "$HOST/App/"
 cp "$ROOT/src/ios/Views/ContentView/PluginImportPicker.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/ContentView/DrawerShortcut.swift" "$HOST/App/"
 cp "$ROOT/scripts/PokiComponentTests.swift" "$HOST/Tests/"
 cat > "$HOST/App/HostApp.swift" <<'EOF'
 import SwiftUI

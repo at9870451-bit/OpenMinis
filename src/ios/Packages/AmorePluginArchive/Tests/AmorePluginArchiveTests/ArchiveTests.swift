@@ -66,6 +66,54 @@ final class ArchiveTests: XCTestCase {
             }
         }
     }
+    func testEvansMetadataReportsTheActualRequiredHost() throws {
+        XCTAssertThrowsError(try PluginArchive.inspect(from: fixture("evans-dsh-metadata"))) { error in
+            guard case PluginArchiveError.unsupportedPackage(let name, let runtime) = error else {
+                return XCTFail("Expected incompatible host, got \(error)")
+            }
+            XCTAssertEqual(name, "dsh-purge")
+            XCTAssertTrue(runtime.contains("Node.js"))
+            XCTAssertTrue(runtime.contains("Cordis"))
+        }
+    }
+
+    func testValidAmoreJSONCanUseAnyFilename() throws {
+        for name in ["renamed-config", "named-package-config", "invalid-canonical-with-valid-config"] {
+            let prepared = try PluginArchive.prepare(from: fixture(name))
+            defer { PluginArchive.discard(prepared) }
+            let object = try XCTUnwrap(JSONSerialization.jsonObject(with: prepared.manifestData) as? [String: Any])
+            XCTAssertEqual(object["id"] as? String, "io.amore.echo")
+            XCTAssertFalse(prepared.configurationFileName.isEmpty)
+            XCTAssertTrue(FileManager.default.fileExists(atPath: prepared.pluginDirectory.appendingPathComponent("index.js").path))
+        }
+    }
+
+    func testMultipleValidJSONsRequireExplicitSelection() throws {
+        let inspected = try PluginArchive.inspect(from: fixture("multiple-configs"))
+        defer { PluginArchive.discard(inspected) }
+        XCTAssertEqual(inspected.candidates.map(\.relativePath), ["first.json", "second.json"])
+        let chosen = try XCTUnwrap(inspected.candidates.last)
+        let prepared = try PluginArchive.prepare(inspected, configuration: chosen)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: prepared.manifestData) as? [String: Any])
+        XCTAssertEqual(object["id"] as? String, "io.amore.alternative")
+        XCTAssertEqual(prepared.configurationFileName, "second.json")
+        XCTAssertThrowsError(try PluginArchive.prepare(from: fixture("multiple-configs"))) { error in
+            guard case PluginArchiveError.multipleManifests = error else {
+                return XCTFail("Must not silently select a JSON")
+            }
+        }
+    }
+
+    func testNpmMetadataIsNotSilentlyRewrittenIntoAmore() throws {
+        XCTAssertThrowsError(try PluginArchive.prepare(from: fixture("npm-only"))) { error in
+            guard case PluginArchiveError.unsupportedPackage(let name, let runtime) = error else {
+                return XCTFail("Expected incompatible package diagnostic")
+            }
+            XCTAssertEqual(name, "tiny-node-package")
+            XCTAssertTrue(runtime.contains("Node.js"))
+        }
+    }
+
     func testFolderIsDetectedWithoutFolderPickerHint() throws {
         let source = root
         try FileManager.default.createDirectory(at: source, withIntermediateDirectories: true)
