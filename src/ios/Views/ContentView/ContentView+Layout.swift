@@ -186,39 +186,6 @@ extension ContentView {
     /// Tab roots under the drawer. Chat stays in the hierarchy (opacity 0 when
     /// inactive) so its scroll position and stream survive a tab switch.
     @ViewBuilder
-    var tabbedContent: some View {
-        ZStack {
-            chatStack
-                .opacity(activeTab == .chat ? 1 : 0)
-                .allowsHitTesting(activeTab == .chat)
-
-            if activeTab == .profile {
-                // SettingsSheet owns its NavigationStack; wrapping it again
-                // gives a double navigation bar.
-                SettingsSheet(showTerminal: $showTerminal, embedded: true)
-            } else if activeTab != .chat {
-                NavigationStack {
-                    Group {
-                        switch activeTab {
-                        case .agent:   HelperSettingsView()
-                        case .tasks:   TasksCenterView()
-                        case .memory:  MemoryManagementView()
-                        case .chat, .profile: EmptyView()
-                        }
-                    }
-                    .navigationTitle(activeTab.title)
-                }
-            }
-        }
-        .safeAreaInset(edge: .bottom) {
-            if !showHistoryDrawer {
-                AmoreTabBar(selection: $activeTab)
-                    .padding(.horizontal, 18)
-                    .padding(.bottom, 6)
-            }
-        }
-    }
-
     // MARK: - Split Layout (iPad / wide window)
 
     var splitLayout: some View {
