@@ -161,6 +161,16 @@ struct SettingsSheet: View {
                         }
                     }
                     NavigationLink {
+                        RootfsManagementView()
+                    } label: {
+                        Label(AppLocalized("Rootfs"), systemImage: "externaldrive")
+                    }
+                    NavigationLink {
+                        ISHTerminalView()
+                    } label: {
+                        Label(AppLocalized("Terminal"), systemImage: "terminal")
+                    }
+                    NavigationLink {
                         AmoreMarketplaceView()
                     } label: {
                         Label(AppLocalized("Plugin Marketplace"), systemImage: "shippingbox")
@@ -904,12 +914,15 @@ struct AmoreMarketplaceView: View {
             }
         }
         .fileImporter(isPresented: $showPicker,
-                      allowedContentTypes: [.folder],
+                      allowedContentTypes: [.folder, .zip],
                       allowsMultipleSelection: false) { result in
             do {
                 let url = try result.get().first
                 guard let url else { return }
-                let record = try AmorePluginInstaller.shared.installLocal(from: url)
+                let installer = AmorePluginInstaller.shared
+                let record = url.pathExtension.lowercased() == "zip"
+                    ? try installer.installZip(from: url)
+                    : try installer.installLocal(from: url)
                 installFailed = false
                 installMessage = "\(record.id) \(record.version)"
             } catch {
