@@ -675,16 +675,14 @@ final class AmorePluginInstaller {
         let result = ISHShellExecutor.executeCommandSync(command, timeout: timeout, lineCallback: nil)
         guard result.exitCode == 0 else {
             try? fm.removeItem(at: guestTmp)
-            throw AmorePluginInstallError.invalidManifest(
-                detail: (result.errorOutput.isEmpty ? result.output : result.errorOutput)
-            )
+            throw AmorePluginInstallError.missingManifest
         }
 
         // Unpacked trees usually nest one folder (id-version/); find manifest.json.
         let outDir = guestTmp.appendingPathComponent("out", isDirectory: true)
         guard let manifestDir = Self.findPluginDirectory(under: outDir, depth: 3) else {
             try? fm.removeItem(at: guestTmp)
-            throw AmorePluginInstallError.invalidManifest(detail: "manifest.json not found in archive")
+            throw AmorePluginInstallError.missingManifest
         }
         let installed = try installLocal(from: manifestDir)
         try? fm.removeItem(at: guestTmp)
