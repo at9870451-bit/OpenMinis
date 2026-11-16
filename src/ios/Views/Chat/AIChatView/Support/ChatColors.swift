@@ -19,22 +19,30 @@ import UIKit
 import UniformTypeIdentifiers
 import WebKit
 
-// MARK: - Color Palette (clean light theme)
+// MARK: - Color Palette (Poki Design System)
 
+/// Every chat surface resolves through `PokiTheme`, so the chat page shares
+/// the same warm-paper palette as the drawer, settings and composer.
 enum ChatColors {
-    static let background = Color(UIColor.systemBackground)
-    static let secondaryBg = Color(UIColor.secondarySystemBackground)
-    static let inputIconBg = Color(UIColor.secondarySystemBackground)
-    static let inputIconBorder = Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.35, alpha: 1) : UIColor(white: 0, alpha: 0) })
-    static let inputBg = Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.12, alpha: 1) : .white })
-    static let inputBorder = Color(UIColor.separator)
-    static let primaryText = Color(UIColor.label)
-    static let secondaryText = Color(UIColor.secondaryLabel)
-    static let tertiaryText = Color(UIColor.tertiaryLabel)
-    static let userBubble = Color(UIColor.tertiarySystemFill)
-    static let toolBg = Color(UIColor.tertiarySystemGroupedBackground)
-    static let toolBorder = Color(UIColor.separator).opacity(0.5)
-    static let accent = Color(UIColor.label)
-    static let sendButton = Color(UIColor.label)
-    static let sendButtonDisabled = Color(UIColor.quaternaryLabel)
+    static let background = PokiTheme.background
+    static let secondaryBg = PokiTheme.surface
+    static let inputIconBg = PokiTheme.surface
+    static let inputIconBorder = PokiTheme.divider
+    static let inputBg = PokiTheme.floatingSurface
+    static let inputBorder = PokiTheme.divider
+    static let primaryText = PokiTheme.primaryText
+    static let secondaryText = PokiTheme.secondaryText
+    static let tertiaryText = PokiTheme.secondaryText.opacity(0.7)
+    /// Assistant replies are deliberately bubble-less; the user side keeps a
+    /// low-contrast paper tint so the two roles stay distinguishable.
+    static let userBubble = PokiTheme.selection
+    static let toolBg = PokiTheme.surface
+    static let toolBorder = PokiTheme.divider
+    static let accent = PokiTheme.aiAccentStrong
+    static let sendButton = PokiTheme.primaryButton
+    static let sendButtonDisabled = PokiTheme.secondaryText.opacity(0.35)
+    /// AI-authored accents (thinking row, retry affordance, suggestions).
+    static let aiAccent = PokiTheme.aiAccent
+    static let aiTagBackground = PokiTheme.tagBackground
+    static let aiTagText = PokiTheme.tagText
 }
