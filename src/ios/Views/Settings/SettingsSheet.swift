@@ -839,6 +839,9 @@ final class AmoreMarketplaceStore: ObservableObject {
 
 struct AmoreMarketplaceView: View {
     @StateObject private var store = AmoreMarketplaceStore()
+    @State private var showPicker = false
+    @State private var installMessage: String?
+    @State private var installFailed = false
 
     var body: some View {
         List {
@@ -890,6 +893,37 @@ struct AmoreMarketplaceView: View {
         }
         .navigationTitle(AppLocalized("Plugin Marketplace"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showPicker = true
+                } label: {
+                    Image(systemName: "folder.badge.plus")
+                }
+                .accessibilityLabel(Text(AppLocalized("Install from Files")))
+            }
+        }
+        .fileImporter(isPresented: $showPicker,
+                      allowedContentTypes: [.folder],
+                      allowsMultipleSelection: false) { result in
+            do {
+                let url = try result.get().first
+                guard let url else { return }
+                let record = try AmorePluginInstaller.shared.installLocal(from: url)
+                installFailed = false
+                installMessage = "\(record.id) \(record.version)"
+            } catch {
+                installFailed = true
+                installMessage = error.localizedDescription
+            }
+        }
+        .alert(installFailed ? AppLocalized("Install failed") : AppLocalized("Installed"),
+               isPresented: Binding(get: { installMessage != nil },
+                                    set: { if !$0 { installMessage = nil } })) {
+            Button(AppLocalized("OK")) { installMessage = nil }
+        } message: {
+            Text(installMessage ?? "")
+        }
         .refreshable { await store.reload() }
         .task { await store.load() }
     }
