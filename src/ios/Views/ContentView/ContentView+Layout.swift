@@ -23,6 +23,132 @@ struct DrawerSessionGroup: Identifiable, Equatable {
 private let shareLog = AppLogger(category: "Share")
 private let draftLog = AppLogger(category: "DraftSession")
 
+// MARK: - Root tabs
+
+/// Bottom-tab roots. Every tab maps to a surface that already exists in the
+/// app — no tab is a placeholder.
+enum AppTab: String, CaseIterable, Identifiable {
+    case chat, agent, tasks, memory, profile
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .chat:    return AppLocalized("Chat")
+        case .agent:   return AppLocalized("Agent")
+        case .tasks:   return AppLocalized("Tasks")
+        case .memory:  return AppLocalized("Memory")
+        case .profile: return AppLocalized("Profile")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .chat:    return "bubble.left.and.bubble.right.fill"
+        case .agent:   return "person.2.wave.2.fill"
+        case .tasks:   return "checklist"
+        case .memory:  return "brain.head.profile"
+        case .profile: return "person.crop.circle"
+        }
+    }
+}
+
+/// Floating glass tab bar (Apple-material, no gradients).
+struct AmoreTabBar: View {
+    @Binding var selection: AppTab
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(AppTab.allCases) { tab in
+                Button {
+                    selection = tab
+                } label: {
+                    VStack(spacing: 3) {
+                        Image(systemName: tab.symbol)
+                            .font(.system(size: 17, weight: .semibold))
+                        Text(tab.title)
+                            .font(.system(size: 10, weight: .medium))
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(selection == tab ? AmoreTheme.accent : AmoreTheme.textSecondary)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selection == tab ? [.isSelected] : [])
+            }
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 6)
+        .background(.ultraThinMaterial, in: Capsule())
+        .overlay(Capsule().strokeBorder(Color.white.opacity(0.45), lineWidth: 0.5))
+        .shadow(color: Color.black.opacity(0.10), radius: 12, y: 4)
+    }
+}
+
+/// Local execution history. Reads `AgentJobRegistry` directly — these are the
+/// same jobs the agent loop and the scheduler create, not placeholder rows.
+struct TasksCenterView: View {
+    @ObservedObject private var registry = AgentJobRegistry.shared
+
+    private var jobs: [AgentJob] {
+        registry.jobs.values.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+    }
+
+    var body: some View {
+        List {
+            if jobs.isEmpty {
+                Section {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(AppLocalized("No tasks yet"))
+                            .font(.headline)
+                        Text(AppLocalized("Sub-agent runs and scheduled jobs show up here as soon as they start."))
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 8)
+                }
+            } else {
+                Section(AppLocalized("Recent runs")) {
+                    ForEach(jobs) { job in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(job.title)
+                                .font(.body)
+                                .lineLimit(2)
+                            HStack(spacing: 6) {
+                                Text(job.state.rawValue.capitalized)
+                                    .font(.caption)
+                                    .foregroundStyle(stateColor(job.state))
+                                if job.firedCount > 0 {
+                                    Text("· \(job.firedCount)x")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                if let next = job.nextFireAt {
+                                    Text("· \(next.formatted(date: .omitted, time: .shortened))")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        .padding(.vertical, 2)
+                    }
+                }
+            }
+        }
+        .navigationTitle(AppLocalized("Tasks"))
+    }
+
+    private func stateColor(_ state: AgentJobState) -> Color {
+        switch state {
+        case .running:            return .blue
+        case .done:               return .green
+        case .failed, .timeout:   return .red
+        case .cancelled:          return .secondary
+        case .pending:            return .orange
+        }
+    }
+}
+
 extension ContentView {
     /// Chat tab, kept mounted across tab switches so a conversation is never
     /// torn down and reloaded just because the user looked at Memory.
@@ -55,6 +181,42 @@ extension ContentView {
                     }
                 }
             }
+    }
+
+    /// Tab roots under the drawer. Chat stays in the hierarchy (opacity 0 when
+    /// inactive) so its scroll position and stream survive a tab switch.
+    @ViewBuilder
+    var tabbedContent: some View {
+        ZStack {
+            chatStack
+                .opacity(activeTab == .chat ? 1 : 0)
+                .allowsHitTesting(activeTab == .chat)
+
+            if activeTab == .profile {
+                // SettingsSheet owns its NavigationStack; wrapping it again
+                // gives a double navigation bar.
+                SettingsSheet(showTerminal: $showTerminal, embedded: true)
+            } else if activeTab != .chat {
+                NavigationStack {
+                    Group {
+                        switch activeTab {
+                        case .agent:   HelperSettingsView()
+                        case .tasks:   TasksCenterView()
+                        case .memory:  MemoryManagementView()
+                        case .chat, .profile: EmptyView()
+                        }
+                    }
+                    .navigationTitle(activeTab.title)
+                }
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            if !showHistoryDrawer {
+                AmoreTabBar(selection: $activeTab)
+                    .padding(.horizontal, 18)
+                    .padding(.bottom, 6)
+            }
+        }
     }
 
     // MARK: - Split Layout (iPad / wide window)
