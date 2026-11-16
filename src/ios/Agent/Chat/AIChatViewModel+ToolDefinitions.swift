@@ -295,7 +295,6 @@ extension AIChatViewModel {
         return lines.joined(separator: "\n") + "\n"
     }
 }
-
 // MARK: - Plugins (manifest v1)
 
 /// Manifest model for the plugin system. Only three kinds exist: a JS sandbox,
@@ -461,15 +460,15 @@ enum AmorePluginInstallError: LocalizedError {
         switch self {
         case .notADirectory: return AppLocalized("Plugin package must be a folder")
         case .missingManifest: return AppLocalized("manifest.json is missing")
-        case .unsupportedSchema(let v): return "\\(AppLocalized("Unsupported schemaVersion")): \\(v)"
-        case .badIdentifier(let id): return "\\(AppLocalized("Invalid plugin id")): \\(id)"
-        case .badVersion(let v): return "\\(AppLocalized("Invalid version")): \\(v)"
-        case .permissionNotAllowed(let p): return "\\(AppLocalized("Permission not allowed")): \\(p)"
+        case .unsupportedSchema(let v): return "\(AppLocalized("Unsupported schemaVersion")): \(v)"
+        case .badIdentifier(let id): return "\(AppLocalized("Invalid plugin id")): \(id)"
+        case .badVersion(let v): return "\(AppLocalized("Invalid version")): \(v)"
+        case .permissionNotAllowed(let p): return "\(AppLocalized("Permission not allowed")): \(p)"
         case .digestMismatch: return AppLocalized("Package digest does not match the registry")
         case .signatureInvalid: return AppLocalized("Signature check failed")
-        case .idMismatch(let e, let f): return "\\(AppLocalized("Plugin id mismatch")): \\(e) / \\(f)"
-        case .versionMismatch(let e, let f): return "\\(AppLocalized("Version mismatch")): \\(e) / \\(f)"
-        case .toolNameInvalid(let n): return "\\(AppLocalized("Invalid tool name")): \\(n)"
+        case .idMismatch(let e, let f): return "\(AppLocalized("Plugin id mismatch")): \(e) / \(f)"
+        case .versionMismatch(let e, let f): return "\(AppLocalized("Version mismatch")): \(e) / \(f)"
+        case .toolNameInvalid(let n): return "\(AppLocalized("Invalid tool name")): \(n)"
         case .alreadyInstalling: return AppLocalized("Another install is in progress")
         }
     }
@@ -676,8 +675,8 @@ enum AmoreJSPluginError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .notLoaded: return AppLocalized("Plugin is not loaded")
-        case .toolNotFound(let n): return "\\(AppLocalized("Plugin has no tool named")): \\(n)"
-        case .permissionDenied(let p): return "\\(AppLocalized("Permission denied")): \\(p)"
+        case .toolNotFound(let n): return "\(AppLocalized("Plugin has no tool named")): \(n)"
+        case .permissionDenied(let p): return "\(AppLocalized("Permission denied")): \(p)"
         case .timedOut: return AppLocalized("Plugin timed out")
         case .disabledAfterTimeouts: return AppLocalized("Plugin disabled after repeated timeouts")
         case .thrown(let m): return m
@@ -885,4 +884,3 @@ enum AmoreJSPluginHTTP {
         _ = semaphore.wait(timeout: .now() + 20)
         return payload
     }
-}
