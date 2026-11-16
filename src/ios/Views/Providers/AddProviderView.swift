@@ -19,7 +19,7 @@ struct AIDataSharingConsentView: View {
                             .font(.title2.bold())
                         Text("Please review how your data is handled before adding an AI provider.")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
 
                     GroupBox {
@@ -28,10 +28,10 @@ struct AIDataSharingConsentView: View {
                                 .font(.headline)
                             Text("Minis does not operate any server and does not collect, store, or process any of your personal data. All data stays on your device.")
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                             Text("However, when you add a third-party AI provider and use it for conversations, the following data may be sent directly from your device to that provider's servers:")
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
 
                             VStack(alignment: .leading, spacing: 6) {
                                 dataItem("Your chat messages and conversation history")
@@ -47,7 +47,7 @@ struct AIDataSharingConsentView: View {
                                 .font(.headline)
                             Text("Depending on which provider you configure, your data will be sent directly to one or more of the following third-party services:")
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
 
                             VStack(alignment: .leading, spacing: 8) {
                                 providerRow("Anthropic", description: "Claude models (anthropic.com)", color: .purple)
@@ -59,7 +59,7 @@ struct AIDataSharingConsentView: View {
 
                             Text("Each provider has its own privacy policy and terms of service that govern how they handle your data.")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
 
@@ -95,6 +95,8 @@ struct AIDataSharingConsentView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .controlSize(.large)
 
                     Button("Cancel", role: .cancel) {
@@ -103,7 +105,7 @@ struct AIDataSharingConsentView: View {
                     .font(.body)
                 }
                 .padding()
-                .background(.bar)
+                .background(PokiTheme.background)
             }
         }
     }
@@ -111,7 +113,7 @@ struct AIDataSharingConsentView: View {
     private func dataItem(_ text: String) -> some View {
         HStack(alignment: .top, spacing: 8) {
             Text("•")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             Text(text)
                 .font(.subheadline)
         }
@@ -127,7 +129,7 @@ struct AIDataSharingConsentView: View {
                     .font(.subheadline.weight(.medium))
                 Text(description)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         }
     }
@@ -283,7 +285,10 @@ struct AddProviderView: View {
         List {
             steppedContent
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
         .animation(.spring(response: 0.35, dampingFraction: 0.88), value: currentStep)
+        .pokiScreen()
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -494,17 +499,17 @@ struct AddProviderView: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(providerPickerLabel(type))
                                 .font(.body.weight(.medium))
-                                .foregroundStyle(Color(UIColor.label))
+                                .foregroundStyle(PokiTheme.primaryText)
                             Text(type.pickerSubtitle)
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
                             .font(.caption)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     }
                 }
             }
@@ -527,19 +532,19 @@ struct AddProviderView: View {
                     Image(systemName: "square.and.arrow.down")
                         .font(.body)
                         .frame(width: 32, height: 32)
-                        .foregroundStyle(Color.accentColor)
-                        .background(Color.accentColor.opacity(0.12))
+                        .foregroundStyle(PokiTheme.tagText)
+                        .background(PokiTheme.tagBackground)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
 
                     Text("Or Import Provider from File")
                         .font(.body.weight(.medium))
-                        .foregroundStyle(Color(UIColor.label))
+                        .foregroundStyle(PokiTheme.primaryText)
 
                     Spacer()
 
                     Image(systemName: "chevron.right")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
             }
         } footer: {
@@ -569,17 +574,17 @@ struct AddProviderView: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(template.name)
                                 .font(.body.weight(.medium))
-                                .foregroundStyle(Color(UIColor.label))
+                                .foregroundStyle(PokiTheme.primaryText)
                             Text(template.capability)
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
                             .font(.caption)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     }
                 }
             }
@@ -629,22 +634,22 @@ struct AddProviderView: View {
                                 Image(systemName: cred == .apiKey ? "key" : "person.badge.shield.checkmark")
                                     .font(.body)
                                     .frame(width: 28)
-                                    .foregroundStyle(Color(UIColor.label))
+                                    .foregroundStyle(PokiTheme.primaryText)
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(cred == .apiKey ? "API Key" : "OAuth")
                                         .font(.body.weight(.medium))
-                                        .foregroundStyle(Color(UIColor.label))
+                                        .foregroundStyle(PokiTheme.primaryText)
                                     Text(credentialDescription(type: type, credential: cred))
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                 }
 
                                 Spacer()
 
                                 Image(systemName: "chevron.right")
                                     .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                             }
                         }
                     }
@@ -731,7 +736,7 @@ struct AddProviderView: View {
                 Section {
                     Text(error)
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(PokiTheme.danger)
                         .textSelection(.enabled)
                 }
             }
@@ -783,7 +788,7 @@ struct AddProviderView: View {
                             showApiKeyPlaintext.toggle()
                         } label: {
                             Image(systemName: showApiKeyPlaintext ? "eye.slash" : "eye")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                         .buttonStyle(.plain)
                     }
@@ -847,10 +852,10 @@ struct AddProviderView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Token")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text(masked)
                             .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
 
@@ -858,14 +863,14 @@ struct AddProviderView: View {
                     HStack {
                         Text("Authorized")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Spacer()
                         Text(authTime, style: .date)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text(authTime, style: .time)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             } else {
@@ -906,7 +911,7 @@ struct AddProviderView: View {
             Section {
                 TextField(defaultBaseURL, text: $customBaseURLInput)
                     .font(.system(.body, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .keyboardType(.URL)
@@ -959,7 +964,7 @@ struct AddProviderView: View {
         Section {
             TextField(defaultBaseURL, text: $customBaseURLInput)
                 .font(.system(.body, design: .monospaced))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .keyboardType(.URL)
@@ -1306,7 +1311,7 @@ struct AddProviderView: View {
                 .foregroundStyle(.purple)
         case .gemini:
             Image(systemName: "diamond")
-                .foregroundStyle(.blue)
+                .foregroundStyle(PokiTheme.tagText)
         case .openAI:
             Image(systemName: "circle.hexagongrid")
                 .foregroundStyle(.green)
@@ -1327,7 +1332,7 @@ struct AddProviderView: View {
                 .foregroundStyle(.indigo)
         case .githubCopilot:
             Image(systemName: "chevron.left.forwardslash.chevron.right")
-                .foregroundStyle(.primary)
+                .foregroundStyle(PokiTheme.primaryText)
         case .unsupported:
             Image(systemName: "questionmark.circle")
                 .foregroundStyle(.gray)

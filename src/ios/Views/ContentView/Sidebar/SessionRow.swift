@@ -275,7 +275,7 @@ struct SessionRow: View, Equatable {
                 highlightedText(
                     session.title ?? "New Chat",
                     font: .system(size: fontSettings.scaledApp(16), weight: .semibold),
-                    color: Color(UIColor.label)
+                    color: PokiTheme.primaryText
                 )
                 .lineLimit(1)
 
@@ -288,14 +288,14 @@ struct SessionRow: View, Equatable {
                     highlightedText(
                         snippet,
                         font: .system(size: fontSettings.scaledApp(14)),
-                        color: Color(UIColor.secondaryLabel)
+                        color: PokiTheme.secondaryText
                     )
                     .lineLimit(2)
                 } else {
                     highlightedText(
                         session.lastMessage ?? "No messages yet",
                         font: .system(size: fontSettings.scaledApp(14)),
-                        color: Color(UIColor.secondaryLabel)
+                        color: PokiTheme.secondaryText
                     )
                     .lineLimit(1)
                 }
@@ -321,15 +321,15 @@ struct SessionRow: View, Equatable {
                 // Date
                 Text(relativeDate(session.updatedAt))
                     .font(.system(size: fontSettings.scaledApp(13)))
-                    .foregroundStyle(Color(UIColor.tertiaryLabel))
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 if isVisuallyLocked {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 10))
-                        .foregroundStyle(Color(UIColor.tertiaryLabel))
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 } else if session.isPinned {
                     Image(systemName: "pin.fill")
                         .font(.system(size: 10))
-                        .foregroundStyle(Color(UIColor.tertiaryLabel))
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
             }
         }
@@ -406,7 +406,7 @@ struct SessionRow: View, Equatable {
         var attr = AttributedString(text)
         attr.foregroundColor = baseColor
         guard !query.isEmpty else { return attr }
-        let highlightBg = Color.accentColor.opacity(0.25)
+        let highlightBg = PokiTheme.tagBackground
         let totalChars = text.count
         for range in SearchKeywords.hitRanges(in: text, terms: SearchKeywords.terms(query)) {
             let lo = text.distance(from: text.startIndex, to: range.lowerBound)
@@ -421,7 +421,7 @@ struct SessionRow: View, Equatable {
             let attrHi = attr.index(attr.startIndex, offsetByCharacters: hi)
             let r = attrLo..<attrHi
             attr[r].backgroundColor = highlightBg
-            attr[r].foregroundColor = Color.accentColor
+            attr[r].foregroundColor = PokiTheme.tagText
             attr[r].inlinePresentationIntent = .stronglyEmphasized
         }
         return attr
@@ -561,9 +561,9 @@ struct RemoteSessionRow: View {
                 .overlay(alignment: .bottomTrailing) {
                     Image(systemName: "icloud.fill")
                         .font(.system(size: 7, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PokiTheme.primaryButtonText)
                         .frame(width: 16, height: 16)
-                        .background(Color.blue)
+                        .background(PokiTheme.primaryButton)
                         .clipShape(Circle())
                         .offset(x: 2, y: 2)
                 }
@@ -571,11 +571,11 @@ struct RemoteSessionRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(session.title ?? "Untitled")
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Color(UIColor.label))
+                    .foregroundStyle(PokiTheme.primaryText)
                     .lineLimit(1)
                 Text(session.updatedAt, style: .relative)
                     .font(.system(size: 14))
-                    .foregroundStyle(Color(UIColor.secondaryLabel))
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(1)
             }
 

@@ -165,9 +165,9 @@ struct BackupSettingsView: View {
                         HStack(spacing: 12) {
                             Image(systemName: "doc.zipper")
                                 .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 28, height: 28)
-                                .background(Color.gray, in: Circle())
+                                .background(PokiTheme.secondaryText, in: Circle())
                             Text("Max Per-File Size")
                         }
                     }
@@ -175,6 +175,7 @@ struct BackupSettingsView: View {
                 }
             } header: {
                 Text("Include")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 // The cap's consequence is stated, because §3.4's whole point is
                 // that a skipped file leaves a tombstone rather than silently
@@ -186,13 +187,17 @@ struct BackupSettingsView: View {
                     // the backup unable to restore a conversation's files at
                     // all, so it should not read like just another size.
                     Text("Chats includes every file in each conversation, not just the messages. File contents are not being backed up — the backup lists which files existed, but restoring won't bring them back.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } else if selected.contains(where: \.carriesFileTree),
                           maxFileSizeMB != Self.unlimitedTag {
                     Text("Chats includes every file in each conversation, not just the messages. Files larger than \(maxFileSizeMB) MB are listed in the backup but not included.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } else {
                     Text("Chats includes every file in each conversation, not just the messages.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             // Encryption is a CHOICE; the passphrase only appears once it's on.
             //
@@ -209,9 +214,9 @@ struct BackupSettingsView: View {
                     HStack(spacing: 12) {
                         Image(systemName: encryptBackup ? "lock.fill" : "lock.open.fill")
                             .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PokiTheme.primaryButtonText)
                             .frame(width: 28, height: 28)
-                            .background(encryptBackup ? Color.green : Color.gray,
+                            .background(encryptBackup ? PokiTheme.primaryButton : PokiTheme.secondaryText,
                                         in: Circle())
                         Text("Encrypt Backup")
                     }
@@ -225,18 +230,20 @@ struct BackupSettingsView: View {
                         if passphrase != confirmPassphrase {
                             Text("Passphrases don't match.")
                                 .font(.footnote)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(PokiTheme.danger)
                         }
                     }
                 }
             } header: {
                 Text("Encryption")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 if encryptBackup {
                     // Both halves are load-bearing: what the passphrase covers,
                     // and that losing it is final. A user who doesn't
                     // understand the second can lose everything.
                     Text("This passphrase encrypts the entire backup, including chats, files, and credentials. There is no way to recover a forgotten passphrase — the backup cannot be opened without it.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } else if selected.contains(where: Self.credentialCarryingCategories.contains) {
                     // [T-backup-credentials-without-encryption] This used to
                     // read "API keys are left out", which was the old
@@ -249,8 +256,10 @@ struct BackupSettingsView: View {
                         .foregroundStyle(.orange)
                 } else {
                     Text("Without encryption the backup is not protected — anyone with the file can read its contents.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             destinationSection
 
@@ -264,14 +273,16 @@ struct BackupSettingsView: View {
                         } icon: {
                             Image(systemName: "arrow.down.doc")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.indigo, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                 } footer: {
                     Text("Restoring merges a backup into your existing data. Nothing is deleted.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
 
             Section {
@@ -347,28 +358,28 @@ struct BackupSettingsView: View {
                         // already selected.
                         Text("Add a storage destination to continue.")
                             .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
                             .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                     } else if selected.isEmpty {
                         Text("Choose at least one thing to include.")
                             .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
                             .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                     } else if encryptBackup && passphrase.isEmpty {
                         Text("Set a passphrase to encrypt this backup.")
                             .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
                             .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                     } else if encryptBackup && passphrase != confirmPassphrase {
                         Text("Confirm the passphrase to continue.")
                             .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
                             .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
@@ -380,9 +391,10 @@ struct BackupSettingsView: View {
                 if let errorText {
                     Text(errorText)
                         .font(.footnote)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(PokiTheme.danger)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             historySection
 
@@ -443,13 +455,13 @@ struct BackupSettingsView: View {
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
                             Image(systemName: r.succeeded
                                   ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                                .foregroundStyle(r.succeeded ? .green : .orange)
+                                .foregroundStyle(r.succeeded ? PokiTheme.primaryText : Color.orange)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(r.folderName)
                                 if let error = r.error {
                                     Text(error)
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                 }
                             }
                         }
@@ -457,20 +469,29 @@ struct BackupSettingsView: View {
                     }
                 } header: {
                     Text("Backup Ready")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     if localCopyRemoved {
                         Text("Delivered to all \(deliveryResults.count) destination(s) and verified. The copy on this iPhone was removed to save space.")
+                        .foregroundStyle(PokiTheme.secondaryText)
                     } else if deliveryResults.isEmpty {
                         Text("Saved in Minis ▸ Backups. Use Save to Files to copy it to iCloud Drive, a connected server, or another cloud provider.")
+                        .foregroundStyle(PokiTheme.secondaryText)
                     } else {
                         let ok = deliveryResults.filter(\.succeeded).count
                         // The local copy is stated explicitly so a user whose
                         // NAS was offline can see the backup still exists.
                         Text("Saved in Minis ▸ Backups, and copied to \(ok) of \(deliveryResults.count) selected folder(s).")
+                        .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .modifier(StandaloneTitle(title: AppLocalized("Backup"),
                                  active: !embedded))
         .onAppear {
@@ -650,13 +671,12 @@ struct BackupSettingsView: View {
                     Image(systemName: d.error != nil ? "exclamationmark.triangle.fill"
                           : d.finishedAt != nil ? "checkmark.circle.fill"
                           : "arrow.up.circle")
-                        .foregroundStyle(d.error != nil ? .orange
-                                         : d.finishedAt != nil ? .green : .blue)
+                        .foregroundStyle(d.error != nil ? Color.orange : PokiTheme.primaryText)
                     Text(d.name).font(.callout)
                     Spacer()
                     Text("\(Int(d.fraction * 100))%")
                         .font(.caption.monospacedDigit())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 if d.error == nil {
                     ProgressView(value: d.fraction)
@@ -668,7 +688,7 @@ struct BackupSettingsView: View {
                 } else {
                     Text(transferDetail(d))
                         .font(.caption.monospacedDigit())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
             .padding(.vertical, 2)
@@ -678,9 +698,9 @@ struct BackupSettingsView: View {
             Label {
                 Text(note).font(.caption)
             } icon: {
-                Image(systemName: "sparkles").foregroundStyle(.green)
+                Image(systemName: "sparkles").foregroundStyle(PokiTheme.primaryText)
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(PokiTheme.secondaryText)
         }
 
     }
@@ -734,9 +754,9 @@ struct BackupSettingsView: View {
             HStack(spacing: 12) {
                 Image(systemName: "iphone")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .frame(width: 28, height: 28)
-                    .background(Color.blue, in: Circle())
+                    .background(PokiTheme.primaryButton, in: Circle())
                 // The placeholder is the automatic name, so an untouched field
                 // shows the user what will be used rather than sitting blank.
                 TextField(DeviceIdentity.automaticName, text: $deviceNameDraft)
@@ -756,12 +776,15 @@ struct BackupSettingsView: View {
             }
         } header: {
             Text("Device Name")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             // Says what the name is FOR — the whole point is the filename —
             // and how to get back to the default, which an empty field does
             // not otherwise advertise.
             Text("Used to identify this device in backup filenames and in the iCloud sync device list. Leave empty to use “\(DeviceIdentity.automaticName)”.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
         // Seeded in onAppear rather than defaulted, so reopening the screen
         // shows what is actually stored instead of an empty field over a set
         // name.
@@ -803,15 +826,18 @@ struct BackupSettingsView: View {
                             } label: {
                                 Label("Resume", systemImage: "play.circle")
                             }
-                            .tint(.blue)
+                            .tint(PokiTheme.primaryButton)
                         }
                     }
                 }
             } header: {
                 Text("Backup History")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Records from the past month. Older ones are removed automatically.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
         }
     }
 
@@ -849,14 +875,14 @@ struct BackupSettingsView: View {
                     Image(systemName: RcloneBackendCatalog.backend(for: r.backend)?.icon
                           ?? "externaldrive.connected.to.line.below")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PokiTheme.primaryButtonText)
                         .frame(width: 28, height: 28)
-                        .background(Color.blue, in: Circle())
+                        .background(PokiTheme.primaryButton, in: Circle())
                     VStack(alignment: .leading, spacing: 2) {
                         Text(r.name)
                         Text("\(r.backend.uppercased()) · /\(r.path)")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                     // Claims the gap between the text and the switch, so the
                     // whole left side of the row opens the details.
@@ -896,7 +922,7 @@ struct BackupSettingsView: View {
                 // working fallback invited the user to consider themselves
                 // backed up when nothing had left the device.
                 Text("No destinations yet — add one to back up.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             } else if !eligible.isEmpty {
                 // Same badge treatment as the category rows above, so the two
                 // lists read as one screen rather than two styles.
@@ -907,14 +933,14 @@ struct BackupSettingsView: View {
                     HStack(spacing: 12) {
                         Image(systemName: "folder.fill")
                             .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PokiTheme.primaryButtonText)
                             .frame(width: 28, height: 28)
-                            .background(Color.indigo, in: Circle())
+                            .background(PokiTheme.primaryButton, in: Circle())
                         VStack(alignment: .leading, spacing: 2) {
                             Text(folder.name)
                             Text(folder.sourceDisplayName)
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                         Spacer(minLength: 8)
                             .contentShape(Rectangle())
@@ -949,9 +975,9 @@ struct BackupSettingsView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "plus")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PokiTheme.primaryButtonText)
                         .frame(width: 28, height: 28)
-                        .background(Color.green, in: Circle())
+                        .background(PokiTheme.primaryButton, in: Circle())
                     Text("Add Backup Destination…")
                 }
             }
@@ -963,13 +989,17 @@ struct BackupSettingsView: View {
             }
         } header: {
             Text("Backup Destinations")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             if eligible.isEmpty {
                 Text("Add a folder to also copy each backup there — including a server connected in the Files app (SMB, WebDAV) or a cloud provider.")
+                .foregroundStyle(PokiTheme.secondaryText)
             } else {
                 Text("Each new backup is also copied to the selected folders — including servers connected in the Files app (SMB, WebDAV) and cloud providers. A folder that is offline is reported and skipped; the local copy is always kept.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private func destinationBinding(for folder: MountedFolderEntry) -> Binding<Bool> {

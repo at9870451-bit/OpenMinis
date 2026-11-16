@@ -153,12 +153,18 @@ struct CrashDiagnosticsView: View {
                 .disabled(exporting)
             } footer: {
                 Text("A zip of the breadcrumbs, crash contexts, MetricKit reports and the last 2 MB of the log. Keys, tokens, URL parameters, e-mail addresses and request bodies are removed first.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
             section("Earlier Runs", kinds: [.breadcrumbs])
             section("Crash Contexts", kinds: [.context])
             section("MetricKit Reports", kinds: [.metricKit])
             section("This Run", kinds: [.currentRun])
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Crash Diagnostics")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { items = CrashDiagnostics.items() }
@@ -177,7 +183,7 @@ struct CrashDiagnosticsView: View {
         let rows = items.filter { kinds.contains($0.kind) }
         Section(title) {
             if rows.isEmpty {
-                Text("None").foregroundStyle(.secondary)
+                Text("None").foregroundStyle(PokiTheme.secondaryText)
             } else {
                 ForEach(rows) { item in
                     NavigationLink {
@@ -187,12 +193,13 @@ struct CrashDiagnosticsView: View {
                             Text(item.title).lineLimit(1)
                             Spacer()
                             Text(ByteCountFormatter.string(fromByteCount: item.size, countStyle: .file))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 }
             }
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private func export() {
@@ -228,6 +235,9 @@ private struct CrashDiagnosticTextView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
         }
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .task {

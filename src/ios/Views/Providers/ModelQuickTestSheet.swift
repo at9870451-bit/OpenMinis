@@ -55,6 +55,7 @@ struct ModelQuickTestSheet: View {
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .pokiScreen()
             .navigationTitle("Quick Test")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -78,13 +79,13 @@ struct ModelQuickTestSheet: View {
         HStack(spacing: 10) {
             Image(systemName: "bolt.badge.checkmark")
                 .font(.title3)
-                .foregroundStyle(.tint)
+                .foregroundStyle(PokiTheme.tagText)
                 .frame(width: 34, height: 34)
-                .background(Color.accentColor.opacity(0.12))
+                .background(PokiTheme.tagBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.model.displayName).font(.headline)
-                Text(entry.model.id).font(.caption2).foregroundStyle(.secondary)
+                Text(entry.model.id).font(.caption2).foregroundStyle(PokiTheme.secondaryText)
             }
             Spacer()
         }
@@ -376,7 +377,7 @@ private struct TestCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                Image(systemName: run.kind.icon).foregroundStyle(.tint)
+                Image(systemName: run.kind.icon).foregroundStyle(PokiTheme.tagText)
                 Text(run.kind.title).font(.subheadline.weight(.semibold))
                 Spacer()
                 statusBadge
@@ -385,7 +386,7 @@ private struct TestCard: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .background(PokiTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         // Auto-play the speech result the moment it arrives, so a voice Quick Test
         // speaks on its own (no manual Play tap) — matching the "tap Quick Test →
@@ -411,13 +412,13 @@ private struct TestCard: View {
         case .running:
             ProgressView()
         case .failure:
-            Image(systemName: "xmark.octagon.fill").foregroundStyle(.red)
+            Image(systemName: "xmark.octagon.fill").foregroundStyle(PokiTheme.danger)
         default:
             HStack(spacing: 4) {
                 Image(systemName: "checkmark.seal.fill").foregroundStyle(.green)
                 if run.elapsed > 0 {
                     Text(String(format: "%.1fs", run.elapsed))
-                        .font(.caption2).foregroundStyle(.tertiary)
+                        .font(.caption2).foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
             }
         }
@@ -426,7 +427,7 @@ private struct TestCard: View {
     @ViewBuilder private var content: some View {
         switch run.state {
         case .running:
-            Text("Testing…").font(.caption).foregroundStyle(.secondary)
+            Text("Testing…").font(.caption).foregroundStyle(PokiTheme.secondaryText)
 
         case .text(let reply):
             Text(reply).font(.subheadline).textSelection(.enabled)
@@ -439,7 +440,7 @@ private struct TestCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             } else {
                 Text("Received \(data.count) bytes (couldn't decode preview)")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption).foregroundStyle(PokiTheme.secondaryText)
             }
 
         case .audio(let data):
@@ -455,13 +456,13 @@ private struct TestCard: View {
             labeled("Transcribed", heard)
 
         case .failure(let message):
-            Text(message).font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
+            Text(message).font(.caption).foregroundStyle(PokiTheme.secondaryText).textSelection(.enabled)
         }
     }
 
     private func labeled(_ title: LocalizedStringKey, _ text: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(title).font(.caption2.weight(.medium)).foregroundStyle(.secondary)
+            Text(title).font(.caption2.weight(.medium)).foregroundStyle(PokiTheme.secondaryText)
             Text(text).font(.subheadline).textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }

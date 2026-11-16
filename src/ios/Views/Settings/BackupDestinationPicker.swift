@@ -41,10 +41,15 @@ struct BackupDestinationPicker: View {
                     Section {
                         Text(errorText)
                             .font(.footnote)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(PokiTheme.danger)
                     }
+                    .listRowBackground(PokiTheme.surface)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(PokiTheme.background)
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.primaryButton)
             .navigationTitle("Backup Destination")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -94,12 +99,12 @@ struct BackupDestinationPicker: View {
                     } label: {
                         HStack(spacing: 12) {
                             icon(RcloneBackendCatalog.backend(for: r.backend)?.icon
-                                 ?? "externaldrive.connected.to.line.below", .blue)
+                                 ?? "externaldrive.connected.to.line.below", PokiTheme.primaryButton)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(r.name)
                                 Text("\(r.backend.uppercased()) · /\(r.path)")
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
@@ -131,12 +136,12 @@ struct BackupDestinationPicker: View {
                         }
                     } label: {
                         HStack(spacing: 12) {
-                            icon("folder.fill", .indigo)
+                            icon("folder.fill", PokiTheme.primaryButton)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(f.name)
                                 Text(f.sourceDisplayName)
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
@@ -156,9 +161,12 @@ struct BackupDestinationPicker: View {
             }
         } header: {
             Text("Saved Destinations")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             Text("Backups are copied to the enabled destinations. Tap for details, or swipe to remove.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     // MARK: - Adding
@@ -169,12 +177,12 @@ struct BackupDestinationPicker: View {
                 showAddServer = true
             } label: {
                 HStack(spacing: 12) {
-                    icon("network", .blue)
+                    icon("network", PokiTheme.primaryButton)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Add Server…").foregroundStyle(.primary)
+                        Text("Add Server…").foregroundStyle(PokiTheme.primaryText)
                         Text("SMB, WebDAV, SFTP, S3, FTP")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             }
@@ -183,20 +191,22 @@ struct BackupDestinationPicker: View {
                 showFolderPicker = true
             } label: {
                 HStack(spacing: 12) {
-                    icon("folder.badge.plus", .indigo)
+                    icon("folder.badge.plus", PokiTheme.primaryButton)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Add Folder…").foregroundStyle(.primary)
+                        Text("Add Folder…").foregroundStyle(PokiTheme.primaryText)
                         // Names both cases, because "folder" alone reads as
                         // on-device only and hides the more useful half.
                         Text("On this iPhone, iCloud Drive, or a server connected in Files")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             }
         } header: {
             Text("Add New")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     // MARK: - Helpers
@@ -204,7 +214,7 @@ struct BackupDestinationPicker: View {
     private func icon(_ name: String, _ colour: Color) -> some View {
         Image(systemName: name)
             .font(.system(size: 13, weight: .semibold))
-            .foregroundStyle(.white)
+            .foregroundStyle(PokiTheme.primaryButtonText)
             .frame(width: 28, height: 28)
             .background(colour, in: Circle())
     }

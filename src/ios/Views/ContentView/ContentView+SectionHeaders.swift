@@ -25,7 +25,7 @@ extension ContentView {
             HStack(spacing: 12) {
                 Image(systemName: selectedIds.contains(session.id) ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 22))
-                    .foregroundStyle(selectedIds.contains(session.id) ? Color.accentColor : Color(UIColor.tertiaryLabel))
+                    .foregroundStyle(selectedIds.contains(session.id) ? PokiTheme.tagText : PokiTheme.secondaryText.opacity(0.72))
                 SessionRow(session: session)
             }
             .padding(.leading, 16)
@@ -50,18 +50,18 @@ extension ContentView {
                 HStack(spacing: 6) {
                     Image(systemName: allSelected ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 18))
-                        .foregroundStyle(allSelected ? Color.accentColor : Color(UIColor.tertiaryLabel))
+                        .foregroundStyle(allSelected ? PokiTheme.tagText : PokiTheme.secondaryText.opacity(0.72))
                     // group.label is a stable English key (used for logic like
                     // == "Pinned"); localize only at display via LocalizedStringKey.
                     // Folder names are user data — render verbatim, not as a key.
                     if group.folderId != nil {
                         Text(group.label)
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color(UIColor.secondaryLabel))
+                            .foregroundStyle(PokiTheme.secondaryText)
                     } else {
                         Text(LocalizedStringKey(group.label))
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color(UIColor.secondaryLabel))
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
                 .textCase(nil)
@@ -72,18 +72,18 @@ extension ContentView {
                 if group.label == "Pinned" {
                     Image(systemName: "pin.fill")
                         .font(.system(size: 10))
-                        .foregroundStyle(Color(UIColor.secondaryLabel))
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 // group.label stays an English key for logic; LocalizedStringKey
                 // resolves the display string per system language.
                 Text(LocalizedStringKey(group.label))
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color(UIColor.secondaryLabel))
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             .textCase(nil)
             .background(
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(dropTargetFolderId == "" ? Color.accentColor.opacity(0.18) : Color.clear)
+                    .fill(dropTargetFolderId == "" ? PokiTheme.tagText.opacity(0.18) : Color.clear)
             )
             // Dropping on a date-bucket header moves the sessions OUT of any
             // folder — the drag gesture works both directions, otherwise
@@ -183,7 +183,7 @@ extension ContentView {
                     .overlay(alignment: .bottomTrailing) {
                         if group.isCollapsed && group.anyPaused {
                             ZStack {
-                                Circle().fill(Color(UIColor.systemBackground))
+                                Circle().fill(PokiTheme.background)
                                     .frame(width: 16, height: 16)
                                 Image(systemName: "exclamationmark.circle.fill")
                                     .font(.system(size: 13))
@@ -210,9 +210,9 @@ extension ContentView {
                         if searchResultsActive,
                            SearchKeywords.firstHit(in: group.label, terms: SearchKeywords.terms(searchQuery)) != nil {
                             Text(SessionRow.highlightedAttributedString(
-                                text: group.label, query: searchQuery, baseColor: Color(UIColor.label)))
+                                text: group.label, query: searchQuery, baseColor: PokiTheme.primaryText))
                         } else {
-                            Text(group.label).foregroundStyle(Color(UIColor.label))
+                            Text(group.label).foregroundStyle(PokiTheme.primaryText)
                         }
                     }
                         .font(.system(size: 16, weight: .semibold))
@@ -231,7 +231,7 @@ extension ContentView {
                         }
                     }
                     .font(.system(size: 14))
-                    .foregroundStyle(Color(UIColor.secondaryLabel))
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(1)
                 }
 
@@ -241,20 +241,20 @@ extension ContentView {
                     if let date = group.latestDate {
                         Text(SessionRow.relativeDateImpl(date))
                             .font(.system(size: 13))
-                            .foregroundStyle(Color(UIColor.tertiaryLabel))
+                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     }
                     HStack(spacing: 4) {
                         if group.isFolderPinned {
                             Image(systemName: "pin.fill")
                                 .font(.system(size: 10))
-                                .foregroundStyle(Color(UIColor.tertiaryLabel))
+                                .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                         }
                         // [T-search-folder-expand] No fold chevron in a result
                         // set: folders stay open there, so it would do nothing.
                         if !searchResultsActive {
                             Image(systemName: "chevron.down")
                                 .font(.system(size: 11, weight: .semibold))
-                                .foregroundStyle(Color(UIColor.tertiaryLabel))
+                                .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                                 .rotationEffect(.degrees(group.isCollapsed ? -90 : 0))
                         }
                     }

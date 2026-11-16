@@ -98,14 +98,14 @@ private struct ProviderImportSheet: View {
             VStack(spacing: 8) {
                 Image(systemName: "doc.badge.gearshape")
                     .font(.system(size: 40))
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(PokiTheme.primaryText)
                     .padding(.top, 8)
                 Text(AppLocalized("Provider Configuration Detected"))
                     .font(.headline)
                     .multilineTextAlignment(.center)
                 Text(AppLocalized("This JSON file looks like an exported provider configuration. Import it as a new provider, or add it to the chat as a file attachment?"))
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -116,6 +116,8 @@ private struct ProviderImportSheet: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                 .controlSize(.large)
 
                 Button(action: { chose = true; onAttach() }) {

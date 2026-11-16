@@ -45,7 +45,7 @@ struct CloudSyncSettingsV2View: View {
                         SyncMigrationDetailView()
                     } label: {
                         LabeledContent("Status") {
-                            Text(statusText).foregroundStyle(.secondary)
+                            Text(statusText).foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 }
@@ -62,8 +62,8 @@ struct CloudSyncSettingsV2View: View {
                     } label: {
                         LabeledContent("Name") {
                             HStack(spacing: 6) {
-                                Text(deviceName).foregroundStyle(.secondary)
-                                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
+                                Text(deviceName).foregroundStyle(PokiTheme.secondaryText)
+                                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                             }
                         }
                     }
@@ -126,7 +126,7 @@ struct CloudSyncSettingsV2View: View {
                     if remoteDevices.isEmpty {
                         Text("No other devices found yet. Devices appear here once they enable iCloud Sync.")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .padding(.vertical, 4)
                     } else {
                         ForEach(remoteDevices, id: \.id) { d in
@@ -134,12 +134,12 @@ struct CloudSyncSettingsV2View: View {
                                 HStack {
                                     Text(d.deviceName).font(.body)
                                     Spacer()
-                                    Text(relativeDate(d.lastSeen)).font(.caption2).foregroundStyle(.secondary)
+                                    Text(relativeDate(d.lastSeen)).font(.caption2).foregroundStyle(PokiTheme.secondaryText)
                                 }
                                 if !d.uploadTypes.isEmpty {
                                     Text(uploadTypesSummary(d.uploadTypes))
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                         .lineLimit(2)
                                 }
                             }
@@ -153,6 +153,9 @@ struct CloudSyncSettingsV2View: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle("iCloud Sync")
 #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)

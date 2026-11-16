@@ -25,7 +25,7 @@ struct PulseRotateIcon: View {
     var body: some View {
         Image(systemName: "arrow.triangle.2.circlepath")
             .font(.system(size: 11, weight: .semibold))
-            .foregroundStyle(.primary)
+            .foregroundStyle(PokiTheme.primaryText)
             .rotationEffect(.degrees(rotation))
             .task { await pulseLoop() }
     }
@@ -69,10 +69,10 @@ struct ForceSyncToastBanner: View {
         HStack(spacing: 10) {
             Image(systemName: "icloud.and.arrow.up")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(PokiTheme.tagText)
             Text(text)
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(.white)
+                .foregroundStyle(PokiTheme.tagText)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
         }
@@ -80,9 +80,8 @@ struct ForceSyncToastBanner: View {
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color.accentColor.opacity(0.92))
+                .fill(PokiTheme.tagBackground)
         )
-        .shadow(color: .black.opacity(0.18), radius: 8, y: 3)
         .padding(.horizontal, 16)
         .frame(maxWidth: 480)
     }

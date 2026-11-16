@@ -21,7 +21,7 @@ struct AgentLoopModelsSection: View {
             if currentGroups.isEmpty && currentEntries.isEmpty {
                 Text("No models or groups added")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
 
             if !currentGroups.isEmpty {
@@ -77,7 +77,7 @@ struct AgentLoopModelsSection: View {
         HStack(spacing: 10) {
             Image(systemName: "square.stack.3d.up.fill")
                 .font(.caption)
-                .foregroundStyle(.blue)
+                .foregroundStyle(PokiTheme.tagText)
                 .frame(width: 16)
 
             VStack(alignment: .leading, spacing: 1) {
@@ -86,14 +86,14 @@ struct AgentLoopModelsSection: View {
                 let count = group.memberEntryIds.count
                 Text(AppLocalized("\(count) models") + " · \(group.strategy == .fallback ? AppLocalized("Fallback") : AppLocalized("Load Balance"))")
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
             }
 
             Spacer()
 
             Text("Group")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
     }
 
@@ -111,20 +111,20 @@ struct AgentLoopModelsSection: View {
                     if let instance = store.instance(for: entry.providerInstanceId) {
                         Text(instance.label)
                             .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     }
                     let badges = modalityBadges(entry.model)
                     if !badges.isEmpty {
                         Text("·")
                             .font(.caption2)
-                            .foregroundStyle(.quaternary)
+                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.60))
                         ForEach(badges, id: \.self) { badge in
                             Text(badge)
                                 .font(.system(size: 9, weight: .medium))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 1)
-                                .background(Color(UIColor.tertiarySystemFill))
+                                .background(PokiTheme.selection)
                                 .clipShape(RoundedRectangle(cornerRadius: 3))
                         }
                     }
@@ -135,7 +135,7 @@ struct AgentLoopModelsSection: View {
 
             Text(entry.model.provider)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
     }
 
@@ -223,7 +223,7 @@ struct AddAgentLoopGroupsSheet: View {
                 Section {
                     Text("All groups are already added.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                 }
@@ -236,18 +236,18 @@ struct AddAgentLoopGroupsSheet: View {
                     HStack(spacing: 10) {
                         Image(systemName: selectedGroupIds.contains(group.id) ? "checkmark.circle.fill" : "circle")
                             .font(.system(size: 20))
-                            .foregroundStyle(selectedGroupIds.contains(group.id) ? Color.accentColor : Color(UIColor.tertiaryLabel))
+                            .foregroundStyle(selectedGroupIds.contains(group.id) ? PokiTheme.tagText : PokiTheme.secondaryText.opacity(0.72))
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(group.name)
                                 .font(.subheadline.weight(.medium))
-                                .foregroundStyle(Color(UIColor.label))
+                                .foregroundStyle(PokiTheme.primaryText)
                             let entries = group.memberEntryIds.compactMap { store.entry(for: $0) }
                             let names = entries.prefix(3).map(\.model.displayName)
                             let suffix = entries.count > 3 ? " +\(entries.count - 3)" : ""
                             Text(names.joined(separator: ", ") + suffix)
                                 .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                                 .lineLimit(1)
                         }
 
@@ -255,11 +255,14 @@ struct AddAgentLoopGroupsSheet: View {
 
                         Text("\(group.memberEntryIds.count) models")
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle("Add Groups")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

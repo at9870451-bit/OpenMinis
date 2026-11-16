@@ -30,7 +30,7 @@ struct ChatScreenshotPreviewSheet: View {
                     .padding(.vertical, 16)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(UIColor.systemBackground).ignoresSafeArea())
+            .background(PokiTheme.background.ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -64,10 +64,10 @@ struct ChatScreenshotPreviewSheet: View {
                 if let toast {
                     Text(toast)
                         .font(.footnote.weight(.medium))
-                        .foregroundStyle(Color(UIColor.systemBackground))
+                        .foregroundStyle(PokiTheme.background)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
-                        .background(Color(UIColor.label).opacity(0.75))
+                        .background(PokiTheme.primaryText.opacity(0.75))
                         .clipShape(Capsule())
                         .padding(.bottom, 32)
                         .transition(.opacity.combined(with: .move(edge: .bottom)))

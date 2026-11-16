@@ -125,14 +125,7 @@ private struct ContextMenuPreviewSurface: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            content
-                // Opaque floor first — see the note above.
-                .background(shape.fill(ChatColors.background))
-                .glassEffect(.regular, in: shape)
-        } else {
-            content.background(ChatColors.background)
-        }
+        content.background(shape.fill(PokiTheme.surface))
     }
 }
 
@@ -192,10 +185,8 @@ private struct UserBubbleSurface: ViewModifier {
                         .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [6, 4]))
                         .foregroundStyle(ChatColors.secondaryText.opacity(0.5))
                 )
-        } else if #available(iOS 26.0, *), !snapshotRendering {
-            content.glassEffect(.regular, in: shape)
         } else {
-            content.background(shape.fill(ChatColors.userBubble))
+            content.background(shape.fill(PokiTheme.surface))
         }
     }
 }
@@ -367,7 +358,7 @@ struct ChatMessageRow: View {
                     .buttonStyle(.plain)
                 }
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(PokiTheme.secondaryText)
             .lineLimit(1)
             .fixedSize()
             VStack { Divider() }
@@ -398,7 +389,7 @@ struct ChatMessageRow: View {
                     .font(.system(size: 12, weight: .medium))
                     .multilineTextAlignment(.center)
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(PokiTheme.secondaryText)
             // [T-browser-download-ux-v4] No .lineLimit(1).fixedSize() here:
             // fixedSize forced the text to its full ideal width, so a long
             // systemInfo line (e.g. pre-v3 "Downloaded … to /var/minis/… —
@@ -557,8 +548,7 @@ struct ChatMessageRow: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [Color(red: 0.72, green: 0.69, blue: 0.59),
-                                     Color(red: 0.6, green: 0.6, blue: 0.55)],
+                            colors: [PokiTheme.aiAccent, PokiTheme.aiAccent],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -841,10 +831,10 @@ struct ChatMessageRow: View {
             if autoRetryAttempt > 0 {
                 Text("Retry in \(autoRetryCountdown)s (\(autoRetryAttempt)/\(AIChatViewModel.retryDelays.count))")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.secondary.opacity(0.12))
+                    .background(PokiTheme.secondaryText.opacity(0.12))
                     .clipShape(Capsule())
             } else if let onRetry {
                 Button(action: onRetry) {
@@ -876,7 +866,7 @@ struct ChatMessageRow: View {
                     .foregroundStyle(.orange)
                 Text("Interrupted — tap Resume to continue")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
 
             Spacer()
@@ -889,10 +879,10 @@ struct ChatMessageRow: View {
                         Text("Resume")
                             .font(.caption.weight(.semibold))
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.orange)
+                    .background(PokiTheme.primaryButton)
                     .clipShape(Capsule())
                 }
             }

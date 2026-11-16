@@ -64,7 +64,7 @@ extension ContentView {
             Button { dismissSearch() } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     // [T-ios-search-bar-glass-hit-hole] The frame alone was not
                     // a tap target: with `.buttonStyle(.plain)` and no fill,
                     // hit-testing follows the DRAWN GLYPH, so only the ~13pt
@@ -80,7 +80,7 @@ extension ContentView {
         } else {
             Button { dismissSearch() } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .frame(width: 32, height: 44)
                     .contentShape(Rectangle())
             }
@@ -290,7 +290,7 @@ extension ContentView {
                         HStack(spacing: 8) {
                             Image(systemName: "magnifyingglass")
                                 .font(.system(size: 15, weight: .medium))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                             TextField("Search chats...", text: $searchText)
                                 .textFieldStyle(.plain)
                                 .autocorrectionDisabled()
@@ -348,12 +348,12 @@ extension ContentView {
                     } label: {
                         Self.fabCircleSurface(
                             tint: nil,
-                            fallbackFill: Color(UIColor.secondarySystemBackground),
+                            fallbackFill: PokiTheme.surface,
                             fallbackShadowOpacity: 0.15
                         ) {
                             Image(systemName: "magnifyingglass")
                                 .font(.system(size: 22, weight: .semibold))
-                                .foregroundStyle(Color(UIColor.label))
+                                .foregroundStyle(PokiTheme.primaryText)
                         }
                             .modifier(FABGlassMorphID(namespace: fabGlassNamespace))
                     }

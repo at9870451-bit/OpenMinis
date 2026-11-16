@@ -23,7 +23,7 @@ struct RootfsManagementView: View {
                     Text("Status")
                     Spacer()
                     Text(viewModel.isInstalled ? "Installed" : "Not Installed")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Image(systemName: viewModel.isInstalled ? "checkmark.circle.fill" : "xmark.circle.fill")
                         .foregroundColor(viewModel.isInstalled ? .green : .red)
                 }
@@ -34,7 +34,7 @@ struct RootfsManagementView: View {
                         Spacer()
                         if viewModel.rootfsSize > 0 {
                             Text(viewModel.formattedSize)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(PokiTheme.secondaryText)
                         } else {
                             ProgressView()
                                 .controlSize(.small)
@@ -46,7 +46,7 @@ struct RootfsManagementView: View {
                         Spacer()
                         Text(viewModel.rootfsPath)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(PokiTheme.secondaryText)
                             .lineLimit(1)
                             .truncationMode(.middle)
                     }
@@ -142,7 +142,7 @@ struct RootfsManagementView: View {
                     HStack {
                         ProgressView()
                         Text(viewModel.statusMessage)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(PokiTheme.secondaryText)
                     }
                 }
             }
@@ -162,14 +162,17 @@ struct RootfsManagementView: View {
 
                     Text("The rootfs contains the Alpine Linux filesystem. Resetting will delete all data and restore to factory state.")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PokiTheme.secondaryText)
 
                     Text("• Reset: Delete everything\n• Backup: Save /root directory\n• Restore: Recover saved data")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PokiTheme.secondaryText)
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle("Rootfs Management")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -364,7 +367,7 @@ struct ContainerNetworkSection: View {
                 if !parsed.invalid.isEmpty {
                     Text("Not a valid IPv4 or IPv6 address: \(parsed.invalid.joined(separator: ", "))")
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(PokiTheme.danger)
                 } else if parsed.servers.isEmpty {
                     Text("Enter at least one DNS server. Until then the system DNS is used.")
                         .font(.caption)

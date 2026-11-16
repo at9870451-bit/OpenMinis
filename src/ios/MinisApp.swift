@@ -131,6 +131,7 @@ struct MinisApp: App {
         // makes the next one say what it was.
         //
         // `install` is idempotent, so the later onAppLaunch() call is a no-op.
+        PokiTheme.applyGlobalAppearance()
         CrashSignalHandler.install()
         // [T-crash-breadcrumbs] Rotate the previous run's breadcrumbs and start
         // this run's ring + 15 s resource sampling, before anything else runs.
@@ -224,6 +225,7 @@ struct MinisApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
+                PokiTheme.background.ignoresSafeArea()
                 ContentView()
                     .overlay(alignment: .top) {
                         BackgroundInterruptionBanner()
@@ -311,6 +313,7 @@ struct MinisApp: App {
                     }
                 }
                 .environmentObject(shareCoordinator)
+                .tint(PokiTheme.primaryButton)
                 .preferredColorScheme(
                     appearanceMode == 1 ? .light : appearanceMode == 2 ? .dark : nil
                 )

@@ -22,13 +22,13 @@ struct ModelGroupsView: View {
                     VStack(spacing: 8) {
                         Image(systemName: "square.stack.3d.up")
                             .font(.system(size: 32))
-                            .foregroundStyle(.quaternary)
+                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.60))
                         Text("No model groups")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text("Groups let you combine models for fallback or load balancing.")
                             .font(.caption)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
@@ -64,7 +64,7 @@ struct ModelGroupsView: View {
                             } label: {
                                 Label("Edit", systemImage: "pencil")
                             }
-                            .tint(.blue)
+                            .tint(PokiTheme.tagText)
                         }
                     }
                     .onMove(perform: moveGroups)
@@ -135,6 +135,9 @@ struct ModelGroupsView: View {
             AgentLoopModelsSection(showAddModels: $showAddAgentModels,
                                    showAddGroups: $showAddAgentGroups)
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle("Model Groups")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showAddAgentModels) {
@@ -177,7 +180,7 @@ struct ModelGroupsView: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(Color.accentColor, in: Capsule())
+                    .background(PokiTheme.tagText, in: Capsule())
                     .padding(.top, 8)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
@@ -322,35 +325,35 @@ private struct GroupRow: View {
         switch modality {
         case .videoOutput:
             Image(systemName: "video.badge.plus")
-                .font(.caption).foregroundStyle(.tint)
+                .font(.caption).foregroundStyle(PokiTheme.tagText)
                 .accessibilityLabel(AppLocalized("Video generation"))
         case .imageOutput:
             Image(systemName: "photo.badge.plus")
-                .font(.caption).foregroundStyle(.tint)
+                .font(.caption).foregroundStyle(PokiTheme.tagText)
                 .accessibilityLabel(AppLocalized("Image generation"))
         case .audioOutput:
             Image(systemName: "speaker.wave.2")
-                .font(.caption).foregroundStyle(.tint)
+                .font(.caption).foregroundStyle(PokiTheme.tagText)
                 .accessibilityLabel(AppLocalized("Speech output"))
         case .audioInput:
             Image(systemName: "waveform.badge.mic")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.caption).foregroundStyle(PokiTheme.secondaryText)
                 .accessibilityLabel(AppLocalized("Speech transcription"))
         case .videoInput:
             Image(systemName: "video")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.caption).foregroundStyle(PokiTheme.secondaryText)
                 .accessibilityLabel(AppLocalized("Video input"))
         case .imageInput:
             Image(systemName: "photo")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.caption).foregroundStyle(PokiTheme.secondaryText)
                 .accessibilityLabel(AppLocalized("Image input"))
         case .pdfInput:
             Image(systemName: "doc")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.caption).foregroundStyle(PokiTheme.secondaryText)
                 .accessibilityLabel(AppLocalized("PDF input"))
         case .textOutput:
             Image(systemName: "text.alignleft")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.caption).foregroundStyle(PokiTheme.secondaryText)
                 .accessibilityLabel(AppLocalized("Text generation"))
         default:
             EmptyView()
@@ -385,29 +388,29 @@ private struct GroupRow: View {
             HStack(spacing: 6) {
                 Image(systemName: group.strategy == .fallback ? "arrow.down.circle" : "arrow.triangle.branch")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Text(group.strategy == .fallback ? "Fallback" : "Load Balance")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 if group.strategy == .fallback {
                     Text("·")
                         .font(.caption)
-                        .foregroundStyle(.quaternary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.60))
                     Text(group.fallbackStrategy == .always ? AppLocalized("Always") : AppLocalized("Default"))
                         .font(.caption)
                         .foregroundStyle(group.fallbackStrategy == .always ? .orange : .secondary)
                 }
                 Text("·")
                     .font(.caption)
-                    .foregroundStyle(.quaternary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.60))
                 Text(AppLocalized("\(group.memberEntryIds.count) models"))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
 
             Text(memberSummary)
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 .lineLimit(1)
         }
         .padding(.vertical, 2)

@@ -28,7 +28,7 @@ struct FaceIDProtectionSettingsView: View {
                         Text("Lock App")
                         Text("Require \(BiometricAuth.biometryDisplayName) to open Minis.")
                             .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
                 .onChange(of: appLockEnabled) { newValue in
@@ -49,7 +49,9 @@ struct FaceIDProtectionSettingsView: View {
                 }
             } footer: {
                 Text("When enabled, \(BiometricAuth.biometryDisplayName) (or device passcode) is required every time you open the app.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             if appLockEnabled {
                 Section {
@@ -63,9 +65,12 @@ struct FaceIDProtectionSettingsView: View {
                     }
                 } header: {
                     Text("App Lock Timeout")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     Text("How long after leaving the app before the lock re-engages.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
 
             // MARK: - Per-Session Lock
@@ -75,7 +80,7 @@ struct FaceIDProtectionSettingsView: View {
                         Text("Lock Sessions")
                         Text("Long-press a session in the list to lock it.")
                             .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
                 .onChange(of: enabled) { newValue in
@@ -90,7 +95,9 @@ struct FaceIDProtectionSettingsView: View {
                 }
             } footer: {
                 Text("When enabled, locked sessions require \(BiometricAuth.biometryDisplayName) (or device passcode) before their contents are revealed.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             if enabled {
                 Section {
@@ -104,16 +111,19 @@ struct FaceIDProtectionSettingsView: View {
                     // lock has its own separate "App Lock Timeout" above bound to
                     // `appLockIdleSeconds` — so this stays session-scoped.
                     Text("Session Lock Timeout")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     Text("After leaving an unlocked session, the lock re-engages once the idle window elapses.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
 
                 Section {
                     HStack {
                         Text("Locked sessions")
                         Spacer()
                         Text("\(store.lockedSessionIds.count)")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .monospacedDigit()
                     }
                     if !store.lockedSessionIds.isEmpty {
@@ -129,11 +139,17 @@ struct FaceIDProtectionSettingsView: View {
                             }
                         } label: {
                             Label("Remove All Locks", systemImage: "lock.open")
+                                .foregroundStyle(PokiTheme.danger)
                         }
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("\(BiometricAuth.biometryDisplayName) Protection")
         .navigationBarTitleDisplayMode(.inline)
     }

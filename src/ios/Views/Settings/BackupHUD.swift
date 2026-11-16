@@ -19,16 +19,16 @@ struct BackupHUD: View {
         HStack(spacing: 10) {
             Image(systemName: isError ? "exclamationmark.triangle.fill"
                                       : "checkmark.circle.fill")
-                .foregroundStyle(isError ? .orange : .green)
+                .foregroundStyle(isError ? PokiTheme.danger : PokiTheme.primaryText)
             Text(text)
                 .font(.footnote)
-                .foregroundStyle(.primary)
+                .foregroundStyle(PokiTheme.primaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-        .shadow(radius: 8, y: 2)
+        .background(PokiTheme.surface, in: RoundedRectangle(cornerRadius: 12))
+        .shadow(color: PokiTheme.primaryText.opacity(0.06), radius: 4, y: 2)
         .padding(.horizontal, 24)
         .transition(.move(edge: .top).combined(with: .opacity))
     }

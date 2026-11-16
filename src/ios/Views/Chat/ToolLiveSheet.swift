@@ -1051,7 +1051,7 @@ struct ToolLiveSheet: View {
         // distribute space between the fixed chrome and the flexible content.
         // On iPhone `.infinity` just fills the sheet detent as before.
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(UIColor.systemGroupedBackground))
+        .background(PokiTheme.background)
         .onAppear {
             startBrowserTimer()
             if isLive && isCurrentShell { resourceMonitor.start() }
@@ -1347,7 +1347,7 @@ struct ToolLiveSheet: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
-        .background(Color(UIColor.systemBackground))
+        .background(PokiTheme.background)
         .fullScreenCover(isPresented: $showTerminal) {
             NavigationStack {
                 // Pre-fill the shell command the tool is currently running,
@@ -1553,10 +1553,10 @@ struct ToolLiveSheet: View {
                         if !action.isEmpty {
                             Text(action)
                                 .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.tagText)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
-                                .background(Color.blue)
+                                .background(PokiTheme.tagBackground)
                                 .clipShape(Capsule())
                         }
                         if !url.isEmpty {
@@ -1585,7 +1585,7 @@ struct ToolLiveSheet: View {
                     .frame(maxWidth: .infinity)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .overlay(RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color(UIColor.separator).opacity(0.5), lineWidth: 0.5))
+                        .stroke(PokiTheme.divider.opacity(0.5), lineWidth: 0.5))
                     .shadow(color: .black.opacity(0.18), radius: 8, x: 0, y: 3)
                     .contextMenu {
                         Button { UIPasteboard.general.image = image } label: {
@@ -1602,15 +1602,15 @@ struct ToolLiveSheet: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "globe")
                                     .font(.system(size: 12))
-                                    .foregroundStyle(Color(UIColor.secondaryLabel))
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                 Text("Result")
                                     .font(.system(size: 13, weight: .medium))
-                                    .foregroundStyle(Color(UIColor.label))
+                                    .foregroundStyle(PokiTheme.primaryText)
                                     .lineLimit(1)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
-                            .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.13, alpha: 1) : UIColor(white: 0.92, alpha: 1) }))
+                            .background(PokiTheme.surface)
 
                             Divider()
 
@@ -1622,7 +1622,7 @@ struct ToolLiveSheet: View {
                                 LazyRevealChunks(chunks: Self.chunkedLines(text), resetKey: block.id) { t in
                                     Text(t)
                                         .font(.system(size: 13, design: .monospaced))
-                                        .foregroundStyle(Color(UIColor.label))
+                                        .foregroundStyle(PokiTheme.primaryText)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .padding(.horizontal, 14)
                                 }
@@ -1630,9 +1630,9 @@ struct ToolLiveSheet: View {
                             .textSelection(.enabled)
                             .padding(.vertical, 14)
                         }
-                        .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.10, alpha: 1) : UIColor(white: 0.94, alpha: 1) }))
+                        .background(PokiTheme.surface)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(PokiTheme.divider, lineWidth: 0.5))
                         .padding(.horizontal, 12)
                     }
             }
@@ -1657,10 +1657,10 @@ struct ToolLiveSheet: View {
                         if !action.isEmpty {
                             Text(action)
                                 .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.tagText)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
-                                .background(Color.blue)
+                                .background(PokiTheme.tagBackground)
                                 .clipShape(Capsule())
                         }
                         if !url.isEmpty {
@@ -1683,15 +1683,15 @@ struct ToolLiveSheet: View {
                         HStack(spacing: 6) {
                             Image(systemName: "globe")
                                 .font(.system(size: 12))
-                                .foregroundStyle(Color(UIColor.secondaryLabel))
+                                .foregroundStyle(PokiTheme.secondaryText)
                             Text("Result")
                                 .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(Color(UIColor.label))
+                                .foregroundStyle(PokiTheme.primaryText)
                                 .lineLimit(1)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
-                        .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.13, alpha: 1) : UIColor(white: 0.92, alpha: 1) }))
+                        .background(PokiTheme.surface)
 
                         Divider()
 
@@ -1701,7 +1701,7 @@ struct ToolLiveSheet: View {
                             LazyRevealChunks(chunks: Self.chunkedLines(text), resetKey: block.id) { t in
                                 Text(t)
                                     .font(.system(size: 13, design: .monospaced))
-                                    .foregroundStyle(Color(UIColor.label))
+                                    .foregroundStyle(PokiTheme.primaryText)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.horizontal, 14)
                             }
@@ -1709,9 +1709,9 @@ struct ToolLiveSheet: View {
                         .textSelection(.enabled)
                         .padding(.vertical, 14)
                     }
-                    .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.10, alpha: 1) : UIColor(white: 0.94, alpha: 1) }))
+                    .background(PokiTheme.surface)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(PokiTheme.divider, lineWidth: 0.5))
                     .padding(.horizontal, 12)
                 }
             }
@@ -1758,7 +1758,7 @@ struct ToolLiveSheet: View {
                         .frame(maxWidth: .infinity, minHeight: cardMinHeight, alignment: .topLeading)
                         .background(Color.black)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(PokiTheme.divider, lineWidth: 0.5))
                         .padding(.horizontal, 12)
                         .padding(.top, 12)
                         .padding(.bottom, 16)
@@ -1808,14 +1808,14 @@ struct ToolLiveSheet: View {
         HStack(spacing: 6) {
             Image(systemName: "doc.text")
                 .font(.system(size: 12))
-                .foregroundStyle(Color(UIColor.secondaryLabel))
+                .foregroundStyle(PokiTheme.secondaryText)
             Text(fileName)
                 .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Color(UIColor.label))
+                .foregroundStyle(PokiTheme.primaryText)
                 .lineLimit(1)
             Text("(\(Self.formatCharCount(charCount)))")
                 .font(.system(size: 11))
-                .foregroundStyle(Color(UIColor.tertiaryLabel))
+                .foregroundStyle(PokiTheme.secondaryText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
@@ -1892,16 +1892,16 @@ struct ToolLiveSheet: View {
                                     .foregroundStyle(.orange)
                                 Text(fileName)
                                     .font(.system(size: 13, weight: .medium))
-                                    .foregroundStyle(Color(UIColor.label))
+                                    .foregroundStyle(PokiTheme.primaryText)
                                     .lineLimit(1)
                                 Text("(\(sizeLabel))")
                                     .font(.system(size: 11))
-                                    .foregroundStyle(isStreaming ? Color.orange.opacity(0.8) : Color(UIColor.tertiaryLabel))
+                                    .foregroundStyle(isStreaming ? Color.orange.opacity(0.8) : PokiTheme.secondaryText)
                                     .lineLimit(1)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
-                            .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.13, alpha: 1) : UIColor(white: 0.92, alpha: 1) }))
+                            .background(PokiTheme.surface)
 
                             Divider()
 
@@ -1958,7 +1958,7 @@ struct ToolLiveSheet: View {
                                     switch block.toolStatus {
                                     case .failed:    return (AppLocalized("Failed to edit"), .red)
                                     case .cancelled: return (AppLocalized("Cancelled"),     .orange)
-                                    default:         return (AppLocalized("Edited"),        Color(UIColor.label))
+                                    default:         return (AppLocalized("Edited"),        PokiTheme.primaryText)
                                     }
                                 }()
                                 let isFailure: Bool = {
@@ -1973,7 +1973,7 @@ struct ToolLiveSheet: View {
                                             .foregroundStyle(labelColor)
                                         Text(filePath)
                                             .font(.system(size: 12, design: .monospaced))
-                                            .foregroundStyle(Color(UIColor.secondaryLabel))
+                                            .foregroundStyle(PokiTheme.secondaryText)
                                             .lineLimit(1)
                                             .truncationMode(.middle)
                                         Spacer()
@@ -1986,14 +1986,14 @@ struct ToolLiveSheet: View {
                                         // lines to keep the card height bounded.
                                         Text(Self.trimmedErrorMessage(errText))
                                             .font(.system(size: 12, design: .monospaced))
-                                            .foregroundStyle(Color(UIColor.secondaryLabel))
+                                            .foregroundStyle(PokiTheme.secondaryText)
                                             .lineLimit(6)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .textSelection(.enabled)
                                     } else if let detail = resultDetail {
                                         Text(detail)
                                             .font(.system(size: 12))
-                                            .foregroundStyle(Color(UIColor.tertiaryLabel))
+                                            .foregroundStyle(PokiTheme.secondaryText)
                                     }
                                 }
                                 .padding(.horizontal, 14)
@@ -2001,9 +2001,9 @@ struct ToolLiveSheet: View {
                             }
                         }
                             .frame(maxWidth: .infinity, minHeight: cardMinHeight, maxHeight: .infinity, alignment: .topLeading)
-                            .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.10, alpha: 1) : UIColor(white: 0.94, alpha: 1) }))
+                            .background(PokiTheme.surface)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(PokiTheme.divider, lineWidth: 0.5))
                             .padding(.horizontal, 12)
                             .padding(.top, 12)
                         }
@@ -2096,11 +2096,11 @@ struct ToolLiveSheet: View {
                 Spacer()
                 Text(Self.formatBytes(script.utf8.count))
                     .font(.system(size: 11))
-                    .foregroundStyle(Color(UIColor.tertiaryLabel))
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
-            .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.13, alpha: 1) : UIColor(white: 0.92, alpha: 1) }))
+            .background(PokiTheme.surface)
 
             Divider()
 
@@ -2110,7 +2110,7 @@ struct ToolLiveSheet: View {
                 LazyRevealChunks(chunks: Self.chunkedLines(script), resetKey: block.id) { t in
                     Text(t)
                         .font(.system(size: 12, design: .monospaced))
-                        .foregroundStyle(Color(UIColor.label))
+                        .foregroundStyle(PokiTheme.primaryText)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 12)
                 }
@@ -2118,9 +2118,9 @@ struct ToolLiveSheet: View {
             .textSelection(.enabled)
             .padding(.vertical, 12)
         }
-        .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.10, alpha: 1) : UIColor(white: 0.94, alpha: 1) }))
+        .background(PokiTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(PokiTheme.divider, lineWidth: 0.5))
         .padding(.horizontal, 12)
     }
 
@@ -2149,7 +2149,7 @@ struct ToolLiveSheet: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.13, alpha: 1) : UIColor(white: 0.92, alpha: 1) }))
+                    .background(PokiTheme.surface)
 
                     Divider()
 
@@ -2178,9 +2178,9 @@ struct ToolLiveSheet: View {
                     .textSelection(.enabled)
                     .padding(.vertical, 14)
                 }
-                .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.10, alpha: 1) : UIColor(white: 0.94, alpha: 1) }))
+                .background(PokiTheme.surface)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(PokiTheme.divider, lineWidth: 0.5))
                 .padding(.horizontal, 12)
                 .padding(.top, 12)
             }
@@ -2213,10 +2213,10 @@ struct ToolLiveSheet: View {
                     HStack(spacing: 6) {
                         Image(systemName: failed ? "exclamationmark.triangle.fill" : "photo")
                             .font(.system(size: 12))
-                            .foregroundStyle(failed ? Color.red : Color(UIColor.secondaryLabel))
+                            .foregroundStyle(failed ? Color.red : PokiTheme.secondaryText)
                         Text(fileName)
                             .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(Color(UIColor.label))
+                            .foregroundStyle(PokiTheme.primaryText)
                             .lineLimit(1)
                         if failed {
                             Text("Failed")
@@ -2226,21 +2226,21 @@ struct ToolLiveSheet: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.13, alpha: 1) : UIColor(white: 0.92, alpha: 1) }))
+                    .background(PokiTheme.surface)
 
                     Divider()
 
                     Text(body)
                         .font(.system(size: 13, design: .monospaced))
-                        .foregroundStyle(failed ? Color.red : Color(UIColor.label))
+                        .foregroundStyle(failed ? Color.red : PokiTheme.primaryText)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 14)
                         .textSelection(.enabled)
                 }
-                .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.10, alpha: 1) : UIColor(white: 0.94, alpha: 1) }))
+                .background(PokiTheme.surface)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(PokiTheme.divider, lineWidth: 0.5))
                 .padding(.horizontal, 12)
                 .padding(.top, 12)
 
@@ -2248,19 +2248,19 @@ struct ToolLiveSheet: View {
                     HStack(spacing: 6) {
                         Image(systemName: "info.circle")
                             .font(.system(size: 12))
-                            .foregroundStyle(Color(UIColor.secondaryLabel))
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text(path)
                             .font(.system(size: 12, design: .monospaced))
-                            .foregroundStyle(Color(UIColor.label))
+                            .foregroundStyle(PokiTheme.primaryText)
                             .lineLimit(1)
                             .truncationMode(.middle)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 10)
-                    .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.15, alpha: 1) : UIColor(white: 0.95, alpha: 1) }))
+                    .background(PokiTheme.surface)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(PokiTheme.divider, lineWidth: 0.5))
                     .padding(.horizontal, 12)
                     .padding(.top, 8)
                 }
@@ -2294,18 +2294,18 @@ struct ToolLiveSheet: View {
                     HStack(spacing: 6) {
                         Image(systemName: isRead ? "doc.text" : "doc.text.fill")
                             .font(.system(size: 12))
-                            .foregroundStyle(Color(UIColor.secondaryLabel))
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text(fileName)
                             .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(Color(UIColor.label))
+                            .foregroundStyle(PokiTheme.primaryText)
                             .lineLimit(1)
                         Text("(\(sizeLabel))")
                             .font(.system(size: 11))
-                            .foregroundStyle(isStreaming ? Color.orange.opacity(0.8) : Color(UIColor.tertiaryLabel))
+                            .foregroundStyle(isStreaming ? Color.orange.opacity(0.8) : PokiTheme.secondaryText)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.13, alpha: 1) : UIColor(white: 0.92, alpha: 1) }))
+                    .background(PokiTheme.surface)
 
                     Divider()
 
@@ -2317,7 +2317,7 @@ struct ToolLiveSheet: View {
                             ForEach(chunks, id: \.id) { chunk in
                                 Text(chunk.text)
                                     .font(.system(size: 13, design: .monospaced))
-                                    .foregroundStyle(Color(UIColor.label))
+                                    .foregroundStyle(PokiTheme.primaryText)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.horizontal, 14)
                             }
@@ -2325,7 +2325,7 @@ struct ToolLiveSheet: View {
                             LazyRevealChunks(chunks: chunks, resetKey: block.id) { text in
                                 Text(text)
                                     .font(.system(size: 13, design: .monospaced))
-                                    .foregroundStyle(Color(UIColor.label))
+                                    .foregroundStyle(PokiTheme.primaryText)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.horizontal, 14)
                             }
@@ -2334,9 +2334,9 @@ struct ToolLiveSheet: View {
                     .textSelection(.enabled)
                     .padding(.vertical, 14)
                 }
-                .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.10, alpha: 1) : UIColor(white: 0.94, alpha: 1) }))
+                .background(PokiTheme.surface)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(PokiTheme.divider, lineWidth: 0.5))
                 .padding(.horizontal, 12)
                 .padding(.top, 12)
 
@@ -2351,22 +2351,22 @@ struct ToolLiveSheet: View {
                     HStack(spacing: 6) {
                         Image(systemName: "info.circle")
                             .font(.system(size: 12))
-                            .foregroundStyle(Color(UIColor.secondaryLabel))
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text(fullPath)
                             .font(.system(size: 12, design: .monospaced))
-                            .foregroundStyle(Color(UIColor.label))
+                            .foregroundStyle(PokiTheme.primaryText)
                             .lineLimit(1)
                             .truncationMode(.middle)
                         Spacer(minLength: 4)
                         Text(sizeLabel)
                             .font(.system(size: 12, design: .monospaced))
-                            .foregroundStyle(Color(UIColor.tertiaryLabel))
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 10)
-                    .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.15, alpha: 1) : UIColor(white: 0.95, alpha: 1) }))
+                    .background(PokiTheme.surface)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(PokiTheme.divider, lineWidth: 0.5))
                     .padding(.horizontal, 12)
                     .padding(.top, 8)
                 }
@@ -2552,7 +2552,7 @@ struct ToolLiveSheet: View {
                         }
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }), lineWidth: 0.5))
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(PokiTheme.divider, lineWidth: 0.5))
                     .padding(.horizontal, 12)
                     .padding(.top, 12)
                     .padding(.bottom, 16)
@@ -2634,10 +2634,10 @@ struct ToolLiveSheet: View {
                                 if !action.isEmpty {
                                     Text(action)
                                         .font(.system(size: 12, weight: .semibold))
-                                        .foregroundStyle(.white)
+                                        .foregroundStyle(PokiTheme.tagText)
                                         .padding(.horizontal, 10)
                                         .padding(.vertical, 5)
-                                        .background(Color.blue)
+                                        .background(PokiTheme.tagBackground)
                                         .clipShape(Capsule())
                                 }
                                 if !url.isEmpty {
@@ -2664,7 +2664,7 @@ struct ToolLiveSheet: View {
                             .frame(maxWidth: .infinity)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                             .overlay(RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color(UIColor.separator).opacity(0.5), lineWidth: 0.5))
+                                .stroke(PokiTheme.divider.opacity(0.5), lineWidth: 0.5))
                             .shadow(color: .black.opacity(0.18), radius: 8, x: 0, y: 3)
                             .contextMenu {
                                 Button { UIPasteboard.general.image = img } label: {
@@ -2683,10 +2683,10 @@ struct ToolLiveSheet: View {
                             if !action.isEmpty {
                                 Text(action)
                                     .font(.system(size: 12, weight: .semibold))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(PokiTheme.tagText)
                                     .padding(.horizontal, 10)
                                     .padding(.vertical, 5)
-                                    .background(Color.blue)
+                                    .background(PokiTheme.tagBackground)
                                     .clipShape(Capsule())
                             }
                             if !url.isEmpty {
@@ -2810,7 +2810,7 @@ struct ToolLiveSheet: View {
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
         }
-        .background(Color(UIColor.systemBackground))
+        .background(PokiTheme.background)
     }
 
     // MARK: - Helpers
@@ -3039,7 +3039,7 @@ private struct ToolPreviewThumbnail: View {
         // glow read as an alert rather than an accent.
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(Color(UIColor.separator).opacity(0.4), lineWidth: 0.5)
+                .stroke(PokiTheme.divider.opacity(0.4), lineWidth: 0.5)
         )
         .overlay(alignment: .bottom) {
             if isLive && isShell {
@@ -3337,13 +3337,13 @@ private struct ToolStatusBarSurface: ViewModifier {
             content.glassEffect(.regular, in: shape)
         } else {
             content
-                .background(Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.15, alpha: 1) : UIColor.systemBackground }))
+                .background(PokiTheme.surface)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color(UIColor.separator).opacity(0.3), lineWidth: 0.5)
+                        .stroke(PokiTheme.divider.opacity(0.3), lineWidth: 0.5)
                 )
-                .shadow(color: Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.08, alpha: 0.75) : UIColor(white: 0, alpha: 0.12) }), radius: 8, x: 0, y: 4)
+                .shadow(color: PokiTheme.shadowSoft, radius: 8, x: 0, y: 4)
         }
     }
 }

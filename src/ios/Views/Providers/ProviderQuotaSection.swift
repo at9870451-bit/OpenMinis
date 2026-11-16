@@ -115,17 +115,17 @@ struct ProviderQuotaSection: View {
         case .unsupported(let reason):
             Text(Self.message(for: reason))
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         case .loading:
             HStack(spacing: 8) {
                 ProgressView().controlSize(.small)
                 Text("Checking balance…")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         case .empty:
             Text("The provider reported no balance or quota for this key.")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         case .failed(let err):
             Label {
                 Text(Self.message(for: err))
@@ -144,7 +144,7 @@ struct ProviderQuotaSection: View {
                     Image(systemName: "person.2")
                 }
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             }
             ForEach(pools) { pool in
                 QuotaPoolRow(pool: pool, status: quota.poolStatus(pool))
@@ -246,7 +246,7 @@ extension QuotaTone {
         case .healthy: return .green
         case .caution: return .orange
         case .critical: return .red
-        case .muted: return Color(UIColor.tertiaryLabel)
+        case .muted: return PokiTheme.secondaryText.opacity(0.72)
         }
     }
 
@@ -279,7 +279,7 @@ struct QuotaUsageBar: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
-                Capsule().fill(Color(UIColor.tertiarySystemFill))
+                Capsule().fill(PokiTheme.selection)
                 Capsule().fill(tone.color)
                     .frame(width: max(geo.size.width * fraction, fraction > 0 ? 4 : 0))
             }
@@ -303,7 +303,7 @@ struct QuotaStatusChip: View {
             Text(label)
         }
         .font(.caption2.weight(.medium))
-        .foregroundStyle(tone == .normal ? Color.secondary : tone.color)
+        .foregroundStyle(tone == .normal ? PokiTheme.secondaryText : tone.color)
         .padding(.horizontal, 6)
         .padding(.vertical, 2)
         .background(tone.color.opacity(tone == .normal ? 0.08 : 0.12), in: Capsule())
@@ -329,11 +329,11 @@ struct QuotaWindowLine: View {
                 if let util {
                     Text(QuotaFormat.percentUsedText(util.percent))
                         .font(.caption.monospacedDigit())
-                        .foregroundStyle(tone == .healthy ? Color.secondary : tone.color)
+                        .foregroundStyle(tone == .healthy ? PokiTheme.secondaryText : tone.color)
                 } else if let r = window.amounts?.remaining {
                     Text(String(format: String(localized: "%@ left"), QuotaFormat.amount(r, unit: pool.unit)))
                         .font(.caption.monospacedDigit())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
             if let fraction {
@@ -342,7 +342,7 @@ struct QuotaWindowLine: View {
             if let reset = window.resetsAt {
                 Text(String(format: String(localized: "Resets %@"), ProviderQuotaSection.relative(reset)))
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         }
         .accessibilityElement(children: .combine)
@@ -377,7 +377,7 @@ struct QuotaPoolRow: View {
             if status.freshness == .expired {
                 Text("Data expired — refresh to update")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             } else {
                 details(tone: tone)
             }
@@ -396,12 +396,12 @@ struct QuotaPoolRow: View {
             if detailed, pool.kind == .prepaidBalance {
                 Text("Prepaid balance — no total cap, so no percentage is shown.")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             if let parts = QuotaFormat.breakdown(amounts, unit: pool.unit) {
                 Text(parts)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         }
         if pool.verdict == .rejected {
@@ -415,7 +415,7 @@ struct QuotaPoolRow: View {
         if pool.unlimited {
             Text("No limit")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
     }
 
@@ -440,7 +440,7 @@ struct QuotaPoolRow: View {
                             QuotaFormat.amount(used, unit: pool.unit), QuotaFormat.amount(total, unit: pool.unit))
                      + (util.map { " · " + QuotaFormat.percent($0.percent) } ?? ""))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         }
     }
@@ -461,15 +461,15 @@ struct QuotaConsoleLinkRow: View {
                 BackupActionIcon(systemName: "safari.fill", tint: .blue)
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Usage on the provider's website")
-                        .foregroundStyle(Color(UIColor.label))
+                        .foregroundStyle(PokiTheme.primaryText)
                     Text(url.host ?? url.absoluteString)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 Spacer()
                 Image(systemName: "arrow.up.right")
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
             }
         }
         .buttonStyle(.plain)

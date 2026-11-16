@@ -17,7 +17,7 @@ struct AudioWaveformView: View {
                 ForEach(0..<barCount, id: \.self) { i in
                     let level = sampleLevel(at: i, barCount: barCount)
                     RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.accentColor)
+                        .fill(PokiTheme.primaryText)
                         .frame(width: barWidth, height: minHeight + CGFloat(level) * (maxHeight - minHeight))
                         .animation(.easeOut(duration: 0.1), value: level)
                 }

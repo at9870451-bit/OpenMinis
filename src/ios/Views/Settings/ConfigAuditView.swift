@@ -22,7 +22,7 @@ struct ConfigAuditView: View {
                 HStack {
                     Text("\(usage.count) / \(usage.capacity) used")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Spacer()
                     if !entries.isEmpty {
                         Button("Clear All", role: .destructive) {
@@ -33,10 +33,12 @@ struct ConfigAuditView: View {
                     }
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             if entries.isEmpty {
                 Text("No config changes recorded yet.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
+                .listRowBackground(PokiTheme.surface)
             } else {
                 ForEach(entries) { entry in
                     // [T-config-readable] Tap a record for its details: the
@@ -47,8 +49,13 @@ struct ConfigAuditView: View {
                         auditRow(entry)
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .listStyle(.insetGrouped)
         .onAppear { reload() }
         .onChange(of: log.revision) { _ in reload() }
@@ -86,11 +93,11 @@ struct ConfigAuditView: View {
                 ConfigAuditStatusBadge(status: entry.status)
                 Text(entry.actor.rawValue)
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Spacer()
                 Text(coarseRelativeTime(entry.at))
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             Text(entry.key)
                 .font(.system(.subheadline, design: .monospaced))
@@ -103,18 +110,18 @@ struct ConfigAuditView: View {
                 Text(verbatim: readable.displayText)
                     .font(.subheadline)
                     .lineLimit(3)
-                    .foregroundStyle(entry.status == .applied ? .primary : .secondary)
+                    .foregroundStyle(entry.status == .applied ? PokiTheme.primaryText : PokiTheme.secondaryText)
             } else {
                 HStack(alignment: .top, spacing: 6) {
                     Text(displayJSON(entry.oldValueJSON))
                         .lineLimit(1)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Image(systemName: "arrow.right")
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Text(displayJSON(entry.newValueJSON))
                         .lineLimit(1)
-                        .foregroundStyle(entry.status == .applied ? .primary : .secondary)
+                        .foregroundStyle(entry.status == .applied ? PokiTheme.primaryText : PokiTheme.secondaryText)
                 }
                 .font(.system(.caption, design: .monospaced))
             }
@@ -123,12 +130,12 @@ struct ConfigAuditView: View {
                 Label {
                     Text(caption)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .lineLimit(3)
                 } icon: {
                     Image(systemName: "text.quote")
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
 
@@ -149,7 +156,7 @@ struct ConfigAuditView: View {
             } else if entry.status == .reverted {
                 Label("Reverted", systemImage: "arrow.uturn.backward.circle.fill")
                     .font(.caption2)
-                    .foregroundStyle(.purple)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .padding(.top, 2)
             }
         }

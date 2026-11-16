@@ -120,11 +120,7 @@ private struct FolderSegmentBorder: Shape {
 /// Edge highlight for the simulated glass: bright hairline in dark mode
 /// (the reference system-folder look), a subtle dark line in light mode
 /// (white would vanish on the light page).
-private let folderEdgeHighlight = Color(UIColor { traits in
-    traits.userInterfaceStyle == .dark
-        ? UIColor(white: 1, alpha: 0.30)
-        : UIColor(white: 0, alpha: 0.08)
-})
+private let folderEdgeHighlight = PokiTheme.divider
 
 /// Background for the expanded FAB search bar. Liquid Glass capsule on iOS 26+,
 /// the original opaque capsule + hand-rolled shadow below it.
@@ -135,16 +131,11 @@ private let folderEdgeHighlight = Color(UIColor { traits in
 /// over a separately-drawn shape.
 struct SearchBarSurface: ViewModifier {
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            // No .clipShape needed — glassEffect(in:) already clips to the
-            // capsule, and no .shadow: the material carries its own.
-            content.glassEffect(.regular, in: .capsule)
-        } else {
-            content
-                .background(Color(UIColor.secondarySystemBackground))
-                .clipShape(Capsule())
-                .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 2)
-        }
+        content
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.tagText)
+            .background(PokiTheme.surface, in: Capsule())
+            .overlay(Capsule().stroke(PokiTheme.divider, lineWidth: 0.5))
     }
 }
 
@@ -199,11 +190,7 @@ private struct FolderSurface: ViewModifier {
     /// color. Sampling it gives pixel-level brightness parity with the
     /// collapsed card, perfectly seamless tiling, and zero perf risk —
     /// chosen by the user over a preference-propagation spike.
-    static let sampledGlassColor = Color(UIColor { traits in
-        traits.userInterfaceStyle == .dark
-            ? UIColor(red: 18/255.0, green: 18/255.0, blue: 18/255.0, alpha: 1)
-            : UIColor(red: 252/255.0, green: 252/255.0, blue: 252/255.0, alpha: 1)
-    })
+    static let sampledGlassColor = PokiTheme.surface
 
     private var shape: AnyShape {
         switch kind {
@@ -223,33 +210,8 @@ private struct FolderSurface: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        Group {
-            // Two states, two deliberate treatments (user decision):
-            // - COLLAPSED lone card: the sampled constant. glassEffect is a
-            //   live material and a collapsed card scrolls past heterogeneous
-            //   content (blurred colorful pinned rows), so live glass
-            //   flickered frame to frame; the constant is what that glass
-            //   rendered over the flat background anyway.
-            // - EXPANDED segments: a real material for translucency. Member
-            //   rows sit over the STABLE list background only — nothing
-            //   colorful ever passes behind them — so the flicker mechanism
-            //   doesn't apply, and the material keeps the container from
-            //   reading as a dull solid slab. regularMaterial (the brighter
-            //   tier; ultraThin ran too dark here before).
-            if kind == .lone {
-                if #available(iOS 26.0, *) {
-                    content.background(shape.fill(Self.sampledGlassColor))
-                } else {
-                    content.background(shape.fill(Color(UIColor.secondarySystemBackground)))
-                }
-            } else {
-                if #available(iOS 26.0, *) {
-                    content.background(shape.fill(.regularMaterial))
-                } else {
-                    content.background(shape.fill(Color(UIColor.secondarySystemBackground)))
-                }
-            }
-        }
+        content
+            .background(shape.fill(Self.sampledGlassColor))
         .overlay {
             // Border: full hairline on the lone card (its existing look, sub-26
             // only — glass carries its own edge); tiled outer-perimeter
@@ -265,7 +227,7 @@ private struct FolderSurface: ViewModifier {
                         .stroke(folderEdgeHighlight, lineWidth: 0.75)
                 } else {
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(Color(UIColor.separator).opacity(0.5), lineWidth: 0.5)
+                        .stroke(PokiTheme.divider.opacity(0.5), lineWidth: 0.5)
                 }
             case .top:
                 FolderSegmentBorder(kind: .top)
@@ -299,8 +261,8 @@ struct FolderCardBackground: ViewModifier {
             .overlay {
                 if isDropTarget {
                     ZStack {
-                        dropShape.fill(Color.accentColor.opacity(0.15))
-                        dropShape.stroke(Color.accentColor, lineWidth: 1.5)
+                        dropShape.fill(PokiTheme.tagText.opacity(0.15))
+                        dropShape.stroke(PokiTheme.tagText, lineWidth: 1.5)
                     }
                 }
             }

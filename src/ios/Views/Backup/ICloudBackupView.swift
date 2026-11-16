@@ -19,7 +19,7 @@ struct ICloudBackupView: View {
                             .background(Color.red)
                             .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
                         Text("iCloud is not available")
-                            .foregroundColor(.primary)
+                            .foregroundColor(PokiTheme.primaryText)
                     }
                 } else {
                     HStack(spacing: 12) {
@@ -50,10 +50,10 @@ struct ICloudBackupView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(category.displayName)
-                                        .foregroundColor(.primary)
+                                        .foregroundColor(PokiTheme.primaryText)
                                     Text(category.description)
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(PokiTheme.secondaryText)
                                 }
                                 Spacer()
                                 if manager.isBackingUp {
@@ -70,7 +70,7 @@ struct ICloudBackupView: View {
                             ProgressView(value: manager.progress)
                             Text(manager.statusMessage)
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(PokiTheme.secondaryText)
                         }
                         .padding(.vertical, 4)
                     }
@@ -83,7 +83,7 @@ struct ICloudBackupView: View {
                         ProgressView(value: manager.progress)
                         Text(manager.statusMessage)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(PokiTheme.secondaryText)
                     }
                     .padding(.vertical, 4)
                 }
@@ -104,7 +104,7 @@ struct ICloudBackupView: View {
             if manager.availableBackups.isEmpty && manager.isICloudAvailable {
                 Section {
                     Text("No backups found")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PokiTheme.secondaryText)
                 }
             }
 
@@ -114,6 +114,9 @@ struct ICloudBackupView: View {
                 Text("Backups are stored in iCloud Drive and sync across your devices. Restoring will replace your current local data.")
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle("iCloud Backup")
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -168,7 +171,7 @@ struct ICloudBackupView: View {
                     Text(entry.fileSize.formattedFileSize)
                 }
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(PokiTheme.secondaryText)
             }
         }
         .swipeActions(edge: .trailing) {
@@ -184,7 +187,7 @@ struct ICloudBackupView: View {
             } label: {
                 Label("Restore", systemImage: "arrow.counterclockwise")
             }
-            .tint(.blue)
+            .tint(PokiTheme.tagText)
         }
         .contextMenu {
             Button {

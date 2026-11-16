@@ -133,6 +133,9 @@ struct CollectionViewMessageListV3: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> MessageListViewController {
         let vc = MessageListViewController()
         context.coordinator.attach(to: vc, vm: vm)
+        let messageBackground = PokiTheme.uiBackground
+        vc.view.backgroundColor = messageBackground
+        vc.collectionView.backgroundColor = messageBackground
         // Drops are handled exclusively by the SwiftUI `.onDrop` on the chat
         // root view. Previously a UIDropInteraction here intercepted drops on
         // top of the collection view, which (a) suppressed SwiftUI's
@@ -143,6 +146,9 @@ struct CollectionViewMessageListV3: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ vc: MessageListViewController, context: Context) {
+        let messageBackground = PokiTheme.uiBackground
+        vc.view.backgroundColor = messageBackground
+        vc.collectionView.backgroundColor = messageBackground
         let coord = context.coordinator
         // [T-ios-scrollbtn-vm-split] The coordinator captured `vm` once in
         // makeUIViewController → attach. SwiftUI reuses this representable's

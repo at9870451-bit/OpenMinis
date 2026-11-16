@@ -271,14 +271,14 @@ final class VideoAttachment: NSTextAttachment {
         let filename = source.components(separatedBy: "/").last ?? source
         let filmIconCfg = UIImage.SymbolConfiguration(pointSize: 10, weight: .regular)
         let filmIcon = UIImageView(image: UIImage(systemName: "film", withConfiguration: filmIconCfg))
-        filmIcon.tintColor = .secondaryLabel
+        filmIcon.tintColor = PokiTheme.uiSecondaryText
         filmIcon.frame = CGRect(x: 0, y: h + 6, width: 14, height: 12)
         container.addSubview(filmIcon)
 
         let label = UILabel()
         label.text = filename
         label.font = .systemFont(ofSize: 12)
-        label.textColor = .secondaryLabel
+        label.textColor = PokiTheme.uiSecondaryText
         label.lineBreakMode = .byTruncatingMiddle
         label.frame = CGRect(x: 18, y: h + 4, width: maxWidth - 18, height: 16)
         container.addSubview(label)
@@ -298,14 +298,14 @@ final class VideoAttachment: NSTextAttachment {
         let container = UIView(frame: CGRect(x: 0, y: 0, width: totalWidth, height: h))
 
         let bg = UIView(frame: CGRect(x: 0, y: 0, width: maxWidth, height: h))
-        bg.backgroundColor = .secondarySystemBackground
+        bg.backgroundColor = PokiTheme.uiSurface
         bg.layer.cornerRadius = 8
         bg.clipsToBounds = true
         container.addSubview(bg)
 
         let iconConfig = UIImage.SymbolConfiguration(pointSize: 44, weight: .regular)
         let icon = UIImageView(image: UIImage(systemName: "play.circle.fill", withConfiguration: iconConfig))
-        icon.tintColor = .tertiaryLabel
+        icon.tintColor = PokiTheme.uiSecondaryText
         icon.sizeToFit()
         icon.center = CGPoint(x: bg.bounds.midX, y: bg.bounds.midY - 12)
         bg.addSubview(icon)
@@ -314,7 +314,7 @@ final class VideoAttachment: NSTextAttachment {
         let label = UILabel()
         label.text = filename
         label.font = .systemFont(ofSize: 12)
-        label.textColor = .secondaryLabel
+        label.textColor = PokiTheme.uiSecondaryText
         label.textAlignment = .center
         label.frame = CGRect(x: 8, y: icon.frame.maxY + 8, width: bg.bounds.width - 16, height: 16)
         bg.addSubview(label)

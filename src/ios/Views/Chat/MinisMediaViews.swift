@@ -453,7 +453,7 @@ struct AsyncImageTile: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .strokeBorder(Color.primary.opacity(0.15), lineWidth: 0.5)
+                            .strokeBorder(PokiTheme.primaryText.opacity(0.15), lineWidth: 0.5)
                     )
                     .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
             } else {
@@ -511,7 +511,7 @@ struct AsyncVideoTile: View {
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
-                                .strokeBorder(Color.primary.opacity(0.15), lineWidth: 0.5)
+                                .strokeBorder(PokiTheme.primaryText.opacity(0.15), lineWidth: 0.5)
                         )
                         .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
                 } else {
@@ -561,10 +561,10 @@ private func attachmentPlaceholderTile(icon: String, size: CGFloat) -> some View
     VStack(spacing: 4) {
         Image(systemName: icon)
             .font(.system(size: 22))
-            .foregroundStyle(.tertiary)
+            .foregroundStyle(PokiTheme.secondaryText)
     }
     .frame(width: size, height: size)
-    .background(Color(.systemGray6))
+    .background(PokiTheme.surface)
     .clipShape(RoundedRectangle(cornerRadius: 8))
 }
 
@@ -695,7 +695,7 @@ private struct MinisImageView: View {
                         .frame(maxWidth: 400, maxHeight: maxH, alignment: .leading)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                         .overlay(RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(UIColor.separator).opacity(0.5), lineWidth: 0.5))
+                            .stroke(PokiTheme.divider.opacity(0.5), lineWidth: 0.5))
                         .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .onTapGesture { showFullscreen = true }
@@ -722,7 +722,7 @@ private struct MinisImageView: View {
                 .frame(maxWidth: 400, maxHeight: maxH, alignment: .leading)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .overlay(RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(UIColor.separator).opacity(0.5), lineWidth: 0.5))
+                    .stroke(PokiTheme.divider.opacity(0.5), lineWidth: 0.5))
                 .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .onTapGesture { showFullscreen = true }
@@ -989,7 +989,7 @@ private struct MinisTextView: UIViewRepresentable {
         textView.isSelectable = true
         textView.backgroundColor = .clear
         textView.font = .monospacedSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .caption1).pointSize, weight: .regular)
-        textView.textColor = .label
+        textView.textColor = PokiTheme.uiPrimaryText
         textView.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
         textView.dataDetectorTypes = []
         return textView

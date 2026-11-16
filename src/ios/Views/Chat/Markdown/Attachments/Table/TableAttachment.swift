@@ -759,7 +759,7 @@ final class TableAttachment: NSTextAttachment {
     }
 
     private func renderCellInline(_ node: InlineNode, font: UIFont) -> NSAttributedString {
-        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: UIColor.label]
+        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: PokiTheme.uiPrimaryText]
         switch node {
         case .text(let text):
             return NSAttributedString(string: text, attributes: attrs)
@@ -902,7 +902,7 @@ final class TableAttachment: NSTextAttachment {
         // light/dark mode that was active *at resolution time*. When this
         // attachment view is created off-window (typical for the first
         // streaming render of a table), the trait collection is the default
-        // (light mode) and resolving `UIColor.label` at 25% alpha gives a
+        // (light mode) and resolving `PokiTheme.uiPrimaryText` at 25% alpha gives a
         // near-black border that disappears against the dark message
         // background. Re-entering the session creates the view while the
         // textView is on-window with the right trait collection, which is
@@ -946,7 +946,7 @@ final class TableAttachment: NSTextAttachment {
         // No dedicated table-background in the theme; use the system background
         // so the copied image is legible (adapts to light/dark) behind the
         // cell text, which carries its own foreground colors.
-        let tableBg = UIColor.systemBackground
+        let tableBg = PokiTheme.uiBackground
         let tableBorder = theme.tableBorderColor
         let copyTableImage: () -> Void = { [weak stack] in
             guard let stack, stack.bounds.width > 0, stack.bounds.height > 0 else { return }

@@ -29,14 +29,14 @@ struct SwipeToSendHint: View {
             let capsuleStart = max(0, armFraction - 0.4)
             let capsuleSpan = max(0.0001, armFraction - capsuleStart)
             let capsuleAlpha = max(0, min(1, (progress - capsuleStart) / capsuleSpan))
-            // `ChatColors.sendButton == UIColor.label` (auto-inverts:
+            // `ChatColors.sendButton == PokiTheme.uiPrimaryText` (auto-inverts:
             // black in light, white in dark). For this floating hint we
             // need a clearly-contrasting *glyph on top of the circle* and
             // *text on top of the capsule* — both must use the inverse
-            // (`UIColor.systemBackground`), otherwise dark mode renders
+            // (`PokiTheme.uiBackground`), otherwise dark mode renders
             // white-on-white and the indicator vanishes (bug 2026-05-18).
             let chipBg = ChatColors.sendButton
-            let chipFg = Color(UIColor.systemBackground)
+            let chipFg = PokiTheme.primaryButtonText
             HStack(spacing: 8) {
                 Image(systemName: "arrow.up.circle.fill")
                     .font(.system(size: 34))
@@ -256,7 +256,7 @@ private struct VideoLoadingChip: View {
         .frame(width: 64, height: 64)
         .background(ChatColors.secondaryBg)
         .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4), lineWidth: 0.5))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(PokiTheme.divider, lineWidth: 0.5))
     }
 }
 
@@ -307,7 +307,7 @@ private struct AttachmentChip: View {
             .frame(width: 64, height: 64)
             .background(ChatColors.secondaryBg)
             .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4), lineWidth: 0.5))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(PokiTheme.divider, lineWidth: 0.5))
     }
 
     /// [T-ios-photo-pick-placeholder] Error chip for a photo that failed to load.
@@ -351,7 +351,7 @@ private struct AttachmentChip: View {
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 64, height: 64)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4), lineWidth: 0.5))
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(PokiTheme.divider, lineWidth: 0.5))
                         .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
 
                     if isVideo {
@@ -460,7 +460,7 @@ private struct AttachmentChip: View {
             .frame(width: 64, height: 64)
             .background(ChatColors.secondaryBg)
             .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4), lineWidth: 0.5))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(PokiTheme.divider, lineWidth: 0.5))
 
             Button {
                 onRemove()
@@ -532,7 +532,7 @@ struct PastedTextChipRow: View {
                         .frame(width: 64, height: 64)
                         .background(ChatColors.secondaryBg)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4), lineWidth: 0.5))
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(PokiTheme.divider, lineWidth: 0.5))
                         .contentShape(RoundedRectangle(cornerRadius: 8))
                         // The ✕ Button keeps priority for its own hit area; the
                         // rest of the card opens the read-only preview.
@@ -893,7 +893,7 @@ struct UserAttachmentList: View {
             .frame(width: tileSize, height: tileSize)
             .background(ChatColors.secondaryBg)
             .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4), lineWidth: 0.5))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(PokiTheme.divider, lineWidth: 0.5))
         }
         .buttonStyle(.plain)
     }
@@ -1009,14 +1009,14 @@ struct QueuedAttachmentPreview: View {
         VStack(spacing: 4) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             Text(fileName)
                 .font(.system(size: 8))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .lineLimit(1)
         }
         .frame(width: tileSize, height: tileSize)
-        .background(RoundedRectangle(cornerRadius: 8).fill(Color(.systemGray5)))
+        .background(RoundedRectangle(cornerRadius: 8).fill(PokiTheme.surface))
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .opacity(0.7)
     }
@@ -1701,6 +1701,8 @@ struct PastableTextView: UIViewRepresentable {
         tv.delegate = context.coordinator
         tv.font = UIFont.systemFont(ofSize: FontSettings.shared.scaledChatInput(16.5))
         tv.backgroundColor = .clear
+        tv.textColor = PokiTheme.uiPrimaryText
+        tv.tintColor = PokiTheme.uiPrimaryText
         if let maxHeightOverride { tv.maxHeight = maxHeightOverride }
         tv.isScrollEnabled = false
         tv.textContainerInset = .zero
@@ -1769,7 +1771,7 @@ struct PastableTextView: UIViewRepresentable {
         let placeholderLabel = UILabel()
         placeholderLabel.text = placeholder
         placeholderLabel.font = UIFont.systemFont(ofSize: FontSettings.shared.scaledChatInput(16.5))
-        placeholderLabel.textColor = .placeholderText
+        placeholderLabel.textColor = PokiTheme.uiSecondaryText
         placeholderLabel.tag = 999
         placeholderLabel.numberOfLines = 0
         placeholderLabel.lineBreakMode = .byWordWrapping
@@ -2571,7 +2573,7 @@ struct PastableTextView: UIViewRepresentable {
         private static func attributedHint(_ page: ContextUsageHint.Page, font: UIFont) -> NSAttributedString {
             let attributed = NSMutableAttributedString(
                 string: page.text,
-                attributes: [.font: font, .foregroundColor: UIColor.placeholderText])
+                attributes: [.font: font, .foregroundColor: PokiTheme.uiSecondaryText])
             let emphasis = UIFont.systemFont(ofSize: font.pointSize, weight: .medium)
             let ns = page.text as NSString
             if let tone = page.tier.highlightColor {

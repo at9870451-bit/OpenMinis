@@ -61,6 +61,10 @@ struct BackupDestinationDetailView: View {
             case .folder(let f): folderSections(f)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         // These MUST hang off the Form, not off a Section inside
@@ -241,9 +245,9 @@ struct BackupDestinationDetailView: View {
             } label: {
                 LabeledContent("Name") {
                     HStack(spacing: 6) {
-                        Text(current.name).foregroundStyle(.secondary)
+                        Text(current.name).foregroundStyle(PokiTheme.secondaryText)
                         Image(systemName: "chevron.right")
-                            .font(.caption2).foregroundStyle(.tertiary)
+                            .font(.caption2).foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             }
@@ -255,11 +259,11 @@ struct BackupDestinationDetailView: View {
                 LabeledContent("Backup folder") {
                     HStack(spacing: 6) {
                         Text(current.path.isEmpty ? "/" : "/\(current.path)")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .lineLimit(1)
                             .truncationMode(.head)
                         Image(systemName: "chevron.right")
-                            .font(.caption2).foregroundStyle(.tertiary)
+                            .font(.caption2).foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             }
@@ -288,19 +292,23 @@ struct BackupDestinationDetailView: View {
                 Label {
                     Text("Edit Connection…")
                 } icon: {
-                    BackupActionIcon(systemName: "pencil", tint: .blue)
+                    BackupActionIcon(systemName: "pencil", tint: PokiTheme.primaryButton)
                 }
             }
         } header: {
             Text("Configuration")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             Text("Tap the name or folder to change them, or edit the connection to change the address and password.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
 
         if let errorText {
             Section {
-                Text(errorText).font(.footnote).foregroundStyle(.red)
+                Text(errorText).font(.footnote).foregroundStyle(PokiTheme.danger)
             }
+            .listRowBackground(PokiTheme.surface)
         }
 
         Section {
@@ -330,7 +338,7 @@ struct BackupDestinationDetailView: View {
                         // action this is, and the colour carries the outcome.
                         Text(testResult)
                             .font(.footnote)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(PokiTheme.primaryText)
                     }
                 }
             }
@@ -357,20 +365,22 @@ struct BackupDestinationDetailView: View {
                 Label {
                     Text("Remove Destination")
                 } icon: {
-                    BackupActionIcon(systemName: "trash.fill", tint: .red)
+                    BackupActionIcon(systemName: "trash.fill", tint: PokiTheme.danger)
                 }
             }
         } footer: {
             // Say what is NOT destroyed — otherwise "remove" next to a list of
             // stored backups reads as though it deletes them.
             Text("Removing forgets this server and its password on this iPhone. Backups already stored on the server are left untouched.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
 
         Section {
             if isLoadingPackages {
-                HStack { ProgressView(); Text("Loading…").foregroundStyle(.secondary) }
+                HStack { ProgressView(); Text("Loading…").foregroundStyle(PokiTheme.secondaryText) }
             } else if packages.isEmpty {
-                Text("No backups found here yet.").foregroundStyle(.secondary)
+                Text("No backups found here yet.").foregroundStyle(PokiTheme.secondaryText)
             } else {
                 ForEach(packages) { p in
                     VStack(alignment: .leading, spacing: 2) {
@@ -379,7 +389,7 @@ struct BackupDestinationDetailView: View {
                             .truncationMode(.middle)
                         Text(detail(for: p))
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                     // [T-backup-remote-delete] Swipe to delete the file ON THE
                     // SERVER. Confirmed rather than immediate: unlike deleting
@@ -398,14 +408,17 @@ struct BackupDestinationDetailView: View {
             }
         } header: {
             Text("Backups Stored Here")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             // The gesture is invisible until tried, and what it does here is
             // irreversible — so it is stated rather than left to be
             // discovered by someone swiping to see what happens.
             if !packages.isEmpty {
                 Text("Swipe a backup left to delete it. Deleted backup files cannot be recovered.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
         }
+        .listRowBackground(PokiTheme.surface)
 
         .task { await loadPackages(r) }
     }
@@ -444,15 +457,18 @@ struct BackupDestinationDetailView: View {
                                                                  time: .shortened))
         } header: {
             Text("Configuration")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             // Says where the folder really lives, since the same row could be
             // a local directory or a server mounted in Files.
             Text("Folders come from the Files app — on this iPhone, iCloud Drive, or a connected server.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
 
         Section {
             if folderPackages.isEmpty {
-                Text("No backups found here yet.").foregroundStyle(.secondary)
+                Text("No backups found here yet.").foregroundStyle(PokiTheme.secondaryText)
             } else {
                 ForEach(folderPackages) { p in
                     VStack(alignment: .leading, spacing: 2) {
@@ -461,7 +477,7 @@ struct BackupDestinationDetailView: View {
                             .truncationMode(.middle)
                         Text("\(ByteCountFormatter.string(fromByteCount: p.size, countStyle: .file)) · \(p.modified.formatted(date: .abbreviated, time: .shortened))")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                     // [T-backup-folder-delete] Swipe to delete the file in the
                     // folder, matching the server list above — a user who has
@@ -480,14 +496,17 @@ struct BackupDestinationDetailView: View {
             }
         } header: {
             Text("Backups Stored Here")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             // The gesture is invisible until tried, and what it does here is
             // irreversible — so it is stated rather than left to be
             // discovered by someone swiping to see what happens.
             if !folderPackages.isEmpty {
                 Text("Swipe a backup left to delete it. Deleted backup files cannot be recovered.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
         }
+        .listRowBackground(PokiTheme.surface)
         .task(id: f.id) { await loadFolderPackages(f) }
     }
 
@@ -599,11 +618,11 @@ struct RcloneFolderBrowser: View {
                         }
                     }
                     if isListing {
-                        HStack { ProgressView(); Text("Loading…").foregroundStyle(.secondary) }
+                        HStack { ProgressView(); Text("Loading…").foregroundStyle(PokiTheme.secondaryText) }
                     } else if visibleEntries.isEmpty {
                         Text(showsFiles ? "This folder is empty."
                                         : "No folders here.")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     } else {
                         ForEach(visibleEntries) { e in
                             if e.isDir {
@@ -614,12 +633,12 @@ struct RcloneFolderBrowser: View {
                                         Label(e.name, systemImage: "folder.fill")
                                         Spacer()
                                         Image(systemName: "chevron.right")
-                                            .font(.caption2).foregroundStyle(.tertiary)
+                                            .font(.caption2).foregroundStyle(PokiTheme.secondaryText)
                                     }
                                 }
                             } else {
                                 Label(e.name, systemImage: "doc")
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
@@ -628,11 +647,11 @@ struct RcloneFolderBrowser: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             Text(currentDir.isEmpty ? "/" : "/\(currentDir)")
                                 .font(.footnote.weight(.medium))
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(PokiTheme.primaryText)
                                 .lineLimit(1)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
-                                .background(Color(.secondarySystemFill), in: Capsule())
+                                .background(PokiTheme.surface, in: Capsule())
                         }
                         Button {
                             newFolderName = ""
@@ -641,15 +660,21 @@ struct RcloneFolderBrowser: View {
                             Label("New Folder", systemImage: "folder.badge.plus")
                                 .labelStyle(.iconOnly)
                                 .font(.body)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         }
                         .buttonStyle(.borderless)
                         .disabled(isListing)
                     }
                     .textCase(nil)
                 }
+                .listRowBackground(PokiTheme.surface)
 
             }
             .backupHUD($errorText)
+            .scrollContentBackground(.hidden)
+            .background(PokiTheme.background)
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.primaryButton)
             .navigationTitle("Backup Folder")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -775,11 +800,11 @@ struct RcloneConnectionEditor: View {
                                 HStack(spacing: 6) {
                                     Text(f.label)
                                         .font(.footnote.weight(.medium))
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                     if f.isOptional {
                                         Text("Optional")
                                             .font(.caption2)
-                                            .foregroundStyle(.tertiary)
+                                            .foregroundStyle(PokiTheme.secondaryText)
                                     }
                                 }
                                 TextField(f.placeholder.isEmpty ? f.label : f.placeholder,
@@ -790,14 +815,16 @@ struct RcloneConnectionEditor: View {
                                 if !f.hint.isEmpty {
                                     Text(f.hint)
                                         .font(.caption)
-                                        .foregroundStyle(.tertiary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                 }
                             }
                             .padding(.vertical, 2)
                         }
                     } header: {
                         Text("Connection")
+                        .foregroundStyle(PokiTheme.secondaryText)
                     }
+                    .listRowBackground(PokiTheme.surface)
 
                     if b.fields.contains(where: \.isSecret) {
                         Section {
@@ -807,20 +834,28 @@ struct RcloneConnectionEditor: View {
                             Toggle("No password (anonymous)", isOn: $clearSecret.animation())
                         } header: {
                             Text("Password")
+                            .foregroundStyle(PokiTheme.secondaryText)
                         } footer: {
                             Text(clearSecret
                                  ? "The stored password will be removed."
                                  : "Leave blank to keep the current password.")
+                            .foregroundStyle(PokiTheme.secondaryText)
                         }
+                        .listRowBackground(PokiTheme.surface)
                     }
                 }
 
                 if let errorText {
                     Section {
-                        Text(errorText).font(.footnote).foregroundStyle(.red)
+                        Text(errorText).font(.footnote).foregroundStyle(PokiTheme.danger)
                     }
+                    .listRowBackground(PokiTheme.surface)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(PokiTheme.background)
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.primaryButton)
             .navigationTitle("Edit Connection")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

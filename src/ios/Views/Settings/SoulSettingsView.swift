@@ -44,6 +44,7 @@ struct SoulSettingsView: View {
             Section {
                 previewCard
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section(AppLocalized("Identity")) {
                 LabeledContent(AppLocalized("Name")) {
@@ -62,14 +63,17 @@ struct SoulSettingsView: View {
                     }
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 personalityEditor
             } header: {
                 Text(AppLocalized("Personality Prompt"))
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 bodyLengthFooter
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Button(role: .destructive) {
@@ -92,22 +96,28 @@ struct SoulSettingsView: View {
                             Spacer()
                             if showForceSyncDone {
                                 Text(AppLocalized("Queued"))
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(PokiTheme.primaryText)
                                     .font(.caption)
                             }
                         }
                     }
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             if let saveError {
                 Section {
                     Text(saveError)
                         .font(.footnote)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(PokiTheme.danger)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(AppLocalized("Soul"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -143,8 +153,8 @@ struct SoulSettingsView: View {
                 Text(AppLocalized("Saved"))
                     .font(.footnote.weight(.medium))
                     .padding(.horizontal, 14).padding(.vertical, 8)
-                    .background(Color.green.opacity(0.85), in: Capsule())
-                    .foregroundStyle(.white)
+                    .background(PokiTheme.primaryButton, in: Capsule())
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .padding(.bottom, 24)
                     .transition(.opacity)
             }
@@ -174,9 +184,9 @@ struct SoulSettingsView: View {
                 SoulIconView(icon: icon, size: SoulIconImage.renderPoints)
                     .frame(width: 44, height: 44)
                     .frame(width: 52, height: 52)
-                    .background(Circle().fill(Color.secondary.opacity(0.12)))
+                    .background(Circle().fill(PokiTheme.surface))
                     .overlay(
-                        Circle().strokeBorder(Color.secondary.opacity(0.18), lineWidth: 0.5)
+                        Circle().strokeBorder(PokiTheme.divider, lineWidth: 0.5)
                     )
                     // The badge sits INSIDE the circle's bounds rather than
                     // straddling its edge. Overhanging it (even with padding)
@@ -192,10 +202,10 @@ struct SoulSettingsView: View {
                     .overlay(alignment: .bottomTrailing) {
                         Image(systemName: "pencil")
                             .font(.system(size: 9, weight: .semibold))
-                            .foregroundStyle(Color.white)
+                            .foregroundStyle(PokiTheme.primaryButtonText)
                             .frame(width: 18, height: 18)
-                            .background(Circle().fill(Color.accentColor))
-                            .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: 1.5))
+                            .background(Circle().fill(PokiTheme.primaryButton))
+                            .overlay(Circle().strokeBorder(PokiTheme.background, lineWidth: 1.5))
                             .offset(x: 1, y: 1)
                     }
             }
@@ -233,7 +243,7 @@ struct SoulSettingsView: View {
                 if !style.trimmingCharacters(in: .whitespaces).isEmpty {
                     Text(style)
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
             Spacer(minLength: 0)
@@ -254,7 +264,7 @@ struct SoulSettingsView: View {
             if bodyText.isEmpty {
                 Text(AppLocalized("Describe the personality and voice you want for your agent"))
                     .font(.system(.body, design: .monospaced))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .padding(.top, 8)
                     .padding(.leading, 5)
                     .allowsHitTesting(false)
@@ -270,15 +280,15 @@ struct SoulSettingsView: View {
         return HStack(spacing: 6) {
             if check.isOverLimit {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
             }
             switch check {
             case .ok:
                 Text(soulBodyCountText(bodyText))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             case .overLimit(let count, let cap):
                 Text(AppLocalized("Over limit: \(count) / \(cap) tokens. Each CJK character and each Latin word counts as one."))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
             }
         }
         .font(.footnote)
@@ -432,7 +442,7 @@ private struct SoulEmojiPickerSheet: View {
                 // shows what the icon will actually look like in place.
                 SoulIconView(icon: draft, size: SoulIconImage.renderPoints)
                     .frame(width: 52, height: 52)
-                    .background(Circle().fill(Color.secondary.opacity(0.12)))
+                    .background(Circle().fill(PokiTheme.surface))
                     .padding(.top, 8)
 
                 ForEach(Array(Self.suggestions.enumerated()), id: \.offset) { _, row in
@@ -448,8 +458,8 @@ private struct SoulEmojiPickerSheet: View {
                                     .frame(width: 38, height: 38)
                                     .background(
                                         Circle().fill(draft == emoji
-                                                      ? Color.accentColor.opacity(0.22)
-                                                      : Color.secondary.opacity(0.10))
+                                                      ? PokiTheme.selection
+                                                      : PokiTheme.surface)
                                     )
                             }
                             .buttonStyle(.plain)
@@ -461,7 +471,7 @@ private struct SoulEmojiPickerSheet: View {
                     .font(.system(size: 28))
                     .multilineTextAlignment(.center)
                     .frame(height: 52)
-                    .background(Color.secondary.opacity(0.10), in: RoundedRectangle(cornerRadius: 10))
+                    .background(PokiTheme.surface, in: RoundedRectangle(cornerRadius: 10))
                     // Every keystroke is normalized to a single emoji: typing
                     // a second one REPLACES the first, and non-emoji input is
                     // dropped outright rather than rejected later with an
@@ -473,12 +483,15 @@ private struct SoulEmojiPickerSheet: View {
 
                 Text(AppLocalized("Tap a suggestion or type one emoji. These render the same on iOS and Android."))
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .multilineTextAlignment(.center)
 
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 20)
+            .background(PokiTheme.background)
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.primaryButton)
             .navigationTitle(AppLocalized("Choose Emoji"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -62,7 +62,7 @@ struct CompactSummarySheet: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
@@ -72,7 +72,7 @@ struct CompactSummarySheet: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { copied = false }
                     } label: {
                         Image(systemName: copied ? "checkmark.circle.fill" : "doc.on.doc.fill")
-                            .foregroundStyle(copied ? .green : .secondary)
+                            .foregroundStyle(copied ? Color.green : PokiTheme.secondaryText)
                     }
                 }
             }
@@ -107,7 +107,7 @@ private struct SelectableTextView: UIViewRepresentable {
         // policy so a future SDK default cannot silently opt this view in.
         tv.dataDetectorTypes = []
         tv.font = .systemFont(ofSize: 14)
-        tv.textColor = .label
+        tv.textColor = PokiTheme.uiPrimaryText
         tv.backgroundColor = .clear
         tv.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 20, right: 0)
         tv.textContainer.lineFragmentPadding = 0

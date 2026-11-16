@@ -52,7 +52,7 @@ struct CopilotDeviceLoginSheet: View {
                 case .starting:
                     ProgressView()
                     Text(AppLocalized("Contacting GitHub…"))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
 
                 case let .awaitingUser(userCode, url):
                     awaitingBody(userCode: userCode, url: url)
@@ -70,14 +70,17 @@ struct CopilotDeviceLoginSheet: View {
                         .foregroundStyle(.orange)
                     Text(message)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .multilineTextAlignment(.center)
                     Button(AppLocalized("Try Again")) { start() }
                         .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
+            .pokiScreen()
             .navigationTitle(AppLocalized("GitHub Copilot Login"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -161,7 +164,7 @@ struct CopilotDeviceLoginSheet: View {
                         comment: "Copilot disclaimer: as-is, user accepts the risk"))
                 }
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.bottom, 8)
@@ -175,6 +178,8 @@ struct CopilotDeviceLoginSheet: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
         .tint(.orange)
     }
 
@@ -195,7 +200,7 @@ struct CopilotDeviceLoginSheet: View {
         // instruction. Tapping the code still works for anyone who wants it.
         Text(AppLocalized("1. Open the verification page — this copies the code\n2. Paste it to authorize Minis"))
             .font(.subheadline)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(PokiTheme.secondaryText)
             .multilineTextAlignment(.center)
 
         // Tap to copy — the code is long enough that retyping it in a browser
@@ -209,7 +214,7 @@ struct CopilotDeviceLoginSheet: View {
                     .font(.system(.title, design: .monospaced).weight(.semibold))
                 Image(systemName: copied ? "checkmark" : "doc.on.doc")
                     .font(.body)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 20)
@@ -232,12 +237,14 @@ struct CopilotDeviceLoginSheet: View {
             Label(AppLocalized("Open verification page"), systemImage: "safari")
         }
         .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
 
         HStack(spacing: 6) {
             ProgressView().controlSize(.small)
             Text(AppLocalized("Waiting for authorization…"))
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
         .padding(.top, 4)
     }

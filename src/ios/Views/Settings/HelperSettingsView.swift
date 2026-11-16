@@ -36,12 +36,14 @@ struct HelperSettingsView: View {
                         Text(AppLocalized("Sub Agents"))
                         Text(SubAgentDefinition.toolName)
                             .font(.caption.monospaced())
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             } footer: {
                 Text(AppLocalized("Delegate self-contained sub-tasks to a sub agent that works in its own hidden session and reports back. The same tool also lets the assistant check on or stop what it started. Several agents can run at once, so a large fan-out uses correspondingly more of your quota. On by default; when off, it is not offered to the model at all."))
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 ForEach(roster) { def in
@@ -68,25 +70,32 @@ struct HelperSettingsView: View {
             } header: {
                 HStack {
                     Text(AppLocalized("Sub Agents"))
+                    .foregroundStyle(PokiTheme.secondaryText)
                     Spacer()
                     if roster.count > 1 { EditButton().font(.caption) }
                 }
             } footer: {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(AppLocalized("The assistant picks a sub agent by its description, so write the description as “when to use this”. Order is the order it sees them in."))
+                    .foregroundStyle(PokiTheme.secondaryText)
                     if !store.canAddSubAgent {
                         Text(String(format: AppLocalized("You can define up to %d sub agents."), SubAgentLimits.maxCount))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
                 .font(.caption)
             }
+            .listRowBackground(PokiTheme.surface)
             // Greyed out but still editable when the switch is off: off means
             // "not offered to the model", not "cannot be configured" — same
             // rule the other tool switches follow.
             .opacity(agentsEnabled ? 1 : 0.5)
         }
         .environment(\.editMode, $editMode)
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(AppLocalized("Sub Agents"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $editorTarget) { target in
@@ -104,24 +113,24 @@ struct HelperSettingsView: View {
                         Text(AppLocalized("Built-in"))
                             .font(.caption2)
                             .padding(.horizontal, 5).padding(.vertical, 1)
-                            .background(Color.secondary.opacity(0.15), in: Capsule())
-                            .foregroundStyle(.secondary)
+                            .background(PokiTheme.tagBackground, in: Capsule())
+                            .foregroundStyle(PokiTheme.tagText)
                     }
                 }
                 if !def.displayDescription.isEmpty {
                     Text(def.displayDescription)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .lineLimit(1)
                 }
                 Text(modelLabel(def))
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
         .contentShape(Rectangle())
     }
@@ -197,7 +206,7 @@ struct SubAgentEditorView: View {
                 // editable: those are genuinely the user's call.
                 Section {
                     if isBuiltIn {
-                        Text(existing?.displayName ?? name).foregroundStyle(.secondary)
+                        Text(existing?.displayName ?? name).foregroundStyle(PokiTheme.secondaryText)
                     } else {
                         TextField(AppLocalized("Name"), text: $name)
                             .autocorrectionDisabled()
@@ -205,16 +214,18 @@ struct SubAgentEditorView: View {
                     }
                 } header: {
                     Text(AppLocalized("Name"))
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     if nameIsDuplicate {
                         Text(AppLocalized("Another sub agent already uses this name."))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(PokiTheme.danger)
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
 
                 Section {
                     if isBuiltIn {
-                        Text(existing?.displayDescription ?? descriptionText).foregroundStyle(.secondary)
+                        Text(existing?.displayDescription ?? descriptionText).foregroundStyle(PokiTheme.secondaryText)
                     } else {
                         TextField(AppLocalized("Description"), text: $descriptionText, axis: .vertical)
                             .lineLimit(2...4)
@@ -222,11 +233,14 @@ struct SubAgentEditorView: View {
                     }
                 } header: {
                     Text(AppLocalized("Description"))
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     Text(isBuiltIn
                          ? AppLocalized("The built-in sub agent's name and description are fixed. You can still change its model and instructions.")
                          : AppLocalized("Describe when this sub agent should be used. Keep it short — details go in Instructions."))
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
 
                 Section {
                     TextField(AppLocalized("Instructions"), text: $instructions, axis: .vertical)
@@ -234,6 +248,7 @@ struct SubAgentEditorView: View {
                     counter(instructions.count, SubAgentLimits.instructionsMaxLength)
                 } header: {
                     Text(AppLocalized("Instructions"))
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     // Two different footers, because the built-in's instructions
                     // are the default for every unnamed delegation while a
@@ -243,7 +258,9 @@ struct SubAgentEditorView: View {
                     Text(isBuiltIn
                          ? AppLocalized("These instructions apply to every delegation that does not name a sub agent. Custom sub agents use their own.")
                          : AppLocalized("These instructions apply only to this sub agent."))
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
 
                 Section {
                     Picker(AppLocalized("Model"), selection: $modelGroupId) {
@@ -254,9 +271,12 @@ struct SubAgentEditorView: View {
                     }
                 } header: {
                     Text(AppLocalized("Model"))
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     Text(AppLocalized("Auto lets the assistant choose per task: the same model as the conversation, your Default group for hard reasoning, or your light group for simple well-defined work. Pick a specific Model Group instead to run this sub agent on it every time."))
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
 
                 // [T-subagent-thinking-override] Same shape as a Model Group's
                 // own Session Defaults section: a toggle for "set one at all",
@@ -270,10 +290,10 @@ struct SubAgentEditorView: View {
                             Image("ThinkingIcon")
                                 .resizable()
                                 .renderingMode(.template)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.tagText)
                                 .frame(width: 11, height: 11)
                                 .frame(width: 21, height: 21)
-                                .background(.purple, in: Circle())
+                                .background(PokiTheme.aiAccent, in: Circle())
                             Text(AppLocalized("Override Reasoning"))
                         }
                     }
@@ -302,12 +322,19 @@ struct SubAgentEditorView: View {
                     }
                 } header: {
                     Text(AppLocalized("Reasoning"))
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     Text(thinkingOverride == nil
                          ? AppLocalized("Off: runs use the reasoning level of the Model Group above, or of the conversation that delegated when the model is Auto.")
                          : AppLocalized("Every run of this sub agent uses this level, overriding the Model Group's own default. Models that cannot reason this hard are clamped to their own ceiling."))
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
+            .scrollContentBackground(.hidden)
+            .background(PokiTheme.background)
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.primaryButton)
             .navigationTitle(existing == nil ? AppLocalized("New Sub Agent") : AppLocalized("Edit Sub Agent"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -351,7 +378,7 @@ struct SubAgentEditorView: View {
             Spacer()
             Text("\(count)/\(limit)")
                 .font(.caption2)
-                .foregroundStyle(count > limit ? .red : .secondary)
+                .foregroundStyle(count > limit ? PokiTheme.danger : PokiTheme.secondaryText)
         }
     }
 

@@ -83,7 +83,7 @@ struct LazyLongTextView: View {
         return VStack(spacing: 8) {
             Text(String(format: AppLocalized("%d more sections"), remaining))
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             HStack(spacing: 16) {
                 Button {
                     revealed = min(revealed + Self.batchChunks, chunks.count)

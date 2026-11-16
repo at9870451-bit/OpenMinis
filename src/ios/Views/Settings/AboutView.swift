@@ -80,17 +80,17 @@ struct AboutView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 18))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 18)
-                                    .stroke(Color(UIColor.separator), lineWidth: 0.5)
+                                    .stroke(PokiTheme.divider, lineWidth: 0.5)
                             )
                     }
                     Text("Amore")
                         .font(.title2.bold())
                     Text("Version \(appVersion)")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Text("Built \(buildDate)")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         // Selectable so it can be copied into a bug report.
                         .textSelection(.enabled)
                     // [T-env-diagnostic-line] Sits with the build date because
@@ -98,16 +98,17 @@ struct AboutView: View {
                     // — and gets copied into the same bug reports.
                     Text(environmentLine)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .textSelection(.enabled)
                     Text("Minis is Your Fully Local, Fully Private On-Device Agent.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
                 .listRowBackground(Color.clear)
             }
+            .listRowBackground(PokiTheme.surface)
 
             // MARK: - Links
             Section("Links") {
@@ -115,11 +116,11 @@ struct AboutView: View {
                     Label {
                         HStack {
                             Text("GitHub Repository")
-                                .foregroundStyle(Color(UIColor.label))
+                                .foregroundStyle(PokiTheme.primaryText)
                             Spacer()
                             Image(systemName: "arrow.up.right.square")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     } icon: {
                         Image(systemName: "link.circle.fill")
@@ -129,18 +130,23 @@ struct AboutView: View {
                     Label {
                         HStack {
                             Text("Report an Issue")
-                                .foregroundStyle(Color(UIColor.label))
+                                .foregroundStyle(PokiTheme.primaryText)
                             Spacer()
                             Image(systemName: "arrow.up.right.square")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     } icon: {
                         Image(systemName: "exclamationmark.circle.fill")
                     }
                 }
             }
+            .listRowBackground(PokiTheme.surface)
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("About")
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -62,12 +62,12 @@ struct ExportPreviewSheet: View {
                     ScrollView {
                         Text(previewText)
                             .font(.system(size: 13, design: .monospaced))
-                            .foregroundStyle(Color(UIColor.label))
+                            .foregroundStyle(PokiTheme.primaryText)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(12)
                             .textSelection(.enabled)
                     }
-                    .background(Color(UIColor.secondarySystemBackground))
+                    .background(PokiTheme.surface)
                 }
 
                 Divider()
@@ -76,7 +76,7 @@ struct ExportPreviewSheet: View {
                 if !fileSize.isEmpty {
                     Text(fileSize)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                         .padding(.top, 6)
                 }
 
@@ -105,8 +105,9 @@ struct ExportPreviewSheet: View {
                     }
                 }
                 .padding(.vertical, 12)
-                .background(Color(UIColor.systemBackground))
+                .background(PokiTheme.background)
             }
+            .pokiScreen()
             .navigationTitle(AppLocalized("Export Preview"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -172,18 +173,18 @@ struct ExportPreviewSheet: View {
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .background(Color(UIColor.secondarySystemBackground))
+        .background(PokiTheme.surface)
     }
 
     private func summaryRow(_ key: String, _ value: String) -> some View {
         HStack(alignment: .firstTextBaseline) {
             Text(key)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             Spacer(minLength: 12)
             Text(value)
                 .font(.subheadline)
-                .foregroundStyle(.primary)
+                .foregroundStyle(PokiTheme.primaryText)
                 .multilineTextAlignment(.trailing)
         }
     }

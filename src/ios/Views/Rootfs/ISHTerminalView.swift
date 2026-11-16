@@ -95,6 +95,9 @@ struct ISHTerminalView: View {
         .background(Color.black)
         .navigationTitle("Minis Shell")
         .navigationBarTitleDisplayMode(.inline)
+        .tint(PokiTheme.primaryText)
+        .toolbarBackground(PokiTheme.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             if showCloseButton {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -494,8 +497,8 @@ struct QuickCommandButton: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(isActive ? Color.blue : Color(white: 0.25))
-            .foregroundColor(isActive ? .white : .green)
+            .background(isActive ? PokiTheme.primaryButton : PokiTheme.surface)
+            .foregroundColor(isActive ? PokiTheme.primaryButtonText : PokiTheme.primaryText)
             .cornerRadius(6)
         }
     }

@@ -100,7 +100,7 @@ struct SessionSkillsView: View {
                 } else if filteredSkills.isEmpty {
                     Section {
                         Text(AppLocalized("No skills match \"\(searchQuery)\"."))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .font(.subheadline)
                     }
                 } else {
@@ -115,7 +115,7 @@ struct SessionSkillsView: View {
                                         if !skill.description.isEmpty {
                                             Text(skill.description)
                                                 .font(.caption)
-                                                .foregroundStyle(.secondary)
+                                                .foregroundStyle(PokiTheme.secondaryText)
                                                 .lineLimit(2)
                                         }
                                     }
@@ -185,7 +185,7 @@ private struct SessionSkillDetailView: View {
                                     .font(.system(.subheadline, design: .monospaced))
                             } icon: {
                                 Image(systemName: iconName(for: relativePath))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
@@ -238,7 +238,7 @@ private struct SkillFilePreviewView: View {
                     }
                 } else {
                     Text("Could not load image.")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             } else {
                 ScrollView {

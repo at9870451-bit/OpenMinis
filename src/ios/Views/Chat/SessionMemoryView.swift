@@ -73,7 +73,7 @@ struct SessionMemoryView: View {
                 if !detail.isEmpty {
                     Text(detail)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .lineLimit(2)
                 }
             }
@@ -362,7 +362,7 @@ private struct MemoryWriteDetailView: View {
                         SectionHeader(title: "Tool Result")
                         Text(item.content)
                             .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
                             .textSelection(.enabled)
@@ -509,7 +509,7 @@ private struct MemoryGetDetailView: View {
                 if let kw = item.keywords, !kw.isEmpty {
                     HStack(spacing: 6) {
                         Image(systemName: "magnifyingglass")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text(kw)
                             .font(.subheadline.bold())
                     }
@@ -537,7 +537,7 @@ private struct SectionHeader: View {
     var body: some View {
         Text(title)
             .font(.caption.bold())
-            .foregroundStyle(.secondary)
+            .foregroundStyle(PokiTheme.secondaryText)
             .textCase(.uppercase)
             .padding(.horizontal)
     }

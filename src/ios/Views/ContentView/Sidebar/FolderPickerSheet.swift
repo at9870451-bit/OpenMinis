@@ -92,7 +92,7 @@ struct FolderPickerSheet: View {
                 Section {
                     HStack {
                         Image(systemName: "folder.badge.plus")
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundStyle(PokiTheme.tagText)
                         TextField("New Group Name", text: $newFolderName)
                             .focused($nameFieldFocused)
                             .submitLabel(.next)
@@ -124,7 +124,7 @@ struct FolderPickerSheet: View {
                                     ProgressView().controlSize(.small)
                                 } else {
                                     Image(systemName: "sparkles")
-                                        .foregroundStyle(Color.accentColor)
+                                        .foregroundStyle(PokiTheme.tagText)
                                 }
                                 Text(suggestFailed ? "AI Suggest (failed — try again)" : "AI Suggest")
                             }
@@ -152,7 +152,7 @@ struct FolderPickerSheet: View {
                                         .font(.subheadline)
                                     Text("Rename to something else, or tap to use it")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                 }
                             } icon: {
                                 Image(systemName: "exclamationmark.triangle.fill")
@@ -169,7 +169,7 @@ struct FolderPickerSheet: View {
                                 Text("Move into “\(merge.folderName)”?")
                             } icon: {
                                 Image(systemName: "sparkles")
-                                    .foregroundStyle(Color.accentColor)
+                                    .foregroundStyle(PokiTheme.tagText)
                             }
                         }
                     }
@@ -204,18 +204,18 @@ struct FolderPickerSheet: View {
                                 // row's text baseline lines up with the group rows.
                                 ZStack {
                                     Circle()
-                                        .fill(Color(UIColor.tertiarySystemFill))
+                                        .fill(PokiTheme.selection)
                                         .frame(width: 40, height: 40)
                                     Image(systemName: "folder.badge.minus")
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                 }
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("No Group")
-                                        .foregroundStyle(Color(UIColor.label))
+                                        .foregroundStyle(PokiTheme.primaryText)
                                         .lineLimit(1)
                                     Text("Remove from its current group")
                                         .font(.system(size: 13))
-                                        .foregroundStyle(Color(UIColor.secondaryLabel))
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                         .lineLimit(1)
                                 }
                                 Spacer()
@@ -240,7 +240,7 @@ struct FolderPickerSheet: View {
                                     VStack(alignment: .leading, spacing: 2) {
                                         // Folder names are user data — verbatim.
                                         Text(item.folder.name)
-                                            .foregroundStyle(Color(UIColor.label))
+                                            .foregroundStyle(PokiTheme.primaryText)
                                             .lineLimit(1)
                                         Group {
                                             if let sub = item.subtitle {
@@ -253,7 +253,7 @@ struct FolderPickerSheet: View {
                                             }
                                         }
                                         .font(.system(size: 13))
-                                        .foregroundStyle(Color(UIColor.secondaryLabel))
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                         .lineLimit(1)
                                     }
                                     Spacer()
@@ -263,11 +263,14 @@ struct FolderPickerSheet: View {
                     }
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
             // Explicitly typed: a bare ternary of two literals infers `String`,
             // which would pick the non-localizing navigationTitle overload and
             // ship the English source text to every locale. As
             // `LocalizedStringKey` both branches keep their `%lld` interpolation
             // and resolve through Localizable.xcstrings.
+            .pokiScreen()
             .navigationTitle(anyFiled
                              ? LocalizedStringKey("Change Group for \(sessionCount)")
                              : LocalizedStringKey("Move \(sessionCount) to Group"))

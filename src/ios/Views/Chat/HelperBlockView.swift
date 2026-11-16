@@ -341,11 +341,7 @@ enum HelperAccent {
     /// done, yellow = warning/timeout, system blue = thinking). Slightly
     /// deeper in light mode for contrast on the light card, lifted in dark
     /// mode so it stays luminous on near-black.
-    static let color = Color(UIColor { tc in
-        tc.userInterfaceStyle == .dark
-            ? UIColor(red: 0.64, green: 0.52, blue: 1.00, alpha: 1)   // #A385FF
-            : UIColor(red: 0.45, green: 0.30, blue: 0.93, alpha: 1)   // #734DED
-    })
+    static let color = PokiTheme.tagText
     /// Glyph with its own circular background — for places that draw the
     /// icon bare (detail header, tool sheet nav bar). [T-agent-icon]
     static let icon = "person.2.circle.fill"
@@ -474,7 +470,7 @@ struct HelperBlockView: View {
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(HelperAccent.color)
                         .padding(.horizontal, 5).padding(.vertical, 1)
-                        .background(HelperAccent.color.opacity(0.15))
+                        .background(PokiTheme.tagBackground)
                         .clipShape(Capsule())
                     SearchHighlightText(info.title, blockId: block.id, field: .title, messageId: searchMessageId)
                         .font(.system(size: 13, weight: .medium))
@@ -527,11 +523,11 @@ struct HelperBlockView: View {
                 // Stop takes the slot back on its own.
                 Button { resume() } label: {
                     ZStack {
-                        Circle().fill(HelperAccent.color.opacity(resuming ? 0.25 : 1))
+                        Circle().fill(PokiTheme.primaryButton.opacity(resuming ? 0.25 : 1))
                             .frame(width: 24, height: 24)
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PokiTheme.primaryButtonText)
                     }
                     .contentShape(Circle())
                 }
@@ -545,7 +541,7 @@ struct HelperBlockView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
-        .background(HelperAccent.color.opacity(0.07))
+        .background(PokiTheme.tagBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -830,7 +826,7 @@ struct HelperDetailCard: View {
                                 .foregroundStyle(HelperAccent.color)
                             }
                             if !activity.isEmpty {
-                                Text(activity).font(.system(size: 13)).foregroundStyle(Color(UIColor.label))
+                                Text(activity).font(.system(size: 13)).foregroundStyle(PokiTheme.primaryText)
                                     .textSelection(.enabled)
                             }
                         }
@@ -847,7 +843,7 @@ struct HelperDetailCard: View {
                             .resizable()
                             .scaledToFit()
                             .clipShape(RoundedRectangle(cornerRadius: 6))
-                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color(UIColor.separator).opacity(0.5), lineWidth: 0.5))
+                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(PokiTheme.divider.opacity(0.5), lineWidth: 0.5))
                     }
                 }
 
@@ -860,7 +856,7 @@ struct HelperDetailCard: View {
                                     icon: "exclamationmark.octagon") {
                         Text(detail)
                             .font(.system(size: 13, design: .monospaced))
-                            .foregroundStyle(Color(UIColor.label))
+                            .foregroundStyle(PokiTheme.primaryText)
                             .textSelection(.enabled)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -902,7 +898,7 @@ struct HelperDetailCard: View {
                         } else {
                             Text(AppLocalized("No deliverable was returned"))
                                 .font(.system(size: 13))
-                                .foregroundStyle(Color(UIColor.secondaryLabel))
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 }
@@ -971,11 +967,11 @@ struct HelperDetailCard: View {
                 VStack(alignment: .leading, spacing: 6) {
                     ForEach(Array(rows.enumerated()), id: \.offset) { _, r in
                         HStack(alignment: .top, spacing: 8) {
-                            Text(r.0).font(.system(size: 12)).foregroundStyle(Color(UIColor.secondaryLabel))
+                            Text(r.0).font(.system(size: 12)).foregroundStyle(PokiTheme.secondaryText)
                                 .lineLimit(1).minimumScaleFactor(0.8)
                                 .frame(width: 84, alignment: .leading)
                             Text(r.1).font(.system(size: 12, design: r.mono ? .monospaced : .default))
-                                .foregroundStyle(Color(UIColor.label))
+                                .foregroundStyle(PokiTheme.primaryText)
                                 .textSelection(.enabled)
                             // [T-subagent-thinking-badge] Same pill the main
                             // conversation's nav bar puts beside its model, so
@@ -995,7 +991,7 @@ struct HelperDetailCard: View {
                                 .foregroundStyle(ChatColors.secondaryText)
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 1)
-                                .background(Capsule().fill(Color.secondary.opacity(0.10)))
+                                .background(Capsule().fill(PokiTheme.secondaryText.opacity(0.10)))
                             }
                         }
                     }
@@ -1015,7 +1011,7 @@ struct HelperDetailCard: View {
                 ReattachingSpinner(size: 11, lineWidth: 1.6, color: HelperAccent.color)
                 Text(AppLocalized("running")).font(.system(size: 11, weight: .semibold)).foregroundStyle(HelperAccent.color)
                 if !clock.isEmpty {
-                    Text(clock).font(.system(size: 11, design: .monospaced)).foregroundStyle(Color(UIColor.tertiaryLabel))
+                    Text(clock).font(.system(size: 11, design: .monospaced)).foregroundStyle(PokiTheme.secondaryText)
                 }
             case .finished(let status, let tier, _, let elapsed, _, _, _, _):
                 Text(info.statusText)
@@ -1025,13 +1021,13 @@ struct HelperDetailCard: View {
                     Text(tier)
                         .font(.system(size: 9, weight: .semibold, design: .monospaced))
                         .padding(.horizontal, 5).padding(.vertical, 1)
-                        .background(HelperAccent.color.opacity(0.15))
+                        .background(PokiTheme.tagBackground)
                         .foregroundStyle(HelperAccent.color)
                         .clipShape(Capsule())
                 }
                 if let elapsed {
                     Text(HelperBlockInfo.elapsedLabel(elapsed))
-                        .font(.system(size: 11, design: .monospaced)).foregroundStyle(Color(UIColor.tertiaryLabel))
+                        .font(.system(size: 11, design: .monospaced)).foregroundStyle(PokiTheme.secondaryText)
                 }
             }
         }
@@ -1242,12 +1238,12 @@ struct HelperDetailCard: View {
 struct AgentDetailCard<Trailing: View, Content: View>: View {
     let title: String
     let icon: String
-    var iconTint: Color = Color(UIColor.secondaryLabel)
+    var iconTint: Color = PokiTheme.secondaryText
     var trailing: () -> Trailing
     var bodyPadding: CGFloat = 12
     @ViewBuilder var content: () -> Content
 
-    init(title: String, icon: String, iconTint: Color = Color(UIColor.secondaryLabel),
+    init(title: String, icon: String, iconTint: Color = PokiTheme.secondaryText,
          @ViewBuilder trailing: @escaping () -> Trailing,
          bodyPadding: CGFloat = 12,
          @ViewBuilder content: @escaping () -> Content) {
@@ -1255,9 +1251,9 @@ struct AgentDetailCard<Trailing: View, Content: View>: View {
         self.trailing = trailing; self.bodyPadding = bodyPadding; self.content = content
     }
 
-    private static var barBg: Color { Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.13, alpha: 1) : UIColor(white: 0.92, alpha: 1) }) }
-    private static var cardBg: Color { Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.10, alpha: 1) : UIColor(white: 0.94, alpha: 1) }) }
-    private static var stroke: Color { Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.25, alpha: 1) : UIColor(white: 0.82, alpha: 1) }) }
+    private static var barBg: Color { PokiTheme.surface }
+    private static var cardBg: Color { PokiTheme.surface }
+    private static var stroke: Color { PokiTheme.divider }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -1267,7 +1263,7 @@ struct AgentDetailCard<Trailing: View, Content: View>: View {
                     .foregroundStyle(iconTint)
                 Text(title)
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(Color(UIColor.label))
+                    .foregroundStyle(PokiTheme.primaryText)
                     .lineLimit(1)
                 Spacer(minLength: 6)
                 trailing()
@@ -1290,7 +1286,7 @@ struct AgentDetailCard<Trailing: View, Content: View>: View {
 }
 
 extension AgentDetailCard where Trailing == EmptyView {
-    init(title: String, icon: String, iconTint: Color = Color(UIColor.secondaryLabel),
+    init(title: String, icon: String, iconTint: Color = PokiTheme.secondaryText,
          bodyPadding: CGFloat = 12,
          @ViewBuilder content: @escaping () -> Content) {
         self.init(title: title, icon: icon, iconTint: iconTint, trailing: { EmptyView() },

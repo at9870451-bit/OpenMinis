@@ -71,6 +71,9 @@ struct LogManagementView: View {
                 logsBody
             }
         }
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Logs")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -103,15 +106,18 @@ struct LogManagementView: View {
             } footer: {
                 if loggingManager.isEnabled && loggingManager.level == .verbose {
                     Text("Verbose adds high-frequency traces (filesystem, rendering, context). Useful when reproducing a specific problem — logs grow very quickly, so switch back to Info afterwards.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } else {
                     Text("When enabled, all console output is captured to daily log files.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section("Log Files") {
                 if vm.runningFiles.isEmpty {
                     Text("No log files")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 } else {
                     ForEach(vm.runningFiles) { file in
                         NavigationLink {
@@ -122,7 +128,7 @@ struct LogManagementView: View {
                                     .lineLimit(1)
                                 Spacer()
                                 Text(vm.format(file.size))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
@@ -135,6 +141,7 @@ struct LogManagementView: View {
                     }
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             if !vm.crashFiles.isEmpty {
                 Section("Crash Reports") {
@@ -147,7 +154,7 @@ struct LogManagementView: View {
                                     .lineLimit(1)
                                 Spacer()
                                 Text(vm.format(file.size))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
@@ -159,6 +166,7 @@ struct LogManagementView: View {
                         vm.load()
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
             }
 
             // [T-crash-diag-export] Breadcrumbs, crash contexts and MetricKit
@@ -170,6 +178,7 @@ struct LogManagementView: View {
                     Label("Crash Diagnostics", systemImage: "stethoscope")
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             if #available(iOS 17.0, *) {
                 Section {
@@ -180,10 +189,11 @@ struct LogManagementView: View {
                             Label("iCloud Sync Logs", systemImage: "icloud.fill")
                             Spacer()
                             Text("\(SyncLogStore.shared.entries.count)")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
             }
 
             if !vm.logFiles.isEmpty {
@@ -195,14 +205,20 @@ struct LogManagementView: View {
                             Label("Delete All Logs", systemImage: "trash")
                             Spacer()
                             Text(vm.format(vm.totalSize))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 } footer: {
                     Text("Total log storage: \(vm.format(vm.totalSize))")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .toolbar {
             if !vm.logFiles.isEmpty && tab == "logs" {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -245,6 +261,9 @@ struct LogDetailView: View {
                 LogTextView(text: content)
             }
         }
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -272,9 +291,9 @@ private struct LogTextView: UIViewRepresentable {
         let textView = UITextView(usingTextLayoutManager: true)
         textView.isEditable = false
         textView.isSelectable = true
-        textView.backgroundColor = .clear
+        textView.backgroundColor = PokiTheme.uiBackground
         textView.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
-        textView.textColor = .label
+        textView.textColor = PokiTheme.uiPrimaryText
         textView.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
         textView.dataDetectorTypes = []
         return textView

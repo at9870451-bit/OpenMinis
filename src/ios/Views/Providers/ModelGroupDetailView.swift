@@ -78,9 +78,10 @@ struct ModelGroupDetailView: View {
                 groupContent(group)
             } else {
                 Text("Group not found")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         }
+        .pokiScreen()
         .navigationTitle(group?.name ?? "Group")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -198,7 +199,7 @@ struct ModelGroupDetailView: View {
                 if group.memberEntryIds.isEmpty {
                     Text("No models in this group")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 } else {
                     ForEach(group.memberEntryIds, id: \.self) { entryId in
                         // System engine member ids ("__builtin_system_speech__/…")
@@ -352,6 +353,8 @@ struct ModelGroupDetailView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
         // [T-ipad-sheet-keyboard-crash] `.immediately`, not `.interactively`:
         // this page lives inside the Settings sheet, where an interactive
         // keyboard drag and the sheet's drag-to-dismiss can share one gesture —
@@ -420,7 +423,7 @@ struct ModelGroupDetailView: View {
                 HStack(alignment: .quotaCapCenter, spacing: 4) {
                     Text(entry.model.displayName)
                         .font(.subheadline)
-                        .foregroundStyle(providerDisabled ? Color.secondary : Color(UIColor.label))
+                        .foregroundStyle(providerDisabled ? PokiTheme.secondaryText : PokiTheme.primaryText)
                         .alignmentGuide(.quotaCapCenter) { $0.quotaCapCenter }
                     // [T-quota-group-member-pill] The model's (or its account's)
                     // quota; this page has no other way to the provider's quota.
@@ -441,7 +444,7 @@ struct ModelGroupDetailView: View {
                         }
                     }
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
             }
 
@@ -460,7 +463,7 @@ struct ModelGroupDetailView: View {
                 return entry.model.provider
             }())
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .opacity(providerDisabled ? 0.5 : 1)
         }
     }
@@ -476,22 +479,22 @@ struct ModelGroupDetailView: View {
         return HStack(spacing: 10) {
             Image(systemName: isTTS ? "speaker.wave.2.fill" : "mic.fill")
                 .font(.system(size: 12))
-                .foregroundStyle(.blue)
+                .foregroundStyle(PokiTheme.tagText)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(entry.model.displayName)
                     .font(.subheadline)
-                    .foregroundStyle(Color(UIColor.label))
+                    .foregroundStyle(PokiTheme.primaryText)
                 Text("iOS built-in, works offline")
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
             }
 
             Spacer()
 
             Text("System")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
     }
 
@@ -506,10 +509,10 @@ struct ModelGroupDetailView: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text("Model no longer available")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Text(entryId)
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     .lineLimit(1)
                     .truncationMode(.middle)
             }
@@ -521,7 +524,7 @@ struct ModelGroupDetailView: View {
             } label: {
                 Image(systemName: "trash")
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
             }
             .buttonStyle(.plain)
         }
@@ -647,7 +650,7 @@ private struct ContextLimitSlider: View {
                 Spacer()
                 Text(currentLabel)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(PokiTheme.tagText)
                     .monospacedDigit()
             }
             Slider(
@@ -663,11 +666,11 @@ private struct ContextLimitSlider: View {
             HStack {
                 Text(steps.first?.label ?? "32K")
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 Spacer()
                 Text("Unlimited")
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
             }
         }
         .padding(.vertical, 4)

@@ -32,10 +32,19 @@ struct BrowserManagementView: View {
     var body: some View {
         List {
             userAgentSection
+                .listRowBackground(PokiTheme.surface)
+                .listRowSeparatorTint(PokiTheme.divider)
             viewportSection
+                .listRowBackground(PokiTheme.surface)
+                .listRowSeparatorTint(PokiTheme.divider)
             cookiesSection
+                .listRowBackground(PokiTheme.surface)
+                .listRowSeparatorTint(PokiTheme.divider)
             domainListSection
+                .listRowBackground(PokiTheme.surface)
+                .listRowSeparatorTint(PokiTheme.divider)
         }
+        .pokiScreen()
         .searchable(text: $searchText, prompt: "Filter by domain")
         .navigationTitle("Browser Settings")
         .navigationBarTitleDisplayMode(.inline)
@@ -90,16 +99,16 @@ struct BrowserManagementView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Label(profile.displayName, systemImage: profile.icon)
-                        .foregroundStyle(Color(UIColor.label))
+                        .foregroundStyle(PokiTheme.primaryText)
                     Text(displayUA(for: profile))
                         .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .lineLimit(2)
                 }
                 Spacer()
                 if pool.userAgentProfile == profile {
                     Image(systemName: "checkmark")
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(PokiTheme.tagText)
                 }
             }
         }
@@ -123,17 +132,17 @@ struct BrowserManagementView: View {
             } label: {
                 HStack {
                     Label("Custom", systemImage: "pencil.line")
-                        .foregroundStyle(Color(UIColor.label))
+                        .foregroundStyle(PokiTheme.primaryText)
                     Spacer()
                     if isSelected {
                         Image(systemName: "checkmark")
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundStyle(PokiTheme.tagText)
                     }
                 }
             }
             TextField("Enter custom user agent...", text: $customUA, axis: .vertical)
                 .font(.system(size: 11, design: .monospaced))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .lineLimit(2...4)
                 .onSubmit {
                     pool.customUserAgentString = customUA
@@ -198,11 +207,11 @@ struct BrowserManagementView: View {
         } label: {
             HStack {
                 Label("Default (auto by UA)", systemImage: "arrow.counterclockwise")
-                    .foregroundStyle(Color(UIColor.label))
+                    .foregroundStyle(PokiTheme.primaryText)
                 Spacer()
                 if !isCustomViewportActive {
                     Image(systemName: "checkmark")
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(PokiTheme.tagText)
                 }
             }
         }
@@ -215,11 +224,11 @@ struct BrowserManagementView: View {
         } label: {
             HStack {
                 Label("Custom", systemImage: "aspectratio")
-                    .foregroundStyle(Color(UIColor.label))
+                    .foregroundStyle(PokiTheme.primaryText)
                 Spacer()
                 if isCustomViewportActive {
                     Image(systemName: "checkmark")
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(PokiTheme.tagText)
                 }
             }
         }
@@ -247,13 +256,15 @@ struct BrowserManagementView: View {
                 TextField("Width", text: $viewportWidthText)
                     .keyboardType(.numberPad)
                     .font(.system(size: 13, design: .monospaced))
+                    .foregroundStyle(PokiTheme.primaryText)
                     .multilineTextAlignment(.center)
                     .frame(width: 72)
                     .onSubmit { commitCustomViewport() }
-                Text("×").foregroundStyle(.secondary)
+                Text("×").foregroundStyle(PokiTheme.secondaryText)
                 TextField("Height", text: $viewportHeightText)
                     .keyboardType(.numberPad)
                     .font(.system(size: 13, design: .monospaced))
+                    .foregroundStyle(PokiTheme.primaryText)
                     .multilineTextAlignment(.center)
                     .frame(width: 72)
                     .onSubmit { commitCustomViewport() }
@@ -298,10 +309,10 @@ struct BrowserManagementView: View {
     private func uaMismatchBanner(_ message: String) -> some View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.yellow)
+                .foregroundStyle(PokiTheme.tagText)
             Text(message)
                 .font(.caption)
-                .foregroundStyle(Color(UIColor.label))
+                .foregroundStyle(PokiTheme.primaryText)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
@@ -312,7 +323,7 @@ struct BrowserManagementView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Quick Set")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(Self.viewportPresets, id: \.label) { preset in
@@ -326,19 +337,19 @@ struct BrowserManagementView: View {
                                     .font(.system(size: 12, weight: .medium))
                                 Text("\(preset.width)×\(preset.height)")
                                     .font(.system(size: 10, design: .monospaced))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
                             .background(
                                 isPresetActive(preset)
-                                    ? Color.accentColor.opacity(0.18)
-                                    : Color(UIColor.tertiarySystemFill)
+                                    ? PokiTheme.selection
+                                    : PokiTheme.tagBackground
                             )
                             .foregroundStyle(
                                 isPresetActive(preset)
-                                    ? Color.accentColor
-                                    : Color(UIColor.label)
+                                    ? PokiTheme.tagText
+                                    : PokiTheme.primaryText
                             )
                             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                         }
@@ -370,7 +381,7 @@ struct BrowserManagementView: View {
                 Text("Cookies")
                 Spacer()
                 Text("\(cookieCount)")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
 
             Button(role: .destructive) {
@@ -399,7 +410,7 @@ struct BrowserManagementView: View {
                                 .font(.system(size: 14, weight: .medium))
                             Text("\(group.cookies.count) cookie\(group.cookies.count == 1 ? "" : "s")")
                                 .font(.system(size: 12))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                         Spacer()
                     }

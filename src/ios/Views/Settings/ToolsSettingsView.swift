@@ -135,12 +135,18 @@ struct ToolsSettingsView: View {
                 toolRow(AppLocalized("Browser Use"), tool: "browser_use", icon: "globe", isOn: $browserEnabled)
             } footer: {
                 Text(AppLocalized("Browse the web in the in-app browser: open pages, read them, click and type. Stable and on by default. When off, the tool is removed from every conversation — the model does not see it at all."))
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
             userAskSections
             // [T-sub-agents-v1] No Agents section here, and deliberately not
             // even a read-only pointer row: the switch belongs to the Sub Agents
             // page, next to the definitions it governs.
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(AppLocalized("Agent Tools"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -174,12 +180,14 @@ struct ToolsSettingsView: View {
         } footer: {
             VStack(alignment: .leading, spacing: 4) {
                 Text(AppLocalized("Lets the assistant ask you to choose between options, or to confirm a risky action before doing it, on a card in the chat. Only in chats you are in — never for sub agents, Shortcuts or scheduled tasks. When off, the assistant decides for itself and does not take risky actions without your go-ahead."))
+                .foregroundStyle(PokiTheme.secondaryText)
                 if userAskEnabled && userAskNotify && notificationsDenied {
                     Text(AppLocalized("Notifications are off for Minis in iOS Settings — questions will only show when you open the app."))
                         .foregroundStyle(.orange)
                 }
             }
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     /// toolRow's icon column (22) plus its spacing (10): where its title starts.
@@ -188,16 +196,16 @@ struct ToolsSettingsView: View {
     static let subRowIndent: CGFloat = toolIconColumn + toolIconSpacing
 
     func toolRow(_ title: String, tool: String, icon: String, iconSize: CGFloat = 14,
-                 accent: Color = Color.accentColor, isOn: Binding<Bool>) -> some View {
+                 accent: Color = PokiTheme.primaryButton, isOn: Binding<Bool>) -> some View {
         Toggle(isOn: isOn) {
             HStack(spacing: Self.toolIconSpacing) {
                 Image(systemName: icon)
                     .font(.system(size: iconSize))
-                    .foregroundStyle(isOn.wrappedValue ? accent : Color.secondary)
+                    .foregroundStyle(isOn.wrappedValue ? accent : PokiTheme.secondaryText)
                     .frame(width: Self.toolIconColumn)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                    Text(tool).font(.caption.monospaced()).foregroundStyle(.secondary)
+                    Text(tool).font(.caption.monospaced()).foregroundStyle(PokiTheme.secondaryText)
                 }
             }
         }

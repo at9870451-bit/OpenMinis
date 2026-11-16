@@ -87,14 +87,14 @@ struct SessionLockGateOverlay: View {
                 .fill(.regularMaterial)
                 .ignoresSafeArea()
                 .overlay {
-                    Color(UIColor.systemBackground).opacity(0.4)
+                    PokiTheme.background.opacity(0.4)
                         .ignoresSafeArea()
                 }
 
             VStack(spacing: 18) {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 56, weight: .light))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
 
                 Text("This session is locked")
                     .font(.system(size: 18, weight: .semibold))
@@ -103,7 +103,7 @@ struct SessionLockGateOverlay: View {
                      ? "Authentication failed. Tap to try again."
                      : "Tap to unlock with \(BiometricAuth.biometryDisplayName)")
                     .font(.system(size: 14))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .multilineTextAlignment(.center)
 
                 Button {
@@ -115,8 +115,8 @@ struct SessionLockGateOverlay: View {
                           systemImage: "faceid")
                         .font(.system(size: 16, weight: .semibold))
                         .padding(.horizontal, 22).padding(.vertical, 10)
-                        .background(.tint, in: Capsule())
-                        .foregroundStyle(.white)
+                        .background(PokiTheme.primaryButton, in: Capsule())
+                        .foregroundStyle(PokiTheme.primaryButtonText)
                 }
             }
             .padding(.horizontal, 32)

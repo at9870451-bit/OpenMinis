@@ -22,7 +22,7 @@ import UIKit
 /// the active trait collection changes. CGColor values frozen from a
 /// dynamic UIColor at view-creation time would otherwise lock in whichever
 /// appearance was active when the attachment was first laid out — typically
-/// before the view enters the window, so light-mode `UIColor.label`
+/// before the view enters the window, so light-mode `PokiTheme.uiPrimaryText`
 /// resolves and renders nearly invisible against a dark message background.
 final class TableScrollView: UIScrollView, UIScrollViewDelegate {
     /// Closure called every time the trait collection changes; should

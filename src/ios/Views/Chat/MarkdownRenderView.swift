@@ -576,7 +576,7 @@ final class MarkdownRenderView: UIView, UIGestureRecognizerDelegate {
         let rect = textLayoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
 
         let flash = UIView(frame: rect.insetBy(dx: -2, dy: -1))
-        flash.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.18)
+        flash.backgroundColor = PokiTheme.uiTagBackground
         flash.layer.cornerRadius = 4
         flash.isUserInteractionEnabled = false
         addSubview(flash)
@@ -584,8 +584,8 @@ final class MarkdownRenderView: UIView, UIGestureRecognizerDelegate {
         let toast = UILabel()
         toast.text = "Copied"
         toast.font = .systemFont(ofSize: 11, weight: .medium)
-        toast.textColor = .white
-        toast.backgroundColor = UIColor.black.withAlphaComponent(0.75)
+        toast.textColor = PokiTheme.uiPrimaryButtonText
+        toast.backgroundColor = PokiTheme.uiPrimaryButton.withAlphaComponent(0.92)
         toast.textAlignment = .center
         toast.layer.cornerRadius = 4
         toast.clipsToBounds = true

@@ -73,13 +73,13 @@ struct GroupSlotPicker: View {
         } label: {
             HStack {
                 Text(label)
-                    .foregroundStyle(Color(UIColor.label))
+                    .foregroundStyle(PokiTheme.primaryText)
                 Spacer()
                 Text(selectedName)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Image(systemName: "chevron.up.chevron.down")
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
             }
         }
         .sheet(isPresented: $showCreate) {

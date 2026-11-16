@@ -24,7 +24,9 @@ struct MemoryManagementView: View {
                 Toggle(AppLocalized("settings_memory_global_enabled"), isOn: $memoryGlobalEnabled)
             } footer: {
                 Text(AppLocalized("settings_memory_global_enabled_footer"))
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             ForEach(memoryFiles) { file in
                 NavigationLink {
@@ -37,17 +39,17 @@ struct MemoryManagementView: View {
                             if !file.fileSize.isEmpty {
                                 Text(file.fileSize)
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                             Spacer()
                             Text(file.modifiedDate)
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                         if !file.preview.isEmpty {
                             Text(file.preview)
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                                 .lineLimit(1)
                         }
                     }
@@ -56,7 +58,12 @@ struct MemoryManagementView: View {
             .onDelete { offsets in
                 deleteFiles(at: offsets)
             }
+            .listRowBackground(PokiTheme.surface)
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Memory")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -85,10 +92,10 @@ struct MemoryManagementView: View {
             if let msg = forceSyncToast {
                 Text(msg)
                     .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(Color.accentColor, in: Capsule())
+                    .background(PokiTheme.primaryButton, in: Capsule())
                     .padding(.top, 8)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
@@ -222,7 +229,7 @@ private struct MemoryFileEditView: View {
             if isGlobal {
                 Text("Persistent instructions and preferences visible to the agent in every session. You can edit it here, or just ask the agent to help organize and update this memory.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -230,7 +237,7 @@ private struct MemoryFileEditView: View {
 
             if let saveError {
                 Text(saveError)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
                     .font(.caption)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
@@ -238,6 +245,9 @@ private struct MemoryFileEditView: View {
             }
 
             TextEditor(text: $content)
+                .scrollContentBackground(.hidden)
+                .background(PokiTheme.background)
+                .foregroundStyle(PokiTheme.primaryText)
                 .font(.system(.caption, design: .monospaced))
                 .padding(.horizontal, 12)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -256,6 +266,9 @@ private struct MemoryFileEditView: View {
         // blank pane under "2026-05-21.md" nav title). Anchor the VStack
         // to the available space so the TextEditor has somewhere to live.
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(fileName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

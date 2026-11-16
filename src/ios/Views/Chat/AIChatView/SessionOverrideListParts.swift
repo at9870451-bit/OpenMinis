@@ -83,13 +83,13 @@ struct SessionOverrideEmptyCard: View {
         VStack(spacing: 8) {
             Image(systemName: systemImage)
                 .font(.system(size: 36))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText)
             Text(title)
                 .font(.body)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             Text(subtitle)
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)

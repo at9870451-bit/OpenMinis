@@ -52,7 +52,7 @@ struct MCPIntegrationsView: View {
                         } label: {
                             Label(AppLocalized("Tools"), systemImage: "arrow.clockwise")
                         }
-                        .tint(.blue)
+                        .tint(PokiTheme.tagText)
                     }
                 }
                 .onDelete { offsets in
@@ -61,6 +61,9 @@ struct MCPIntegrationsView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle(Text("MCP Integrations"))
         .navigationBarTitleDisplayMode(.inline)
         // [T-ios-mcp-list-reload-on-appear] Re-read servers.json on appear so a
@@ -118,12 +121,12 @@ struct MCPIntegrationsView: View {
         VStack(spacing: 12) {
             Image(systemName: "puzzlepiece.extension")
                 .font(.system(size: 44))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             Text("No MCP Servers")
                 .font(.headline)
             Text("Add an MCP server to give the agent extra tools. Tap + to add one manually or import a JSON config.")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
@@ -139,14 +142,14 @@ struct MCPIntegrationsView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(server.id)
                     .font(.body)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(PokiTheme.primaryText)
                 HStack(spacing: 4) {
                     Text(server.isHTTP ? "HTTP" : (server.isSTDIO ? "STDIO" : "—"))
                         .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Text(server.transportSummary)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
@@ -154,7 +157,7 @@ struct MCPIntegrationsView: View {
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
         }
         .contentShape(Rectangle())
     }
@@ -180,7 +183,7 @@ struct MCPToolsSheet: View {
                     HStack(spacing: 10) {
                         ProgressView()
                         Text("Reconnecting and fetching tools…")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 } else if let errorText {
                     Section {
@@ -194,7 +197,7 @@ struct MCPToolsSheet: View {
                     }
                 } else if tools.isEmpty {
                     Text("The server reported no tools.")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 } else {
                     Section(footer: Text("Fetched live from the server just now.")) {
                         ForEach(tools) { tool in
@@ -204,7 +207,7 @@ struct MCPToolsSheet: View {
                                 if !tool.description.isEmpty {
                                     Text(tool.description)
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                         .lineLimit(3)
                                 }
                             }
@@ -212,6 +215,9 @@ struct MCPToolsSheet: View {
                     }
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+            .pokiScreen()
             .navigationTitle(Text(verbatim: serverName))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

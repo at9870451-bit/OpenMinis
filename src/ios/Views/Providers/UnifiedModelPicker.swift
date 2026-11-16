@@ -583,10 +583,10 @@ struct UnifiedModelPicker: View {
                     HStack(alignment: .top, spacing: 8) {
                         Image(systemName: "info.circle")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text(note)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             }
@@ -614,7 +614,7 @@ struct UnifiedModelPicker: View {
                                 .textCase(nil)
                         }
                         .buttonStyle(.plain)
-                        .foregroundStyle(.tint)
+                        .foregroundStyle(PokiTheme.tagText)
                     }
                 } footer: {
                     if searchText.isEmpty {
@@ -643,7 +643,7 @@ struct UnifiedModelPicker: View {
                     Text(String(format: AppLocalized("Showing the %d best matches of %d. Type more to narrow the search."),
                                 Self.maxSearchResults, totalSearchMatches))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
@@ -658,7 +658,7 @@ struct UnifiedModelPicker: View {
                             ProgressView()
                             Text("Loading models...")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                         Spacer()
                     }
@@ -679,6 +679,8 @@ struct UnifiedModelPicker: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search models")
         // [T-picker-search-debounce] Drive the debounced query (GH#271).
         //
@@ -701,6 +703,7 @@ struct UnifiedModelPicker: View {
             }
         }
         .onDisappear { searchDebounceTask?.cancel() }
+        .pokiScreen()
         .navigationTitle(config.title)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -794,7 +797,7 @@ struct UnifiedModelPicker: View {
         } label: {
             Image(systemName: "bolt.badge.checkmark")
                 .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(.tint)
+                .foregroundStyle(PokiTheme.tagText)
                 .frame(width: 32, height: 32)
                 .contentShape(Rectangle())
         }
@@ -896,15 +899,15 @@ struct UnifiedModelPicker: View {
         HStack(spacing: 10) {
             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                 .font(.system(size: 20))
-                .foregroundStyle(isSelected ? Color.accentColor : Color(UIColor.tertiaryLabel))
+                .foregroundStyle(isSelected ? PokiTheme.tagText : PokiTheme.secondaryText.opacity(0.72))
             Image(systemName: "square.stack.3d.up.fill")
-                .font(.caption).foregroundStyle(.blue)
+                .font(.caption).foregroundStyle(PokiTheme.tagText)
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(group.name)
                         .font(.subheadline.weight(.medium))
-                        .foregroundStyle(Color(UIColor.label))
+                        .foregroundStyle(PokiTheme.primaryText)
                     strategyBadge(group.strategy)
                 }
                 groupSubtitle(group)
@@ -921,11 +924,11 @@ struct UnifiedModelPicker: View {
                 // narrows the group name beside it instead of wrapping here.
                 Text("Default (badge)", comment: "Short tag on the default model group in the model picker; keep it as short as possible")
                     .font(.caption2.weight(.medium))
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(PokiTheme.tagText)
                     .lineLimit(1)
                     .padding(.horizontal, 5)
                     .padding(.vertical, 1)
-                    .background(Color.blue.opacity(0.1))
+                    .background(PokiTheme.tagBackground)
                     .clipShape(Capsule())
                     .fixedSize()
             }
@@ -941,9 +944,9 @@ struct UnifiedModelPicker: View {
             } label: {
                 Image(systemName: expandedGroupIds.contains(group.id) ? "chevron.up" : "chevron.down")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .frame(width: 28, height: 28)
-                    .background(Color(UIColor.tertiarySystemFill))
+                    .background(PokiTheme.selection)
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
@@ -972,20 +975,20 @@ struct UnifiedModelPicker: View {
         if group.memberEntryIds.isEmpty {
             Text(AppLocalized("No models"))
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
         } else if isGroupSelected(group),
                   let eid = config.currentEntryId?(),
                   let entry = store.entry(for: eid) {
             Text("→ \(entry.model.displayName)")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         } else {
             let available = availableMemberEntryIds(group).count
             let total = group.memberEntryIds.count
             if available == total {
                 Text(AppLocalized("\(total) models"))
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
             } else if available == 0 {
                 Text(AppLocalized("\(total) models · all unavailable"))
                     .font(.caption)
@@ -1005,10 +1008,10 @@ struct UnifiedModelPicker: View {
             Text(strategy == .fallback ? "FB" : "LB")
                 .font(.system(size: 9, weight: .medium, design: .rounded))
         }
-        .foregroundStyle(.secondary)
+        .foregroundStyle(PokiTheme.secondaryText)
         .padding(.horizontal, 4)
         .padding(.vertical, 1)
-        .background(Color(UIColor.quaternarySystemFill))
+        .background(PokiTheme.selection)
         .clipShape(Capsule())
     }
 
@@ -1107,7 +1110,7 @@ struct UnifiedModelPicker: View {
         if group.memberEntryIds.isEmpty {
             Text("No models in this group")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .padding(.leading, 30)
                 .padding(.vertical, 4)
         } else {
@@ -1142,7 +1145,7 @@ struct UnifiedModelPicker: View {
         HStack(spacing: 10) {
             Image(systemName: isActive ? "checkmark.circle.fill" : "circle")
                 .font(.system(size: 17))
-                .foregroundStyle(isActive ? Color.accentColor : Color(UIColor.quaternaryLabel))
+                .foregroundStyle(isActive ? PokiTheme.tagText : PokiTheme.secondaryText.opacity(0.60))
 
             providerDot(entry.model.provider)
                 .opacity(disabled ? 0.4 : 1)
@@ -1171,14 +1174,14 @@ struct UnifiedModelPicker: View {
                     if let instanceLabel = store.instance(for: entry.providerInstanceId)?.label {
                         Text(instanceLabel)
                             .font(.caption2.weight(.medium))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text("·")
                             .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     }
                     Text(entry.model.id)
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
             }
             // [T-model-row-premature-wrap] The column takes the free width
@@ -1213,7 +1216,7 @@ struct UnifiedModelPicker: View {
     private func memberRowName(_ entry: ModelEntry, disabled: Bool) -> some View {
         Text(entry.model.displayName)
             .font(.subheadline)
-            .foregroundStyle(disabled ? Color(UIColor.tertiaryLabel) : Color(UIColor.label))
+            .foregroundStyle(disabled ? PokiTheme.secondaryText.opacity(0.72) : PokiTheme.primaryText)
             .alignmentGuide(.quotaCapCenter) { $0.quotaCapCenter }
     }
 
@@ -1274,7 +1277,7 @@ struct UnifiedModelPicker: View {
         HStack(spacing: 10) {
             Image(systemName: "circle")
                 .font(.system(size: 17))
-                .foregroundStyle(Color(UIColor.quaternaryLabel))
+                .foregroundStyle(PokiTheme.secondaryText.opacity(0.60))
 
             if let entry {
                 providerDot(entry.model.provider)
@@ -1283,16 +1286,16 @@ struct UnifiedModelPicker: View {
                 VStack(alignment: .leading, spacing: 1) {
                     Text(entry.model.displayName)
                         .font(.subheadline)
-                        .foregroundStyle(Color(UIColor.tertiaryLabel))
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     HStack(spacing: 4) {
                         if let instanceLabel = store.instance(for: entry.providerInstanceId)?.label {
                             Text(instanceLabel)
                                 .font(.caption2.weight(.medium))
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                         }
                         Text("·")
                             .font(.caption2)
-                            .foregroundStyle(.quaternary)
+                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.60))
                         Text(reason)
                             .font(.caption2)
                             .foregroundStyle(.red.opacity(0.7))
@@ -1302,7 +1305,7 @@ struct UnifiedModelPicker: View {
                 VStack(alignment: .leading, spacing: 1) {
                     Text(entryId.components(separatedBy: "/").last ?? entryId)
                         .font(.subheadline)
-                        .foregroundStyle(Color(UIColor.tertiaryLabel))
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     Text(reason)
                         .font(.caption2)
                         .foregroundStyle(.red.opacity(0.7))
@@ -1373,7 +1376,7 @@ struct UnifiedModelPicker: View {
                         Text(AppLocalized("Show \(item.entries.count) models"))
                             .font(.caption)
                     }
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(PokiTheme.tagText)
                 }
             }
         } header: {
@@ -1407,7 +1410,7 @@ struct UnifiedModelPicker: View {
                             .lineLimit(1)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(PokiTheme.tagText)
                     .fixedSize()
                     .accessibilityLabel(Text("Edit \(item.instance.label)"))
                 }
@@ -1424,9 +1427,9 @@ struct UnifiedModelPicker: View {
                     } label: {
                         Image(systemName: collapsed ? "chevron.down" : "chevron.up")
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .frame(width: 28, height: 28)
-                            .background(Color(UIColor.tertiarySystemFill))
+                            .background(PokiTheme.selection)
                             .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
@@ -1460,7 +1463,7 @@ struct UnifiedModelPicker: View {
         return HStack(spacing: 10) {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 20))
-                    .foregroundStyle(isSelected ? Color.accentColor : Color(UIColor.tertiaryLabel))
+                    .foregroundStyle(isSelected ? PokiTheme.tagText : PokiTheme.secondaryText.opacity(0.72))
 
                 Image(systemName: traits.iconSymbol)
                     .font(.system(size: 11))
@@ -1471,7 +1474,7 @@ struct UnifiedModelPicker: View {
                     HStack(spacing: 4) {
                         Text(entry.model.displayName)
                             .font(.subheadline)
-                            .foregroundStyle(disabled ? Color(UIColor.tertiaryLabel) : Color(UIColor.label))
+                            .foregroundStyle(disabled ? PokiTheme.secondaryText.opacity(0.72) : PokiTheme.primaryText)
                         if !isMulti, config.currentGroupId?() != nil,
                            config.currentEntryId?() == entry.id {
                             activeBadge
@@ -1491,7 +1494,7 @@ struct UnifiedModelPicker: View {
                             if !badges.isEmpty {
                                 Text("·")
                                     .font(.caption2)
-                                    .foregroundStyle(.quaternary)
+                                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.60))
                             }
                             entryRowTags(badges, disabled: disabled)
                         }
@@ -1544,7 +1547,7 @@ struct UnifiedModelPicker: View {
             // for built-ins; the raw model id for cloud models.
             Text(traits.subtitle ?? entry.model.id)
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
         }
     }
 
@@ -1554,10 +1557,10 @@ struct UnifiedModelPicker: View {
         ForEach(badges, id: \.self) { badge in
             Text(badge)
                 .font(.system(size: 9, weight: .medium))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .padding(.horizontal, 4)
                 .padding(.vertical, 1)
-                .background(Color(UIColor.tertiarySystemFill))
+                .background(PokiTheme.selection)
                 .clipShape(RoundedRectangle(cornerRadius: 3))
         }
         if disabled {
@@ -1574,15 +1577,15 @@ struct UnifiedModelPicker: View {
             VStack(spacing: 8) {
                 Image(systemName: searchText.isEmpty ? "cpu" : "magnifyingglass")
                     .font(.system(size: 28))
-                    .foregroundStyle(.quaternary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.60))
                 Text(searchText.isEmpty ? "No models available" : "No results")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Text(searchText.isEmpty
                      ? "Configure providers in Settings to see models here."
                      : "Try a different search term.")
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)

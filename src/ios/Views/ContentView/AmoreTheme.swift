@@ -1,75 +1,52 @@
-//
-//  AmoreTheme.swift
-//  Amore — Poki Design System
-//
-//  Warm Paper UI · Minimalist Monochrome · Soft Lavender AI
-//
-//  Single source of truth for colour. Every surface in the app resolves
-//  through these tokens, and `applyGlobalAppearance()` pushes the same
-//  palette into UIKit's appearance proxies so navigation bars, table
-//  backgrounds and control tints match without touching every screen.
-//
-
 import SwiftUI
 import UIKit
 
-// MARK: - Palette (Poki)
-
+/// Single adaptive palette for SwiftUI and UIKit. Providers resolve directly
+/// from traitCollection; no conversion through a pre-resolved SwiftUI Color.
 enum PokiTheme {
-
-    // MARK: Raw hex → Color
-
-    private static func hex(_ value: UInt32, alpha: CGFloat = 1) -> Color {
-        Color(
-            .sRGB,
-            red: Double((value >> 16) & 0xFF) / 255,
-            green: Double((value >> 8) & 0xFF) / 255,
-            blue: Double(value & 0xFF) / 255,
-            opacity: Double(alpha)
-        )
+    private static func rgba(_ hex: UInt32, alpha: CGFloat = 1) -> UIColor {
+        UIColor(red: CGFloat((hex >> 16) & 255) / 255,
+                green: CGFloat((hex >> 8) & 255) / 255,
+                blue: CGFloat(hex & 255) / 255, alpha: alpha)
+    }
+    private static func pair(_ light: UInt32, _ dark: UInt32,
+                             lightAlpha: CGFloat = 1, darkAlpha: CGFloat = 1) -> UIColor {
+        UIColor { traits in
+            traits.userInterfaceStyle == .dark
+                ? rgba(dark, alpha: darkAlpha) : rgba(light, alpha: lightAlpha)
+        }
     }
 
-    /// Resolves to `light` in light mode and `dark` in dark mode, refreshing
-    /// automatically when the system appearance changes.
-    static func adaptive(light: Color, dark: Color) -> Color {
-        Color(UIColor { traits in
-            traits.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light)
-        })
-    }
+    static let uiBackground = pair(0xFAFAF9, 0x0C0C0D)
+    static let uiPrimaryText = pair(0x111110, 0xF4F4F1)
+    static let uiSecondaryText = pair(0x6F6F69, 0x8D8D87)
+    static let uiSurface = pair(0xEFEFEC, 0x1C1C1E)
+    static let uiDivider = pair(0x000000, 0xFFFFFF, lightAlpha: 0.13, darkAlpha: 0.14)
+    static let uiAIAccent = pair(0xC4CEFB, 0x3A4270)
+    static let uiTagBackground = pair(0xDEE3FD, 0x2A3052)
+    static let uiTagText = pair(0x262D63, 0xD5DAFB)
+    static let uiPrimaryButton = pair(0x111110, 0xF4F4F1)
+    static let uiPrimaryButtonText = pair(0xFAFAF9, 0x0C0C0D)
+    static let uiDanger = pair(0xB3261E, 0xF2B8B5)
+    static let uiSelection = pair(0xDEE3FD, 0x2A3052)
 
-    // MARK: Light / dark pairs
-
-    static let background = adaptive(light: hex(0xFAFAF9), dark: hex(0x0C0C0D))
-    static let primaryText = adaptive(light: hex(0x111110), dark: hex(0xF4F4F1))
-    static let secondaryText = adaptive(light: hex(0x6F6F69), dark: hex(0x8D8D87))
-    static let surface = adaptive(light: hex(0xEFEFEC), dark: hex(0x1C1C1E))
-    static let aiAccent = adaptive(light: hex(0xC4CEFB), dark: hex(0x3A4270))
-    static let tagBackground = adaptive(light: hex(0xDEE3FD), dark: hex(0x2A3052))
-    static let tagText = adaptive(light: hex(0x262D63), dark: hex(0xD5DAFB))
-    static let primaryButton = adaptive(light: hex(0x111110), dark: hex(0xF4F4F1))
-    static let primaryButtonText = adaptive(light: hex(0xFAFAF9), dark: hex(0x0C0C0D))
-
-    /// 13% black in light, 14% white in dark.
-    static let divider = adaptive(
-        light: hex(0x000000, alpha: 0.13),
-        dark: hex(0xFFFFFF, alpha: 0.14)
-    )
-
-    // MARK: Semantics that are not in the spec table but are needed in practice
-
-    /// Slightly deeper than `aiAccent`, for glyphs and icons that must stay legible.
-    static let aiAccentStrong = adaptive(light: hex(0x8E9BE8), dark: hex(0xA9B4F0))
-    /// Composer / floating surfaces.
-    static let floatingSurface = adaptive(
-        light: hex(0xFFFFFF, alpha: 0.72),
-        dark: hex(0x1C1C1E, alpha: 0.72)
-    )
-    /// Pressed / selected row.
-    static let selection = adaptive(light: hex(0x000000, alpha: 0.045), dark: hex(0xFFFFFF, alpha: 0.07))
-    /// Destructive actions.
-    static let danger = adaptive(light: hex(0xB3261E), dark: hex(0xF2B8B5))
-
-    // MARK: Radii
+    static let background = Color(uiBackground)
+    static let primaryText = Color(uiPrimaryText)
+    static let secondaryText = Color(uiSecondaryText)
+    static let surface = Color(uiSurface)
+    static let divider = Color(uiDivider)
+    static let aiAccent = Color(uiAIAccent)
+    static let tagBackground = Color(uiTagBackground)
+    static let tagText = Color(uiTagText)
+    static let primaryButton = Color(uiPrimaryButton)
+    static let primaryButtonText = Color(uiPrimaryButtonText)
+    static let selection = Color(uiSelection)
+    static let danger = Color(uiDanger)
+    /// Legacy name maps to the specified accessible lavender foreground.
+    static let aiAccentStrong = tagText
+    static let floatingSurface = Color(pair(0xFAFAF9, 0x1C1C1E, lightAlpha: 0.86, darkAlpha: 0.86))
+    static let shadowSoft = Color.black.opacity(0.04)
+    static let shadowFloating = Color.black.opacity(0.06)
 
     enum Radius {
         static let chip: CGFloat = 12
@@ -80,86 +57,89 @@ enum PokiTheme {
         static let screen: CGFloat = 28
     }
 
-    // MARK: Shadows (deliberately restrained)
+    static func adaptive(light: Color, dark: Color) -> Color {
+        Color(UIColor { traits in
+            traits.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light)
+        })
+    }
 
-    static let shadowSoft = Color.black.opacity(0.06)
-    static let shadowFloating = Color.black.opacity(0.08)
-
-    // MARK: - Global UIKit appearance
-
-    /// Pushes the palette into UIKit so screens that use `List`, `Form`,
-    /// `NavigationStack` or plain `UITableView` inherit it without edits.
-    /// Idempotent; call once when the root view appears.
-    static func applyGlobalAppearance() {
-        let bg = UIColor(background)
-        let surface = UIColor(PokiTheme.surface)
-        let primary = UIColor(primaryText)
-        let secondary = UIColor(secondaryText)
-        let divider = UIColor(PokiTheme.divider)
-        let accent = UIColor(aiAccentStrong)
-
-        // Navigation bars — flat paper, no blur band.
+    /// Install before the first window, not in ContentView.onAppear (too late
+    /// for bars and existing table cells to inherit UIAppearance).
+    @MainActor static func applyGlobalAppearance() {
         let nav = UINavigationBarAppearance()
         nav.configureWithOpaqueBackground()
-        nav.backgroundColor = bg
+        nav.backgroundColor = uiBackground
         nav.shadowColor = .clear
-        nav.titleTextAttributes = [.foregroundColor: primary]
-        nav.largeTitleTextAttributes = [.foregroundColor: primary]
+        nav.titleTextAttributes = [.foregroundColor: uiPrimaryText]
+        nav.largeTitleTextAttributes = [.foregroundColor: uiPrimaryText]
         UINavigationBar.appearance().standardAppearance = nav
         UINavigationBar.appearance().scrollEdgeAppearance = nav
         UINavigationBar.appearance().compactAppearance = nav
-        UINavigationBar.appearance().tintColor = accent
-
-        // Toolbars / tab bars.
+        UINavigationBar.appearance().compactScrollEdgeAppearance = nav
+        UINavigationBar.appearance().tintColor = uiPrimaryButton
+        let bar = UIToolbarAppearance()
+        bar.configureWithOpaqueBackground()
+        bar.backgroundColor = uiBackground
+        bar.shadowColor = .clear
+        UIToolbar.appearance().standardAppearance = bar
+        UIToolbar.appearance().scrollEdgeAppearance = bar
+        UIToolbar.appearance().tintColor = uiPrimaryButton
         let tab = UITabBarAppearance()
         tab.configureWithOpaqueBackground()
-        tab.backgroundColor = bg
-        tab.shadowColor = divider
+        tab.backgroundColor = uiBackground
+        tab.shadowColor = uiDivider
         UITabBar.appearance().standardAppearance = tab
         UITabBar.appearance().scrollEdgeAppearance = tab
-        UITabBar.appearance().tintColor = accent
-        UITabBar.appearance().unselectedItemTintColor = secondary
-
-        // Lists and scroll views (Settings, Memory, Providers, …).
-        UITableView.appearance().backgroundColor = bg
-        UICollectionView.appearance().backgroundColor = .clear
-        UIScrollView.appearance().backgroundColor = .clear
-        // Rows sit on the Surface token so lists read as warm paper cards
-        // rather than pure white sheets.
-        UITableViewCell.appearance().backgroundColor = surface
-        UITableView.appearance().separatorColor = divider
-
-        // Controls.
-        UISwitch.appearance().onTintColor = accent
-        UISegmentedControl.appearance().selectedSegmentTintColor = surface
-        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: primary], for: .normal)
-        UISearchBar.appearance().tintColor = accent
-        UITextField.appearance().tintColor = accent
-        UITextView.appearance().tintColor = accent
+        UITabBar.appearance().tintColor = uiPrimaryButton
+        UITabBar.appearance().unselectedItemTintColor = uiSecondaryText
+        UITableView.appearance().backgroundColor = uiBackground
+        UITableView.appearance().separatorColor = uiDivider
+        UITableViewCell.appearance().backgroundColor = uiSurface
+        UICollectionView.appearance().backgroundColor = uiBackground
+        UISwitch.appearance().onTintColor = uiTagText
+        UISegmentedControl.appearance().selectedSegmentTintColor = uiSurface
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: uiPrimaryText], for: .normal)
+        UITextField.appearance().tintColor = uiTagText
+        UITextView.appearance().tintColor = uiTagText
+        UISearchBar.appearance().tintColor = uiPrimaryButton
+        UIProgressView.appearance().progressTintColor = uiTagText
+        UIPageControl.appearance().currentPageIndicatorTintColor = uiTagText
     }
 }
 
-// MARK: - Legacy bridge
+/// Explicit screen styling is required for SwiftUI List/Form; UIAppearance
+/// alone cannot override scrollContentBackground or a view's own hardcodes.
+private struct PokiScreenModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .scrollContentBackground(.hidden)
+            .background(PokiTheme.background.ignoresSafeArea())
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.primaryButton)
+            .toolbarBackground(PokiTheme.background, for: .navigationBar)
+    }
+}
+extension View {
+    func pokiScreen() -> some View { modifier(PokiScreenModifier()) }
+    func pokiCard() -> some View {
+        background(PokiTheme.surface, in: RoundedRectangle(cornerRadius: PokiTheme.Radius.card, style: .continuous))
+    }
+}
 
-/// The rest of the app still refers to `AmoreTheme`. Rather than touching
-/// ~170 view files, every legacy token is re-pointed at the Poki palette so
-/// existing call sites render in the new system immediately.
+/// Source-compatible aliases; direct rendering call sites are migrated too.
 enum AmoreTheme {
     static let background = PokiTheme.background
     static let secondaryBackground = PokiTheme.surface
-    static let groupedBackground = PokiTheme.surface
+    static let groupedBackground = PokiTheme.background
     static let card = PokiTheme.surface
-
     static let textPrimary = PokiTheme.primaryText
     static let textSecondary = PokiTheme.secondaryText
     static let textDisabled = PokiTheme.secondaryText.opacity(0.6)
-
     static let separator = PokiTheme.divider
-    static let accent = PokiTheme.aiAccentStrong
-    static let success = PokiTheme.aiAccentStrong
+    static let accent = PokiTheme.tagText
+    static let success = PokiTheme.tagText
     static let warning = PokiTheme.secondaryText
     static let danger = PokiTheme.danger
-
     enum Radius {
         static let chip = PokiTheme.Radius.chip
         static let row = PokiTheme.Radius.row
@@ -167,14 +147,7 @@ enum AmoreTheme {
         static let panel = PokiTheme.Radius.panel
         static let screen = PokiTheme.Radius.screen
     }
-
-    /// Translucent paper tint used by floating surfaces (drawer, composer, bars).
-    /// Resolves to the Poki background hue at the requested alpha, so glass
-    /// panels read as warm paper in light and deep charcoal in dark.
     static func glassFill(_ opacity: Double = 0.80) -> Color {
-        PokiTheme.adaptive(
-            light: Color(.sRGB, red: 0xFA / 255, green: 0xFA / 255, blue: 0xF9 / 255, opacity: opacity),
-            dark: Color(.sRGB, red: 0x0C / 255, green: 0x0C / 255, blue: 0x0D / 255, opacity: opacity)
-        )
+        PokiTheme.background.opacity(opacity)
     }
 }

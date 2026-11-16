@@ -79,19 +79,19 @@ struct FileBrowserView: View {
                         }) {
                             Text(viewModel.pathComponents[index])
                                 .font(.caption)
-                                .foregroundColor(.blue)
+                                .foregroundColor(PokiTheme.tagText)
                         }
                         if index < viewModel.pathComponents.count - 1 {
                             Image(systemName: "chevron.right")
                                 .font(.caption2)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(PokiTheme.secondaryText)
                         }
                     }
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 8)
             }
-            .background(Color(UIColor.secondarySystemBackground))
+            .background(PokiTheme.surface)
 
             // File list
             if viewModel.isLoading {
@@ -103,9 +103,9 @@ struct FileBrowserView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "folder")
                         .font(.system(size: 48))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PokiTheme.secondaryText)
                     Text("Empty folder")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PokiTheme.secondaryText)
                 }
                 Spacer()
             } else {
@@ -135,11 +135,13 @@ struct FileBrowserView: View {
                             // highlight (downloads panel "Show in Files").
                             .listRowBackground(
                                 highlightActive && item.name == highlightFileName
-                                    ? Color.accentColor.opacity(0.18)
+                                    ? PokiTheme.tagText.opacity(0.18)
                                     : nil
                             )
                         }
                     }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
                     .listStyle(.plain)
                     .onAppear { locateHighlightTarget(proxy: proxy) }
                     .onChange(of: viewModel.items.map(\.name)) { _ in
@@ -148,6 +150,7 @@ struct FileBrowserView: View {
                 }
             }
         }
+        .pokiScreen()
         .navigationTitle("Files")
         .navigationBarTitleDisplayMode(.inline)
         // [T-ios-copy-abs-path-copied-toast] Self-dismissing "Copied" capsule.
@@ -418,6 +421,7 @@ private struct FilePreviewSheet: View {
     var body: some View {
         NavigationStack {
             content
+                .pokiScreen()
                 .navigationTitle(item.name)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -623,12 +627,12 @@ private struct FileLoadErrorView: View {
         VStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             Text("Could not read file")
                 .font(.headline)
             Text(message)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
         }
@@ -703,10 +707,10 @@ private struct FileInfoView: View {
                 VStack(spacing: 12) {
                     Image(systemName: item.iconName)
                         .font(.system(size: 48))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Text("Preview not available")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 24)
@@ -716,7 +720,7 @@ private struct FileInfoView: View {
                 ForEach(fileAttributes, id: \.0) { key, value in
                     HStack(alignment: .top) {
                         Text(key)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .frame(width: 80, alignment: .leading)
                         Text(value)
                             .textSelection(.enabled)
@@ -724,6 +728,8 @@ private struct FileInfoView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
     }
 }
 
@@ -849,7 +855,7 @@ struct FileItemRow: View {
                     }
                 }
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(PokiTheme.secondaryText)
             }
 
             Spacer()
@@ -858,7 +864,7 @@ struct FileItemRow: View {
             if !item.isDirectory {
                 Button(action: onExport) {
                     Image(systemName: "square.and.arrow.up")
-                        .foregroundColor(.blue)
+                        .foregroundColor(PokiTheme.tagText)
                 }
                 .buttonStyle(.borderless)
             }
@@ -867,7 +873,7 @@ struct FileItemRow: View {
             if item.isDirectory {
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(PokiTheme.secondaryText)
             }
         }
         .contentShape(Rectangle())
@@ -1609,19 +1615,19 @@ private struct DirectoryPickerView: View {
                         Button { navigateTo(index: index) } label: {
                             Text(pathComponents[index])
                                 .font(.caption)
-                                .foregroundColor(.blue)
+                                .foregroundColor(PokiTheme.tagText)
                         }
                         if index < pathComponents.count - 1 {
                             Image(systemName: "chevron.right")
                                 .font(.caption2)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(PokiTheme.secondaryText)
                         }
                     }
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 8)
             }
-            .background(Color(UIColor.secondarySystemBackground))
+            .background(PokiTheme.surface)
 
             // Directory list
             if items.isEmpty {
@@ -1629,9 +1635,9 @@ private struct DirectoryPickerView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "folder")
                         .font(.system(size: 48))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PokiTheme.secondaryText)
                     Text("Empty folder")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PokiTheme.secondaryText)
                 }
                 Spacer()
             } else {
@@ -1640,14 +1646,14 @@ private struct DirectoryPickerView: View {
                         HStack(spacing: 12) {
                             Image(systemName: "folder.fill")
                                 .font(.title2)
-                                .foregroundColor(.blue)
+                                .foregroundColor(PokiTheme.tagText)
                             Text(item.name)
                                 .font(.body)
                                 .lineLimit(1)
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(PokiTheme.secondaryText)
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -1656,9 +1662,12 @@ private struct DirectoryPickerView: View {
                         }
                     }
                 }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
                 .listStyle(.plain)
             }
         }
+        .pokiScreen()
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

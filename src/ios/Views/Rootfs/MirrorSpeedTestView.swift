@@ -496,7 +496,7 @@ struct MirrorsSectionView: View {
                            let selected = vm.selectedMirror(for: category) {
                             Text(selected.name)
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                         if let fastest = vm.fastestResult(for: category) {
                             latencyBadge(fastest.latencyMs)
@@ -545,12 +545,12 @@ struct MirrorCategoryDetailView: View {
                         Text(mirror.name).font(.body.weight(.medium))
                         Text(mirror.baseURL)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .lineLimit(1)
                     }
                 } else {
                     Text(AppLocalized("Official (default)"))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
 
@@ -598,6 +598,9 @@ struct MirrorCategoryDetailView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle(category.displayName)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -615,19 +618,19 @@ struct MirrorCategoryDetailView: View {
                     if mirror.isOfficial {
                         Text(AppLocalized("Official"))
                             .font(.caption2.weight(.medium))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .padding(.horizontal, 5)
                             .padding(.vertical, 1)
-                            .background(Color.secondary.opacity(0.12))
+                            .background(PokiTheme.secondaryText.opacity(0.12))
                             .clipShape(Capsule())
                     }
                     Text(mirror.region)
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
                 Text(mirror.baseURL)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(1)
             }
 
@@ -649,19 +652,19 @@ struct MirrorCategoryDetailView: View {
                     if result.mirror.isOfficial {
                         Text(AppLocalized("Official"))
                             .font(.caption2.weight(.medium))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .padding(.horizontal, 5)
                             .padding(.vertical, 1)
-                            .background(Color.secondary.opacity(0.12))
+                            .background(PokiTheme.secondaryText.opacity(0.12))
                             .clipShape(Capsule())
                     }
                     Text(result.mirror.region)
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
                 Text(result.mirror.baseURL)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(1)
             }
 
@@ -674,7 +677,7 @@ struct MirrorCategoryDetailView: View {
             } else {
                 Text(AppLocalized("Timeout"))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         }
         .contentShape(Rectangle())

@@ -316,16 +316,16 @@ struct SubAgentStatChips: View {
     private func chip(_ symbol: String, _ text: String, tint: Color? = nil, label: String? = nil) -> some View {
         HStack(spacing: 4) {
             Image(systemName: symbol).font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(tint ?? Color(UIColor.secondaryLabel))
+                .foregroundStyle(tint ?? PokiTheme.secondaryText)
             // Proportional with fixed-width digits: a monospaced face spread
             // "6 次工具调用" out with double-width gaps around the number.
             Text(text).font(.system(size: 11, weight: .medium)).monospacedDigit()
-                .foregroundStyle(Color(UIColor.label))
+                .foregroundStyle(PokiTheme.primaryText)
                 .lineLimit(1)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(Capsule().fill(Color(UIColor.secondarySystemFill)))
+        .background(Capsule().fill(PokiTheme.surface))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label ?? text)
     }
@@ -379,7 +379,7 @@ struct SubAgentCollapsibleText: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(text)
                 .font(.system(size: 13, design: monospaced ? .monospaced : .default))
-                .foregroundStyle(Color(UIColor.label))
+                .foregroundStyle(PokiTheme.primaryText)
                 .lineLimit(long && !expanded ? 4 : nil)
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -412,7 +412,7 @@ struct SubAgentTaskCard: View {
                     Divider()
                     Text(AppLocalized("Context"))
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(Color(UIColor.secondaryLabel))
+                        .foregroundStyle(PokiTheme.secondaryText)
                     SubAgentCollapsibleText(text: args.context)
                 }
             }
@@ -443,9 +443,9 @@ struct SubAgentToolTimelineCard: View {
                                     .font(.system(size: 10, weight: .medium))
                                     .lineLimit(1)
                             }
-                            .foregroundStyle(Color(UIColor.secondaryLabel))
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .padding(.horizontal, 7).padding(.vertical, 3)
-                            .background(Capsule().stroke(Color(UIColor.separator), lineWidth: 0.5))
+                            .background(Capsule().stroke(PokiTheme.divider, lineWidth: 0.5))
                         }
                     }
                 }
@@ -463,7 +463,7 @@ struct SubAgentToolTimelineCard: View {
         if digest.total > limit {
             Text(String(format: AppLocalized("Latest %1$lld of %2$lld"), limit, digest.total))
                 .font(.system(size: 10))
-                .foregroundStyle(Color(UIColor.tertiaryLabel))
+                .foregroundStyle(PokiTheme.secondaryText)
         }
     }
 
@@ -479,11 +479,11 @@ struct SubAgentToolTimelineCard: View {
                         .font(.system(size: 12, weight: .semibold))
                         .lineLimit(1)
                 }
-                .foregroundStyle(call.state == .running ? HelperAccent.color : Color(UIColor.label))
+                .foregroundStyle(call.state == .running ? HelperAccent.color : PokiTheme.primaryText)
                 if !call.title.isEmpty {
                     Text(call.title)
                         .font(.system(size: 12))
-                        .foregroundStyle(Color(UIColor.secondaryLabel))
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .lineLimit(2)
                         .textSelection(.enabled)
                 }
@@ -492,7 +492,7 @@ struct SubAgentToolTimelineCard: View {
             if let duration = call.duration {
                 Text(SubAgentRunDigest.durationLabel(duration))
                     .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(Color(UIColor.tertiaryLabel))
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         }
         .accessibilityElement(children: .combine)
@@ -509,7 +509,7 @@ struct SubAgentToolTimelineCard: View {
             Image(systemName: "xmark.circle.fill").font(.system(size: 12)).foregroundStyle(.red)
         case .cancelled:
             Image(systemName: "minus.circle.fill").font(.system(size: 12))
-                .foregroundStyle(Color(UIColor.tertiaryLabel))
+                .foregroundStyle(PokiTheme.secondaryText)
         }
     }
 }
@@ -536,7 +536,7 @@ struct SubAgentActionsCard: View {
                             .lineLimit(1...4)
                             .focused($focused)
                             .padding(.horizontal, 10).padding(.vertical, 7)
-                            .background(RoundedRectangle(cornerRadius: 8).fill(Color(UIColor.tertiarySystemFill)))
+                            .background(RoundedRectangle(cornerRadius: 8).fill(PokiTheme.surface))
                         Button {
                             if SubAgentUserSteer.send(draft, childSessionId: childSessionId) {
                                 draft = ""
@@ -546,7 +546,7 @@ struct SubAgentActionsCard: View {
                         } label: {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.system(size: 26))
-                                .foregroundStyle(isBlank ? Color(UIColor.tertiaryLabel) : HelperAccent.color)
+                                .foregroundStyle(isBlank ? PokiTheme.secondaryText : HelperAccent.color)
                         }
                         .buttonStyle(.plain)
                         .disabled(isBlank)
@@ -556,7 +556,7 @@ struct SubAgentActionsCard: View {
                          ? AppLocalized("Sent. The sub agent reads it at its next turn.")
                          : AppLocalized("Read at the sub agent's next turn; a tool call already running is not interrupted."))
                         .font(.system(size: 11))
-                        .foregroundStyle(Color(UIColor.secondaryLabel))
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Button(role: .destructive) { confirmStop = true } label: {

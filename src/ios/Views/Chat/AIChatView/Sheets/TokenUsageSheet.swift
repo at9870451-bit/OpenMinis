@@ -117,7 +117,7 @@ private struct StatRow: View {
             }
             Spacer()
             Text(value)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .monospacedDigit()
         }
     }

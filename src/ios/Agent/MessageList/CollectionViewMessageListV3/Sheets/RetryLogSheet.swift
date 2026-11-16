@@ -24,10 +24,10 @@ struct RetryMarkerButton: View {
         Button(action: action) {
             Image(systemName: "arrow.triangle.2.circlepath")
                 .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(Color.black.opacity(0.75))
+                .foregroundStyle(PokiTheme.tagText)
                 .padding(.horizontal, 7)
                 .padding(.vertical, 2)
-                .background(Color.yellow)
+                .background(PokiTheme.tagBackground)
                 .clipShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -59,7 +59,7 @@ struct RetryLogSheet: View {
             List {
                 if shown.isEmpty {
                     Text("No retries so far in this run.")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 } else {
                     Section {
                         ForEach(shown) { event in
@@ -99,23 +99,23 @@ struct RetryLogSheet: View {
                 outcomeChip(e.outcome)
                 Text(Self.timeFormatter.string(from: e.time))
                     .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             if let n = e.attempt, let total = e.maxAttempts {
                 let attempt = String(format: AppLocalized("Attempt %lld of %lld"), n, total)
                 let wait = e.delaySeconds.map { " · " + String(format: AppLocalized("Waited %lld s"), $0) } ?? ""
-                Text(attempt + wait).font(.caption).foregroundStyle(.secondary)
+                Text(attempt + wait).font(.caption).foregroundStyle(PokiTheme.secondaryText)
             }
             Text(String(format: AppLocalized("Model: %@"), e.model))
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.caption).foregroundStyle(PokiTheme.secondaryText)
             if let to = e.switchedTo {
                 Text(String(format: AppLocalized("Switched to: %@"), to))
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption).foregroundStyle(PokiTheme.secondaryText)
             }
             if !e.reason.isEmpty {
                 Text(e.reason)
                     .font(.caption)
-                    .foregroundStyle(.primary.opacity(0.8))
+                    .foregroundStyle(PokiTheme.primaryText.opacity(0.8))
                     .lineLimit(6)
                     .textSelection(.enabled)
             }
@@ -149,7 +149,7 @@ struct RetryLogSheet: View {
             case .succeeded: return (AppLocalized("Recovered"), .green)
             // Not the shared "Failed" key: its zh-Hans reads 加载失败 (load failed).
             case .failed: return (AppLocalized("Not recovered"), .red)
-            case .unfinished: return (AppLocalized("Unfinished"), .gray)
+            case .unfinished: return (AppLocalized("Unfinished"), PokiTheme.secondaryText)
             }
         }()
         Text(text)

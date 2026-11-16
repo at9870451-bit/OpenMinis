@@ -81,14 +81,14 @@ extension AIChatView {
             if vm.isSuspended {
                 HStack(spacing: 8) {
                     ProgressView()
-                        .tint(.yellow)
+                        .tint(PokiTheme.tagText)
                     Text("Waiting for other tasks to complete...")
                         .font(.system(size: 13))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
-                .background(Color.yellow.opacity(0.08))
+                .background(PokiTheme.tagBackground)
             }
 
             // [T-ios-chat-body-stack-erase] Same as body: erase the composer
@@ -135,7 +135,7 @@ extension AIChatView {
                 .padding(.horizontal, 8)
                 .padding(.vertical, 6)
             })
-            .contentShape(RoundedRectangle(cornerRadius: 20))
+            .contentShape(RoundedRectangle(cornerRadius: 24))
             .onTapGesture { inputFocused = true }
             .onReceive(speechManager.$recognizedText) { text in
                 guard speechManager.state == .recording || !text.isEmpty else { return }

@@ -86,15 +86,15 @@ private struct SpeechLanguagePickerSheet: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(speechManager.displayName(for: loc))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(PokiTheme.primaryText)
                     Text(loc.identifier)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 Spacer()
                 if loc.identifier == speechManager.locale.identifier {
                     Image(systemName: "checkmark")
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(PokiTheme.primaryText)
                         .fontWeight(.semibold)
                 }
             }

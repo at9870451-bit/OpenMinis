@@ -27,7 +27,9 @@ struct EnhancedBackgroundSettingsView: View {
                     .focusHighlight(shouldFocus("enhancedBackgroundExecution", current: keepAlive.enhancedBackgroundEnabled))
             } footer: {
                 Text("Keeps agent tasks running when the app is in the background. Shows progress via Live Activity on the Lock Screen and Dynamic Island. Also turns on Background Speak so text-to-speech narration keeps playing.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             // [T-bka-continued-setting] iOS 26+ only (BGContinuedProcessingTask).
             // Shown whatever Enhanced Background says: the task is the
@@ -39,7 +41,9 @@ struct EnhancedBackgroundSettingsView: View {
                         .focusHighlight(shouldFocus("continuedProcessingPreferred", current: keepAlive.continuedProcessingPreferred))
                 } footer: {
                     Text("Shows a Minis task status on screen so the task keeps processing in the background.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
 
             // [T-ipad16-liveactivity-restore-crash] Hidden on devices where
@@ -57,14 +61,18 @@ struct EnhancedBackgroundSettingsView: View {
                     // Live Activity freezes; the location heartbeat is what
                     // keeps it refreshing.
                     Text("Show agent task progress on the Lock Screen and in the Dynamic Island. Turning this off also removes the currently displayed Live Activity. Tip: enable Location Tracking below so the Live Activity keeps refreshing while the app stays in the background — without it, updates pause about 30 seconds after you leave the app.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
 
             Section {
                 Toggle("Task Notifications", isOn: $keepAlive.backgroundNotificationsEnabled)
             } footer: {
                 Text("Show local notifications when agent tasks start and complete, including tasks triggered by Shortcuts.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             // [T-ios-live-activity-privacy-mode] Sits right after the two
             // surfaces it governs (Live Activity above, Task Notifications
@@ -75,14 +83,18 @@ struct EnhancedBackgroundSettingsView: View {
                 Toggle("Task Status Privacy", isOn: $keepAlive.liveActivityPrivacyMode)
             } footer: {
                 Text("Hide session content on the Lock Screen, in the Dynamic Island and in notifications. Only the number of completed tasks and the elapsed time are shown — no session titles, tool status or reply content.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Toggle("Background Speak", isOn: $keepAlive.backgroundSpeakEnabled)
                     .focusHighlight(shouldFocus("backgroundSpeakEnabled", current: keepAlive.backgroundSpeakEnabled))
             } footer: {
                 Text("Enables background audio playback for text-to-speech narration and music/audio playback while the app is in the background.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             // MARK: - Speech Settings
 
@@ -92,7 +104,7 @@ struct EnhancedBackgroundSettingsView: View {
                         Text("Rate")
                         Spacer()
                         Text(String(format: "%.2f", keepAlive.speechRate))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(PokiTheme.secondaryText)
                             .monospacedDigit()
                     }
                     Slider(
@@ -107,7 +119,7 @@ struct EnhancedBackgroundSettingsView: View {
                         Text("Pitch")
                         Spacer()
                         Text(String(format: "%.1f", keepAlive.speechPitch))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(PokiTheme.secondaryText)
                             .monospacedDigit()
                     }
                     Slider(value: $keepAlive.speechPitch, in: 0.5...2.0, step: 0.1)
@@ -118,23 +130,28 @@ struct EnhancedBackgroundSettingsView: View {
                         Text("Volume")
                         Spacer()
                         Text(String(format: "%.1f", keepAlive.speechVolume))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(PokiTheme.secondaryText)
                             .monospacedDigit()
                     }
                     Slider(value: $keepAlive.speechVolume, in: 0.0...1.0, step: 0.1)
                 }
             } header: {
                 Text("Speech")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 voicePicker(label: "English Voice", language: "en", selection: $keepAlive.speechVoiceEn)
                 voicePicker(label: "中文语音", language: "zh", selection: $keepAlive.speechVoiceZh)
             } header: {
                 Text("Voice")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Choose a specific voice for each language. Download more voices in Settings > Accessibility > Spoken Content > Voices.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Button("Reset to Defaults") {
@@ -145,6 +162,7 @@ struct EnhancedBackgroundSettingsView: View {
                     previewSpeech()
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             // MARK: - Other Settings
 
@@ -158,7 +176,9 @@ struct EnhancedBackgroundSettingsView: View {
                     }
             } footer: {
                 Text("Lets the agent keep working in the background and keeps the task Live Activity refreshing in real time. Uses coarse, low-accuracy location only as a background heartbeat — it does not track or store your precise location.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 // [T-keepalive-survival-tier] Shows the app's background
@@ -171,14 +191,14 @@ struct EnhancedBackgroundSettingsView: View {
                     switch keepAlive.survivalTier {
                     case .short:
                         Text("Short-Lived (~30s)")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(PokiTheme.secondaryText)
                     case .extended(let location, let audio):
                         HStack(spacing: 4) {
                             Circle()
-                                .fill(.green)
+                                .fill(PokiTheme.primaryText)
                                 .frame(width: 8, height: 8)
                             Text(extendedTierLabel(location: location, audio: audio))
-                                .foregroundColor(.green)
+                                .foregroundColor(PokiTheme.primaryText)
                         }
                     }
                 }
@@ -191,10 +211,17 @@ struct EnhancedBackgroundSettingsView: View {
                 }
             } header: {
                 Text("Status")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("How long the app can keep working after moving to the background. Without any keep-alive mechanism, iOS suspends apps after roughly 30 seconds; enabling Location Tracking (and granting location permission) or Background Speak extends this for the duration of a task.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Background")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

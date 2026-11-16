@@ -218,7 +218,7 @@ struct UsageStatsView: View {
             if vm.isLoaded && vm.providers.isEmpty {
                 Section {
                     Text("No usage data yet. Start a conversation to see token statistics here.")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             } else if vm.isLoaded {
                 // Grand totals
@@ -258,13 +258,13 @@ struct UsageStatsView: View {
                                         if let caveat = model.attributionCaveat {
                                             Text(caveat)
                                                 .font(.caption2)
-                                                .foregroundStyle(.secondary)
+                                                .foregroundStyle(PokiTheme.secondaryText)
                                         }
                                     }
                                     Spacer()
                                     let totalInputLabel = model.inputTokens + model.cacheReadTokens + model.cacheCreationTokens
                                     Text("\(formatCount(totalInputLabel)) / \(formatCount(model.outputTokens))")
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                 }
                             }
                         }

@@ -56,26 +56,29 @@ struct QuotaDetailSheet: View {
                         Section {
                             HStack(spacing: 8) {
                                 ProgressView().controlSize(.small)
-                                Text("Checking balance…").foregroundStyle(.secondary)
+                                Text("Checking balance…").foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     case .unsupported(let reason):
-                        Section { Text(ProviderQuotaSection.message(for: reason)).foregroundStyle(.secondary) }
+                        Section { Text(ProviderQuotaSection.message(for: reason)).foregroundStyle(PokiTheme.secondaryText) }
                     case .failed(let err):
                         Section { Text(ProviderQuotaSection.message(for: err)).foregroundStyle(.orange) }
                     case .empty:
                         Section {
-                            Text("The provider reported no balance or quota for this key.").foregroundStyle(.secondary)
+                            Text("The provider reported no balance or quota for this key.").foregroundStyle(PokiTheme.secondaryText)
                         }
                     case .hidden:
-                        Section { Text("Add an API key to see the balance.").foregroundStyle(.secondary) }
+                        Section { Text("Add an API key to see the balance.").foregroundStyle(PokiTheme.secondaryText) }
                     }
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
             .refreshable { await refresh() }
             .sheet(item: $consoleURL) { url in
                 MinisLinkPreviewView(url: url, browserPool: nil)
             }
+            .pokiScreen()
             .navigationTitle(ProviderConfigStore.shared.instance(for: instanceId)?.label ?? String(localized: "Quota"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -112,7 +115,7 @@ struct QuotaDetailSheet: View {
                         Text(detection.text)
                         Text(String(format: String(localized: "detected %@"), ProviderQuotaSection.relative(detection.at)))
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             }
@@ -127,7 +130,7 @@ struct QuotaDetailSheet: View {
                 Text(String(format: String(localized: "Same account as “%@” — the same balance, don't add them up"),
                             sharing.joined(separator: "”, “")))
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             if let err = subject?.lastRefresh?.error {
                 Text(String(format: String(localized: "Last refresh failed: %@"), ProviderQuotaSection.message(for: err)))
@@ -137,7 +140,7 @@ struct QuotaDetailSheet: View {
             if let blockedMessage {
                 Text(blockedMessage)
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             if let instance = ProviderConfigStore.shared.instance(for: instanceId),
                let url = QuotaConsoleLink.url(for: QuotaStore.descriptor(for: instance)) {
@@ -168,7 +171,7 @@ struct QuotaDetailSheet: View {
                         if binding.evidence == .assumedSubjectWide {
                             Text("The provider didn't state the scope; treated as shared by the account.")
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 } icon: {

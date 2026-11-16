@@ -211,9 +211,9 @@ struct BridgedAssistantFooterV3: View {
             Spacer()
             if bridge.autoRetryAttempt > 0 {
                 Text("Retry in \(bridge.autoRetryCountdown)s (\(bridge.autoRetryAttempt)/\(AIChatViewModel.retryDelays.count))")
-                    .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                    .font(.caption.weight(.semibold)).foregroundStyle(PokiTheme.secondaryText)
                     .padding(.horizontal, 12).padding(.vertical, 6)
-                    .background(Color.secondary.opacity(0.12)).clipShape(Capsule())
+                    .background(PokiTheme.secondaryText.opacity(0.12)).clipShape(Capsule())
             } else if let onRetry = bridge.onRetry {
                 Button(action: onRetry) {
                     HStack(spacing: 4) {
@@ -234,7 +234,7 @@ struct BridgedAssistantFooterV3: View {
         HStack(alignment: .center, spacing: 8) {
             HStack(spacing: 6) {
                 Image(systemName: "pause.circle.fill").font(.caption).foregroundStyle(.orange)
-                Text(AppLocalized("Interrupted — tap Resume to continue")).font(.caption).foregroundStyle(.secondary)
+                Text(AppLocalized("Interrupted — tap Resume to continue")).font(.caption).foregroundStyle(PokiTheme.secondaryText)
             }
             Spacer()
             if let onResume = bridge.onResume {
@@ -243,9 +243,9 @@ struct BridgedAssistantFooterV3: View {
                         Image(systemName: "play.fill").font(.caption.weight(.semibold))
                         Text(AppLocalized("Resume")).font(.caption.weight(.semibold))
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .padding(.horizontal, 12).padding(.vertical, 6)
-                    .background(Color.orange).clipShape(Capsule())
+                    .background(PokiTheme.primaryButton).clipShape(Capsule())
                 }
             }
         }

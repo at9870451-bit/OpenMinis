@@ -86,10 +86,15 @@ struct BackupRestoreView: View {
                 Section {
                     Text(errorText)
                         .font(.footnote)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(PokiTheme.danger)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .modifier(StandaloneTitle(title: AppLocalized("Restore"),
                                  active: !embedded))
         .fileImporter(isPresented: $showPicker,
@@ -160,7 +165,7 @@ struct BackupRestoreView: View {
                             name: folder.name,
                             subtitle: AppLocalized("Shared Folder"),
                             systemName: "externaldrive.connected.to.line.below.fill",
-                            tint: .teal)
+                            tint: PokiTheme.primaryButton)
                     }
                     .disabled(isWorking)
                 }
@@ -172,15 +177,18 @@ struct BackupRestoreView: View {
                             name: r.name,
                             subtitle: "\(r.backend.uppercased()) · /\(r.path)",
                             systemName: "network",
-                            tint: .indigo)
+                            tint: PokiTheme.primaryButton)
                     }
                     .disabled(isWorking)
                 }
             } header: {
                 Text("Backup Destinations")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Tap a destination to browse its folders and pick a backup.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
         }
     }
 
@@ -192,7 +200,7 @@ struct BackupRestoreView: View {
                 Text(name)
                 Text(subtitle)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(1)
                     .truncationMode(.middle)
             }
@@ -216,7 +224,7 @@ struct BackupRestoreView: View {
                 Label {
                     Text("Choose from Files…")
                 } icon: {
-                    BackupActionIcon(systemName: "folder.fill", tint: .blue)
+                    BackupActionIcon(systemName: "folder.fill", tint: PokiTheme.primaryButton)
                 }
             }
             .disabled(isWorking)
@@ -227,15 +235,18 @@ struct BackupRestoreView: View {
                 Label {
                     Text("Browse Other Servers…")
                 } icon: {
-                    BackupActionIcon(systemName: "globe", tint: .purple)
+                    BackupActionIcon(systemName: "globe", tint: PokiTheme.primaryButton)
                 }
             }
             .disabled(isWorking)
         } header: {
             Text("Other Sources")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             Text("Pick a .minisbak file from Files, iCloud Drive, or any connected storage — or add a server your backups were saved to.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     /// Shown while the picked package is being opened and its manifest read.
@@ -259,13 +270,13 @@ struct BackupRestoreView: View {
                 ProgressView()
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Opening backup…")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     // Deliberately smaller and dimmer than the title: it is
                     // reassurance that work is happening, not information the
                     // user has to read.
                     Text(inspectStage)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .lineLimit(1)
                         // The stage text changes underneath a fixed layout, so
                         // the row must not resize as the wording changes.
@@ -283,6 +294,7 @@ struct BackupRestoreView: View {
                 .layoutPriority(1)
             }
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     /// [T-restore-destinations-first] The chosen package, at the very top:
@@ -296,7 +308,7 @@ struct BackupRestoreView: View {
         Section {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 12) {
-                    BackupActionIcon(systemName: "doc.zipper", tint: .green)
+                    BackupActionIcon(systemName: "doc.zipper", tint: PokiTheme.primaryButton)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(packageURL?.lastPathComponent ?? AppLocalized("Backup"))
                             .font(.callout.weight(.medium))
@@ -304,7 +316,7 @@ struct BackupRestoreView: View {
                             .truncationMode(.middle)
                         Text(packageHeadline(m))
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             }
@@ -352,7 +364,9 @@ struct BackupRestoreView: View {
             .disabled(isWorking)
         } header: {
             Text("Selected Backup")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     /// One line of totals for the package: size, then what is in it.
@@ -453,7 +467,7 @@ struct BackupRestoreView: View {
                             if let stat = m.categories[category.rawValue] {
                                 Text(detailText(category, stat))
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
@@ -461,9 +475,12 @@ struct BackupRestoreView: View {
             }
         } header: {
             Text("Restore")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             Text("Merge: items are matched by id. Existing items are only replaced when the backup's copy is newer. Nothing is deleted.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private var passphraseSection: some View {
@@ -477,9 +494,12 @@ struct BackupRestoreView: View {
                 .disabled(isWorking)
         } header: {
             Text("Encryption")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             Text("This backup is encrypted. Without its passphrase it cannot be opened.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private var actionSection: some View {
@@ -500,9 +520,9 @@ struct BackupRestoreView: View {
                         ProgressView()
                             .frame(width: 28, height: 28)
                         Text(statusText.isEmpty ? AppLocalized("Working…") : statusText)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     } else {
-                        BackupActionIcon(systemName: "arrow.down.doc.fill", tint: .indigo)
+                        BackupActionIcon(systemName: "arrow.down.doc.fill", tint: PokiTheme.primaryButton)
                         Text("Start Restore")
                             .fontWeight(.semibold)
                     }
@@ -511,6 +531,7 @@ struct BackupRestoreView: View {
             }
             .disabled(isWorking || selected.isEmpty || !passphraseReady)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     /// [T-restore-result-severity] The "warning, not failure" row style.
@@ -556,7 +577,7 @@ struct BackupRestoreView: View {
                 if let failed = c.failed {
                     Text("\(displayNameRaw(c.category)): \(failed)")
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(PokiTheme.danger)
                 } else {
                     // Was `.secondary`, which made a real gap look like fine print.
                     if c.sizeSkippedInPackage > 0 {
@@ -590,12 +611,14 @@ struct BackupRestoreView: View {
             }
         } header: {
             Text("Restore Complete")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             if let prov = r.categories.first(where: { $0.category == BackupCategory.providers.rawValue }) {
                 if prov.credentialsRestored > 0 {
                     // Credentials now always travel with Providers, so this is
                     // the normal outcome rather than a bonus.
                     Text("API keys were restored for \(prov.credentialsRestored) provider(s) along with their settings. Existing keys on this device were kept. OAuth logins may still need to be renewed if their tokens have expired.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } else if prov.credentialsKept > 0 {
                     // [T-backup-credentials-message-inverted] Nothing was
                     // WRITTEN, but only because every key in the package is
@@ -612,15 +635,18 @@ struct BackupRestoreView: View {
                     // `credentialsKept` was already being computed for this and
                     // simply never read by any view.
                     Text("Your existing API keys were kept — the backup's keys matched credentials already on this device, so nothing needed to be overwritten.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } else {
                     // Reachable for OLDER packages: exports used to offer a
                     // credential-free "share copy", and those must keep
                     // restoring. Says why nothing arrived instead of implying
                     // the restore misbehaved.
                     Text("This backup was created without API keys, so restored providers have no credentials — enter each API key or sign in again before use.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     // MARK: - Actions
@@ -879,7 +905,7 @@ struct FolderPackageListView: View {
             if loading {
                 HStack(spacing: 10) {
                     ProgressView()
-                    Text("Looking for backups…").foregroundStyle(.secondary)
+                    Text("Looking for backups…").foregroundStyle(PokiTheme.secondaryText)
                 }
             } else if packages.isEmpty {
                 // Distinguishes "nothing there" from "couldn't reach it" — an
@@ -890,12 +916,12 @@ struct FolderPackageListView: View {
                 VStack(spacing: 10) {
                     Image(systemName: "externaldrive.badge.questionmark")
                         .font(.system(size: 40))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Text("No .minisbak files in this folder.")
                         .font(.headline)
                     Text("If it's on a server, open it once in the Files app to reconnect, then pull down to refresh.")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
@@ -915,10 +941,10 @@ struct FolderPackageListView: View {
                         Text(pkg.url.lastPathComponent)
                             .lineLimit(1)
                             .truncationMode(.middle)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(PokiTheme.primaryText)
                         Text("\(ByteCountFormatter.string(fromByteCount: pkg.size, countStyle: .file)) · \(pkg.modified.formatted(date: .abbreviated, time: .shortened))")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
                 // [T-restore-list-swipe-delete] Same gesture and safeguards as
@@ -936,15 +962,21 @@ struct FolderPackageListView: View {
             if let errorText {
                 Text(errorText)
                     .font(.footnote)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
             }
             } footer: {
                 if !packages.isEmpty {
                     Text("Showing .minisbak files in this folder.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
         }
         .refreshable { await reload() }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(folder.name)
         .navigationBarTitleDisplayMode(.inline)
         .alert(item: $pendingDelete) { pkg in
@@ -1027,13 +1059,15 @@ struct ServerRestorePickerSheet: View {
                                     Text(r.name)
                                     Text("\(r.backend.uppercased()) · /\(r.path)")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                 }
                             }
                         }
                     } header: {
                         Text("Servers")
+                        .foregroundStyle(PokiTheme.secondaryText)
                     }
+                    .listRowBackground(PokiTheme.surface)
                 }
 
                 Section {
@@ -1044,8 +1078,14 @@ struct ServerRestorePickerSheet: View {
                     }
                 } footer: {
                     Text("Add the server your backups were saved to. Servers added here are also available as backup destinations.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
+            .scrollContentBackground(.hidden)
+            .background(PokiTheme.background)
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.primaryButton)
             .navigationTitle("Restore from Server")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -1179,19 +1219,26 @@ struct ServerPackageListView: View {
                     if loading {
                         HStack(spacing: 10) {
                             ProgressView()
-                            Text("Contacting server…").foregroundStyle(.secondary)
+                            Text("Contacting server…").foregroundStyle(PokiTheme.secondaryText)
                         }
                     } else if entries.isEmpty, errorText == nil {
-                        Text("Nothing here.").foregroundStyle(.secondary)
+                        Text("Nothing here.").foregroundStyle(PokiTheme.secondaryText)
                     }
 
                     entryRows
                 } footer: {
                     Text("Open folders to browse. Only .minisbak files are shown.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
+            .scrollContentBackground(.hidden)
+            .background(PokiTheme.background)
             .refreshable { await reload() }
         }
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(remote.name)
         .navigationBarTitleDisplayMode(.inline)
         // A modal, not an inline spinner. Downloading a backup can run for
@@ -1293,8 +1340,8 @@ struct ServerPackageListView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(path.isEmpty || loading)
-                .foregroundStyle(path.isEmpty || loading ? AnyShapeStyle(.tertiary)
-                                                         : AnyShapeStyle(.tint))
+                .foregroundStyle(path.isEmpty || loading ? AnyShapeStyle(PokiTheme.secondaryText)
+                                                         : AnyShapeStyle(PokiTheme.primaryButton))
                 .accessibilityLabel(AppLocalized("Up One Level"))
 
                 ScrollViewReader { proxy in
@@ -1304,7 +1351,7 @@ struct ServerPackageListView: View {
                             ForEach(Array(crumbs.enumerated()), id: \.offset) { i, c in
                                 Image(systemName: "chevron.compact.right")
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                 crumb(title: c.name, target: c.path,
                                       isLast: i == crumbs.count - 1)
                             }
@@ -1329,7 +1376,7 @@ struct ServerPackageListView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             // A bar, not a card: full-bleed background with a hairline under
             // it, which is what a pinned location bar looks like on iOS.
-            .background(.bar)
+            .background(PokiTheme.surface)
 
             Divider()
         }
@@ -1355,7 +1402,7 @@ struct ServerPackageListView: View {
                     .padding(.vertical, 3)
             }
             .buttonStyle(.plain)
-            .foregroundStyle(.tint)
+            .foregroundStyle(PokiTheme.primaryButton)
             .disabled(loading)
         }
     }
@@ -1393,10 +1440,10 @@ struct ServerPackageListView: View {
                         HStack {
                             Label {
                                 Text(e.name).lineLimit(1).truncationMode(.middle)
-                                    .foregroundStyle(.primary)
+                                    .foregroundStyle(PokiTheme.primaryText)
                             } icon: {
                                 Image(systemName: "folder.fill")
-                                    .foregroundStyle(.tint)
+                                    .foregroundStyle(PokiTheme.primaryButton)
                             }
                             Spacer(minLength: 8)
                             // Kept so a folder still reads as "opens
@@ -1404,7 +1451,7 @@ struct ServerPackageListView: View {
                             // a NavigationLink drawing this for us.
                             Image(systemName: "chevron.right")
                                 .font(.footnote.weight(.semibold))
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                     .disabled(downloadingKey != nil || loading)
@@ -1421,10 +1468,10 @@ struct ServerPackageListView: View {
                             Text(e.name)
                                 .lineLimit(1)
                                 .truncationMode(.middle)
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(PokiTheme.primaryText)
                             Text(subtitle(e.asPackage))
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                     .disabled(downloadingKey != nil)
@@ -1446,7 +1493,7 @@ struct ServerPackageListView: View {
             if let errorText {
                 Text(errorText)
                     .font(.footnote)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
             }
         }
     }
@@ -1457,7 +1504,7 @@ struct ServerPackageListView: View {
                 .font(.headline)
             Text(downloadingName)
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .lineLimit(1)
                 .truncationMode(.middle)
 
@@ -1467,7 +1514,7 @@ struct ServerPackageListView: View {
                 .progressViewStyle(.linear)
             Text(progressText)
                 .font(.callout.monospacedDigit())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             // [T-restore-download-speed] Rate and time left, on their own
             // line so the byte counts above stay easy to read. Empty until
             // there is a rate to show rather than displaying a placeholder
@@ -1475,7 +1522,7 @@ struct ServerPackageListView: View {
             if !speedText.isEmpty {
                 Text(speedText)
                     .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
 
             Button(role: .cancel) {
@@ -1491,6 +1538,9 @@ struct ServerPackageListView: View {
             .disabled(cancelFlag.value)
         }
         .padding(24)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .presentationDetents([.height(240)])
         // No swipe-to-dismiss: leaving the sheet would hide a transfer that is
         // still running, which is how the concurrency problem started.

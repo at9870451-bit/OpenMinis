@@ -125,28 +125,30 @@ final class WebAppWebViewController: UIViewController, WKNavigationDelegate, WKU
         // Container itself owns the shadow so the blur view's
         // cornerRadius+masksToBounds doesn't clip it.
         container.layer.shadowColor = UIColor.black.cgColor
-        container.layer.shadowOpacity = 0.3
-        container.layer.shadowRadius = 12
-        container.layer.shadowOffset = CGSize(width: 0, height: 4)
+        container.layer.shadowOpacity = 0.04
+        container.layer.shadowRadius = 6
+        container.layer.shadowOffset = CGSize(width: 0, height: 2)
 
-        let bg = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
+        let bg = UIVisualEffectView(effect: nil)
+        bg.backgroundColor = PokiTheme.uiSurface
         bg.translatesAutoresizingMaskIntoConstraints = false
         bg.isUserInteractionEnabled = false
         bg.layer.cornerRadius = 22
         bg.layer.masksToBounds = true
         bg.layer.borderWidth = 0.5
-        bg.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
+        bg.layer.borderColor = PokiTheme.uiDivider.resolvedColor(with: traitCollection).cgColor
 
         let button = UIButton(type: .custom)
         button.translatesAutoresizingMaskIntoConstraints = false
         let cfg = UIImage.SymbolConfiguration(pointSize: 20, weight: .bold)
         let glyph = UIImage(systemName: "ellipsis", withConfiguration: cfg)?
-            .withTintColor(.white, renderingMode: .alwaysOriginal)
+            .withRenderingMode(.alwaysTemplate)
         button.setImage(glyph, for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
         button.adjustsImageWhenHighlighted = false
         button.accessibilityLabel = NSLocalizedString("More", comment: "")
         button.backgroundColor = .clear
+        button.tintColor = PokiTheme.uiPrimaryText
         button.menu = makeMenu()
         button.showsMenuAsPrimaryAction = true
 
@@ -205,6 +207,7 @@ final class WebAppWebViewController: UIViewController, WKNavigationDelegate, WKU
     private func share() {
         let sheet = UIActivityViewController(activityItems: [resolved.htmlURL],
                                              applicationActivities: nil)
+        sheet.view.tintColor = PokiTheme.uiPrimaryButton
         // iPad popover anchor
         if let pop = sheet.popoverPresentationController {
             pop.sourceView = view

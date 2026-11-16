@@ -130,6 +130,7 @@ struct BrowserHistoryView: View {
                     historyList
                 }
             }
+            .pokiScreen()
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -158,13 +159,13 @@ struct BrowserHistoryView: View {
         VStack(spacing: 12) {
             Image(systemName: "clock.arrow.circlepath")
                 .font(.system(size: 40))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText.opacity(0.75))
             Text("No History")
                 .font(.headline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.primaryText)
             Text("Pages you visit will appear here for 7 days.")
                 .font(.subheadline)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText.opacity(0.75))
                 .multilineTextAlignment(.center)
         }
         .padding()
@@ -181,31 +182,35 @@ struct BrowserHistoryView: View {
                         } label: {
                             historyRow(entry)
                         }
+                        .listRowBackground(PokiTheme.surface)
+                        .listRowSeparatorTint(PokiTheme.divider)
                     }
                 } header: {
                     Text(dayLabel(group.date))
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
         }
         .listStyle(.insetGrouped)
+        .pokiScreen()
     }
 
     private func historyRow(_ entry: BrowserHistoryEntry) -> some View {
         HStack(spacing: 10) {
             Image(systemName: "globe")
                 .font(.system(size: 14))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.title.isEmpty ? entry.domain : entry.title)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(Color(UIColor.label))
+                    .foregroundStyle(PokiTheme.primaryText)
                     .lineLimit(1)
 
                 Text(entry.url)
                     .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(1)
             }
 
@@ -213,7 +218,7 @@ struct BrowserHistoryView: View {
 
             Text(timeLabel(entry.timestamp))
                 .font(.system(size: 11))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText.opacity(0.75))
         }
         .contentShape(Rectangle())
     }

@@ -7,20 +7,21 @@ struct AppLockOverlay: View {
     var body: some View {
         if store.appIsLocked {
             ZStack {
-                Color(.systemBackground)
+                PokiTheme.background
                     .ignoresSafeArea()
 
                 VStack(spacing: 24) {
                     Image(systemName: BiometricAuth.biometryIconName)
                         .font(.system(size: 48))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
 
                     Text("Minis is Locked")
                         .font(.title2.bold())
+                        .foregroundStyle(PokiTheme.primaryText)
 
                     Text("Tap to unlock with \(BiometricAuth.biometryDisplayName)")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
 
                     Button {
                         authenticate()
@@ -29,8 +30,8 @@ struct AppLockOverlay: View {
                             .font(.headline)
                             .padding(.horizontal, 28)
                             .padding(.vertical, 12)
-                            .background(.blue, in: RoundedRectangle(cornerRadius: 12))
-                            .foregroundStyle(.white)
+                            .background(PokiTheme.primaryButton, in: RoundedRectangle(cornerRadius: 12))
+                            .foregroundStyle(PokiTheme.primaryButtonText)
                     }
                     .disabled(isAuthenticating)
                 }
@@ -40,7 +41,7 @@ struct AppLockOverlay: View {
                 authenticate()
             }
         } else if store.showPrivacyScreen {
-            Color(.systemBackground)
+            PokiTheme.background
                 .ignoresSafeArea()
         }
     }

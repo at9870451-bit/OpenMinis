@@ -49,7 +49,7 @@ struct OnboardingModelSelectionView: View {
                             if fetchError != AppLocalized("Could not fetch the model list automatically.") {
                                 Text(fetchError)
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                             HStack(spacing: 12) {
                                 Button {
@@ -73,7 +73,7 @@ struct OnboardingModelSelectionView: View {
                                 ProgressView()
                                 Text("Loading models...")
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                             Spacer()
                         }
@@ -104,7 +104,10 @@ struct OnboardingModelSelectionView: View {
 
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
         .searchable(text: $searchText, prompt: "Filter models")
+        .pokiScreen()
         .navigationTitle("Select Models")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -214,17 +217,17 @@ struct OnboardingModelSelectionView: View {
             HStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(isSelected ? Color.accentColor : Color(UIColor.tertiarySystemFill))
+                        .fill(isSelected ? PokiTheme.primaryButton : PokiTheme.selection)
                         .frame(width: 26, height: 26)
                     if isSelected, let idx = selectionIndex {
                         Text("\(idx + 1)")
                             .font(.caption.weight(.semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PokiTheme.primaryButtonText)
                     }
                 }
                 Text(entry.model.displayName)
                     .font(.body)
-                    .foregroundStyle(Color(UIColor.label))
+                    .foregroundStyle(PokiTheme.primaryText)
                 Spacer()
             }
         }

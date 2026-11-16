@@ -24,6 +24,10 @@ struct BackupHistoryDetailView: View {
             if !record.destinations.isEmpty { destinationsSection }
             logSection
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(record.startedAt.formatted(date: .abbreviated, time: .shortened))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { keepScreenAwake = BackupScreenAwake.isEnabled }
@@ -115,7 +119,9 @@ struct BackupHistoryDetailView: View {
             }
         } footer: {
             Text("Stopping keeps what has been backed up so far, and this run can be resumed later. Deleting the record discards it.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private var summarySection: some View {
@@ -172,7 +178,7 @@ struct BackupHistoryDetailView: View {
                     Spacer(minLength: 0)
                     Text(name)
                         .multilineTextAlignment(.trailing)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                         .layoutPriority(1)
                 }
@@ -202,13 +208,16 @@ struct BackupHistoryDetailView: View {
                 }
             }
             if let e = record.errorMessage {
-                Text(e).font(.footnote).foregroundStyle(.red)
+                Text(e).font(.footnote).foregroundStyle(PokiTheme.danger)
             }
         } header: {
             Text("Summary")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             Text("Included: \(record.categories.map(displayName).joined(separator: ", "))")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     /// [T-backup-delete-files-too] Whether "Delete Record and Files" makes
@@ -307,7 +316,9 @@ struct BackupHistoryDetailView: View {
             }
         } header: {
             Text("Destinations")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private func destinationRow(_ d: BackupHistory.DestinationOutcome) -> some View {
@@ -319,7 +330,7 @@ struct BackupHistoryDetailView: View {
         HStack(alignment: .center, spacing: 8) {
             Image(systemName: d.succeeded ? "checkmark.circle.fill"
                                           : "exclamationmark.triangle.fill")
-                .foregroundStyle(d.succeeded ? .green : .orange)
+                .foregroundStyle(d.succeeded ? PokiTheme.primaryText : Color.orange)
             VStack(alignment: .leading, spacing: 2) {
                 Text(d.name)
                 // [T-backup-destination-detail] The saved name alone
@@ -329,7 +340,7 @@ struct BackupHistoryDetailView: View {
                 if let where_ = destinationSubtitle(d) {
                     Text(where_)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
@@ -348,7 +359,7 @@ struct BackupHistoryDetailView: View {
     private var logSection: some View {
         Section {
             if record.log.isEmpty {
-                Text("No log for this run.").foregroundStyle(.secondary)
+                Text("No log for this run.").foregroundStyle(PokiTheme.secondaryText)
             } else {
                 // [T-backup-log-newest-first] Newest first. A finished run's
                 // log is long (one line per category, plus per-destination
@@ -358,16 +369,18 @@ struct BackupHistoryDetailView: View {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
                         Text(e.at.formatted(date: .omitted, time: .standard))
                             .font(.caption.monospacedDigit())
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text(e.message)
                             .font(.caption)
-                            .foregroundStyle(e.isProblem ? .red : .secondary)
+                            .foregroundStyle(e.isProblem ? PokiTheme.danger : PokiTheme.secondaryText)
                     }
                 }
             }
         } header: {
             Text("Log")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private func durationText(_ d: TimeInterval) -> String {
@@ -441,7 +454,7 @@ private struct BackupRunningIndicator: View {
             let turns = t / Self.secondsPerTurn
             Image(systemName: "arrow.triangle.2.circlepath")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(PokiTheme.primaryButtonText)
                 .rotationEffect(.degrees(turns.truncatingRemainder(dividingBy: 1) * 360))
         }
         .frame(width: 28, height: 28)
@@ -463,7 +476,7 @@ struct BackupHistoryRow: View {
             } else {
                 Image(systemName: Self.statusIcon(record.status))
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .frame(width: 28, height: 28)
                     .background(Self.statusColour(record.status),
                                 in: Circle())
@@ -472,7 +485,7 @@ struct BackupHistoryRow: View {
                 Text(record.startedAt.formatted(date: .abbreviated, time: .shortened))
                 Text(subtitle)
                     .font(.caption)
-                    .foregroundStyle(record.status == .failed ? .red : .secondary)
+                    .foregroundStyle(record.status == .failed ? PokiTheme.danger : PokiTheme.secondaryText)
                     .lineLimit(1)
             }
         }
@@ -514,10 +527,10 @@ struct BackupHistoryRow: View {
 
     static func statusColour(_ s: BackupHistory.Status) -> Color {
         switch s {
-        case .running: return .blue
-        case .succeeded: return .green
+        case .running: return PokiTheme.primaryButton
+        case .succeeded: return PokiTheme.primaryButton
         case .completedWithIssues: return .orange
-        case .failed: return .red
+        case .failed: return PokiTheme.danger
         }
     }
 

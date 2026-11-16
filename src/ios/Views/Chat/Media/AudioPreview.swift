@@ -20,7 +20,7 @@ struct MinisAudioPreviewView: View {
     @State private var showShareSheet = false
     @State private var showSavePicker = false
     @State private var artworkImage: UIImage? = nil
-    @State private var dominantColor: Color = Color(UIColor.secondarySystemBackground)
+    @State private var dominantColor: Color = PokiTheme.surface
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -80,7 +80,7 @@ struct MinisAudioPreviewView: View {
                     .ignoresSafeArea()
             }
         } else {
-            Color(UIColor.systemBackground)
+            PokiTheme.background
                 .ignoresSafeArea()
         }
     }
@@ -149,10 +149,10 @@ struct MinisAudioPreviewView: View {
         } else {
             ZStack {
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(UIColor.secondarySystemBackground))
+                    .fill(PokiTheme.surface)
                 Image(systemName: "waveform")
                     .font(.system(size: 64, weight: .light))
-                    .foregroundStyle(Color.accentColor.opacity(0.8))
+                    .foregroundStyle(PokiTheme.primaryText.opacity(0.8))
             }
             .frame(maxWidth: .infinity)
             .aspectRatio(1, contentMode: .fit)
@@ -168,11 +168,11 @@ struct MinisAudioPreviewView: View {
                 Text(displayTitle)
                     .font(.title2.bold())
                     .lineLimit(1)
-                    .foregroundColor(artworkImage != nil ? .white : Color(UIColor.label))
+                    .foregroundColor(artworkImage != nil ? .white : PokiTheme.primaryText)
                 Text(displaySubtitle)
                     .font(.subheadline)
                     .lineLimit(1)
-                    .foregroundColor(artworkImage != nil ? .white.opacity(0.7) : Color(UIColor.secondaryLabel))
+                    .foregroundColor(artworkImage != nil ? .white.opacity(0.7) : PokiTheme.secondaryText)
             }
             Spacer()
         }
@@ -190,15 +190,15 @@ struct MinisAudioPreviewView: View {
                 ZStack(alignment: .leading) {
                     // Background track
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(artworkImage != nil ? Color.white.opacity(0.3) : Color(UIColor.tertiarySystemFill))
+                        .fill(artworkImage != nil ? Color.white.opacity(0.3) : PokiTheme.surface)
                         .frame(height: 5)
                     // Played portion
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(artworkImage != nil ? Color.white : Color.accentColor)
+                        .fill(artworkImage != nil ? Color.white : PokiTheme.primaryText)
                         .frame(width: max(0, geo.size.width * CGFloat(progress)), height: 5)
                     // Drag handle
                     Circle()
-                        .fill(artworkImage != nil ? Color.white : Color.accentColor)
+                        .fill(artworkImage != nil ? Color.white : PokiTheme.primaryText)
                         .frame(width: 14, height: 14)
                         .offset(x: max(0, geo.size.width * CGFloat(progress) - 7))
                 }
@@ -221,7 +221,7 @@ struct MinisAudioPreviewView: View {
                 Text(formatTime(player.duration))
             }
             .font(.caption2.monospacedDigit())
-            .foregroundColor(artworkImage != nil ? .white.opacity(0.7) : Color(UIColor.secondaryLabel))
+            .foregroundColor(artworkImage != nil ? .white.opacity(0.7) : PokiTheme.secondaryText)
         }
     }
 
@@ -232,21 +232,21 @@ struct MinisAudioPreviewView: View {
             Button { player.skip(by: -10) } label: {
                 Image(systemName: "gobackward.10")
                     .font(.system(size: 28, weight: .medium))
-                    .foregroundColor(artworkImage != nil ? .white : Color(UIColor.label))
+                    .foregroundColor(artworkImage != nil ? .white : PokiTheme.primaryText)
             }
             .buttonStyle(.plain)
 
             Button { player.togglePlayPause() } label: {
                 Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
                     .font(.system(size: 44, weight: .medium))
-                    .foregroundColor(artworkImage != nil ? .white : Color(UIColor.label))
+                    .foregroundColor(artworkImage != nil ? .white : PokiTheme.primaryText)
             }
             .buttonStyle(.plain)
 
             Button { player.skip(by: 10) } label: {
                 Image(systemName: "goforward.10")
                     .font(.system(size: 28, weight: .medium))
-                    .foregroundColor(artworkImage != nil ? .white : Color(UIColor.label))
+                    .foregroundColor(artworkImage != nil ? .white : PokiTheme.primaryText)
             }
             .buttonStyle(.plain)
         }
@@ -273,20 +273,20 @@ struct MinisAudioPreviewView: View {
                     Circle()
                         .fill(artworkImage != nil
                             ? Color.white.opacity(0.2)
-                            : Color(UIColor.secondarySystemBackground))
+                            : PokiTheme.surface)
                         .frame(width: 44, height: 44)
                     Image(systemName: "speedometer")
                         .font(.system(size: 22, weight: .medium))
-                        .foregroundColor(artworkImage != nil ? .white : Color(UIColor.label))
+                        .foregroundColor(artworkImage != nil ? .white : PokiTheme.primaryText)
                         .frame(width: 44, height: 44)
                 }
                 .overlay(alignment: .topTrailing) {
                     Text(rateLabel(player.rate))
                         .font(.system(size: 9, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(PokiTheme.primaryButtonText)
                         .padding(.horizontal, 3)
                         .padding(.vertical, 1)
-                        .background(Capsule().fill(Color.accentColor))
+                        .background(Capsule().fill(PokiTheme.primaryText))
                         .offset(x: 4, y: -2)
                 }
                 .frame(width: 56, height: 56)
@@ -303,11 +303,11 @@ struct MinisAudioPreviewView: View {
                     Circle()
                         .fill(artworkImage != nil
                             ? Color.white.opacity(0.2)
-                            : Color(UIColor.secondarySystemBackground))
+                            : PokiTheme.surface)
                         .frame(width: 44, height: 44)
                     Image(systemName: "pip")
                         .font(.system(size: 17, weight: .medium))
-                        .foregroundColor(artworkImage != nil ? .white : Color(UIColor.label))
+                        .foregroundColor(artworkImage != nil ? .white : PokiTheme.primaryText)
                 }
             }
             .buttonStyle(.plain)
@@ -393,10 +393,10 @@ private struct CircleIconButton: View {
     var body: some View {
         Image(systemName: icon)
             .font(.system(size: 16, weight: .medium))
-            .foregroundColor(hasArtwork ? .white : Color(UIColor.secondaryLabel))
+            .foregroundColor(hasArtwork ? .white : PokiTheme.secondaryText)
             .frame(width: 36, height: 36)
             .background(
-                Circle().fill(hasArtwork ? Color.white.opacity(0.2) : Color(UIColor.tertiarySystemBackground))
+                Circle().fill(hasArtwork ? Color.white.opacity(0.2) : PokiTheme.surface)
             )
     }
 }
@@ -407,11 +407,11 @@ private extension UIImage {
     /// Returns an approximate dominant color by sampling the image at low resolution.
     func dominantSwiftUIColor() -> Color {
         guard let resized = resized(to: CGSize(width: 50, height: 50)),
-              let cgImage = resized.cgImage else { return Color(UIColor.secondarySystemBackground) }
+              let cgImage = resized.cgImage else { return PokiTheme.surface }
         let width = cgImage.width
         let height = cgImage.height
         guard let data = cgImage.dataProvider?.data,
-              let ptr = CFDataGetBytePtr(data) else { return Color(UIColor.secondarySystemBackground) }
+              let ptr = CFDataGetBytePtr(data) else { return PokiTheme.surface }
         let bytesPerPixel = cgImage.bitsPerPixel / 8
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
         let total = width * height

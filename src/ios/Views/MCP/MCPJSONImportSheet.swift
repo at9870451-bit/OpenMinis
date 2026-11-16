@@ -36,7 +36,7 @@ struct MCPJSONImportSheet: View {
                     Section {
                         Text(errorMessage)
                             .font(.footnote)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(PokiTheme.danger)
                     }
                 }
 
@@ -47,17 +47,20 @@ struct MCPJSONImportSheet: View {
                         ForEach(parsed) { server in
                             HStack(spacing: 8) {
                                 Image(systemName: server.isSTDIO ? "terminal" : "globe")
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                 Text(server.id)
                                 Spacer()
                                 Text(server.isSTDIO ? "STDIO" : "HTTP")
                                     .font(.caption2.weight(.semibold))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+            .pokiScreen()
             .navigationTitle(Text("Import JSON"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

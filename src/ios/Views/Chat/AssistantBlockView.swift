@@ -42,31 +42,31 @@ struct AssistantBlockView: View {
             )
             .padding(.vertical, 2)
         case .shellTool:
-            ToolCapsuleView(block: block, icon: "terminal", accentColor: .green,
+            ToolCapsuleView(block: block, icon: "terminal", accentColor: PokiTheme.tagText,
                             commandStartTime: commandStartTime, onStop: onStop, browserPool: browserPool,
                             toolSnapshots: toolSnapshots, detailBlock: $detailBlock)
         case .fileReadTool:
-            ToolCapsuleView(block: block, icon: "doc.text", accentColor: .cyan,
+            ToolCapsuleView(block: block, icon: "doc.text", accentColor: PokiTheme.tagText,
                             commandStartTime: commandStartTime, onStop: onStop,
                             toolSnapshots: toolSnapshots, detailBlock: $detailBlock)
         case .fileWriteTool:
-            ToolCapsuleView(block: block, icon: "doc.text.fill", accentColor: .blue,
+            ToolCapsuleView(block: block, icon: "doc.text.fill", accentColor: PokiTheme.tagText,
                             commandStartTime: commandStartTime, onStop: onStop,
                             toolSnapshots: toolSnapshots, detailBlock: $detailBlock)
         case .fileEditTool:
-            ToolCapsuleView(block: block, icon: "square.and.pencil", accentColor: .orange,
+            ToolCapsuleView(block: block, icon: "square.and.pencil", accentColor: PokiTheme.tagText,
                             commandStartTime: commandStartTime, onStop: onStop,
                             toolSnapshots: toolSnapshots, detailBlock: $detailBlock)
         case .browserTool:
-            ToolCapsuleView(block: block, icon: "globe", accentColor: .blue,
+            ToolCapsuleView(block: block, icon: "globe", accentColor: PokiTheme.tagText,
                             commandStartTime: commandStartTime, onStop: onStop, browserPool: browserPool,
                             toolSnapshots: toolSnapshots, detailBlock: $detailBlock)
         case .readImageTool:
-            ToolCapsuleView(block: block, icon: "photo", accentColor: .purple,
+            ToolCapsuleView(block: block, icon: "photo", accentColor: PokiTheme.tagText,
                             commandStartTime: commandStartTime, onStop: onStop,
                             toolSnapshots: toolSnapshots, detailBlock: $detailBlock)
         case .memoryTool:
-            ToolCapsuleView(block: block, icon: "brain.head.profile", accentColor: .pink,
+            ToolCapsuleView(block: block, icon: "brain.head.profile", accentColor: PokiTheme.tagText,
                             commandStartTime: commandStartTime, onStop: onStop,
                             toolSnapshots: toolSnapshots, detailBlock: $detailBlock)
         case .userAskTool:
@@ -451,7 +451,7 @@ struct ToolCapsuleView: View {
             }
             .padding(.horizontal, 12)
             .frame(height: 36)
-            .background(Color(UIColor.systemGray6))
+            .background(PokiTheme.surface)
             .clipShape(Capsule())
             .overlay(
                 Group {
@@ -964,14 +964,14 @@ struct ThinkingBlockView: View {
                 Image("ThinkingIcon")
                     .resizable()
                     .frame(width: 14, height: 14)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(PokiTheme.tagText)
                 Text(AppLocalized("Deep Thinking"))
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(PokiTheme.tagText)
                 if isStreaming {
                     ProgressView()
                         .controlSize(.mini)
-                        .tint(.blue)
+                        .tint(PokiTheme.primaryText)
                 }
                 Spacer()
                 // [T-thinking-count-beside-chevron] The character count sits at
@@ -988,11 +988,11 @@ struct ThinkingBlockView: View {
                         let charCount = max(block.content.count, block.thinkingContentBuffer.count)
                         Text(charCount > 1000 ? "\(charCount / 1000)K" : "\(charCount)")
                             .font(.system(size: 11, weight: .medium, design: .monospaced))
-                            .foregroundStyle(.blue.opacity(0.6))
+                            .foregroundStyle(PokiTheme.tagText.opacity(0.75))
                     }
                     Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.blue.opacity(0.5))
+                        .foregroundStyle(PokiTheme.tagText.opacity(0.65))
                 }
             }
             .padding(.horizontal, 12)
@@ -1048,7 +1048,7 @@ struct ThinkingBlockView: View {
                             if isTruncated {
                                 Text("Showing last \(displayContent.count / 1000)K of \(total / 1000)K characters", comment: "Thinking window truncation hint")
                                     .font(.system(size: 11))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                     .padding(.horizontal, 12)
                                     .padding(.bottom, 4)
                             }
@@ -1164,11 +1164,11 @@ struct ThinkingBlockView: View {
         .onDisappear {
             ThinkingHitchMonitor.shared.stop(owner: block.id)
         }
-        .background(Color.blue.opacity(0.06))
+        .background(PokiTheme.tagBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.blue.opacity(0.15), lineWidth: 0.5)
+                .stroke(PokiTheme.aiAccent, lineWidth: 0.5)
         )
         .task(id: block.id) {
             // One-shot per-block auto-expand. Runs when this cell first hosts
@@ -1367,11 +1367,11 @@ struct ThinkingLevelSheetView: View {
                     .frame(width: 16, height: 16)
                     .opacity(level == .off ? 0.4 : 1.0)
                 Text(level.displayName)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(PokiTheme.primaryText)
                 Spacer()
                 if isSelected {
                     Image(systemName: "checkmark")
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(PokiTheme.tagText)
                         .fontWeight(.semibold)
                 }
             }

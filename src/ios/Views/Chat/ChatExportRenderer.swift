@@ -258,7 +258,7 @@ private struct ChatExportGroupView: View {
         }
         .frame(width: canvasWidth, alignment: .leading)
         .coordinateSpace(name: "exportUnit")
-        .background(Color(uiColor: .systemBackground))
+        .background(PokiTheme.background)
     }
 
     /// Bubbles and cards are objects with a width of their own; stretching them
@@ -289,13 +289,12 @@ private struct ChatExportHeaderView: View {
         let size = Self.avatarSize
         let isImage = SoulIconImage.decode(icon) != nil
         ZStack {
-            Circle().fill(Color(uiColor: .secondarySystemBackground))
+            Circle().fill(PokiTheme.surface)
             SoulIconView(
                 icon: icon,
                 size: isImage ? size : size * 0.55,
                 sparkleGradient: LinearGradient(
-                    colors: [Color(red: 0.72, green: 0.69, blue: 0.59),
-                             Color(red: 0.6, green: 0.6, blue: 0.55)],
+                    colors: [PokiTheme.aiAccent, PokiTheme.aiAccent],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ),
@@ -304,7 +303,7 @@ private struct ChatExportHeaderView: View {
         }
         .frame(width: size, height: size)
         .clipShape(Circle())
-        .overlay(Circle().stroke(Color(uiColor: .separator), lineWidth: 0.5))
+        .overlay(Circle().stroke(PokiTheme.divider, lineWidth: 0.5))
     }
 
     /// "model · date" on one line when it fits; otherwise one part per line, so a
@@ -315,12 +314,12 @@ private struct ChatExportHeaderView: View {
     private var subtitleLine: some View {
         let font = UIFont.systemFont(ofSize: 13)
         ViewThatFits(in: .horizontal) {
-            ExportLabel(text: subtitle.joined(separator: " · "), font: font, color: .secondaryLabel, lines: 1)
+            ExportLabel(text: subtitle.joined(separator: " · "), font: font, color: PokiTheme.uiSecondaryText, lines: 1)
                 .fixedSize()
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(Array(subtitle.enumerated()), id: \.offset) { i, part in
                     ExportLabel(text: i < subtitle.count - 1 ? part + " ·" : part,
-                                font: font, color: .secondaryLabel)
+                                font: font, color: PokiTheme.uiSecondaryText)
                 }
             }
         }
@@ -348,11 +347,11 @@ private struct ChatExportHeaderView: View {
                             .frame(width: 24, height: 24)
                             .clipShape(RoundedRectangle(cornerRadius: 5.5, style: .continuous))
                             .overlay(RoundedRectangle(cornerRadius: 5.5, style: .continuous)
-                                .stroke(Color(uiColor: .separator), lineWidth: 0.5))
+                                .stroke(PokiTheme.divider, lineWidth: 0.5))
                     }
                     // Product name: not localized.
                     ExportLabel(text: "Open Minis", font: .systemFont(ofSize: 14, weight: .semibold),
-                                color: .label, lines: 1)
+                                color: PokiTheme.uiPrimaryText, lines: 1)
                         .fixedSize()
                 }
             }
@@ -360,7 +359,7 @@ private struct ChatExportHeaderView: View {
         }
         .padding(.horizontal, 16)
         .frame(width: width, alignment: .leading)
-        .background(Color(uiColor: .systemBackground))
+        .background(PokiTheme.background)
     }
 }
 
@@ -368,7 +367,7 @@ private struct ChatExportHeaderView: View {
 private struct ExportLabel: UIViewRepresentable {
     let text: String
     let font: UIFont
-    var color: UIColor = .label
+    var color: UIColor = PokiTheme.uiPrimaryText
     var lines = 0
 
     func makeUIView(context: Context) -> UILabel {
@@ -546,7 +545,7 @@ final class ChatExportRenderer {
         let started = Date()
         let byId = Dictionary(messages.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         style = options.dark ? .dark : .light
-        pageColor = UIColor.systemBackground.resolvedColor(with: UITraitCollection(userInterfaceStyle: style))
+        pageColor = PokiTheme.uiBackground.resolvedColor(with: UITraitCollection(userInterfaceStyle: style))
         let base = Self.rowWidth(wide: options.wideLayout)
         let groups = groups.map { $0.filter { byId[$0.messageId] != nil } }.filter { !$0.isEmpty }
         guard !groups.isEmpty else { throw ChatExportError.nothingToExport }
@@ -705,7 +704,7 @@ final class ChatExportRenderer {
             // [T-share-hide-title] Page number only when the title is hidden.
             let label = (title.isEmpty ? "\(openPage + 1)" : "\(title) · \(openPage + 1)") as NSString
             UIGraphicsPushContext(ctx)
-            let footerColor = UIColor.secondaryLabel.resolvedColor(with: UITraitCollection(userInterfaceStyle: style))
+            let footerColor = PokiTheme.uiSecondaryText.resolvedColor(with: UITraitCollection(userInterfaceStyle: style))
             label.draw(at: CGPoint(x: m, y: pageHeight - m - 12),
                        withAttributes: [.font: UIFont.systemFont(ofSize: 9), .foregroundColor: footerColor])
             UIGraphicsPopContext()

@@ -236,10 +236,10 @@ struct AlarmListView: View {
                     VStack(spacing: 12) {
                         Image(systemName: "alarm")
                             .font(.system(size: 48, weight: .thin))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text("No Alarms")
                             .font(.title3)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
@@ -259,9 +259,12 @@ struct AlarmListView: View {
                             }
                         }
                     }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
                     .listStyle(.insetGrouped)
                 }
             }
+            .pokiScreen()
             .navigationTitle("Alarms")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -305,12 +308,12 @@ private struct AlarmRowView: View {
                 if !alarm.label.isEmpty {
                     Text(alarm.label)
                         .font(.subheadline)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(PokiTheme.primaryText)
                 }
                 if !alarm.subtitle.isEmpty {
                     Text(alarm.subtitle)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
             Spacer()
@@ -319,7 +322,7 @@ private struct AlarmRowView: View {
                 if let day = alarm.weekdayLabel {
                     Text(day)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
         }
@@ -340,7 +343,7 @@ private struct AlarmRowView: View {
             }
         case "countdown":
             Image(systemName: "timer")
-                .foregroundStyle(.blue)
+                .foregroundStyle(PokiTheme.tagText)
         default:
             EmptyView()
         }

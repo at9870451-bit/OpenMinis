@@ -84,7 +84,7 @@ private struct FontScaleRow: View {
                 } label: {
                     Text("A")
                         .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 .buttonStyle(.plain)
 
@@ -103,7 +103,7 @@ private struct FontScaleRow: View {
                 } label: {
                     Text("A")
                         .font(.system(size: 22, weight: .medium))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 .buttonStyle(.plain)
             }
@@ -136,14 +136,14 @@ private struct SteppedSlider: View {
             ZStack(alignment: .leading) {
                 // Track background
                 Capsule()
-                    .fill(Color(.systemFill))
+                    .fill(PokiTheme.divider)
                     .frame(height: trackHeight)
                     .position(x: totalW / 2, y: midY)
 
                 // Filled portion
                 let fillW = maxStep > 0 ? totalW * CGFloat(displayValue) / maxStep : 0
                 Capsule()
-                    .fill(Color.accentColor)
+                    .fill(PokiTheme.primaryButton)
                     .frame(width: fillW, height: trackHeight)
                     .position(x: fillW / 2, y: midY)
 
@@ -151,7 +151,7 @@ private struct SteppedSlider: View {
                 ForEach(0..<steps, id: \.self) { i in
                     let x = maxStep > 0 ? totalW * CGFloat(i) / maxStep : 0
                     Circle()
-                        .fill(i <= displayValue ? Color.accentColor : Color(.systemFill))
+                        .fill(i <= displayValue ? PokiTheme.primaryButton : PokiTheme.divider)
                         .frame(width: tickSize, height: tickSize)
                         .position(x: x, y: midY)
                 }
@@ -159,8 +159,8 @@ private struct SteppedSlider: View {
                 // Thumb
                 let thumbX = maxStep > 0 ? totalW * CGFloat(displayValue) / maxStep : 0
                 Circle()
-                    .fill(.white)
-                    .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
+                    .fill(PokiTheme.primaryButton)
+                    .shadow(color: PokiTheme.primaryText.opacity(0.06), radius: 2, y: 1)
                     .frame(width: thumbSize, height: thumbSize)
                     .position(x: thumbX, y: midY)
             }
@@ -260,9 +260,12 @@ struct AppearanceSettingsView: View {
                 .pickerStyle(.segmented)
             } header: {
                 Text("Theme")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Override the system appearance for this app.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
             .onChange(of: appearanceMode) { _ in
                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
                 windowScene.windows.forEach { window in
@@ -279,9 +282,12 @@ struct AppearanceSettingsView: View {
                 }
             } header: {
                 Text("Launch Session")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Choose what to show when the app starts. \"Auto\" opens a new chat if the last session is older than 15 minutes.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             // Auto-grouping default is OFF on principle: it costs nothing
             // extra (it rides the title-generation call), but it moves user
@@ -293,9 +299,12 @@ struct AppearanceSettingsView: View {
                 Toggle("Auto-Grouping", isOn: autoGroupingBinding)
             } header: {
                 Text("Grouping")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("When a chat's title is first generated, also file it into a matching existing group. Runs once per chat, only uses groups you already created, and leaves the chat ungrouped when nothing matches.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Picker(AppLocalized("Return Key"), selection: $returnKeyBehavior) {
@@ -305,9 +314,12 @@ struct AppearanceSettingsView: View {
                 .pickerStyle(.segmented)
             } header: {
                 Text("Return Key")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Choose whether the Return key in the chat input inserts a newline or sends the message. Hardware Shift+Return always inserts a newline.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Toggle(AppLocalized("Keep Screen Awake"), isOn: $keepScreenAwakeDuringTasks)
@@ -324,38 +336,51 @@ struct AppearanceSettingsView: View {
                 }
             } header: {
                 Text("Keep Screen Awake")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Prevent the screen from sleeping while any session is running a task. May increase battery drain.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                     // [T-always-on] Kept as a second line so the sentence above
                     // keeps its existing translations.
                     Text("Screen Saver: after the chosen time without a touch, the chat on screen turns black and shows only the current step; tap anywhere to return. Staying in the foreground helps tasks run faster. Use “Keep Screen On” in a chat's … menu to turn it on or off for that chat only.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Toggle(AppLocalized("Auto-Focus Input After Reply"), isOn: $autoFocusAfterReply)
             } header: {
                 Text("Auto-Focus Input After Reply")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("When on, the keyboard pops up automatically after the model finishes replying so the input is ready for a follow-up. On by default; turn off if you prefer to read the response without an unexpected keyboard.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Toggle(AppLocalized("Confirm Before Stopping"), isOn: $confirmBeforeStopping)
             } header: {
                 Text("Confirm Before Stopping")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Ask for confirmation when you tap the stop button while a task is running, so an accidental tap does not end a long run. Off by default. You can also long-press the stop button to switch.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Toggle(AppLocalized("Tool Preview Window"), isOn: $toolPreviewEnabled)
             } header: {
                 Text("Tool Status Bar")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Show a live preview thumbnail alongside the tool status bar during agent execution.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             // [T-thinking-auto-expand-toggle] Whether a NEW streaming thinking
             // block opens expanded (historical behavior, default) or stays
@@ -365,9 +390,12 @@ struct AppearanceSettingsView: View {
                 Toggle(AppLocalized("Expand Thinking While Streaming"), isOn: $autoExpandThinking)
             } header: {
                 Text("Deep Thinking")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("When on, a new thinking block expands automatically while the model is reasoning and collapses when it finishes. When off, thinking blocks stay collapsed — tap one to read it.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             // [T-fold-consecutive-tools] Fold a run of 3+ tool calls that a
             // reply follows into one "Ran N tools" line.
@@ -379,9 +407,12 @@ struct AppearanceSettingsView: View {
                     }
             } header: {
                 Text("Tool Calls")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Consecutive tool calls are shown as one line. Tap it to see each call.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 FontScaleRow(
@@ -400,14 +431,17 @@ struct AppearanceSettingsView: View {
                     Button("Reset to Defaults") {
                         fontSettings.resetToDefaults()
                     }
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
             } header: {
                 Text("Font Size")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Scale fonts for chat input, message content, and general app text. Changes apply immediately.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             if UIApplication.shared.supportsAlternateIcons {
                 Section {
@@ -430,7 +464,7 @@ struct AppearanceSettingsView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                                .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
+                                                .stroke(PokiTheme.divider, lineWidth: 0.5)
                                         )
                                 }
                                 VStack(alignment: .leading, spacing: 2) {
@@ -439,15 +473,15 @@ struct AppearanceSettingsView: View {
                                     // Wrap in LocalizedStringKey so the catalog lookup kicks
                                     // in — Text(String) would render them verbatim.
                                     Text(LocalizedStringKey(option.title))
-                                        .foregroundStyle(.primary)
+                                        .foregroundStyle(PokiTheme.primaryText)
                                     Text(LocalizedStringKey(option.subtitle))
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                 }
                                 Spacer()
                                 if appIconMode == option.id {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .foregroundStyle(.blue)
+                                        .foregroundStyle(PokiTheme.primaryButton)
                                         .font(.title3)
                                 }
                             }
@@ -456,9 +490,12 @@ struct AppearanceSettingsView: View {
                     }
                 } header: {
                     Text("App Icon")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     Text("\"Automatic\" uses the system icon which adapts to Dark Mode on iOS 18+.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
 
             Section {
@@ -491,15 +528,15 @@ struct AppearanceSettingsView: View {
                             } else {
                                 Image(systemName: "globe")
                                     .font(.title3)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                     .frame(width: 28)
                             }
                             Text(lang.name)
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(PokiTheme.primaryText)
                             Spacer()
                             if appLanguage == lang.id {
                                 Image(systemName: "checkmark")
-                                    .foregroundStyle(.blue)
+                                    .foregroundStyle(PokiTheme.primaryButton)
                                     .fontWeight(.semibold)
                             }
                         }
@@ -507,11 +544,18 @@ struct AppearanceSettingsView: View {
                 }
             } header: {
                 Text("Language")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Override the display language for this app. \"System\" follows your device language.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Appearance")
         .navigationBarTitleDisplayMode(.inline)
         .background(InteractivePopGestureDisabler())

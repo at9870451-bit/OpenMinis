@@ -609,7 +609,7 @@ struct AOJITSettingsSection: View {
                     row(image)
                 }
                 if let error = model.fixError {
-                    Text(error).font(.caption).foregroundStyle(.red)
+                    Text(error).font(.caption).foregroundStyle(PokiTheme.danger)
                 }
                 if let notice = model.fixNotice {
                     Text(notice).font(.caption).foregroundStyle(.green)
@@ -666,32 +666,32 @@ struct AOJITSettingsSection: View {
                 Spacer()
                 stateBadge(image)
             }
-            Text(image.binaries).font(.caption.monospaced()).foregroundStyle(.secondary)
-            Text(image.affects).font(.caption).foregroundStyle(.secondary)
-            Text("Image recorded from \(image.build.package)").font(.caption2).foregroundStyle(.tertiary)
+            Text(image.binaries).font(.caption.monospaced()).foregroundStyle(PokiTheme.secondaryText)
+            Text(image.affects).font(.caption).foregroundStyle(PokiTheme.secondaryText)
+            Text("Image recorded from \(image.build.package)").font(.caption2).foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
             // [T-aojit-family] What the installed file gets from the image.
             switch state {
             case .matched:
-                Text("Full speed: this is the recorded build.").font(.caption2).foregroundStyle(.secondary)
+                Text("Full speed: this is the recorded build.").font(.caption2).foregroundStyle(PokiTheme.secondaryText)
             case .family(let file):
                 Text("Another version is installed (\(file)): code unchanged since \(image.build.package) runs from the image, the rest is emulated.")
-                    .font(.caption2).foregroundStyle(.secondary)
+                    .font(.caption2).foregroundStyle(PokiTheme.secondaryText)
             case .mismatch:
                 Text("The installed file is not a version this image can serve, so it runs without AOJIT.")
-                    .font(.caption2).foregroundStyle(.secondary)
+                    .font(.caption2).foregroundStyle(PokiTheme.secondaryText)
             default:
                 EmptyView()
             }
             if let c = model.runtime.coverage(for: image), c.blocks > 0 {
-                Text("AOT coverage: \(Self.percent(c.hits, of: c.blocks)) of \(c.blocks) blocks").font(.caption2).foregroundStyle(.tertiary)
+                Text("AOT coverage: \(Self.percent(c.hits, of: c.blocks)) of \(c.blocks) blocks").font(.caption2).foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 if c.moved > 0 {
-                    Text("\(c.moved) of them reused from another version by content").font(.caption2).foregroundStyle(.tertiary)
+                    Text("\(c.moved) of them reused from another version by content").font(.caption2).foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
             }
             // Plan B only when the installed file is not in the family at all.
             if !image.restorePackages.isEmpty, case .mismatch = state {
                 Text("You can put back the build bundled with Minis.")
-                    .font(.caption2).foregroundStyle(.secondary)
+                    .font(.caption2).foregroundStyle(PokiTheme.secondaryText)
                 Button(role: .destructive) {
                     pendingRestore = image
                 } label: {

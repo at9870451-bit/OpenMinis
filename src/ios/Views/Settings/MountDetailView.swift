@@ -131,6 +131,10 @@ struct MountDetailView: View {
                 unmountSection
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(context.canRename ? AppLocalized("Edit Mount") : AppLocalized("Folder Details"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -180,33 +184,34 @@ struct MountDetailView: View {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: context.iconName)
                     .font(.system(size: 13))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .frame(width: 32, height: 32)
-                    .background(context.iconColor, in: RoundedRectangle(cornerRadius: 8))
+                    .background(PokiTheme.primaryButton, in: RoundedRectangle(cornerRadius: 8))
                 VStack(alignment: .leading, spacing: 4) {
                     Text(context.initialName)
                         .font(.headline)
                     Text(context.linuxPath)
                         .font(.caption.monospaced())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .lineLimit(1)
                         .truncationMode(.middle)
                     if let source = context.sourceDisplayName {
                         Text(verbatim: "← \(source)")
                             .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .lineLimit(1)
                     }
                     if let subtitle = context.subtitle {
                         Text(subtitle)
                             .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
                 Spacer()
             }
             .padding(.vertical, 4)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private var nameSection: some View {
@@ -217,13 +222,16 @@ struct MountDetailView: View {
             if nameChanged && !nameIsValid {
                 Text("Mount name must not be empty, contain '/', or be '.' or '..'.")
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
             }
         } header: {
             Text("Name")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             Text("Becomes the folder name under /var/minis/mounts/")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private var allowWriteSection: some View {
@@ -235,14 +243,17 @@ struct MountDetailView: View {
                          ? AppLocalized("AI, shell, and Files browser can modify files in this mount.")
                          : AppLocalized("This mount is exposed as read-only to protect it from accidental edits."))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
         } header: {
             Text("Permissions")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             Text("When off, the iSH shell and AI tools cannot create, edit, or delete files in this mount.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private var visibilitySection: some View {
@@ -254,17 +265,19 @@ struct MountDetailView: View {
                          ? AppLocalized("This folder appears in Files → On My iPhone → Minis.")
                          : AppLocalized("This folder is hidden from the iOS Files app."))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
             if context.isReadOnlyFromFiles {
                 Text("Read-only from the Files app. The app itself can always read and write.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         } header: {
             Text("Files app")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private var browseSection: some View {
@@ -277,12 +290,13 @@ struct MountDetailView: View {
                 } icon: {
                     Image(systemName: "folder.fill")
                         .font(.system(size: 9))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PokiTheme.primaryButtonText)
                         .frame(width: 21, height: 21)
-                        .background(.blue, in: Circle())
+                        .background(PokiTheme.primaryButton, in: Circle())
                 }
             }
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private var unmountSection: some View {
@@ -295,12 +309,13 @@ struct MountDetailView: View {
                 } icon: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 9))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PokiTheme.primaryButtonText)
                         .frame(width: 21, height: 21)
-                        .background(.red, in: Circle())
+                        .background(PokiTheme.danger, in: Circle())
                 }
             }
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     // MARK: - Actions

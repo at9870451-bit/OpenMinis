@@ -36,7 +36,7 @@ struct KimiDeviceLoginSheet: View {
                 case .starting:
                     ProgressView()
                     Text(AppLocalized("Contacting Kimi…"))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
 
                 case let .awaitingUser(userCode, url):
                     awaitingBody(userCode: userCode, url: url)
@@ -54,14 +54,17 @@ struct KimiDeviceLoginSheet: View {
                         .foregroundStyle(.orange)
                     Text(message)
                         .multilineTextAlignment(.center)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .padding(.horizontal)
                     Button(AppLocalized("Try Again")) { start() }
                         .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
+            .pokiScreen()
             .navigationTitle(AppLocalized("Kimi Code Login"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -89,7 +92,7 @@ struct KimiDeviceLoginSheet: View {
     private func awaitingBody(userCode: String, url: String) -> some View {
         Text(AppLocalized("1. Open the verification page\n2. Enter this code to authorize Minis"))
             .font(.subheadline)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(PokiTheme.secondaryText)
             .multilineTextAlignment(.center)
 
         // The user code — tap to copy.
@@ -102,7 +105,7 @@ struct KimiDeviceLoginSheet: View {
                     .font(.system(.title, design: .monospaced).weight(.semibold))
                 Image(systemName: copied ? "checkmark" : "doc.on.doc")
                     .font(.body)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 20)
@@ -116,12 +119,14 @@ struct KimiDeviceLoginSheet: View {
             Label(AppLocalized("Open verification page"), systemImage: "safari")
         }
         .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
 
         HStack(spacing: 6) {
             ProgressView().controlSize(.small)
             Text(AppLocalized("Waiting for authorization…"))
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
         .padding(.top, 4)
     }

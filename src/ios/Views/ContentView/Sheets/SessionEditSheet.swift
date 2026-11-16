@@ -64,7 +64,7 @@ struct SessionEditSheet: View {
                                         )
                                     Text(LocalizedStringKey(cat.label))
                                         .font(.caption2)
-                                        .foregroundStyle(editCategory == cat.key ? cat.color : .secondary)
+                                        .foregroundStyle(editCategory == cat.key ? cat.color : PokiTheme.secondaryText)
                                 }
                             }
                             .buttonStyle(.plain)
@@ -79,7 +79,7 @@ struct SessionEditSheet: View {
                     } label: {
                         HStack {
                             if isRegenerating {
-                                SpinningRing(color: .accentColor)
+                                SpinningRing(color: PokiTheme.tagText)
                                     .frame(width: 18, height: 18)
                             } else {
                                 Image(systemName: "arrow.triangle.2.circlepath")
@@ -91,6 +91,9 @@ struct SessionEditSheet: View {
                     .disabled(isRegenerating)
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+            .pokiScreen()
             .navigationTitle("Edit Session")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -119,6 +119,9 @@ struct MCPFormSheet: View {
                         .lineLimit(1...4)
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+            .pokiScreen()
             .navigationTitle(Text(isEditing ? "Edit Server" : "Add Server"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -155,11 +158,13 @@ struct MCPFormSheet: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                 .controlSize(.large)
                 .disabled(!canSave)
                 .padding(.horizontal)
                 .padding(.vertical, 12)
-                .background(.bar)
+                .background(PokiTheme.background)
             }
             // Self-dismissing "Copied" capsule, mirroring FileBrowserView.
             .overlay(alignment: .bottom) {
@@ -267,7 +272,7 @@ struct MCPFormSheet: View {
                             .font(.subheadline)
                     } else {
                         Label(AppLocalized("Not authorized"), systemImage: "xmark.seal")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .font(.subheadline)
                     }
                     Spacer()
@@ -289,12 +294,14 @@ struct MCPFormSheet: View {
                     }
                     .disabled(isAuthorizing || !canSave || oauthClientId.trimmingCharacters(in: .whitespaces).isEmpty)
                     .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .controlSize(.small)
                 }
                 if let oauthError {
                     Text(oauthError)
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(PokiTheme.danger)
                 }
             }
         } header: {
@@ -323,13 +330,13 @@ struct MCPFormSheet: View {
                 // the system sheet takes over the screen.
                 Text(outcome.issuer)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(2)
                     .truncationMode(.middle)
                 if outcome.reusedCachedClient {
                     Text(AppLocalized("Reusing this app's existing registration."))
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
                 Button {
                     Task { await continueBrowserAuthorize(outcome) }
@@ -342,13 +349,15 @@ struct MCPFormSheet: View {
                 }
                 .disabled(isAuthorizing)
                 .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                 .controlSize(.small)
             }
         } else {
             VStack(alignment: .leading, spacing: 8) {
                 Text(AppLocalized("Minis will find this service's sign-in page automatically. No Client ID needed."))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Button {
                     Task { await runDiscovery() }
                 } label: {
@@ -360,13 +369,15 @@ struct MCPFormSheet: View {
                 }
                 .disabled(isAuthorizing || url.trimmingCharacters(in: .whitespaces).isEmpty)
                 .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                 .controlSize(.small)
             }
         }
         if let discoveryNote {
             Text(discoveryNote)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
     }
 
@@ -554,7 +565,7 @@ struct MCPFormSheet: View {
                         requestDelete(pair.wrappedValue, in: pairs)
                     } label: {
                         Image(systemName: "minus.circle.fill")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(PokiTheme.danger)
                     }
                     .buttonStyle(.plain)   // keep it tap-isolated inside the row
                     .frame(minWidth: 44, minHeight: 44, alignment: .trailing)
@@ -647,7 +658,7 @@ struct MCPFormSheet: View {
             }
         } label: {
             Image(systemName: "curlybraces")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
         .accessibilityLabel(Text("Insert App environment variable reference"))
     }

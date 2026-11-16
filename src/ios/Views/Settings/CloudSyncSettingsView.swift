@@ -27,6 +27,10 @@ struct CloudSyncSettingsView: View {
             advancedSection
             dangerZoneSection
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("iCloud Sync")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { refresh() }
@@ -82,10 +86,11 @@ struct CloudSyncSettingsView: View {
                     Text("Last synced")
                     Spacer()
                     Text(date, format: .dateTime.month(.abbreviated).day().hour().minute())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     @ViewBuilder
@@ -96,7 +101,7 @@ struct CloudSyncSettingsView: View {
                 Image(systemName: "checkmark.circle.fill")
                 Text("Up to date")
             }
-            .foregroundStyle(.green)
+            .foregroundStyle(PokiTheme.primaryText)
             .font(.caption)
         case .syncing:
             HStack(spacing: 4) {
@@ -104,7 +109,7 @@ struct CloudSyncSettingsView: View {
                     .controlSize(.mini)
                 Text("Syncing...")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         case .error(let msg):
             HStack(spacing: 4) {
@@ -112,14 +117,14 @@ struct CloudSyncSettingsView: View {
                 Text(msg)
                     .lineLimit(1)
             }
-            .foregroundStyle(.red)
+            .foregroundStyle(PokiTheme.danger)
             .font(.caption)
         case .disabled:
             HStack(spacing: 4) {
                 Image(systemName: "minus.circle.fill")
                 Text("Disabled")
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(PokiTheme.secondaryText)
             .font(.caption)
         }
     }
@@ -132,23 +137,23 @@ struct CloudSyncSettingsView: View {
                 Text("Name")
                 Spacer()
                 Text(DeviceIdentity.deviceName)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             HStack {
                 Text("Local Sessions")
                 Spacer()
                 Text("\(localSessionCount)")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
 
             Toggle(isOn: $engine.syncSessions) {
                 HStack {
-                    settingsIcon("bubble.left.and.bubble.right", color: .blue)
+                    settingsIcon("bubble.left.and.bubble.right", color: PokiTheme.primaryButton)
                     Text("Chat Sessions")
                     Spacer()
                     Text(formatSize(sessionsSize))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
             Picker(selection: Binding(
@@ -164,45 +169,48 @@ struct CloudSyncSettingsView: View {
                 Text("Unlimited").tag(Int.max)
             } label: {
                 HStack {
-                    settingsIcon("arrow.up.arrow.down.circle", color: .gray)
+                    settingsIcon("arrow.up.arrow.down.circle", color: PokiTheme.primaryButton)
                     Text("Max Per-File Size")
                 }
             }
             Toggle(isOn: $engine.syncSkills) {
                 HStack {
-                    settingsIcon("puzzlepiece.extension", color: .orange)
+                    settingsIcon("puzzlepiece.extension", color: PokiTheme.primaryButton)
                     Text("Skills")
                     Spacer()
                     Text(formatSize(skillsSize))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
             Toggle(isOn: $engine.syncProviders) {
                 HStack {
-                    settingsIcon("server.rack", color: .teal)
+                    settingsIcon("server.rack", color: PokiTheme.primaryButton)
                     Text("Providers")
                     Spacer()
                     Text(formatSize(providersSize))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
             Toggle(isOn: $engine.syncEnvironments) {
                 HStack {
-                    settingsIcon("terminal", color: .mint)
+                    settingsIcon("terminal", color: PokiTheme.primaryButton)
                     Text("Environments")
                     Spacer()
                     Text(formatSize(envVarsSize))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
         } header: {
             Text("Upload (This Device)")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             Text("Choose which data this device pushes to iCloud. API keys and secrets are synced securely via iCloud Keychain.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     // MARK: - Synced Devices (Download)
@@ -212,11 +220,13 @@ struct CloudSyncSettingsView: View {
         if devices.isEmpty {
             Section {
                 Text("No other devices found yet. Devices appear here after they enable iCloud Sync.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .font(.callout)
             } header: {
                 Text("Synced Devices (Download)")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
         } else {
             ForEach(devices) { device in
                 DeviceSyncSection(device: device, engine: engine)
@@ -232,9 +242,9 @@ struct CloudSyncSettingsView: View {
                 showSyncConfirm = true
             } label: {
                 HStack {
-                    settingsIcon("arrow.triangle.2.circlepath.icloud", color: .blue)
+                    settingsIcon("arrow.triangle.2.circlepath.icloud", color: PokiTheme.primaryButton)
                     Text("Force Full Sync")
-                        .foregroundStyle(Color.primary)
+                        .foregroundStyle(PokiTheme.primaryText)
                     if case .syncing = engine.syncStatus {
                         Spacer()
                         ProgressView()
@@ -251,6 +261,7 @@ struct CloudSyncSettingsView: View {
                 Text("This will re-download all sync data from iCloud, which may take 10–30 seconds and consume significant network traffic. Wi-Fi is recommended.\n\nYour local sessions, skills, and files are not affected.")
             }
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     // MARK: - Danger Zone
@@ -261,9 +272,9 @@ struct CloudSyncSettingsView: View {
                 showDeleteCloudStep1 = true
             } label: {
                 HStack {
-                    settingsIcon("trash", color: .red)
+                    settingsIcon("trash", color: PokiTheme.danger)
                     Text("Delete iCloud Data")
-                        .foregroundStyle(Color.primary)
+                        .foregroundStyle(PokiTheme.primaryText)
                     if isDeletingCloud {
                         Spacer()
                         ProgressView()
@@ -274,9 +285,12 @@ struct CloudSyncSettingsView: View {
             .disabled(isDeletingCloud)
         } header: {
             Text("Danger Zone")
+            .foregroundStyle(PokiTheme.secondaryText)
         } footer: {
             Text("Permanently erase all Minis data from iCloud. Local data on this device is not affected.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     private func performDeleteCloudData() {
@@ -304,7 +318,7 @@ struct CloudSyncSettingsView: View {
     private func settingsIcon(_ systemName: String, color: Color) -> some View {
         Image(systemName: systemName)
             .font(.system(size: 9))
-            .foregroundStyle(.white)
+            .foregroundStyle(PokiTheme.primaryButtonText)
             .frame(width: 21, height: 21)
             .background(color, in: Circle())
     }
@@ -356,10 +370,10 @@ private struct DeviceSyncSection: View {
     }
 
     private static let allContentTypes: [ContentTypeInfo] = [
-        ContentTypeInfo(type: "Sessions", label: "Sessions & Files", icon: "bubble.left.and.bubble.right", color: .blue),
-        ContentTypeInfo(type: "Skills", label: "Skills", icon: "puzzlepiece.extension", color: .orange),
-        ContentTypeInfo(type: "Providers", label: "Providers", icon: "server.rack", color: .teal),
-        ContentTypeInfo(type: "Environments", label: "Environments", icon: "terminal", color: .mint),
+        ContentTypeInfo(type: "Sessions", label: "Sessions & Files", icon: "bubble.left.and.bubble.right", color: PokiTheme.primaryButton),
+        ContentTypeInfo(type: "Skills", label: "Skills", icon: "puzzlepiece.extension", color: PokiTheme.primaryButton),
+        ContentTypeInfo(type: "Providers", label: "Providers", icon: "server.rack", color: PokiTheme.primaryButton),
+        ContentTypeInfo(type: "Environments", label: "Environments", icon: "terminal", color: PokiTheme.primaryButton),
     ]
 
     private var availableTypes: [ContentTypeInfo] {
@@ -392,7 +406,7 @@ private struct DeviceSyncSection: View {
     private func settingsIcon(_ systemName: String, color: Color) -> some View {
         Image(systemName: systemName)
             .font(.system(size: 9))
-            .foregroundStyle(.white)
+            .foregroundStyle(PokiTheme.primaryButtonText)
             .frame(width: 21, height: 21)
             .background(color, in: Circle())
     }
@@ -406,15 +420,15 @@ private struct DeviceSyncSection: View {
             )) {
                 HStack {
                     Image(systemName: deviceIcon)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(device.deviceName)
                         HStack(spacing: 8) {
                             Text(device.osVersion)
                                 .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                             Text("Last seen: \(Self.relativeTime(device.lastSeen))")
-                                .font(.caption2).foregroundStyle(.tertiary)
+                                .font(.caption2).foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 }
@@ -436,7 +450,9 @@ private struct DeviceSyncSection: View {
             }
         } header: {
             Text("Download (\(device.deviceName))")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 }
 
@@ -455,7 +471,8 @@ struct RemoteDeviceSessionsView: View {
         List {
             if sessions.isEmpty {
                 Text("No sessions synced from this device yet.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
+                .listRowBackground(PokiTheme.surface)
             } else {
                 ForEach(sessions) { session in
                     HStack {
@@ -465,15 +482,15 @@ struct RemoteDeviceSessionsView: View {
                             HStack(spacing: 8) {
                                 Text(session.modelId)
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                 Text(session.updatedAt, style: .relative)
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                             if let preview = session.lastMessage {
                                 Text(preview)
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                     .lineLimit(2)
                             }
                         }
@@ -502,8 +519,13 @@ struct RemoteDeviceSessionsView: View {
                         }
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(deviceName)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -545,7 +567,8 @@ struct RemoteSkillsListView: View {
         List {
             if skills.isEmpty {
                 Text("No skills synced from this device.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
+                .listRowBackground(PokiTheme.surface)
             } else {
                 ForEach(skills) { skill in
                     HStack {
@@ -555,19 +578,19 @@ struct RemoteSkillsListView: View {
                             if !skill.description.isEmpty {
                                 Text(skill.description)
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                     .lineLimit(2)
                             }
                             Text("v\(skill.version)")
                                 .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
 
                         Spacer()
 
                         if copiedIds.contains(skill.id) {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.green)
+                                .foregroundStyle(PokiTheme.primaryText)
                         } else {
                             Button {
                                 Task {
@@ -583,8 +606,13 @@ struct RemoteSkillsListView: View {
                         }
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Skills from \(deviceName)")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -606,7 +634,8 @@ struct RemoteMemoriesListView: View {
         List {
             if memories.isEmpty {
                 Text("No memories synced from this device.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
+                .listRowBackground(PokiTheme.surface)
             } else {
                 ForEach(memories) { memory in
                     HStack {
@@ -615,18 +644,18 @@ struct RemoteMemoriesListView: View {
                                 .font(.headline)
                             Text(memory.content.prefix(100))
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                                 .lineLimit(2)
                             Text(memory.updatedAt, style: .relative)
                                 .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
 
                         Spacer()
 
                         if copiedIds.contains(memory.id) {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.green)
+                                .foregroundStyle(PokiTheme.primaryText)
                         } else {
                             Button {
                                 Task {
@@ -642,8 +671,13 @@ struct RemoteMemoriesListView: View {
                         }
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Memories from \(deviceName)")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -664,12 +698,14 @@ struct SyncLogView: View {
             Section {
                 Text("Sync events are recorded as iCloud sync sends and receives data. Up to 1,000 entries are kept.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
             if store.entries.isEmpty {
                 Text("No sync events yet.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .font(.callout)
+                .listRowBackground(PokiTheme.surface)
             } else {
                 ForEach(store.entries) { entry in
                     VStack(alignment: .leading, spacing: 4) {
@@ -680,17 +716,17 @@ struct SyncLogView: View {
                             Spacer()
                             Text(entry.timestamp, format: .dateTime.hour().minute().second())
                                 .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                         if !entry.summary.isEmpty {
                             Text(entry.summary)
                                 .font(.caption)
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(PokiTheme.primaryText)
                                 .lineLimit(1)
                         }
                         Text(formatRecordName(entry.recordName))
                             .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .lineLimit(1)
                         if let deviceName = entry.deviceName {
                             HStack(spacing: 4) {
@@ -699,12 +735,12 @@ struct SyncLogView: View {
                                 Text(deviceName)
                             }
                             .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         }
                         if entry.direction == .error {
                             Text(entry.detail)
                                 .font(.caption2)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(PokiTheme.danger)
                                 .lineLimit(2)
                         } else if entry.direction == .conflict {
                             Text(entry.detail)
@@ -715,8 +751,13 @@ struct SyncLogView: View {
                     }
                     .padding(.vertical, 2)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("iCloud Sync Logs")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -748,16 +789,16 @@ struct SyncLogView: View {
             switch direction {
             case .sent:
                 Image(systemName: "arrow.up.circle.fill")
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(PokiTheme.primaryButton)
             case .received:
                 Image(systemName: "arrow.down.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(PokiTheme.primaryText)
             case .conflict:
                 Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
                     .foregroundStyle(.yellow)
             case .error:
                 Image(systemName: "exclamationmark.circle.fill")
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
             }
         }
         .font(.system(size: 16))

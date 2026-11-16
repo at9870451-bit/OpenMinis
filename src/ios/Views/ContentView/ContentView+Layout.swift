@@ -70,7 +70,7 @@ struct AmoreTabBar: View {
                             .lineLimit(1)
                     }
                     .frame(maxWidth: .infinity)
-                    .foregroundStyle(selection == tab ? AmoreTheme.accent : AmoreTheme.textSecondary)
+                    .foregroundStyle(selection == tab ? PokiTheme.tagText : PokiTheme.secondaryText)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -79,9 +79,8 @@ struct AmoreTabBar: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 6)
-        .background(.ultraThinMaterial, in: Capsule())
-        .overlay(Capsule().strokeBorder(Color.white.opacity(0.45), lineWidth: 0.5))
-        .shadow(color: Color.black.opacity(0.10), radius: 12, y: 4)
+        .background(PokiTheme.surface, in: Capsule())
+        .overlay(Capsule().strokeBorder(PokiTheme.divider, lineWidth: 0.5))
     }
 }
 
@@ -103,7 +102,7 @@ struct TasksCenterView: View {
                             .font(.headline)
                         Text(AppLocalized("Sub-agent runs and scheduled jobs show up here as soon as they start."))
                             .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                     .padding(.vertical, 8)
                 }
@@ -121,12 +120,12 @@ struct TasksCenterView: View {
                                 if job.firedCount > 0 {
                                     Text("· \(job.firedCount)x")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                 }
                                 if let next = job.nextFireAt {
                                     Text("· \(next.formatted(date: .omitted, time: .shortened))")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                 }
                             }
                         }
@@ -135,15 +134,18 @@ struct TasksCenterView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle(AppLocalized("Tasks"))
     }
 
     private func stateColor(_ state: AgentJobState) -> Color {
         switch state {
-        case .running:            return .blue
+        case .running:            return PokiTheme.tagText
         case .done:               return .green
-        case .failed, .timeout:   return .red
-        case .cancelled:          return .secondary
+        case .failed, .timeout:   return PokiTheme.danger
+        case .cancelled:          return PokiTheme.secondaryText
         case .pending:            return .orange
         }
     }
@@ -312,7 +314,7 @@ extension ContentView {
                             }
                         Text("Amore")
                             .font(.system(size: 25, weight: .bold))
-                            .foregroundStyle(AmoreTheme.textPrimary)
+                            .foregroundStyle(PokiTheme.primaryText)
                             .lineLimit(1)
                     }
                     Spacer(minLength: 4)
@@ -322,9 +324,9 @@ extension ContentView {
                     } label: {
                         Image(systemName: "square.and.pencil")
                             .font(.system(size: 17, weight: .medium))
-                            .foregroundStyle(AmoreTheme.textPrimary)
+                            .foregroundStyle(PokiTheme.primaryText)
                             .frame(width: 40, height: 40)
-                            .background(Circle().fill(Color.black.opacity(0.05)))
+                            .background(Circle().fill(PokiTheme.surface))
                     }
                     .buttonStyle(DrawerIconButtonStyle())
                     .accessibilityLabel(Text("New Chat"))
@@ -337,9 +339,9 @@ extension ContentView {
                     } label: {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(AmoreTheme.textPrimary)
+                            .foregroundStyle(PokiTheme.primaryText)
                             .frame(width: 40, height: 40)
-                            .background(Circle().fill(Color.black.opacity(0.05)))
+                            .background(Circle().fill(PokiTheme.surface))
                     }
                     .buttonStyle(DrawerIconButtonStyle())
                     .accessibilityLabel(Text("Search"))
@@ -352,12 +354,12 @@ extension ContentView {
                     HStack(spacing: 8) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(AmoreTheme.textSecondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         TextField("Search chats", text: $drawerSearch)
                             .textFieldStyle(.plain)
                             .font(.system(size: 16))
-                            .foregroundStyle(AmoreTheme.textPrimary)
-                            .tint(AmoreTheme.accent)
+                            .foregroundStyle(PokiTheme.primaryText)
+                            .tint(PokiTheme.tagText)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
                     }
@@ -365,7 +367,7 @@ extension ContentView {
                     .frame(height: 42)
                     .background(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(Color.black.opacity(0.04))
+                            .fill(PokiTheme.surface)
                     )
                     .padding(.horizontal, 22)
                     .padding(.bottom, 12)
@@ -392,7 +394,7 @@ extension ContentView {
                 .padding(.bottom, 6)
 
                 Rectangle()
-                    .fill(AmoreTheme.separator)
+                    .fill(PokiTheme.divider)
                     .frame(height: 0.5)
                     .padding(.horizontal, 20)
                     .padding(.bottom, 8)
@@ -400,7 +402,7 @@ extension ContentView {
                 HStack {
                     Text(showArchivedDrawerSessions ? "Archived" : "Recent")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(AmoreTheme.textSecondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Spacer()
                     Button {
                         withAnimation(.easeInOut(duration: 0.18)) {
@@ -409,7 +411,7 @@ extension ContentView {
                     } label: {
                         Image(systemName: showArchivedDrawerSessions ? "bubble.left.and.bubble.right" : "archivebox")
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(AmoreTheme.textSecondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .frame(width: 34, height: 34)
                     }
                     .buttonStyle(DrawerIconButtonStyle())
@@ -424,7 +426,7 @@ extension ContentView {
                         if groups.isEmpty && filteredDrawerSessions.isEmpty {
                             Text(showArchivedDrawerSessions ? "No archived chats" : AppLocalized("No conversations yet"))
                                 .font(.system(size: 14))
-                                .foregroundStyle(AmoreTheme.textSecondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal, 20)
                                 .padding(.top, 14)
@@ -433,7 +435,7 @@ extension ContentView {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(group.label)
                                         .font(.system(size: 13, weight: .semibold))
-                                        .foregroundStyle(AmoreTheme.textSecondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                         .padding(.horizontal, 20)
                                         .padding(.top, 6)
                                     ForEach(group.sessions) { session in
@@ -447,7 +449,7 @@ extension ContentView {
                 }
 
                 Rectangle()
-                    .fill(AmoreTheme.separator)
+                    .fill(PokiTheme.divider)
                     .frame(height: 0.5)
                     .padding(.horizontal, 18)
 
@@ -467,16 +469,16 @@ extension ContentView {
                                 }
                             }
                             .frame(width: 38, height: 38)
-                            .background(Circle().fill(AmoreTheme.secondaryBackground))
+                            .background(Circle().fill(PokiTheme.surface))
                             .clipShape(Circle())
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(soulName.isEmpty ? "Amore" : soulName)
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundStyle(AmoreTheme.textPrimary)
+                                    .foregroundStyle(PokiTheme.primaryText)
                                     .lineLimit(1)
                                 Text("Personal account")
                                     .font(.system(size: 11))
-                                    .foregroundStyle(AmoreTheme.textSecondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                     .lineLimit(1)
                             }
                             Spacer(minLength: 0)
@@ -508,9 +510,9 @@ extension ContentView {
                     } label: {
                         Image(systemName: "gearshape")
                             .font(.system(size: 17, weight: .medium))
-                            .foregroundStyle(AmoreTheme.textPrimary)
+                            .foregroundStyle(PokiTheme.primaryText)
                             .frame(width: 40, height: 40)
-                            .background(Circle().fill(Color.black.opacity(0.05)))
+                            .background(Circle().fill(PokiTheme.surface))
                     }
                     .buttonStyle(DrawerIconButtonStyle())
                     .accessibilityLabel(Text("Settings"))
@@ -522,14 +524,10 @@ extension ContentView {
             .frame(maxWidth: .infinity)
             .frame(maxHeight: .infinity)
             .background {
-                // Real frosted glass: the material does the blurring, the tint
-                // stays light enough that content behind shows through. A heavy
-                // white fill (0.82) used to flatten it into a solid panel.
-                ZStack {
-                    Rectangle().fill(.ultraThinMaterial)
-                    AmoreTheme.glassFill(0.55)
-                }
-                .ignoresSafeArea(edges: .vertical)
+                // Flat Poki paper keeps history readable in both appearances.
+                // The full-screen drawer geometry and swipe handling stay unchanged.
+                PokiTheme.background
+                    .ignoresSafeArea(edges: .vertical)
             }
             // Rounded only on the trailing edge: the panel slides out from the
             // screen edge, so the leading corners must stay square.
@@ -550,9 +548,8 @@ extension ContentView {
                     topTrailingRadius: 24,
                     style: .continuous
                 )
-                .strokeBorder(Color.white.opacity(0.5), lineWidth: 0.5)
+                .strokeBorder(PokiTheme.divider, lineWidth: 0.5)
             }
-            .shadow(color: Color.black.opacity(0.18), radius: 22, x: 8, y: 0)
             .onAppear { rebuildDrawerGroups() }
             .onChange(of: sessions) { _ in rebuildDrawerGroups() }
             .onChange(of: drawerSearch) { _ in rebuildDrawerGroups() }
@@ -632,11 +629,11 @@ extension ContentView {
             HStack(spacing: 14) {
                 Image(systemName: meta.symbol)
                     .font(.system(size: 17, weight: .regular))
-                    .foregroundStyle(AmoreTheme.textPrimary)
+                    .foregroundStyle(PokiTheme.primaryText)
                     .frame(width: 24, alignment: .center)
                 Text(meta.title)
                     .font(.system(size: 16.5, weight: .regular))
-                    .foregroundStyle(AmoreTheme.textPrimary)
+                    .foregroundStyle(PokiTheme.primaryText)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 12)
@@ -656,11 +653,11 @@ extension ContentView {
             HStack(spacing: 14) {
                 Image(systemName: "qrcode.viewfinder")
                     .font(.system(size: 17, weight: .regular))
-                    .foregroundStyle(AmoreTheme.textPrimary)
+                    .foregroundStyle(PokiTheme.primaryText)
                     .frame(width: 24, alignment: .center)
                 Text("SnowLuma + QQBot")
                     .font(.system(size: 16.5, weight: .regular))
-                    .foregroundStyle(AmoreTheme.textPrimary)
+                    .foregroundStyle(PokiTheme.primaryText)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 12)
@@ -682,12 +679,12 @@ extension ContentView {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(session.title?.isEmpty == false ? session.title! : "New Chat")
                         .font(.system(size: 15.5, weight: .regular))
-                        .foregroundStyle(AmoreTheme.textPrimary)
+                        .foregroundStyle(PokiTheme.primaryText)
                         .lineLimit(1)
                         .truncationMode(.tail)
                     Text(session.updatedAt, style: .relative)
                         .font(.system(size: 12))
-                        .foregroundStyle(AmoreTheme.textSecondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 Spacer(minLength: 0)
             }
@@ -696,7 +693,7 @@ extension ContentView {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(selected ? Color.white.opacity(0.08) : Color.clear)
+                    .fill(selected ? PokiTheme.selection : Color.clear)
             )
             .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
@@ -750,14 +747,15 @@ extension ContentView {
             VStack(spacing: 12) {
                 Image(systemName: "bubble.left.and.bubble.right")
                     .font(.system(size: 48))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Text("No Conversation Selected")
                     .font(.title3.bold())
                 Text("Select a conversation or start a new one")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .pokiScreen()
         }
     }
 }

@@ -522,7 +522,7 @@ extension ContentView {
                     // Folder names are user data — verbatim.
                     Text(folder.name)
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Color(UIColor.label))
+                        .foregroundStyle(PokiTheme.primaryText)
                         .lineLimit(1)
                 }
                 // Widen the tap zone to everything left of the chevron.
@@ -546,9 +546,9 @@ extension ContentView {
                 } label: {
                     Image(systemName: "chevron.up")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(Color(UIColor.secondaryLabel))
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .frame(width: 32, height: 32)
-                        .background(Circle().fill(Color(UIColor.tertiarySystemFill)))
+                        .background(Circle().fill(PokiTheme.selection))
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text("Collapse Group"))
@@ -558,9 +558,8 @@ extension ContentView {
         .padding(.trailing, 8)
         .frame(height: 48)
         .frame(maxWidth: 320)
-        .background(.ultraThinMaterial, in: Capsule())
-        .overlay(Capsule().stroke(Color(UIColor.separator).opacity(0.5), lineWidth: 0.5))
-        .shadow(color: Color.black.opacity(0.15), radius: 8, y: 2)
+        .background(PokiTheme.surface, in: Capsule())
+        .overlay(Capsule().stroke(PokiTheme.divider, lineWidth: 0.5))
         .padding(.top, 8)
         .padding(.horizontal, 24)
     }

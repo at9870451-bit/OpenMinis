@@ -28,7 +28,7 @@ import WebKit
 /// old system spinner never appears after / alongside the new loading UI.
 struct LoadingDotsView: View {
     var dotSize: CGFloat = 10
-    var color: Color = .accentColor
+    var color: Color = PokiTheme.tagText
     @State private var animating = false
 
     var body: some View {

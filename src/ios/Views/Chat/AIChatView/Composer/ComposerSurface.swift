@@ -53,26 +53,14 @@ struct FloatingCircleButtonSurface: ViewModifier {
     /// accent that washes out against the glass material, `.primary` is the
     /// full-strength accent, which stays readable (verified on device).
     /// Sub-26 keeps the original `.secondary` over its opaque disc.
-    static var glyphStyle: HierarchicalShapeStyle {
-        if #available(iOS 26.0, *) { return .primary }
-        return .secondary
-    }
+    static var glyphStyle: Color { PokiTheme.secondaryText }
 
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            content
-                .glassEffect(.regular.interactive(), in: .circle)
-                .contentShape(Circle())
-        } else {
-            content
-                .background {
-                    Color(.systemBackground)
-                        .opacity(colorScheme == .dark ? 0.8 : legacyLightOpacity)
-                        .clipShape(Circle())
-                }
-                .overlay(Circle().stroke(Color.gray.opacity(legacyStrokeOpacity), lineWidth: 0.5))
-                .shadow(color: .black.opacity(legacyShadowOpacity), radius: legacyShadowRadius, y: 2)
-        }
+        content
+            .background(Circle().fill(PokiTheme.surface))
+            .overlay(Circle().stroke(PokiTheme.divider, lineWidth: 0.5))
+            .shadow(color: PokiTheme.shadowSoft, radius: legacyShadowRadius, y: 2)
+            .contentShape(Circle())
     }
 }
 
@@ -104,23 +92,16 @@ struct ComposerSurface: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            content
-                .glassEffect(.regular, in: shape)
-                .clipShape(shape)
-                .overlay(shape.strokeBorder(PokiTheme.divider, lineWidth: 0.5))
-        } else {
-            content
-                .background {
-                    ZStack {
-                        shape.fill(.ultraThinMaterial)
-                        shape.fill(PokiTheme.floatingSurface)
-                    }
+        content
+            .background {
+                ZStack {
+                    shape.fill(.ultraThinMaterial)
+                    shape.fill(PokiTheme.floatingSurface)
                 }
-                .clipShape(shape)
-                .overlay(shape.strokeBorder(PokiTheme.divider, lineWidth: 0.5))
-                .shadow(color: PokiTheme.shadowFloating, radius: 10, x: 0, y: 3)
-        }
+            }
+            .clipShape(shape)
+            .overlay(shape.strokeBorder(PokiTheme.divider, lineWidth: 0.5))
+            .shadow(color: PokiTheme.shadowSoft, radius: 10, x: 0, y: 3)
     }
 }
 
@@ -159,7 +140,7 @@ struct ComposerContextGlow: View {
     /// Must match ComposerSurface's shape exactly: it is the stroke path and
     /// the clip that keeps the glow inside the wall.
     private var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 20, style: .continuous)
+        RoundedRectangle(cornerRadius: 24, style: .continuous)
     }
     private var color: Color {
         tier == .critical ? Color(UIColor.systemRed) : Color(UIColor.systemOrange)

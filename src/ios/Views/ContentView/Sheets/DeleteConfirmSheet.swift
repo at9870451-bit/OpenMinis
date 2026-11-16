@@ -44,21 +44,21 @@ struct DeleteConfirmSheet: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Associated Files")
                                         .font(.subheadline.bold())
-                                        .foregroundStyle(.primary)
+                                        .foregroundStyle(PokiTheme.primaryText)
                                     ForEach(info.fileNames, id: \.self) { name in
                                         HStack(spacing: 6) {
                                             Image(systemName: "doc")
                                                 .font(.caption)
-                                                .foregroundStyle(.secondary)
+                                                .foregroundStyle(PokiTheme.secondaryText)
                                             Text(name)
                                                 .font(.subheadline)
-                                                .foregroundStyle(.secondary)
+                                                .foregroundStyle(PokiTheme.secondaryText)
                                         }
                                     }
                                     if info.totalFileCount > info.fileNames.count {
                                         Text("and \(info.totalFileCount - info.fileNames.count) more file\(info.totalFileCount - info.fileNames.count == 1 ? "" : "s")")
                                             .font(.caption)
-                                            .foregroundStyle(.tertiary)
+                                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                                     }
                                 }
                             }
@@ -84,7 +84,9 @@ struct DeleteConfirmSheet: View {
                                 .padding(.vertical, 12)
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.red)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
+                        .tint(PokiTheme.danger)
 
                         Button {
                             dismiss()
@@ -99,6 +101,7 @@ struct DeleteConfirmSheet: View {
                     .padding(.vertical, 12)
                 }
             }
+            .pokiScreen()
             .navigationTitle("Confirm Deletion")
             .navigationBarTitleDisplayMode(.inline)
         }
@@ -108,10 +111,10 @@ struct DeleteConfirmSheet: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.subheadline.bold())
-                .foregroundStyle(.primary)
+                .foregroundStyle(PokiTheme.primaryText)
             Text(value)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
     }
 }

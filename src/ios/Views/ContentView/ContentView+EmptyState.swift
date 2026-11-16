@@ -39,7 +39,7 @@ extension ContentView {
             // App icon / hero
             Image(systemName: "sparkles")
                 .font(.system(size: 56))
-                .foregroundStyle(.tint)
+                .foregroundStyle(PokiTheme.tagText)
                 .padding(.bottom, 4)
 
             VStack(spacing: 8) {
@@ -47,7 +47,7 @@ extension ContentView {
                     .font(.title2.bold())
                 Text("Your first On-Device Agent is almost ready.")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .multilineTextAlignment(.center)
             }
 
@@ -114,7 +114,7 @@ extension ContentView {
                 } label: {
                     Label("Have a backup? Restore from it", systemImage: "clock.arrow.circlepath")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 .buttonStyle(.plain)
                 .padding(.bottom, 12)
@@ -122,6 +122,8 @@ extension ContentView {
             }
         }
         .frame(maxHeight: .infinity)
+        .foregroundStyle(PokiTheme.primaryText)
+        .background(PokiTheme.background)
         .padding(.horizontal, 32)
         .sheet(isPresented: $showAddProvider) {
             NavigationStack {
@@ -168,26 +170,26 @@ extension ContentView {
                 // Step indicator
                 ZStack {
                     Circle()
-                        .fill(isDone ? Color.green : Color.accentColor)
+                        .fill(isDone ? PokiTheme.tagBackground : PokiTheme.primaryButton)
                         .frame(width: 32, height: 32)
                     if isDone {
                         Image(systemName: "checkmark")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(isDone ? PokiTheme.tagText : PokiTheme.primaryButtonText)
                     } else {
                         Text("\(number)")
                             .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundColor(.white)
+                            .foregroundColor(isDone ? PokiTheme.tagText : PokiTheme.primaryButtonText)
                     }
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.body.weight(.medium))
-                        .foregroundStyle(isDone ? .secondary : .primary)
+                        .foregroundStyle(isDone ? PokiTheme.secondaryText : PokiTheme.primaryText)
                     Text(subtitle)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
 
                 Spacer()
@@ -195,13 +197,13 @@ extension ContentView {
                 if !isDone {
                     Image(systemName: "chevron.right")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
             }
             .padding(14)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+                    .fill(PokiTheme.surface)
             )
         }
         .buttonStyle(.plain)

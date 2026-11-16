@@ -73,7 +73,7 @@ final class AudioAttachment: NSTextAttachment {
         container.backgroundColor = .clear
 
         let bg = UIView(frame: CGRect(x: 0, y: 0, width: maxW, height: h))
-        bg.backgroundColor = .secondarySystemBackground
+        bg.backgroundColor = PokiTheme.uiSurface
         bg.layer.cornerRadius = 10
         bg.clipsToBounds = true
         container.addSubview(bg)
@@ -83,14 +83,14 @@ final class AudioAttachment: NSTextAttachment {
 
         // Waveform icon + filename
         let waveIcon = UIImageView(image: UIImage(systemName: "waveform"))
-        waveIcon.tintColor = .secondaryLabel
+        waveIcon.tintColor = PokiTheme.uiSecondaryText
         waveIcon.frame = CGRect(x: 10, y: 8, width: 14, height: 14)
         bg.addSubview(waveIcon)
 
         let nameLabel = UILabel()
         nameLabel.text = filename
         nameLabel.font = .systemFont(ofSize: 12)
-        nameLabel.textColor = .secondaryLabel
+        nameLabel.textColor = PokiTheme.uiSecondaryText
         nameLabel.lineBreakMode = .byTruncatingMiddle
         nameLabel.frame = CGRect(x: 28, y: 8, width: maxW - 62, height: 16)
         bg.addSubview(nameLabel)
@@ -99,13 +99,13 @@ final class AudioAttachment: NSTextAttachment {
         let iconConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .regular)
         let playBtn = UIButton(type: .system)
         playBtn.setImage(UIImage(systemName: "play.circle.fill", withConfiguration: iconConfig), for: .normal)
-        playBtn.tintColor = .systemOrange
+        playBtn.tintColor = PokiTheme.uiPrimaryText
         playBtn.frame = CGRect(x: 10, y: 30, width: 30, height: 30)
         bg.addSubview(playBtn)
 
         // Slider
         let slider = UISlider()
-        slider.minimumTrackTintColor = .systemOrange
+        slider.minimumTrackTintColor = PokiTheme.uiPrimaryText
         slider.frame = CGRect(x: 46, y: 34, width: maxW - 100, height: 22)
         slider.value = 0
         bg.addSubview(slider)
@@ -114,7 +114,7 @@ final class AudioAttachment: NSTextAttachment {
         let durLabel = UILabel()
         durLabel.text = "--:--"
         durLabel.font = .monospacedDigitSystemFont(ofSize: 11, weight: .regular)
-        durLabel.textColor = .secondaryLabel
+        durLabel.textColor = PokiTheme.uiSecondaryText
         durLabel.textAlignment = .right
         durLabel.frame = CGRect(x: maxW - 50, y: 36, width: 40, height: 16)
         bg.addSubview(durLabel)
@@ -123,7 +123,7 @@ final class AudioAttachment: NSTextAttachment {
         let expandBtn = UIButton(type: .system)
         let expandConfig = UIImage.SymbolConfiguration(pointSize: 11, weight: .medium)
         expandBtn.setImage(UIImage(systemName: "arrow.up.left.and.arrow.down.right", withConfiguration: expandConfig), for: .normal)
-        expandBtn.tintColor = .secondaryLabel
+        expandBtn.tintColor = PokiTheme.uiSecondaryText
         expandBtn.frame = CGRect(x: maxW - 28, y: 6, width: 22, height: 22)
         bg.addSubview(expandBtn)
 

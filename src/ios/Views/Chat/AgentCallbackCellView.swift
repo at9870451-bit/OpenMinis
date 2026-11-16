@@ -294,7 +294,7 @@ struct AgentCallbackCellView: View {
         }
         .padding(.horizontal, 12)
         .frame(height: Self.cardHeight)
-        .background(RoundedRectangle(cornerRadius: 14).fill(Color(UIColor.secondarySystemBackground)))
+        .background(RoundedRectangle(cornerRadius: 14).fill(PokiTheme.surface))
         .overlay(RoundedRectangle(cornerRadius: 14).stroke(accent.opacity(0.25), lineWidth: 1))
         .contentShape(Rectangle())
         .onTapGesture {

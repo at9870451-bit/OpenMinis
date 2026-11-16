@@ -23,7 +23,7 @@ struct ShadowVoiceProviderDetailView: View {
             Section {
                 LabeledContent {
                     Text(instance?.label ?? "—")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 } label: {
                     Label {
                         Text("Credential from", comment: "Shadow voice credential label")
@@ -35,7 +35,7 @@ struct ShadowVoiceProviderDetailView: View {
                     LabeledContent {
                         Text(base)
                             .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .lineLimit(1)
                             .truncationMode(.middle)
                     } label: {
@@ -79,6 +79,9 @@ struct ShadowVoiceProviderDetailView: View {
                      comment: "Shadow voice toggle note")
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle(shadow?.displayName ?? instance?.label ?? AppLocalized("Voice Service"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $quickTestEntry) { entry in

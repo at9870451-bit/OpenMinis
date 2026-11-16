@@ -84,10 +84,10 @@ struct ThinkingRulesSection: View {
         Section {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Image(systemName: "info.circle")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Text("This provider uses an official protocol, so its thinking parameters are maintained by Minis. Custom rules apply to OpenAI-compatible providers on the Chat Completions API.")
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         } header: {
             Text("Thinking Rules")
@@ -122,14 +122,14 @@ struct ThinkingRulesSection: View {
                 HStack(spacing: 6) {
                     Image(systemName: "lock.fill")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Text("Default rules")
                     Text("\(builtInRules.count)")
                         .font(.caption)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Color.secondary.opacity(0.15), in: Capsule())
-                        .foregroundStyle(.secondary)
+                        .background(PokiTheme.secondaryText.opacity(0.15), in: Capsule())
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
 
@@ -154,10 +154,10 @@ struct ThinkingRulesSection: View {
                     // a real model. Without it the rule list is another hidden variable.
                     Label(hit, systemImage: "scope")
                         .font(.caption)
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(PokiTheme.tagText)
                 }
                 Text("Default rules are built in and cannot be deleted. Add a rule above them to override one.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             .font(.caption)
         }
@@ -184,26 +184,26 @@ struct ThinkingRulesSection: View {
                 HStack(spacing: 6) {
                     Text(rule.label)
                         .font(isBuiltIn ? .callout : .body)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(PokiTheme.primaryText)
                     if isBuiltIn {
                         Image(systemName: "lock.fill")
                             .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     }
                 }
                 Text(rule.scope.displayText)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 if let fmt = rule.wireFormat {
                     Text(fmt.displaySummary)
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                 }
             }
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
         }
         .contentShape(Rectangle())
     }

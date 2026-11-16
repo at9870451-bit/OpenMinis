@@ -118,7 +118,7 @@ struct ThinkingRuleEditorView: View {
                     }
                     Text(choice.explanation)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     formatFields
                 } header: {
                     Text("What to send")
@@ -134,6 +134,9 @@ struct ThinkingRuleEditorView: View {
                     Text("The thinking fields this rule adds to a request at the High level.")
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+            .pokiScreen()
             .navigationTitle(existing == nil ? Text("New Rule") : Text("Edit Rule"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -163,7 +166,7 @@ struct ThinkingRuleEditorView: View {
                 // backend killed whole requests on MiMo (c5efeb1e).
                 Text("The field is omitted entirely when thinking is off.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         case .booleanToggle:
             TextField("Field path", text: $togglePath)

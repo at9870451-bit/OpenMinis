@@ -9,7 +9,7 @@ struct VoiceWaveformView: View {
         HStack(spacing: 3) {
             ForEach(Array(levels.enumerated()), id: \.offset) { _, level in
                 Capsule()
-                    .fill(Color.accentColor)
+                    .fill(PokiTheme.primaryText)
                     .frame(width: 3, height: max(4, CGFloat(level) * 32))
                     .animation(.spring(response: 0.15, dampingFraction: 0.6), value: level)
             }

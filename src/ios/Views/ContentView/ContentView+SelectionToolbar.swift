@@ -91,12 +91,13 @@ extension ContentView {
                         .font(.caption2)
                 }
                 .frame(maxWidth: .infinity)
-                .foregroundStyle(selectedIds.isEmpty ? Color.gray : Color.red)
+                .foregroundStyle(selectedIds.isEmpty ? PokiTheme.secondaryText : PokiTheme.danger)
             }
             .disabled(selectedIds.isEmpty)
         }
         .padding(.vertical, 10)
-        .background(.ultraThinMaterial)
+        .tint(PokiTheme.primaryText)
+        .background(PokiTheme.surface)
     }
 
     /// Force-sync the given sessions: bumps each session, its messages,

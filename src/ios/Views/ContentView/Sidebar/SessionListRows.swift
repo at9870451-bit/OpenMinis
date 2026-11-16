@@ -74,7 +74,7 @@ struct SessionStackRow: View {
         .overlay {
             if isRegeneratingTitle {
                 ZStack {
-                    Color(.systemBackground).opacity(0.7)
+                    PokiTheme.background.opacity(0.7)
                     ProgressView()
                 }
             }
@@ -85,7 +85,7 @@ struct SessionStackRow: View {
             if inFolder {
                 FolderMemberRowBackground(isLast: isLastInFolder)
             } else {
-                Color(.systemBackground)
+                PokiTheme.background
             }
         })
         .contextMenu {
@@ -115,7 +115,7 @@ struct SessionSplitRow: View {
     let isLastInFolder: Bool
     let menuActions: SessionMenuActionChannel
 
-    private static let highlightFill = Color(red: 183/255.0, green: 175/255.0, blue: 150/255.0).opacity(0.3)
+    private static let highlightFill = PokiTheme.selection
 
     var body: some View {
         let _ = HomeListPerf.rowBuilt()
@@ -132,7 +132,7 @@ struct SessionSplitRow: View {
         .overlay {
             if isRegeneratingTitle {
                 ZStack {
-                    Color(.systemBackground).opacity(0.7)
+                    PokiTheme.background.opacity(0.7)
                     ProgressView()
                 }
             }

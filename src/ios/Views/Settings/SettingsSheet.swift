@@ -90,9 +90,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "paintbrush.fill")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.indigo, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                 }
@@ -107,9 +107,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "wrench.and.screwdriver.fill")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.indigo, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     // [T-sub-agents-v1] Directly under Agent Tools: the two pages
@@ -129,9 +129,9 @@ struct SettingsSheet: View {
                             // circle at this section's icon size.
                             Image(systemName: HelperAccent.glyph)
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(HelperAccent.color, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     NavigationLink {
@@ -142,9 +142,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "puzzlepiece.extension")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.blue, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     NavigationLink {
@@ -155,9 +155,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "sparkles")
                                 .font(.system(size: 11))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.pink, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     NavigationLink {
@@ -183,9 +183,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "brain.head.profile")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.purple, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     NavigationLink {
@@ -196,9 +196,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "arrow.down.right.and.arrow.up.left")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.orange, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     NavigationLink {
@@ -209,9 +209,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "square.stack.3d.up")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.teal, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     NavigationLink {
@@ -222,9 +222,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "terminal")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.green, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                 }
@@ -238,9 +238,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "archivebox")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.blue, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     NavigationLink {
@@ -251,9 +251,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "folder.fill.badge.person.crop")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.green, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     NavigationLink {
@@ -264,9 +264,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "externaldrive.badge.plus")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.orange, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     if #available(iOS 17.0, *) {
@@ -280,9 +280,9 @@ struct SettingsSheet: View {
                             } icon: {
                                 Image(systemName: "icloud")
                                     .font(.system(size: 9))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(PokiTheme.primaryButtonText)
                                     .frame(width: 21, height: 21)
-                                    .background(.cyan, in: Circle())
+                                    .background(PokiTheme.primaryButton, in: Circle())
                             }
                         }
                     }
@@ -299,9 +299,9 @@ struct SettingsSheet: View {
                             // rather than a one-way export.
                             Image(systemName: "arrow.triangle.2.circlepath")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.indigo, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                 }
@@ -315,9 +315,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "lock.shield")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.red, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     if BiometricAuth.isAvailable {
@@ -331,9 +331,9 @@ struct SettingsSheet: View {
                                 // devices showed a Face ID glyph here before.
                                 Image(systemName: BiometricAuth.biometryIconName)
                                     .font(.system(size: 11))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(PokiTheme.primaryButtonText)
                                     .frame(width: 21, height: 21)
-                                    .background(.teal, in: Circle())
+                                    .background(PokiTheme.primaryButton, in: Circle())
                             }
                         }
                     }
@@ -348,9 +348,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "doc.text")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.gray, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                 }
@@ -364,9 +364,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "info")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.indigo, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     Link(destination: URL(string: "https://openminis.github.io/privacy-policy.html")!) {
@@ -375,9 +375,9 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "hand.raised")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.teal, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
                     Button {
@@ -388,12 +388,12 @@ struct SettingsSheet: View {
                         } icon: {
                             Image(systemName: "bubble.left.and.bubble.right.fill")
                                 .font(.system(size: 9))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .frame(width: 21, height: 21)
-                                .background(.indigo, in: Circle())
+                                .background(PokiTheme.primaryButton, in: Circle())
                         }
                     }
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(PokiTheme.primaryText)
                     .confirmationDialog("Feedback", isPresented: $showFeedbackDialog, titleVisibility: .visible) {
                         Button("Report a Bug (GitHub)") {
                             if let url = Self.makeBugReportURL() { UIApplication.shared.open(url) }
@@ -409,6 +409,7 @@ struct SettingsSheet: View {
                 }
 
             }
+            .pokiScreen()
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -691,7 +692,7 @@ struct ContextCompressionSettingsView: View {
                             Text(AppLocalized("Auto-compress long chats"))
                             Text(AppLocalized("Summarise older turns before the model runs out of context"))
                                 .font(.footnote)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     } icon: {
                         Image(systemName: "arrow.down.right.and.arrow.up.left")
@@ -707,7 +708,7 @@ struct ContextCompressionSettingsView: View {
                         Text(AppLocalized("Keep recent turns"))
                         Spacer()
                         Text("\(keepRecent)")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .monospacedDigit()
                     }
                 }
@@ -750,7 +751,7 @@ struct ContextCompressionSettingsView: View {
             Text(AppLocalized(label))
             Spacer()
             Text(AppLocalized(value))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
     }
 }
@@ -849,112 +850,160 @@ final class AmoreMarketplaceStore: ObservableObject {
 
 struct AmoreMarketplaceView: View {
     @StateObject private var store = AmoreMarketplaceStore()
+    @StateObject private var importer = AmorePluginImportStore()
     @State private var showPicker = false
-    @State private var installMessage: String?
-    @State private var installFailed = false
+    @State private var pickFolder = false
+    @State private var recordToDelete: AmoreInstalledPlugin?
+    @State private var queuedSelection: URL?
+    @State private var queuedFolder = false
 
     var body: some View {
         List {
-            switch store.phase {
-            case .idle, .loading:
-                HStack { ProgressView(); Text(AppLocalized("Searching GitHub…")) }
-            case .failed(let message):
-                Section {
-                    Text(message).font(.footnote).foregroundStyle(.secondary)
-                    Button(AppLocalized("Retry")) { Task { await store.reload() } }
-                }
-            case .loaded:
-                if store.items.isEmpty {
-                    VStack(spacing: 8) {
-                        Image(systemName: "shippingbox").font(.largeTitle).foregroundStyle(.secondary)
-                        Text(AppLocalized("No plugins yet")).font(.headline)
-                        Text(AppLocalized("No public repository carries the amore-plugin topic."))
-                            .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity).padding(.vertical, 24)
-                } else {
-                    Section {
-                        ForEach(store.items) { item in
-                            Link(destination: URL(string: item.htmlURL) ?? URL(fileURLWithPath: "/")) {
-                                VStack(alignment: .leading, spacing: 3) {
-                                    HStack(spacing: 6) {
-                                        Text(item.name).font(.body.weight(.medium))
-                                        Text(AppLocalized("Unverified"))
-                                            .font(.caption2.weight(.semibold))
-                                            .padding(.horizontal, 6).padding(.vertical, 2)
-                                            .background(Color.red.opacity(0.12), in: Capsule())
-                                            .foregroundStyle(.red)
-                                    }
-                                    Text(item.fullName).font(.caption).foregroundStyle(.secondary)
-                                    if let description = item.description, !description.isEmpty {
-                                        Text(description).font(.caption2).foregroundStyle(.secondary).lineLimit(2)
-                                    }
-                                    Text("★ \(item.stars)").font(.caption2).foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-                    } header: {
-                        Text(AppLocalized("Community plugins"))
-                    } footer: {
-                        Text(AppLocalized("These repositories are not reviewed by Amore. Install only what you can audit."))
-                    }
-                }
-            }
-        }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            Button {
-                showPicker = true
-            } label: {
-                Label(AppLocalized("Install from Files (.zip or folder)"), systemImage: "square.and.arrow.down")
-                    .font(.callout.weight(.medium))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(PokiTheme.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .strokeBorder(PokiTheme.divider, lineWidth: 0.5))
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(PokiTheme.background)
-        }
-        .navigationTitle(AppLocalized("Plugin Marketplace"))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            Section {
                 Button {
+                    pickFolder = false
                     showPicker = true
                 } label: {
-                    Image(systemName: "folder.badge.plus")
+                    HStack(spacing: 12) {
+                        Image(systemName: "doc.zipper").font(.title2)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(AppLocalized("Import ZIP plugin")).font(.headline)
+                            Text(AppLocalized("Choose a ZIP from Files or iCloud Drive"))
+                                .font(.caption).opacity(0.8)
+                        }
+                        Spacer()
+                        Image(systemName: "plus.circle.fill")
+                    }
+                    .foregroundStyle(PokiTheme.primaryButtonText)
+                    .padding(.vertical, 12).padding(.horizontal, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(PokiTheme.primaryButton, in: RoundedRectangle(cornerRadius: 16))
                 }
-                .accessibilityLabel(Text(AppLocalized("Install from Files")))
+                .buttonStyle(.plain)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .disabled(importer.isWorking)
+                Button {
+                    pickFolder = true
+                    showPicker = true
+                } label: {
+                    Label(AppLocalized("Import plugin folder"), systemImage: "folder.badge.plus")
+                        .foregroundStyle(PokiTheme.primaryText)
+                }
+                .disabled(importer.isWorking)
+                .listRowBackground(PokiTheme.surface)
+                if importer.isWorking {
+                    HStack(spacing: 10) {
+                        ProgressView().tint(PokiTheme.tagText)
+                        Text(importer.phaseText).font(.callout).foregroundStyle(PokiTheme.secondaryText)
+                    }.listRowBackground(PokiTheme.surface)
+                }
+            } header: {
+                Text(AppLocalized("Local plugins"))
+            } footer: {
+                Text(AppLocalized("ZIP import works without starting Terminal or downloading a Linux image. Maximum 10 MB and 500 files."))
             }
+
+            Section(AppLocalized("Installed plugins")) {
+                if importer.installed.isEmpty {
+                    Label(AppLocalized("No installed plugins"), systemImage: "shippingbox")
+                        .foregroundStyle(PokiTheme.secondaryText)
+                }
+                ForEach(importer.installed, id: \.id) { record in
+                    VStack(alignment: .leading, spacing: 5) {
+                        HStack {
+                            Image(systemName: "shippingbox.fill").foregroundStyle(PokiTheme.tagText)
+                            Text(record.id).font(.callout.weight(.medium)).lineLimit(2)
+                            Spacer()
+                            Text(record.version).font(.caption.monospaced()).foregroundStyle(PokiTheme.secondaryText)
+                        }
+                        Text(record.enabled ? AppLocalized("Enabled") : AppLocalized("Installed · disabled"))
+                            .font(.caption).foregroundStyle(PokiTheme.secondaryText)
+                        Button(role: .destructive) { recordToDelete = record } label: {
+                            Label(AppLocalized("Uninstall"), systemImage: "trash")
+                                .font(.caption).foregroundStyle(PokiTheme.danger)
+                        }.buttonStyle(.borderless)
+                    }
+                }
+            }.listRowBackground(PokiTheme.surface)
+
+            Section {
+                switch store.phase {
+                case .idle, .loading:
+                    HStack { ProgressView(); Text(AppLocalized("Searching GitHub…")) }
+                case .failed(let message):
+                    Text(message).font(.footnote).foregroundStyle(PokiTheme.secondaryText)
+                    Button(AppLocalized("Retry")) { Task { await store.reload() } }
+                case .loaded:
+                    if store.items.isEmpty {
+                        Label(AppLocalized("No plugins yet"), systemImage: "magnifyingglass")
+                            .foregroundStyle(PokiTheme.secondaryText)
+                    }
+                    ForEach(store.items) { item in
+                        if let url = URL(string: item.htmlURL) {
+                            Link(destination: url) {
+                                VStack(alignment: .leading, spacing: 5) {
+                                    HStack {
+                                        Text(item.name).font(.body.weight(.medium)).foregroundStyle(PokiTheme.primaryText)
+                                        Text(AppLocalized("Unverified")).font(.caption2.weight(.medium))
+                                            .padding(.horizontal, 7).padding(.vertical, 3)
+                                            .background(PokiTheme.tagBackground, in: Capsule())
+                                            .foregroundStyle(PokiTheme.tagText)
+                                    }
+                                    Text(item.fullName).font(.caption).foregroundStyle(PokiTheme.secondaryText)
+                                    if let description = item.description, !description.isEmpty {
+                                        Text(description).font(.caption).foregroundStyle(PokiTheme.secondaryText).lineLimit(3)
+                                    }
+                                    Text("★ \(item.stars)").font(.caption2).foregroundStyle(PokiTheme.secondaryText)
+                                }.padding(.vertical, 4)
+                            }
+                        }
+                    }
+                }
+            } header: {
+                Text(AppLocalized("Community plugins"))
+            } footer: {
+                Text(AppLocalized("These repositories are not reviewed by Amore. Install only what you can audit."))
+            }.listRowBackground(PokiTheme.surface)
         }
-        .fileImporter(isPresented: $showPicker,
-                      allowedContentTypes: [.folder, .zip],
-                      allowsMultipleSelection: false) { result in
-            do {
-                let url = try result.get().first
-                guard let url else { return }
-                let installer = AmorePluginInstaller.shared
-                let record = url.pathExtension.lowercased() == "zip"
-                    ? try installer.installZip(from: url)
-                    : try installer.installLocal(from: url)
-                installFailed = false
-                installMessage = "\(record.id) \(record.version)"
-            } catch {
-                installFailed = true
-                installMessage = error.localizedDescription
+        .pokiScreen()
+        .navigationTitle(AppLocalized("Plugin Marketplace"))
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showPicker, onDismiss: {
+            if let selected = queuedSelection {
+                queuedSelection = nil
+                importer.selected(selected, folder: queuedFolder)
             }
+        }) {
+            AmorePluginDocumentPicker(folder: pickFolder, onSelection: { result in
+                showPicker = false
+                switch result {
+                case .success(let url):
+                    queuedSelection = url
+                    queuedFolder = pickFolder
+                case .failure(let error): importer.pickerFailed(error)
+                }
+            }, onCancel: { showPicker = false })
         }
-        .alert(installFailed ? AppLocalized("Install failed") : AppLocalized("Installed"),
-               isPresented: Binding(get: { installMessage != nil },
-                                    set: { if !$0 { installMessage = nil } })) {
-            Button(AppLocalized("OK")) { installMessage = nil }
-        } message: {
-            Text(installMessage ?? "")
+        .sheet(item: $importer.pending, onDismiss: { importer.confirmationDismissed() }) { selection in
+            AmorePluginImportConfirmation(selection: selection,
+                onInstall: { importer.confirm() }, onCancel: { importer.cancel() })
         }
-        .refreshable { await store.reload() }
-        .task { await store.load() }
+        .alert(importer.failed ? AppLocalized("Install failed") : AppLocalized("Installed"),
+               isPresented: Binding(get: { importer.resultMessage != nil },
+                                    set: { if !$0 { importer.resultMessage = nil } })) {
+            Button(AppLocalized("OK")) { importer.resultMessage = nil }
+        } message: { Text(importer.resultMessage ?? "") }
+        .confirmationDialog(AppLocalized("Uninstall plugin?"),
+            isPresented: Binding(get: { recordToDelete != nil }, set: { if !$0 { recordToDelete = nil } }),
+            titleVisibility: .visible) {
+                Button(AppLocalized("Uninstall"), role: .destructive) {
+                    if let record = recordToDelete { importer.uninstall(record) }
+                    recordToDelete = nil
+                }
+                Button(AppLocalized("Cancel"), role: .cancel) { recordToDelete = nil }
+            }
+        .refreshable { await store.reload(); await importer.refreshInstalled() }
+        .task { await importer.refreshInstalled(); await store.load() }
     }
 }

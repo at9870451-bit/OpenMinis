@@ -211,7 +211,7 @@ extension ModelQuotaHintView {
 enum QuotaTagStyle {
     static func background(_ level: QuotaLevel) -> Color {
         switch level {
-        case .normal: return Color(UIColor.tertiarySystemFill)
+        case .normal: return PokiTheme.selection
         case .low: return .yellow
         case .depleted: return .red
         }

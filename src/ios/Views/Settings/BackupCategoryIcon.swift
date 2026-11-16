@@ -33,7 +33,7 @@ struct BackupActionIcon: View {
     var body: some View {
         Image(systemName: systemName)
             .font(.system(size: 9))
-            .foregroundStyle(.white)
+            .foregroundStyle(PokiTheme.primaryButtonText)
             .frame(width: 21, height: 21)
             .background(tint, in: Circle())
     }
@@ -45,7 +45,7 @@ struct BackupCategoryIcon: View {
     var body: some View {
         Image(systemName: Self.symbol(for: category))
             .font(.system(size: 13, weight: .semibold))
-            .foregroundStyle(.white)
+            .foregroundStyle(PokiTheme.primaryButtonText)
             .frame(width: 28, height: 28)
             .background(Self.tint(for: category), in: Circle())
     }
@@ -65,14 +65,14 @@ struct BackupCategoryIcon: View {
 
     static func tint(for c: BackupCategory) -> Color {
         switch c {
-        case .chats: return .blue
-        case .sharedFiles: return .indigo
-        case .skills: return .orange
-        case .memory: return .pink
-        case .providers: return .teal
-        case .mcpServers: return .cyan
-        case .voiceCorrections: return .purple
-        case .environmentVariables: return .brown
+        case .chats: return PokiTheme.primaryButton
+        case .sharedFiles: return PokiTheme.primaryButton
+        case .skills: return PokiTheme.primaryButton
+        case .memory: return PokiTheme.primaryButton
+        case .providers: return PokiTheme.primaryButton
+        case .mcpServers: return PokiTheme.primaryButton
+        case .voiceCorrections: return PokiTheme.primaryButton
+        case .environmentVariables: return PokiTheme.primaryButton
         }
     }
 }

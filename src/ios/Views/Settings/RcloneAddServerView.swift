@@ -101,13 +101,18 @@ struct RcloneAddServerView: View {
                     Section {
                         Text(errorText)
                             .font(.footnote)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(PokiTheme.danger)
                     }
+                    .listRowBackground(PokiTheme.surface)
                 }
             }
             .backupHUD(Binding(
                 get: { connectedRemote == nil ? nil : errorText },
                 set: { if $0 == nil { errorText = nil } }))
+            .scrollContentBackground(.hidden)
+            .background(PokiTheme.background)
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.primaryButton)
             .navigationTitle(connectedRemote == nil ? "Add Server" : "Choose Folder")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -185,26 +190,28 @@ struct RcloneAddServerView: View {
                     HStack(spacing: 12) {
                         Image(systemName: b.icon)
                             .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PokiTheme.primaryButtonText)
                             .frame(width: 28, height: 28)
-                            .background(backend?.type == b.type ? Color.blue : Color.gray,
+                            .background(backend?.type == b.type ? PokiTheme.primaryButton : PokiTheme.secondaryText,
                                         in: Circle())
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(b.title).foregroundStyle(.primary)
+                            Text(b.title).foregroundStyle(PokiTheme.primaryText)
                             Text(b.subtitle)
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                         Spacer()
                         if backend?.type == b.type {
-                            Image(systemName: "checkmark").foregroundStyle(.blue)
+                            Image(systemName: "checkmark").foregroundStyle(PokiTheme.primaryButton)
                         }
                     }
                 }
             }
         } header: {
             Text("Type")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     // MARK: - Step 2
@@ -218,9 +225,12 @@ struct RcloneAddServerView: View {
                     .textInputAutocapitalization(.never)
             } header: {
                 Text("Name")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Shown in the destination list.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 ForEach(b.fields) { f in
@@ -235,11 +245,11 @@ struct RcloneAddServerView: View {
                         HStack(spacing: 6) {
                             Text(f.label)
                                 .font(.footnote.weight(.medium))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                             if f.isOptional {
                                 Text("Optional")
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                         if f.isSecret {
@@ -256,19 +266,22 @@ struct RcloneAddServerView: View {
                         if !f.hint.isEmpty {
                             Text(f.hint)
                                 .font(.caption)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                     .padding(.vertical, 2)
                 }
             } header: {
                 Text("Connection")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 // Say where the password goes. "Stored in the Keychain" is the
                 // difference between this and typing a password into a text
                 // file, and the user cannot see that from the form itself.
                 Text("Passwords are stored in the iOS Keychain on this device only — never in the backup file.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
         }
     }
 
@@ -292,13 +305,13 @@ struct RcloneAddServerView: View {
                     Text(isConnecting ? String(localized: "Connecting…")
                          : picksFolder ? String(localized: "Connect")
                                        : String(localized: "Connect & Save"))
-                        .foregroundStyle(isConnecting ? AnyShapeStyle(.secondary)
-                                                      : AnyShapeStyle(.tint))
+                        .foregroundStyle(isConnecting ? AnyShapeStyle(PokiTheme.secondaryText)
+                                                      : AnyShapeStyle(PokiTheme.primaryButton))
                 } icon: {
                     if isConnecting {
                         ProgressView().frame(width: 21, height: 21)
                     } else {
-                        BackupActionIcon(systemName: "bolt.horizontal.fill", tint: .blue)
+                        BackupActionIcon(systemName: "bolt.horizontal.fill", tint: PokiTheme.primaryButton)
                     }
                 }
             }
@@ -307,7 +320,7 @@ struct RcloneAddServerView: View {
             if !requiredFieldsFilled && !isConnecting {
                 Text("Fill in the required fields to continue.")
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
 
             // Shown only after the server's certificate was actually
@@ -321,7 +334,7 @@ struct RcloneAddServerView: View {
                         Text("Trust this certificate")
                         Text("The server's certificate isn't signed by a known authority — usual for a NAS using its own certificate.")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
                 if allowInsecureTLS {
@@ -331,6 +344,7 @@ struct RcloneAddServerView: View {
                 }
             }
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     // MARK: - Step 3
@@ -347,9 +361,9 @@ struct RcloneAddServerView: View {
                 }
             }
             if isListing {
-                HStack { ProgressView(); Text("Loading…").foregroundStyle(.secondary) }
+                HStack { ProgressView(); Text("Loading…").foregroundStyle(PokiTheme.secondaryText) }
             } else if folderEntries.isEmpty {
-                Text("No folders here.").foregroundStyle(.secondary)
+                Text("No folders here.").foregroundStyle(PokiTheme.secondaryText)
             } else {
                 // Folders only. This step picks a DESTINATION, and the files
                 // already in a backups directory — often hundreds of them —
@@ -364,7 +378,7 @@ struct RcloneAddServerView: View {
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 }
@@ -387,11 +401,11 @@ struct RcloneAddServerView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         Text(displayPath)
                             .font(.footnote.weight(.medium))
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(PokiTheme.primaryText)
                             .lineLimit(1)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(Color(.secondarySystemFill), in: Capsule())
+                            .background(PokiTheme.surface, in: Capsule())
                     }
                 }
                 .buttonStyle(.plain)
@@ -403,6 +417,7 @@ struct RcloneAddServerView: View {
                     Label("New Folder", systemImage: "folder.badge.plus")
                         .labelStyle(.iconOnly)
                         .font(.body)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
                 .buttonStyle(.borderless)
                 .disabled(isListing)
@@ -410,7 +425,9 @@ struct RcloneAddServerView: View {
             .textCase(nil)
         } footer: {
             Text("Browse to the folder where backups should be saved, then tap Save Here.")
+            .foregroundStyle(PokiTheme.secondaryText)
         }
+        .listRowBackground(PokiTheme.surface)
     }
 
     // MARK: - Actions

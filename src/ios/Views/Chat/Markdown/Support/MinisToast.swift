@@ -45,19 +45,19 @@ enum MinisToast {
         label.text = message
         label.font = .preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = .white
+        label.textColor = PokiTheme.uiPrimaryButtonText
         // Wraps instead of truncating: a hint that names where to find a
         // setting is useless cut off. Short messages still take one line.
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
 
         let check = UIImageView(image: UIImage(systemName: systemImage))
-        check.tintColor = .white
+        check.tintColor = PokiTheme.uiPrimaryButtonText
         check.contentMode = .scaleAspectFit
         check.translatesAutoresizingMaskIntoConstraints = false
 
         let capsule = UIView()
-        capsule.backgroundColor = UIColor.black.withAlphaComponent(0.8)
+        capsule.backgroundColor = PokiTheme.uiPrimaryButton.withAlphaComponent(0.92)
         capsule.layer.cornerRadius = 18
         capsule.layer.cornerCurve = .continuous
         capsule.translatesAutoresizingMaskIntoConstraints = false

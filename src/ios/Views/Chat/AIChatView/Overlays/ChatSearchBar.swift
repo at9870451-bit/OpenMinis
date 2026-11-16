@@ -61,7 +61,7 @@ struct ChatSearchBar: View {
             }
             .padding(.horizontal, 10)
             .frame(height: 36)
-            .background(Color(UIColor.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(PokiTheme.surface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 
             navButton(systemName: "chevron.up", label: AppLocalized("Previous Result")) { search.previous() }
                 .keyboardShortcut(.return, modifiers: .shift)
@@ -78,13 +78,13 @@ struct ChatSearchBar: View {
                     .font(.system(size: 15, weight: .semibold))
             }
             .buttonStyle(.plain)
-            .foregroundStyle(Color.accentColor)
+            .foregroundStyle(PokiTheme.primaryText)
             .padding(.leading, 2)
             .accessibilityIdentifier("chatSearchDone")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(.bar)
+        .background(PokiTheme.background)
         .overlay(alignment: .bottom) { Divider() }
         .overlay(alignment: .bottom) { noticeView.offset(y: 34) }
         .onAppear { fieldFocused = true }
@@ -124,7 +124,7 @@ struct ChatSearchBar: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .foregroundStyle(hasResults ? Color.accentColor : ChatColors.tertiaryText)
+        .foregroundStyle(hasResults ? PokiTheme.primaryText : ChatColors.tertiaryText)
         .disabled(!hasResults)
         .accessibilityLabel(label)
     }
@@ -134,10 +134,10 @@ struct ChatSearchBar: View {
         if let notice = search.notice {
             Text(ChatSearchController.noticeText(notice))
                 .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(.white)
+                .foregroundStyle(PokiTheme.primaryButtonText)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(Color.black.opacity(0.75), in: Capsule())
+                .background(PokiTheme.primaryButton.opacity(0.92), in: Capsule())
                 .transition(.opacity)
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)

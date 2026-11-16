@@ -95,20 +95,20 @@ struct MoveToSessionSheet: View {
                                     highlightedText(
                                         session.title ?? AppLocalized("New Chat"),
                                         font: .system(size: 16, weight: .semibold),
-                                        color: Color(UIColor.label)
+                                        color: PokiTheme.primaryText
                                     )
                                     .lineLimit(1)
                                     highlightedText(
                                         session.lastMessage ?? AppLocalized("No messages yet"),
                                         font: .system(size: 14),
-                                        color: Color(UIColor.secondaryLabel)
+                                        color: PokiTheme.secondaryText
                                     )
                                     .lineLimit(1)
                                 }
                                 Spacer(minLength: 1)
                                 Text(relativeDate(session.updatedAt))
                                     .font(.system(size: 13))
-                                    .foregroundStyle(Color(UIColor.tertiaryLabel))
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
@@ -182,7 +182,7 @@ struct MoveToSessionSheet: View {
                     .font(font).foregroundColor(color)
             }
             result = result + Text(text[range])
-                .font(font).foregroundColor(.accentColor).bold()
+                .font(font).foregroundColor(PokiTheme.primaryText).bold()
             current = range.upperBound
         }
         if current < text.endIndex {

@@ -95,10 +95,10 @@ extension AIChatView {
             if let notice = vm.transientNotice {
                 Text(notice)
                     .font(.system(size: 12))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .padding(.horizontal, 12).padding(.vertical, 8)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.black.opacity(0.75))
+                    .background(PokiTheme.primaryButton.opacity(0.92))
                     .onAppear {
                         let captured = notice
                         DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
@@ -233,10 +233,10 @@ extension AIChatView {
             Divider()
             HStack {
                 Image(systemName: "eye")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Text("Read-only session from another device")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Spacer()
                 Button {
                     guard let sid = sessionId, let devId = remoteDeviceId else { return }

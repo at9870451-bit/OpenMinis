@@ -36,23 +36,25 @@ struct MountedFoldersSettingsView: View {
             Section {
                 InfoBanner()
             }
+            .listRowBackground(PokiTheme.surface)
 
             if model.entries.isEmpty {
                 Section {
                     VStack(spacing: 10) {
                         Image(systemName: "externaldrive.badge.plus")
                             .font(.system(size: 40))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text("No mounted folders")
                             .font(.headline)
                         Text("Tap + to pick a folder from Files (e.g. an Obsidian vault in iCloud Drive).")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 24)
                 }
+                .listRowBackground(PokiTheme.surface)
             } else {
                 Section {
                     ForEach(model.entries) { entry in
@@ -79,10 +81,11 @@ struct MountedFoldersSettingsView: View {
                 } header: {
                     HStack {
                         Text("Mounted Folders")
+                        .foregroundStyle(PokiTheme.secondaryText)
                         Spacer()
                         Text("\(model.entries.count) / \(MountedFoldersManager.maxMountCount)")
                             .font(.caption.monospacedDigit())
-                            .foregroundStyle(model.isAtCapacity ? .orange : .secondary)
+                            .foregroundStyle(model.isAtCapacity ? Color.orange : PokiTheme.secondaryText)
                     }
                 } footer: {
                     if model.isAtCapacity {
@@ -90,8 +93,13 @@ struct MountedFoldersSettingsView: View {
                             .foregroundStyle(.orange)
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Mount External Folders")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -259,7 +267,7 @@ private struct InfoBanner: View {
                 .font(.subheadline.weight(.semibold))
             Text("Picked folders are bind-mounted at /var/minis/mounts/<name>. You can browse them in Browse Files and read/write them directly from the iSH shell, just like /var/minis/shared. Up to 10 folders can be mounted at a time.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
@@ -276,7 +284,7 @@ private struct MountedFolderRow: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 8) {
                 Image(systemName: "folder.fill")
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(PokiTheme.primaryButton)
                 Text(entry.name)
                     .font(.body.weight(.medium))
                 accessBadge
@@ -284,12 +292,12 @@ private struct MountedFolderRow: View {
             }
             Text("/var/minis/mounts/\(entry.name)")
                 .font(.caption.monospaced())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .lineLimit(1)
                 .truncationMode(.middle)
             Text(verbatim: "← \(sourceURL?.path ?? entry.sourceDisplayName)")
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .lineLimit(1)
                 .truncationMode(.middle)
         }
@@ -305,9 +313,9 @@ private struct MountedFolderRow: View {
         if !entry.isWritable {
             badgePill(text: AppLocalized("Read-only"), color: .orange)
         } else if !entry.userAllowWrite {
-            badgePill(text: AppLocalized("Locked"), color: .purple)
+            badgePill(text: AppLocalized("Locked"), color: PokiTheme.secondaryText)
         } else {
-            badgePill(text: AppLocalized("R/W"), color: .green)
+            badgePill(text: AppLocalized("R/W"), color: PokiTheme.primaryText)
         }
     }
 
@@ -340,10 +348,10 @@ private struct AddMountSheet: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Source path")
                                 .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                             Text(url.path)
                                 .font(.caption2.monospaced())
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(PokiTheme.primaryText)
                                 .textSelection(.enabled)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -351,7 +359,9 @@ private struct AddMountSheet: View {
                     } footer: {
                         Text("The path above is how iOS exposes the folder you picked. Use it to confirm which app this data belongs to.")
                             .font(.caption2)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     }
+                    .listRowBackground(PokiTheme.surface)
                 }
 
                 Section(header: Text("Mount name")) {
@@ -360,8 +370,9 @@ private struct AddMountSheet: View {
                         .autocorrectionDisabled()
                     Text("This will be the folder name under /var/minis/mounts/")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
 
                 Section {
                     Toggle(isOn: $allowWrite) {
@@ -371,16 +382,23 @@ private struct AddMountSheet: View {
                                 ? AppLocalized("AI, shell, and Files browser can modify files in this mount.")
                                 : AppLocalized("This mount will be exposed as read-only. Useful for reference vaults you don't want the AI to touch."))
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 } header: {
                     Text("Permissions")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     Text("You can change the write permission later from the mount details page.")
                         .font(.caption)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
+            .scrollContentBackground(.hidden)
+            .background(PokiTheme.background)
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.primaryButton)
             .navigationTitle("New Mount")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

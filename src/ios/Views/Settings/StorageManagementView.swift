@@ -590,13 +590,13 @@ struct StorageManagementView: View {
     private var storageContent: some View {
         List {
             Section {
-                storageRow(icon: "terminal", color: .gray, label: "Shell Container", value: vm.format(vm.shellContainerSize))
-                storageRow(icon: "cylinder", color: .blue, label: "Chat Database", value: vm.format(vm.chatDatabaseSize))
-                storageRow(icon: "doc", color: .indigo, label: "Session Files", value: vm.format(vm.totalSessionSize))
-                storageRow(icon: "doc.text", color: .orange, label: "Logs & Caches", value: vm.format(vm.logsAndCachesSize))
-                storageRow(icon: "clock", color: .teal, label: "Temporary Files", value: vm.format(vm.temporarySize))
+                storageRow(icon: "terminal", color: PokiTheme.primaryButton, label: "Shell Container", value: vm.format(vm.shellContainerSize))
+                storageRow(icon: "cylinder", color: PokiTheme.primaryButton, label: "Chat Database", value: vm.format(vm.chatDatabaseSize))
+                storageRow(icon: "doc", color: PokiTheme.primaryButton, label: "Session Files", value: vm.format(vm.totalSessionSize))
+                storageRow(icon: "doc.text", color: PokiTheme.primaryButton, label: "Logs & Caches", value: vm.format(vm.logsAndCachesSize))
+                storageRow(icon: "clock", color: PokiTheme.primaryButton, label: "Temporary Files", value: vm.format(vm.temporarySize))
                 conditionalOverviewRows
-                storageRow(icon: "ellipsis", color: .gray, label: "Other", value: vm.format(vm.otherSize))
+                storageRow(icon: "ellipsis", color: PokiTheme.primaryButton, label: "Other", value: vm.format(vm.otherSize))
                 HStack {
                     Text("Total")
                         .fontWeight(.semibold)
@@ -606,9 +606,12 @@ struct StorageManagementView: View {
                 }
             } header: {
                 Text("Overview")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("Total is the app's full container size and should match the figure iOS Settings shows for Minis. \"Other\" covers everything not itemized above, so the categories always add up to the total.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             // [T-storage-clear-logs-caches]
             Section {
@@ -628,7 +631,9 @@ struct StorageManagementView: View {
                 .disabled(vm.isClearingLogsAndCaches)
             } footer: {
                 Text("Deletes all logs, including crash reports, and cached data such as model lists and web page caches. Logs older than 15 days are also deleted automatically. Chats, files and settings are not affected.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             orphanCleanupSection
 
@@ -641,14 +646,19 @@ struct StorageManagementView: View {
                     }
                 } else if vm.sessions.isEmpty {
                     Text("No sessions")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 } else {
                     ForEach(vm.sessions) { session in
                         sessionRow(session)
                     }
                 }
             }
+            .listRowBackground(PokiTheme.surface)
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Storage")
         .navigationBarTitleDisplayMode(.inline)
         // [T-storage-session-cache] Scan once per visit: onAppear fires again
@@ -714,14 +724,14 @@ struct StorageManagementView: View {
         // Only shown when non-zero: these two are failure residue, and a
         // permanent "0 bytes" row would read as a normal part of the app.
         if vm.orphanedSessionSize > 0 {
-            storageRow(icon: "questionmark.folder", color: .brown, label: "Orphaned Session Files", value: vm.format(vm.orphanedSessionSize))
+            storageRow(icon: "questionmark.folder", color: PokiTheme.primaryButton, label: "Orphaned Session Files", value: vm.format(vm.orphanedSessionSize))
         }
         if vm.staleRootfsSize > 0 {
-            storageRow(icon: "exclamationmark.triangle", color: .red, label: "Stale Shell Leftovers", value: vm.format(vm.staleRootfsSize))
+            storageRow(icon: "exclamationmark.triangle", color: PokiTheme.danger, label: "Stale Shell Leftovers", value: vm.format(vm.staleRootfsSize))
         }
         // [T-storage-orphan-cleanup] Was folded into "orphaned".
         if vm.sharedDataSize > 0 {
-            storageRow(icon: "square.stack.3d.up", color: .purple, label: "Skills, Memory & Shared Files", value: vm.format(vm.sharedDataSize))
+            storageRow(icon: "square.stack.3d.up", color: PokiTheme.primaryButton, label: "Skills, Memory & Shared Files", value: vm.format(vm.sharedDataSize))
         }
     }
 
@@ -743,7 +753,9 @@ struct StorageManagementView: View {
                 .disabled(vm.isCleaningOrphans || vm.isLoading)
             } footer: {
                 Text("Orphaned session files were left behind by conversations that no longer exist, for example ones deleted by an older version of the app or on another device. They are not in the list below. Cleaning them up does not touch your chats, skills, memory or shared files.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
         }
     }
 
@@ -776,7 +788,7 @@ struct StorageManagementView: View {
                 Label("Clean Up Orphaned Session Files", systemImage: "trash")
                 Spacer()
                 Text(vm.format(vm.orphanedSessionSize))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         }
     }
@@ -793,7 +805,7 @@ struct StorageManagementView: View {
             } label: {
                 HStack {
                     Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                        .foregroundStyle(selected ? Color.accentColor : Color.secondary)
+                        .foregroundStyle(selected ? PokiTheme.primaryButton : PokiTheme.secondaryText)
                         .font(.title3)
                     sessionLabel(session, busy: busy)
                 }
@@ -816,7 +828,7 @@ struct StorageManagementView: View {
                 } label: {
                     Label("Delete", systemImage: "trash")
                 }
-                .tint(.red)
+                .tint(PokiTheme.danger)
                 Button {
                     confirm(.clearFiles, [session.id])
                 } label: {
@@ -832,14 +844,14 @@ struct StorageManagementView: View {
         HStack {
             Text(session.title ?? "Untitled")
                 .lineLimit(1)
-                .foregroundStyle(.primary)
+                .foregroundStyle(PokiTheme.primaryText)
             Spacer()
             if busy {
                 ProgressView()
                     .controlSize(.small)
             } else {
                 Text(vm.format(session.totalSize))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         }
     }
@@ -874,11 +886,11 @@ struct StorageManagementView: View {
             if !selection.isEmpty {
                 Text("\(selection.count) selected · \(vm.format(selectedBytes))")
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .padding(.bottom, 8)
             }
         }
-        .background(.bar)
+        .background(PokiTheme.surface)
     }
 
     private func confirm(_ action: StorageManagementViewModel.SessionAction, _ ids: [String]) {
@@ -960,7 +972,7 @@ struct StorageManagementView: View {
         HStack {
             Image(systemName: icon)
                 .font(.system(size: 9))
-                .foregroundStyle(.white)
+                .foregroundStyle(PokiTheme.primaryButtonText)
                 .frame(width: 21, height: 21)
                 .background(color, in: Circle())
             // [T-storage-orphan-cleanup] `Text(label)` with a String shows the
@@ -969,7 +981,7 @@ struct StorageManagementView: View {
             Text(AppLocalized(String.LocalizationValue(label)))
             Spacer()
             Text(value)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
         }
     }
 }
@@ -1018,14 +1030,15 @@ struct SessionStorageDetailView: View {
                             Label("Browse Files", systemImage: "folder")
                             Spacer()
                             Text(formatter.string(fromByteCount: currentMinisSize))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 } else {
                     Text("No minis files")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Button(role: .destructive) {
@@ -1042,15 +1055,21 @@ struct SessionStorageDetailView: View {
                         Spacer()
                         if !isClearing {
                             Text(formatter.string(fromByteCount: totalFileSize))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 }
                 .disabled(!hasFiles || isClearing)
             } footer: {
                 Text("Removes all files generated by this session. The conversation itself will be preserved.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle(session.title ?? "Session")
         .navigationBarTitleDisplayMode(.inline)
         .alert("Clear Session Files?", isPresented: $showClearConfirmation) {

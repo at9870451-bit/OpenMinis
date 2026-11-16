@@ -124,7 +124,7 @@ struct SyncMigrationDetailView: View {
                 Section {
                     HStack {
                         ProgressView().controlSize(.small)
-                        Text("Loading…").foregroundStyle(.secondary)
+                        Text("Loading…").foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             }
@@ -140,19 +140,19 @@ struct SyncMigrationDetailView: View {
                         Text("Engine")
                         Spacer()
                         if let until = vm.pausedUntil {
-                            Text(pauseRemaining(until: until)).foregroundStyle(.secondary)
+                            Text(pauseRemaining(until: until)).foregroundStyle(PokiTheme.secondaryText)
                         } else if let until = vm.bootDelayUntil, until > Date() {
-                            Text(bootDelayRemaining(until: until)).foregroundStyle(.secondary)
+                            Text(bootDelayRemaining(until: until)).foregroundStyle(PokiTheme.secondaryText)
                         } else if !vm.isRunning {
                             // boot deadline passed but SyncCore.start() is still
                             // mid-flight (CKDatabase ensureZonesExist + initial
                             // sendChanges take a few seconds after the delay
                             // expires). Show 'Starting…' until isRunning flips.
-                            Text("Starting…").foregroundStyle(.secondary)
+                            Text("Starting…").foregroundStyle(PokiTheme.secondaryText)
                         } else if let until = vm.throttledUntil, until > Date() {
                             Text(throttleRemaining(until: until)).foregroundStyle(.orange)
                         } else {
-                            Text("Running").foregroundStyle(.primary)
+                            Text("Running").foregroundStyle(PokiTheme.primaryText)
                         }
                         if vm.isRunning {
                             Spacer().frame(width: 12)
@@ -166,6 +166,8 @@ struct SyncMigrationDetailView: View {
                                         .frame(width: 16, height: 16)
                                 }
                                 .buttonStyle(.borderedProminent)
+                    .tint(PokiTheme.primaryButton)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                                 .clipShape(Circle())
                             } else {
                                 Button {
@@ -199,21 +201,21 @@ struct SyncMigrationDetailView: View {
                         LabeledContent(AppLocalized("Pending push"), value: "\(vm.pendingPush)")
                         if vm.pendingPushNew > 0 {
                             LabeledContent {
-                                Text("\(vm.pendingPushNew)").foregroundStyle(.secondary)
+                                Text("\(vm.pendingPushNew)").foregroundStyle(PokiTheme.secondaryText)
                             } label: {
-                                Text("· New writes").foregroundStyle(.secondary).font(.callout)
+                                Text("· New writes").foregroundStyle(PokiTheme.secondaryText).font(.callout)
                             }
                         }
                         if vm.pendingPushMigration > 0 {
                             LabeledContent {
-                                Text("\(vm.pendingPushMigration)").foregroundStyle(.secondary)
+                                Text("\(vm.pendingPushMigration)").foregroundStyle(PokiTheme.secondaryText)
                             } label: {
-                                Text("· Migration backlog").foregroundStyle(.secondary).font(.callout)
+                                Text("· Migration backlog").foregroundStyle(PokiTheme.secondaryText).font(.callout)
                             }
                         }
                     } else {
                         LabeledContent(AppLocalized("Pending push")) {
-                            Text("Up to date").foregroundStyle(.secondary)
+                            Text("Up to date").foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                     LabeledContent(AppLocalized("Sent this session"), value: "\(vm.totalSent)")
@@ -242,7 +244,7 @@ struct SyncMigrationDetailView: View {
                 Section {
                     LabeledContent {
                         Text("\(vm.unmigratedHistoryCount)")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     } label: {
                         Text("Eligible records")
                     }
@@ -271,15 +273,15 @@ struct SyncMigrationDetailView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Last attempt failed")
                                 .font(.caption.weight(.medium))
-                                .foregroundStyle(.red)
+                                .foregroundStyle(PokiTheme.danger)
                             Text(err)
                                 .font(.caption.monospaced())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     } else if vm.isCanceledByUser {
                         Text("Migration canceled. Tap to resume backfilling local history.")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                     Button {
                         showRequestMigrationConfirm = true
@@ -318,7 +320,7 @@ struct SyncMigrationDetailView: View {
                                 .foregroundStyle(.orange)
                             Text("Paused — no progress for 30 minutes. Minis continues automatically when you come back to the app.")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                         Button {
                             Task { await MigrationEngine.shared.resumeIfSuspended(trigger: "continueButton", force: true) }
@@ -340,7 +342,7 @@ struct SyncMigrationDetailView: View {
                         showCancelMigrationConfirm = true
                     } label: {
                         Text("Cancel Migration")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(PokiTheme.danger)
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
                     // [T-icloud-migration-reset] Escape hatch for a migration
@@ -374,10 +376,10 @@ struct SyncMigrationDetailView: View {
                                 .foregroundStyle(.green)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("V1 zone deleted")
-                                    .foregroundStyle(.primary)
+                                    .foregroundStyle(PokiTheme.primaryText)
                                 Text(AppLocalized("Deleted \(deletedAtRelativeString())"))
                                     .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     } else {
@@ -412,7 +414,7 @@ struct SyncMigrationDetailView: View {
 
                 if let err = m.lastError {
                     Section("Last error") {
-                        Text(err).font(.caption.monospaced()).foregroundStyle(.red)
+                        Text(err).font(.caption.monospaced()).foregroundStyle(PokiTheme.danger)
                     }
                 }
             }
@@ -423,6 +425,8 @@ struct SyncMigrationDetailView: View {
             // deleting whole zones they no longer need.
             iCloudZonesSection
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
         .confirmationDialog("Request Migration", isPresented: $showRequestMigrationConfirm, titleVisibility: .visible) {
             Button("Start Migration") {
                 if #available(iOS 17.0, *) {
@@ -508,6 +512,7 @@ struct SyncMigrationDetailView: View {
             // butt up against the sheet edge / show-through content.
             Color.clear.frame(height: 24)
         }
+        .pokiScreen()
         .navigationTitle("iCloud Sync")
 #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -604,12 +609,12 @@ struct SyncMigrationDetailView: View {
             if zonesLoading && zonesList.isEmpty {
                 HStack {
                     ProgressView().controlSize(.small)
-                    Text("Loading zones…").foregroundStyle(.secondary)
+                    Text("Loading zones…").foregroundStyle(PokiTheme.secondaryText)
                 }
             } else if let err = zonesLoadError {
-                Text(err).font(.caption).foregroundStyle(.red)
+                Text(err).font(.caption).foregroundStyle(PokiTheme.danger)
             } else if zonesList.isEmpty {
-                Text("No zones found.").foregroundStyle(.secondary)
+                Text("No zones found.").foregroundStyle(PokiTheme.secondaryText)
             } else {
                 ForEach(zonesList) { row in
                     zoneRowView(row)
@@ -626,7 +631,7 @@ struct SyncMigrationDetailView: View {
                         .foregroundStyle(.orange)
                     Text(zoneDeleteError)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -673,12 +678,12 @@ struct SyncMigrationDetailView: View {
                     if row.isOwn {
                         Image(systemName: "person.crop.circle.fill")
                             .font(.caption2)
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(PokiTheme.tagText)
                     }
                 }
                 Text(zoneDescription(for: row))
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(2)
             }
             Spacer(minLength: 8)
@@ -886,7 +891,7 @@ struct SyncMigrationDetailView: View {
                     .font(.caption.weight(.semibold))
                 Text("To improve sync experience and reduce iCloud storage, we've upgraded the sync engine. Historical data is being migrated automatically — this may consume some extra battery or cellular data. You can cancel migration any time below.")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
@@ -895,7 +900,7 @@ struct SyncMigrationDetailView: View {
             } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .frame(width: 20, height: 20)
             }
             .buttonStyle(.plain)
@@ -923,7 +928,7 @@ struct SyncMigrationDetailView: View {
                 .frame(width: 20, height: 20)
                 .background(tint, in: Circle())
             Text(title)
-                .foregroundStyle(titleColor ?? Color.primary)
+                .foregroundStyle(titleColor ?? PokiTheme.primaryText)
         }
         .frame(maxWidth: .infinity, alignment: .center)
     }
@@ -935,9 +940,9 @@ struct SyncMigrationDetailView: View {
                 Spacer()
                 if total > 0 {
                     let pct = Int(Double(min(done, total)) * 100 / Double(total))
-                    Text("\(done) / \(total) (\(pct)%)").foregroundStyle(.secondary)
+                    Text("\(done) / \(total) (\(pct)%)").foregroundStyle(PokiTheme.secondaryText)
                 } else {
-                    Text("\(done)").foregroundStyle(.secondary)
+                    Text("\(done)").foregroundStyle(PokiTheme.secondaryText)
                 }
             }
             if total > 0 {
@@ -1136,11 +1141,11 @@ private struct PauseSyncSheet: View {
                         } label: {
                             HStack {
                                 Text(pauseLabel(hours))
-                                    .foregroundStyle(.primary)
+                                    .foregroundStyle(PokiTheme.primaryText)
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                             }
                         }
                     }
@@ -1148,6 +1153,9 @@ private struct PauseSyncSheet: View {
                     Text("Pending changes are preserved locally and pushed once the pause ends.")
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+            .pokiScreen()
             .navigationTitle("Pause iCloud Sync")
 #if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)

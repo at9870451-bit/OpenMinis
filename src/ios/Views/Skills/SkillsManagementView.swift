@@ -62,13 +62,13 @@ struct SkillsManagementView: View {
             if store.skills.isEmpty {
                 Section {
                     Text(AppLocalized("No skills installed. Tap + to import a SKILL.md from GitHub or paste one manually."))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .font(.subheadline)
                 }
             } else if filteredSkills.isEmpty {
                 Section {
                     Text(AppLocalized("No skills match \"\(searchQuery)\"."))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .font(.subheadline)
                 }
             }
@@ -86,7 +86,7 @@ struct SkillsManagementView: View {
                             if !skill.description.isEmpty {
                                 Text(skill.description)
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                     .lineLimit(2)
                             }
                         }
@@ -107,6 +107,9 @@ struct SkillsManagementView: View {
                 for id in ids { store.deleteSkill(id) }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle("Skills")
         .searchable(text: $searchQuery, placement: .navigationBarDrawer(displayMode: .always),
                     prompt: Text(AppLocalized("Search skills")))
@@ -178,7 +181,7 @@ struct SkillsManagementView: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(Color.accentColor, in: Capsule())
+                    .background(PokiTheme.tagText, in: Capsule())
                     .padding(.top, 8)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
@@ -208,7 +211,7 @@ struct SkillsManagementView: View {
         case .url:
             Image(systemName: "link")
                 .font(.caption2)
-                .foregroundStyle(.blue)
+                .foregroundStyle(PokiTheme.tagText)
         case .file:
             Image(systemName: "doc")
                 .font(.caption2)
@@ -286,7 +289,7 @@ private struct ImportSkillSheet: View {
                 switch importMode {
                 case .url:
                     Section("GitHub URL") {
-                        TextField("", text: $urlText, prompt: Text("github.com/user/repo/blob/main/SKILL.md").foregroundColor(.secondary))
+                        TextField("", text: $urlText, prompt: Text("github.com/user/repo/blob/main/SKILL.md").foregroundColor(PokiTheme.secondaryText))
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .keyboardType(.URL)
@@ -311,11 +314,14 @@ private struct ImportSkillSheet: View {
                 if let errorMessage {
                     Section {
                         Text(errorMessage)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(PokiTheme.danger)
                             .font(.caption)
                     }
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+            .pokiScreen()
             .navigationTitle(AppLocalized("Import Skill"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -333,7 +339,7 @@ private struct ImportSkillSheet: View {
                 if isImporting {
                     ProgressView("Importing…")
                         .padding()
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        .background(PokiTheme.surface, in: RoundedRectangle(cornerRadius: 12))
                 }
             }
             .sheet(isPresented: $showFilePicker) {
@@ -545,7 +551,7 @@ private struct SkillDetailView: View {
                             } label: {
                                 Image(systemName: "pencil")
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                             .buttonStyle(.plain)
                         }
@@ -554,7 +560,7 @@ private struct SkillDetailView: View {
                     if let modDate = latestFileModDate {
                         LabeledContent("Last Modified") {
                             Text(Self.relativeTime(modDate))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                     LabeledContent("Source") {
@@ -567,15 +573,15 @@ private struct SkillDetailView: View {
                             } else {
                                 Text(url)
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                                     .lineLimit(1)
                             }
                         case .file:
-                            Text(AppLocalized("File import")).foregroundStyle(.secondary)
+                            Text(AppLocalized("File import")).foregroundStyle(PokiTheme.secondaryText)
                         case .bundled:
-                            Text(AppLocalized("Built-in")).foregroundStyle(.secondary)
+                            Text(AppLocalized("Built-in")).foregroundStyle(PokiTheme.secondaryText)
                         case .session:
-                            Text(AppLocalized("Session created")).foregroundStyle(.secondary)
+                            Text(AppLocalized("Session created")).foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                     // [T-skill-copy-source-url] Long-press the Source row; the
@@ -605,7 +611,7 @@ private struct SkillDetailView: View {
                                     ProgressView()
                                 } else {
                                     Text(updatedAgoText)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                         .font(.caption)
                                 }
                             }
@@ -670,7 +676,7 @@ private struct SkillDetailView: View {
                     Section("Description") {
                         Text(bodyPreview)
                             .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .lineLimit(nil)
                     }
                 }
@@ -686,7 +692,7 @@ private struct SkillDetailView: View {
                                     .font(.system(.subheadline, design: .monospaced))
                             } icon: {
                                 Image(systemName: fileIcon(for: relativePath))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
@@ -694,7 +700,7 @@ private struct SkillDetailView: View {
 
                 if let updateError {
                     Section {
-                        Text(updateError).foregroundStyle(.red).font(.caption)
+                        Text(updateError).foregroundStyle(PokiTheme.danger).font(.caption)
                     }
                 }
 
@@ -711,9 +717,12 @@ private struct SkillDetailView: View {
                     }
                 }
             } else {
-                Text(AppLocalized("Skill not found.")).foregroundStyle(.secondary)
+                Text(AppLocalized("Skill not found.")).foregroundStyle(PokiTheme.secondaryText)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle(skill?.name ?? "Skill")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -929,13 +938,14 @@ private struct SkillFileDetailView: View {
             .overlay(alignment: .bottom) {
                 if let saveError {
                     Text(saveError)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(PokiTheme.danger)
                         .font(.caption)
                         .padding(8)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+                        .background(PokiTheme.surface, in: RoundedRectangle(cornerRadius: 8))
                         .padding()
                 }
             }
+            .pokiScreen()
             .navigationTitle(fileName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -986,6 +996,7 @@ struct MinisSkillsBrowserView: View {
                     .animation(.spring(response: 0.3), value: coordinator.hudState)
                 }
             }
+            .pokiScreen()
             .navigationTitle("Minis Skills")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -1027,13 +1038,13 @@ struct MinisSkillsBrowserView: View {
                     .lineLimit(1)
             case .error(let msg):
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
                 Text(msg)
                     .foregroundStyle(.white)
                     .lineLimit(2)
             case .hint(let msg):
                 Image(systemName: "info.circle.fill")
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(PokiTheme.tagText)
                 Text(msg)
                     .foregroundStyle(.white)
                     .lineLimit(2)

@@ -637,14 +637,14 @@ final class ImageAttachment: NSTextAttachment {
         let container = UIView(frame: CGRect(x: 0, y: 0, width: width, height: h))
 
         let bg = UIView(frame: CGRect(x: 0, y: 0, width: min(width, 400), height: h))
-        bg.backgroundColor = .secondarySystemBackground
+        bg.backgroundColor = PokiTheme.uiSurface
         bg.layer.cornerRadius = 8
         bg.clipsToBounds = true
         container.addSubview(bg)
 
         let iconConfig = UIImage.SymbolConfiguration(pointSize: 32, weight: .light)
         let icon = UIImageView(image: UIImage(systemName: "photo", withConfiguration: iconConfig))
-        icon.tintColor = .tertiaryLabel
+        icon.tintColor = PokiTheme.uiSecondaryText
         icon.sizeToFit()
         icon.center = CGPoint(x: bg.bounds.midX, y: bg.bounds.midY - 12)
         bg.addSubview(icon)
@@ -653,7 +653,7 @@ final class ImageAttachment: NSTextAttachment {
         let label = UILabel()
         label.text = filename
         label.font = .systemFont(ofSize: 12)
-        label.textColor = .secondaryLabel
+        label.textColor = PokiTheme.uiSecondaryText
         label.textAlignment = .center
         label.frame = CGRect(x: 8, y: icon.frame.maxY + 8, width: bg.bounds.width - 16, height: 16)
         bg.addSubview(label)

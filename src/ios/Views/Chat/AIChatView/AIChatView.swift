@@ -758,6 +758,8 @@ struct AIChatView: View {
             kernelBootOverlay
         })
         .background(ChatColors.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryText)
         .onDrop(of: [.image, .movie, .fileURL, .data], isTargeted: $isDropTargeted) { providers in
             handleDropProviders(providers)
             return true
@@ -765,8 +767,8 @@ struct AIChatView: View {
         .overlay {
             if isDropTargeted {
                 RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [8]))
-                    .background(Color.accentColor.opacity(0.08).clipShape(RoundedRectangle(cornerRadius: 16)))
+                    .strokeBorder(PokiTheme.primaryText, style: StrokeStyle(lineWidth: 2, dash: [8]))
+                    .background(PokiTheme.primaryText.opacity(0.08).clipShape(RoundedRectangle(cornerRadius: 16)))
                     .padding(8)
                     .allowsHitTesting(false)
             }
@@ -848,10 +850,10 @@ struct AIChatView: View {
             if let msg = forcePullToast {
                 Text(msg)
                     .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(Color.accentColor, in: Capsule())
+                    .background(PokiTheme.primaryButton, in: Capsule())
                     .padding(.top, 8)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }

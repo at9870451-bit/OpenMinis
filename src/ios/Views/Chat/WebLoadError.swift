@@ -111,13 +111,13 @@ struct WebLoadErrorOverlay: View {
         VStack(spacing: 14) {
             Image(systemName: error.systemImage)
                 .font(.system(size: 44, weight: .regular))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             Text(error.title)
                 .font(.headline)
                 .multilineTextAlignment(.center)
             Text(error.message)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
             Button(action: onRetry) {
@@ -131,6 +131,6 @@ struct WebLoadErrorOverlay: View {
         .padding(28)
         .frame(maxWidth: 360)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.background)
+        .background(PokiTheme.background)
     }
 }

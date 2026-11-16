@@ -466,7 +466,7 @@ struct SpeechPlayerControl: View {
     private func speakerGlyph(size: CGFloat, ring: CGFloat) -> some View {
         // Muted → dimmed slashed speaker; otherwise active accent speaker.
         let tint: Color = showFailureFlash ? .red
-            : (state.isMuted ? Color.secondary : Color.accentColor)
+            : (state.isMuted ? PokiTheme.secondaryText : PokiTheme.primaryText)
         Image(systemName: state.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
             .font(.system(size: size, weight: .medium))
             .foregroundStyle(tint)
@@ -484,16 +484,16 @@ struct SpeechPlayerControl: View {
         ZStack(alignment: .bottomTrailing) {
             // No shadow — a faint border instead, matching the scroll-to-bottom pill.
             Circle()
-                .fill(.ultraThinMaterial)
+                .fill(PokiTheme.surface)
                 .frame(width: 40, height: 40)
-                .overlay(Circle().stroke(Color.gray.opacity(0.25), lineWidth: 0.5))
+                .overlay(Circle().stroke(PokiTheme.divider, lineWidth: 0.5))
             speakerGlyph(size: 15, ring: 40).frame(width: 40, height: 40)
             if state.speechSpeed > 1.0 {
                 Text(Self.speedLabel(state.speechSpeed))
                     .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PokiTheme.primaryButtonText)
                     .padding(.horizontal, 4).padding(.vertical, 1)
-                    .background(Capsule().fill(Color.accentColor))
+                    .background(Capsule().fill(PokiTheme.primaryText))
                     .offset(x: 6, y: 4)
             }
         }
@@ -529,7 +529,7 @@ struct SpeechPlayerControl: View {
         HStack(spacing: 8) {
             Image(systemName: state.readAloudVolume <= 0 ? "speaker.fill" : "speaker.wave.1.fill")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .frame(width: 16)
                 .accessibilityHidden(true)
             Slider(value: Binding(
@@ -541,7 +541,7 @@ struct SpeechPlayerControl: View {
             .accessibilityValue(Text(verbatim: "\(ReadAloudVolume.percent(state.readAloudVolume))%"))
             Text(verbatim: "\(ReadAloudVolume.percent(state.readAloudVolume))%")
                 .font(.caption2.weight(.semibold).monospacedDigit())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
                 .lineLimit(1)
                 // Large Dynamic Type shrinks the digits instead of truncating
                 // them inside the fixed-width row.
@@ -552,8 +552,8 @@ struct SpeechPlayerControl: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .frame(width: Self.volumeRowWidth)
-        .background(Capsule().fill(.ultraThinMaterial))
-        .overlay(Capsule().stroke(Color.gray.opacity(0.25), lineWidth: 0.5))
+        .background(Capsule().fill(PokiTheme.surface))
+        .overlay(Capsule().stroke(PokiTheme.divider, lineWidth: 0.5))
         .accessibilityElement(children: .contain)
     }
 
@@ -575,14 +575,14 @@ struct SpeechPlayerControl: View {
                 HStack(spacing: 4) {
                     Image(systemName: "waveform")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Text(modelLabel.isEmpty ? "Voice" : modelLabel)
                         .font(.caption.weight(.medium))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(PokiTheme.primaryText)
                         .lineLimit(1)
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.system(size: 8, weight: .semibold))
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 .frame(maxWidth: 130)
             }
@@ -595,12 +595,12 @@ struct SpeechPlayerControl: View {
                 Text(Self.speedLabel(state.speechSpeed))
                     .font(.caption2.weight(.bold))
                     .lineLimit(1)
-                    .foregroundStyle(state.speechSpeed > 1.0 ? Color.accentColor : .secondary)
+                    .foregroundStyle(state.speechSpeed > 1.0 ? PokiTheme.primaryText : PokiTheme.secondaryText)
                     // Fixed width sized for the widest label ("1.25×") so cycling
                     // through speeds doesn't change the chip width (→ no jitter).
                     .frame(width: 34)
                     .padding(.vertical, 4)
-                    .background(Capsule().fill(Color.secondary.opacity(0.15)))
+                    .background(Capsule().fill(PokiTheme.secondaryText.opacity(0.15)))
             }
             .buttonStyle(.plain)
 
@@ -610,7 +610,7 @@ struct SpeechPlayerControl: View {
             } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .frame(width: 24, height: 24)
             }
             .buttonStyle(.plain)
@@ -618,8 +618,8 @@ struct SpeechPlayerControl: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 9)
         // No shadow — a faint border instead, matching the scroll-to-bottom pill.
-        .background(Capsule().fill(.ultraThinMaterial))
-        .overlay(Capsule().stroke(Color.gray.opacity(0.25), lineWidth: 0.5))
+        .background(Capsule().fill(PokiTheme.surface))
+        .overlay(Capsule().stroke(PokiTheme.divider, lineWidth: 0.5))
         // Drag to reposition. Highest priority so the outer tap-to-dismiss layer
         // doesn't steal it.
         .highPriorityGesture(dragGesture)
@@ -668,7 +668,7 @@ private struct RotatingArc: View {
             let angle = Angle(degrees: (t / period).truncatingRemainder(dividingBy: 1) * 360)
             Circle()
                 .trim(from: 0, to: arcFraction)
-                .stroke(Color.blue, style: StrokeStyle(lineWidth: 1.5, lineCap: .round))
+                .stroke(PokiTheme.aiAccent, style: StrokeStyle(lineWidth: 1.5, lineCap: .round))
                 .frame(width: diameter, height: diameter)
                 .rotationEffect(angle)
         }

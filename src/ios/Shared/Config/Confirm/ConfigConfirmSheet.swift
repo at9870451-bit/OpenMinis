@@ -42,7 +42,7 @@ struct ConfigConfirmSheet: View {
                 if let caption = change.caption, !caption.isEmpty {
                     Text(caption)
                         .font(.system(.footnote, design: .monospaced))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                         .padding(.top, 8)
@@ -51,6 +51,8 @@ struct ConfigConfirmSheet: View {
                     Section {
                         ForEach($workingItems) { $item in
                             ConfigConfirmRow(item: $item)
+                                .listRowBackground(PokiTheme.surface)
+                                .listRowSeparatorTint(PokiTheme.divider)
                         }
                     }
                     // [T-config-readable] Batch summary: the readable sentences
@@ -61,7 +63,7 @@ struct ConfigConfirmSheet: View {
                             ForEach(Array(summaryLines.enumerated()), id: \.offset) { _, line in
                                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                                     Text(verbatim: "•")
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(PokiTheme.secondaryText)
                                     Text(verbatim: line)
                                         .font(.subheadline)
                                         .fixedSize(horizontal: false, vertical: true)
@@ -73,7 +75,9 @@ struct ConfigConfirmSheet: View {
                     }
                 }
                 .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
             }
+            .pokiScreen()
             .navigationTitle(workingItems.count > 1
                              ? "Confirm \(workingItems.count) changes"
                              : "Confirm change")
@@ -123,7 +127,7 @@ struct ConfigConfirmSheet: View {
 struct ConfigReadableDivider: View {
     var body: some View {
         Rectangle()
-            .fill(Color(uiColor: .separator))
+            .fill(PokiTheme.divider)
             .frame(height: 1 / UIScreen.main.scale)
             .padding(.vertical, 2)
             .accessibilityHidden(true)
@@ -138,13 +142,13 @@ private struct ConfigConfirmRow: View {
             HStack(spacing: 6) {
                 Text(item.verb.uppercased())
                     .font(.system(.caption2, design: .monospaced))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(verbForeground)
                     .padding(.horizontal, 5)
                     .padding(.vertical, 1)
                     .background(verbBackground, in: Capsule())
                 Text(item.displayName)
                     .font(.system(.body, design: .default))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(PokiTheme.primaryText)
                 Spacer()
                 Toggle("", isOn: $item.isApproved)
                     .labelsHidden()
@@ -152,13 +156,13 @@ private struct ConfigConfirmRow: View {
             }
             Text(item.path)
                 .font(.system(.caption2, design: .monospaced))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             HStack(alignment: .top, spacing: 6) {
                 if !item.oldDisplay.isEmpty {
                     Text(item.oldDisplay)
                         .lineLimit(2)
                         .truncationMode(.middle)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Image(systemName: "arrow.right")
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
@@ -167,9 +171,9 @@ private struct ConfigConfirmRow: View {
                     Text(item.newDisplay)
                         .lineLimit(2)
                         .truncationMode(.middle)
-                        .foregroundStyle(item.risk == .destructive ? .red
-                                         : item.risk == .sensitive ? .orange
-                                         : .primary)
+                        .foregroundStyle(item.risk == .destructive ? PokiTheme.danger
+                                         : item.risk == .sensitive ? PokiTheme.tagText
+                                         : PokiTheme.primaryText)
                         .fontWeight(.medium)
                 }
             }
@@ -183,10 +187,10 @@ private struct ConfigConfirmRow: View {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Image(systemName: "text.bubble")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     Text(verbatim: readable.displayText)
                         .font(.subheadline)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(PokiTheme.primaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.top, 2)
@@ -195,7 +199,7 @@ private struct ConfigConfirmRow: View {
             if item.risk == .destructive {
                 Label("This may affect later tool calls.", systemImage: "exclamationmark.triangle.fill")
                     .font(.caption2)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
             } else if item.risk == .sensitive {
                 Label("Reversible, but worth a quick look.", systemImage: "exclamationmark.circle")
                     .font(.caption2)
@@ -206,14 +210,19 @@ private struct ConfigConfirmRow: View {
         .opacity(item.isApproved ? 1.0 : 0.45)
     }
 
+    private var verbForeground: Color {
+        switch item.verb.lowercased() {
+        case "remove", "delete": return PokiTheme.danger
+        case "hide": return PokiTheme.secondaryText
+        default: return PokiTheme.tagText
+        }
+    }
+
     private var verbBackground: Color {
         switch item.verb.lowercased() {
-        case "remove", "delete": return .red
-        case "add", "create":    return .green
-        case "hide":             return .gray
-        case "show":             return .blue
-        case "revert":           return .purple
-        default:                 return .accentColor
+        case "remove", "delete": return PokiTheme.danger.opacity(0.12)
+        case "hide": return PokiTheme.surface
+        default: return PokiTheme.tagBackground
         }
     }
 }

@@ -59,10 +59,10 @@ struct SelectableMarkdownTheme {
     }
 
     var baseFont: UIFont { .systemFont(ofSize: baseFontSize) }
-    var labelColor: UIColor { .label }
-    var secondaryLabelColor: UIColor { .secondaryLabel }
-    var accentColor: UIColor { .systemOrange }
-    var linkColor: UIColor { .systemBlue }
+    var labelColor: UIColor { PokiTheme.uiPrimaryText }
+    var secondaryLabelColor: UIColor { PokiTheme.uiSecondaryText }
+    var accentColor: UIColor { PokiTheme.uiTagText }
+    var linkColor: UIColor { PokiTheme.uiTagText }
     var codeBlockBackground: UIColor {
         UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.15, alpha: 1) : .black }
     }
@@ -71,8 +71,8 @@ struct SelectableMarkdownTheme {
     }
     var inlineCodeBackground: UIColor { minisInlineCodeBackgroundColor }
     var inlineCodeColor: UIColor { .systemOrange }
-    var blockquoteBarColor: UIColor { UIColor.systemOrange.withAlphaComponent(0.5) }
-    var tableBorderColor: UIColor { UIColor.label.withAlphaComponent(0.25) }
+    var blockquoteBarColor: UIColor { PokiTheme.uiAIAccent }
+    var tableBorderColor: UIColor { PokiTheme.uiDivider }
 
     func headingFont(level: Int) -> UIFont {
         let size: CGFloat

@@ -22,10 +22,11 @@ struct SharedFoldersSettingsView: View {
                         .font(.subheadline.weight(.semibold))
                     Text("These directories appear in iOS Files under On My iPhone → Minis. Tap a row to see details, browse, or toggle visibility.")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section(AppLocalized("Folders")) {
                 ForEach(model.entries) { entry in
@@ -42,7 +43,12 @@ struct SharedFoldersSettingsView: View {
                     }
                 }
             }
+            .listRowBackground(PokiTheme.surface)
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Shared Folders")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -78,9 +84,9 @@ private struct SharedFolderRow: View {
         HStack(spacing: 12) {
             Image(systemName: entry.iconName)
                 .font(.system(size: 9))
-                .foregroundStyle(.white)
+                .foregroundStyle(PokiTheme.primaryButtonText)
                 .frame(width: 21, height: 21)
-                .background(entry.iconColor, in: Circle())
+                .background(PokiTheme.primaryButton, in: Circle())
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
@@ -90,17 +96,17 @@ private struct SharedFolderRow: View {
                     if !isVisible {
                         Text("Hidden")
                             .font(.caption2.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .padding(.horizontal, 5)
                             .padding(.vertical, 1)
                             .background(
-                                Capsule().strokeBorder(Color.secondary.opacity(0.5), lineWidth: 1)
+                                Capsule().strokeBorder(PokiTheme.divider, lineWidth: 1)
                             )
                     }
                 }
                 Text(entry.linuxPath)
                     .font(.caption.monospaced())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(1)
                     .truncationMode(.middle)
             }
@@ -114,11 +120,11 @@ private struct SharedFolderRow: View {
         if entry.isWritableFromFiles {
             Text("R/W")
                 .font(.caption2.weight(.semibold))
-                .foregroundStyle(.green)
+                .foregroundStyle(PokiTheme.primaryText)
                 .padding(.horizontal, 5)
                 .padding(.vertical, 1)
                 .background(
-                    Capsule().strokeBorder(Color.green.opacity(0.5), lineWidth: 1)
+                    Capsule().strokeBorder(PokiTheme.divider, lineWidth: 1)
                 )
         } else {
             Text("Read-only")

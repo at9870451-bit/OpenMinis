@@ -147,7 +147,7 @@ extension ContentView {
                     .font(.system(size: 14, weight: .medium))
                 Spacer(minLength: 0)
             }
-            .foregroundStyle(Color.accentColor)
+            .foregroundStyle(PokiTheme.tagText)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .contentShape(Rectangle())
@@ -260,13 +260,15 @@ extension ContentView {
                     } else if group.showsGroupsHeader {
                         Text("Groups")
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color(UIColor.secondaryLabel))
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .textCase(nil)
                     }
                 }
             }
 
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
         .listStyle(.plain)
         #if DEBUG
         // TEMPORARY scroll-phase markers to bracket the jitter window in the
@@ -358,13 +360,15 @@ extension ContentView {
                     } else if group.showsGroupsHeader {
                         Text("Groups")
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color(UIColor.secondaryLabel))
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .textCase(nil)
                     }
                 }
             }
 
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
         .listStyle(.plain)
         .navigationSplitViewColumnWidth(min: 340, ideal: 380, max: 500)
         // [T-macos27-liquid-glass-navbar] See MacOS27GlassWorkaround. Applied to

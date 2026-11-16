@@ -178,8 +178,7 @@ struct AlwaysOnOverlayView: View {
                     icon: soul.icon,
                     size: 56,
                     sparkleGradient: LinearGradient(
-                        colors: [Color(red: 0.72, green: 0.69, blue: 0.59),
-                                 Color(red: 0.6, green: 0.6, blue: 0.55)],
+                        colors: [PokiTheme.aiAccent, PokiTheme.aiAccent],
                         startPoint: .topLeading, endPoint: .bottomTrailing)
                 )
                 .opacity(0.8)

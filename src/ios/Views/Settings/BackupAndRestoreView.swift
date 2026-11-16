@@ -72,6 +72,9 @@ struct BackupAndRestoreView: View {
                     .accessibilityHidden(tab != .restore)
             }
         }
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Backup & Restore")
         .navigationBarTitleDisplayMode(.inline)
     }

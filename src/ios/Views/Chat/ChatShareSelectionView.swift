@@ -166,10 +166,12 @@ struct ChatShareSelectionView: View {
                         .padding(.vertical, 6)
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(PokiTheme.primaryButton)
+                .foregroundStyle(PokiTheme.primaryButtonText)
                 .disabled(selection.isEmpty)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-                .background(.bar)
+                .background(PokiTheme.background)
             }
             .sheet(isPresented: $showOptions) {
                 ChatSharePreviewSheet(
@@ -191,7 +193,7 @@ struct ChatShareSelectionView: View {
             // Selected: a tint plus a check badge floating at the leading edge
             // (not a column, so the row keeps the chat's layout); unselected rows
             // show nothing extra.
-            .background(isOn ? Color.accentColor.opacity(0.18) : Color.clear)
+            .background(isOn ? PokiTheme.selection : Color.clear)
             .overlay(alignment: .leading) {
                 if isOn {
                     // Small, tucked into the 16pt side margin and centred on the row's
@@ -199,7 +201,7 @@ struct ChatShareSelectionView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 13))
                         .symbolRenderingMode(.palette)
-                        .foregroundStyle(.white, Color.accentColor)
+                        .foregroundStyle(PokiTheme.primaryButtonText, PokiTheme.primaryButton)
                         .padding(.leading, 1)
                         .allowsHitTesting(false)
                 }
@@ -345,9 +347,9 @@ struct ChatShareSelectionView: View {
                             .rotationEffect(.degrees(-45))
                     }
                 }
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(PokiTheme.primaryText)
             Text(title)
-                .foregroundStyle(.primary)
+                .foregroundStyle(PokiTheme.primaryText)
         }
         .font(.caption.weight(.medium))
         .lineLimit(1)
@@ -534,7 +536,7 @@ private struct ChatSharePreviewSheet: View {
         }
         .padding(.top, 8)
         .padding(.bottom, 4)
-        .background(.bar)
+        .background(PokiTheme.background)
     }
 
     private func controlItem(icon: String, label: String, active: Bool, disabled: Bool = false,
@@ -549,7 +551,7 @@ private struct ChatSharePreviewSheet: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
-            .foregroundStyle(active ? Color.accentColor : Color.primary)
+            .foregroundStyle(active ? PokiTheme.tagText : PokiTheme.primaryText)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 6)
             .contentShape(Rectangle())
@@ -578,7 +580,7 @@ private struct ChatSharePreviewSheet: View {
                             ProgressView()
                             Text("\(AppLocalized("Creating…")) \(progress.done)/\(progress.total)")
                                 .font(.footnote.monospacedDigit())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                         .padding(20)
                         .background(RoundedRectangle(cornerRadius: 14).fill(.regularMaterial))
@@ -587,7 +589,7 @@ private struct ChatSharePreviewSheet: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(uiColor: .secondarySystemBackground))
+                .background(PokiTheme.surface)
                 .overlay(alignment: .top) {
                     ChatShareFormatSwitch(
                         format: format,
@@ -765,7 +767,7 @@ private struct ChatExportPDFPreview: UIViewRepresentable {
         view.displayMode = .singlePageContinuous
         view.displayDirection = .vertical
         view.autoScales = false
-        view.backgroundColor = .secondarySystemBackground
+        view.backgroundColor = PokiTheme.uiSurface
         let doubleTap = UITapGestureRecognizer(target: context.coordinator,
                                                action: #selector(Coordinator.doubleTapped(_:)))
         doubleTap.numberOfTapsRequired = 2
@@ -850,8 +852,8 @@ private struct ChatShareFloatingButtonSurface: ViewModifier {
             content
                 .buttonStyle(.plain)
                 .background(.ultraThinMaterial, in: Capsule())
-                .overlay(Capsule().strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5))
-                .shadow(color: .black.opacity(colorScheme == .dark ? 0.35 : 0.10), radius: 6, y: 2)
+                .overlay(Capsule().strokeBorder(PokiTheme.divider, lineWidth: 0.5))
+                .shadow(color: PokiTheme.shadowSoft, radius: 6, y: 2)
         }
     }
 }
@@ -896,7 +898,7 @@ private struct ChatShareFormatSwitch: View {
         } label: {
             Label(title, systemImage: icon)
                 .font(.footnote.weight(isOn ? .semibold : .medium))
-                .foregroundStyle(isOn ? Color.accentColor : Color.primary)
+                .foregroundStyle(isOn ? PokiTheme.tagText : PokiTheme.primaryText)
                 .lineLimit(1)
                 .fixedSize()
                 .padding(.horizontal, 14)
@@ -904,7 +906,7 @@ private struct ChatShareFormatSwitch: View {
                 .background {
                     if isOn {
                         Capsule()
-                            .fill(Color(uiColor: .systemBackground).opacity(0.9))
+                            .fill(PokiTheme.background.opacity(0.9))
                             .shadow(color: .black.opacity(0.12), radius: 3, y: 1)
                             .matchedGeometryEffect(id: "pill", in: pill)
                     }

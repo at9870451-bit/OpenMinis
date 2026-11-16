@@ -95,7 +95,7 @@ struct SessionMCPsView: View {
                 } else if filteredServers.isEmpty {
                     Section {
                         Text(AppLocalized("No MCP servers match \"\(searchQuery)\"."))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .font(.subheadline)
                     }
                 } else {
@@ -112,7 +112,7 @@ struct SessionMCPsView: View {
                                         if let note = server.note, !note.isEmpty {
                                             Text(note)
                                                 .font(.caption)
-                                                .foregroundStyle(.secondary)
+                                                .foregroundStyle(PokiTheme.secondaryText)
                                                 .lineLimit(2)
                                         }
                                     }
@@ -137,6 +137,9 @@ struct SessionMCPsView: View {
                     }
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+            .pokiScreen()
             .navigationTitle("MCPs in Session")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchQuery, placement: .navigationBarDrawer(displayMode: .always),
@@ -240,6 +243,9 @@ private struct SessionMCPDetailView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle(server.id)
         .navigationBarTitleDisplayMode(.inline)
         .task(id: server.id) {
@@ -265,7 +271,7 @@ private struct SessionMCPDetailView: View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             if selectable {
                 Text(value).font(.system(.subheadline, design: .monospaced)).textSelection(.enabled)
             } else {

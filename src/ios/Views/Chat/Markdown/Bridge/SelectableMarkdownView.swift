@@ -631,7 +631,7 @@ struct SelectableMarkdownView: UIViewRepresentable {
                 let mut = NSMutableAttributedString(attributedString: renderedBody)
                 let suffixAttrs: [NSAttributedString.Key: Any] = [
                     .font: UIFont.systemFont(ofSize: FontSettings.shared.scaledMessage(16.5)),
-                    .foregroundColor: UIColor.label,
+                    .foregroundColor: PokiTheme.uiPrimaryText,
                 ]
                 mut.append(NSAttributedString(string: _splitForUpdate.plainSuffix, attributes: suffixAttrs))
                 attributed = mut

@@ -16,20 +16,25 @@ struct OffloadPermissionSettingsView: View {
                     Label("Background", systemImage: "location.circle.fill")
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Toggle("Allow minis-config", isOn: $configGate.enabled)
             } header: {
                 Text("Configuration Tool")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("When disabled, the agent cannot read or modify any settings via minis-config. The change history at Logs → Config Changes remains accessible. The agent will receive a permission_denied error and can guide you via deep links instead.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section("Privacy") {
                 ForEach(settingsCommands, id: \.name) { cmd in
                     CommandPermissionRow(command: cmd)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section {
                 Toggle(AppLocalized("Collect voice correction data",
@@ -44,9 +49,12 @@ struct OffloadPermissionSettingsView: View {
                 }
             } header: {
                 Text("Voice Correction Learning")
+                .foregroundStyle(PokiTheme.secondaryText)
             } footer: {
                 Text("When enabled, your manual fixes to voice transcripts (original → corrected pairs), accepted/rejected AI corrections, and frequently typed terms are stored in a local on-device database to make future voice corrections smarter. Nothing is uploaded. Default is off; existing data stays until you clear it.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
             .confirmationDialog(
                 AppLocalized("Clear all collected voice correction data?",
                        comment: "Permissions: confirm wipe of correction learning data"),
@@ -72,6 +80,10 @@ struct OffloadPermissionSettingsView: View {
                 Button("OK") {}
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Permissions")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -112,7 +124,7 @@ private struct CommandPermissionRow: View {
                 Text(command.displayLabel)
                 Text(command.description)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             Spacer()
             Picker("", selection: $level) {

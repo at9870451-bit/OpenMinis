@@ -71,7 +71,7 @@ struct RootfsResetButton: View {
         } label: {
             Image(systemName: "arrow.clockwise.circle")
                 .imageScale(.large)
-                .foregroundColor(.red)
+                .foregroundColor(PokiTheme.danger)
         }
     }
 
@@ -88,7 +88,7 @@ struct RootfsResetButton: View {
             }
         } label: {
             Label("Reset Rootfs", systemImage: "arrow.clockwise")
-                .foregroundColor(.red)
+                .foregroundColor(PokiTheme.danger)
         }
     }
 
@@ -121,7 +121,7 @@ struct RootfsResetButton: View {
                     ProgressView()
                     Text(statusMessage ?? "Processing...")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PokiTheme.secondaryText)
                 }
             }
         }
@@ -208,6 +208,7 @@ struct RootfsResetToolbarItem: ToolbarContent {
         VStack {
             RootfsResetButton(style: .compact)
         }
+        .pokiScreen()
         .navigationTitle("Compact Style")
     }
 }
@@ -219,6 +220,9 @@ struct RootfsResetToolbarItem: ToolbarContent {
                 RootfsResetButton(style: .normal)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .pokiScreen()
         .navigationTitle("Normal Style")
     }
 }
@@ -233,6 +237,7 @@ struct RootfsResetToolbarItem: ToolbarContent {
             RootfsResetButton(style: .prominent)
         }
         .padding()
+        .pokiScreen()
         .navigationTitle("Prominent Style")
     }
 }

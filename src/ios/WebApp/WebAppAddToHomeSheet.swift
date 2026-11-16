@@ -46,18 +46,18 @@ struct WebAppAddToHomeSheet: View {
                        classification?.scope != .mount {
                         Section {
                             HStack {
-                                Image(systemName: "link").foregroundStyle(.secondary)
+                                Image(systemName: "link").foregroundStyle(PokiTheme.secondaryText)
                                 Text("Associated with session")
                                 Spacer()
                                 Text(sid.prefix(8))
                                     .font(.caption.monospaced())
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
                     if let err = errorMessage {
                         Section {
-                            Text(err).foregroundStyle(.red).font(.caption)
+                            Text(err).foregroundStyle(PokiTheme.danger).font(.caption)
                         }
                     }
                     Section {
@@ -67,7 +67,7 @@ struct WebAppAddToHomeSheet: View {
                             HStack {
                                 Spacer()
                                 if opening {
-                                    ProgressView().tint(.white)
+                                    ProgressView().tint(PokiTheme.primaryButtonText)
                                 } else {
                                     Text("Continue in Safari")
                                         .fontWeight(.semibold)
@@ -76,13 +76,14 @@ struct WebAppAddToHomeSheet: View {
                             }
                         }
                         .disabled(opening || titleInput.trimmingCharacters(in: .whitespaces).isEmpty)
-                        .listRowBackground(Color.accentColor)
-                        .foregroundStyle(.white)
+                        .listRowBackground(PokiTheme.primaryButton)
+                        .foregroundStyle(PokiTheme.primaryButtonText)
                     } footer: {
                         Text("Safari will open the launcher page. Tap the Share button → Add to Home Screen to pin the icon.")
                     }
                 }
             }
+            .pokiScreen()
             .navigationTitle("Add to Home Screen")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -105,7 +106,7 @@ struct WebAppAddToHomeSheet: View {
                         .font(.subheadline.weight(.semibold))
                     Text("Only files inside a session, the shared folder, or a mounted folder can be added to the Home Screen.")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             } icon: {
                 Image(systemName: "exclamationmark.triangle")
@@ -150,14 +151,14 @@ struct WebAppAddToHomeSheet: View {
                         VStack(spacing: 4) {
                             ZStack {
                                 Circle()
-                                    .fill(c.color.opacity(0.22))
+                                    .fill(category == c ? PokiTheme.selection : PokiTheme.tagBackground)
                                     .frame(width: 44, height: 44)
                                 Image(systemName: c.symbol)
                                     .font(.system(size: 20, weight: .semibold))
-                                    .foregroundStyle(c.color)
+                                    .foregroundStyle(PokiTheme.tagText)
                                 if category == c {
                                     Circle()
-                                        .strokeBorder(c.color, lineWidth: 2.5)
+                                        .strokeBorder(PokiTheme.tagText, lineWidth: 2.5)
                                         .frame(width: 44, height: 44)
                                 }
                             }
@@ -386,17 +387,8 @@ private struct LauncherTilePreview: View {
                 // approximation; the actual home-screen tile uses the
                 // exact PNG from openminis.app.
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(red: 0.78, green: 0.92, blue: 1.00),
-                                Color(red: 0.92, green: 0.85, blue: 1.00),
-                                Color(red: 1.00, green: 0.88, blue: 0.78),
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(PokiTheme.surface)
+                    .shadow(color: PokiTheme.shadowSoft, radius: 5, y: 2)
                 Circle()
                     .fill(category.color.opacity(0.22))
                     .frame(width: chip, height: chip)

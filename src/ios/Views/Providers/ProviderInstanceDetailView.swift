@@ -47,9 +47,10 @@ struct ProviderInstanceDetailView: View {
                 instanceContent(instance)
             } else {
                 Text("Instance not found")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
         }
+        .pokiScreen()
         .navigationTitle(instance?.label ?? "Provider")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -140,6 +141,9 @@ struct ProviderInstanceDetailView: View {
                         Text("Paste the bearer token. Whitespace and newlines will be stripped automatically.")
                     }
                 }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+                .pokiScreen()
                 .navigationTitle("Manual Bearer Token")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -380,7 +384,7 @@ struct ProviderInstanceDetailView: View {
                                 .font(.caption)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 3)
-                                .background(Color.secondary.opacity(0.15), in: Capsule())
+                                .background(PokiTheme.secondaryText.opacity(0.15), in: Capsule())
                             }
                         }
                         .disabled(isFetchingModels)
@@ -399,7 +403,7 @@ struct ProviderInstanceDetailView: View {
                         if outcome.source == .kept {
                             Text(AppLocalized("You may need to add the model ID manually."))
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                     // Error (red)
@@ -409,11 +413,11 @@ struct ProviderInstanceDetailView: View {
                             + (lines.count > 4 ? "\n…" : "")
                         Text(truncated)
                             .font(.caption)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(PokiTheme.danger)
                             .textSelection(.enabled)
                         Text(AppLocalized("You may need to add the model ID manually."))
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                 }
             }
@@ -437,7 +441,7 @@ struct ProviderInstanceDetailView: View {
                             if store.isVoiceShadowDisabled(instance.id) {
                                 Text("Hidden", comment: "Voice shadow disabled badge")
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
                     }
@@ -454,6 +458,8 @@ struct ProviderInstanceDetailView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
         .sheet(isPresented: $showExportShare) {
             if let json = store.exportInstanceJSON(instanceId) {
                 let label = store.instance(for: instanceId).map(\.label) ?? "provider"
@@ -463,7 +469,7 @@ struct ProviderInstanceDetailView: View {
                     .presentationDetents([.medium])
             } else {
                 Text("Failed to export provider configuration.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .presentationDetents([.medium])
             }
         }
@@ -515,12 +521,12 @@ struct ProviderInstanceDetailView: View {
                     .textContentType(.oneTimeCode)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                    .foregroundStyle(showKeyRevealed ? Color.primary : Color.clear)
+                    .foregroundStyle(showKeyRevealed ? PokiTheme.primaryText : Color.clear)
 
                 if !showKeyRevealed {
                     // Show bullet mask over the clear-glyph text field
                     Text(keyInputText.isEmpty ? "" : String(repeating: "•", count: keyInputText.count))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(PokiTheme.primaryText)
                         .allowsHitTesting(false)
                 }
             }
@@ -544,7 +550,7 @@ struct ProviderInstanceDetailView: View {
                 showKeyRevealed.toggle()
             } label: {
                 Image(systemName: showKeyRevealed ? "eye.slash" : "eye")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             .buttonStyle(.plain)
         }
@@ -577,11 +583,11 @@ struct ProviderInstanceDetailView: View {
                         .font(.body)
                     Text(detail)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                     if needsReauth {
                         Text(AppLocalized("Sign-in expired. Sign in again to keep using this provider."))
                             .font(.caption)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(PokiTheme.danger)
                     }
                 }
                 Spacer()
@@ -868,7 +874,7 @@ struct ProviderInstanceDetailView: View {
                             .font(.body)
                         Text("Configured")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
                     Spacer()
                     Circle()
@@ -915,7 +921,7 @@ struct ProviderInstanceDetailView: View {
             VStack(spacing: 8) {
                 Text("No models")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                 Button {
                     showAddCustomModel = true
                 } label: {
@@ -944,7 +950,7 @@ struct ProviderInstanceDetailView: View {
                 HStack(spacing: 4) {
                     Text(entry.model.id)
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                     if entry.isCustom {
                         Text("Custom")
                             .font(.caption2.weight(.medium))
@@ -979,14 +985,14 @@ struct ProviderInstanceDetailView: View {
             } label: {
                 Image(systemName: "trash")
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(PokiTheme.danger)
             }
             .buttonStyle(.plain)
             .frame(minWidth: 22, minHeight: 22)
 
             Image(systemName: "chevron.right")
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -1016,44 +1022,44 @@ struct ProviderInstanceDetailView: View {
             if modality.contains(.imageInput) {
                 Image(systemName: "photo")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .accessibilityLabel(AppLocalized("Image input"))
             }
             if modality.contains(.pdfInput) {
                 Image(systemName: "doc")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .accessibilityLabel(AppLocalized("PDF input"))
             }
             if modality.contains(.audioInput) {
                 Image(systemName: "waveform")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .accessibilityLabel(AppLocalized("Audio input"))
             }
             if modality.contains(.videoInput) {
                 Image(systemName: "video")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .accessibilityLabel(AppLocalized("Video input"))
             }
             // Output modalities (tinted, generate-style glyphs).
             if modality.contains(.imageOutput) {
                 Image(systemName: "photo.badge.plus")
                     .font(.caption2)
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(PokiTheme.tagText)
                     .accessibilityLabel(AppLocalized("Image output"))
             }
             if modality.contains(.audioOutput) {
                 Image(systemName: "speaker.wave.2")
                     .font(.caption2)
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(PokiTheme.tagText)
                     .accessibilityLabel(AppLocalized("Audio output"))
             }
             if modality.contains(.videoOutput) {
                 Image(systemName: "video.badge.plus")
                     .font(.caption2)
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(PokiTheme.tagText)
                     .accessibilityLabel(AppLocalized("Video output"))
             }
         }
@@ -1350,7 +1356,7 @@ struct AddCustomModelSheet: View {
                 } footer: {
                     if let duplicateError {
                         Text(duplicateError)
-                            .foregroundColor(.red)
+                            .foregroundColor(PokiTheme.danger)
                     } else {
                         Text("Leave display name empty to use the model ID.")
                     }
@@ -1392,6 +1398,9 @@ struct AddCustomModelSheet: View {
                     Text("Enable for models that generate images (e.g. gpt-image-1, dall-e-3, flux) or audio (e.g. TTS models). Text output is always enabled.")
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+            .pokiScreen()
             .navigationTitle("Add Custom Model")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -1525,7 +1534,7 @@ struct ModelEntryDetailSheet: View {
                 Section("Identity") {
                     HStack {
                         Text("Model ID")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Spacer()
                         if entry.isCustom {
                             // axis: .vertical lets long IDs wrap so the cursor
@@ -1540,14 +1549,14 @@ struct ModelEntryDetailSheet: View {
                         } else {
                             Text(entry.model.id)
                                 .font(.system(.body, design: .monospaced))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                                 .textSelection(.enabled)
                         }
                     }
 
                     HStack {
                         Text("Display Name")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Spacer()
                         TextField("Display name", text: $displayName)
                             .multilineTextAlignment(.trailing)
@@ -1557,16 +1566,16 @@ struct ModelEntryDetailSheet: View {
 
                     HStack {
                         Text("Provider")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Spacer()
                         Text(providerDisplayName)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                     }
 
                     if entry.isCustom {
                         HStack {
                             Text("Type")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                             Spacer()
                             Text("Custom")
                                 .font(.caption.weight(.medium))
@@ -1610,7 +1619,7 @@ struct ModelEntryDetailSheet: View {
 
                         HStack {
                             Text(AppLocalized("Thinking"))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                             Spacer()
                             if supportsThinking {
                                 Label(AppLocalized("Supported"), systemImage: "checkmark.circle.fill")
@@ -1618,10 +1627,10 @@ struct ModelEntryDetailSheet: View {
                                     .labelStyle(.titleAndIcon)
                             } else if entry.baseModel.supportsReasoning == false {
                                 Text(AppLocalized("Not Supported"))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(PokiTheme.secondaryText)
                             } else {
                                 Text(AppLocalized("Unknown"))
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(PokiTheme.secondaryText.opacity(0.72))
                                 Button(AppLocalized("Force Enable")) {
                                     showForceThinkingAlert = true
                                 }
@@ -1693,6 +1702,9 @@ struct ModelEntryDetailSheet: View {
                     Text(AppLocalized("Run a quick test matching this model's main capability."))
                 }
             }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+            .pokiScreen()
             .navigationTitle("Model Details")
             .navigationBarTitleDisplayMode(.inline)
             // [T-ipad-sheet-keyboard-crash] `.immediately`, NOT `.interactively`.

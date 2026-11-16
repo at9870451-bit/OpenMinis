@@ -617,7 +617,7 @@ struct InlineVoiceInputView: View {
             if !viewModel.transcript.isEmpty {
                 Text("… \(viewModel.transcript.count) chars …", comment: "Compact voice buffered char count")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(1)
             }
             micButtonWithSwitch
@@ -640,7 +640,7 @@ struct InlineVoiceInputView: View {
             HStack(spacing: 8) {
                 statusLineText
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(1)
                 if viewModel.isEditingTranscript {
                     Button {
@@ -648,10 +648,10 @@ struct InlineVoiceInputView: View {
                     } label: {
                         Text("Exit", comment: "Exit transcript editing")
                             .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 3)
-                            .background(Capsule().fill(Color.secondary.opacity(0.15)))
+                            .background(Capsule().fill(PokiTheme.secondaryText.opacity(0.15)))
                     }
                     .buttonStyle(.plain)
                 }
@@ -705,7 +705,7 @@ struct InlineVoiceInputView: View {
                         .foregroundStyle(.orange)
                     Text(error)
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .lineLimit(2)
                         .multilineTextAlignment(.center)
                 }
@@ -913,20 +913,20 @@ struct InlineVoiceInputView: View {
                 if let g = activeGroupName {
                     Text(g)
                         .font(.caption2.weight(.medium))
-                        .foregroundStyle(.secondary)
-                    Text("·").font(.caption2).foregroundStyle(.quaternary)
+                        .foregroundStyle(PokiTheme.secondaryText)
+                    Text("·").font(.caption2).foregroundStyle(PokiTheme.secondaryText)
                 }
                 Text(activeModelLabel)
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     .lineLimit(1)
                 Image(systemName: "chevron.up.chevron.down")
                     .font(.system(size: 9, weight: .semibold))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(PokiTheme.secondaryText)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
-            .background(Capsule().fill(Color.secondary.opacity(0.1)))
+            .background(Capsule().fill(PokiTheme.secondaryText.opacity(0.1)))
         }
     }
 
@@ -1164,9 +1164,9 @@ struct InlineVoiceInputView: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(Color.white)
+                    .fill(PokiTheme.primaryButton)
                     .frame(width: micDiameter, height: micDiameter)
-                    .shadow(color: .black.opacity(0.18), radius: expanded ? 7 : 5, y: expanded ? 3 : 2)
+                    .shadow(color: PokiTheme.shadowSoft, radius: expanded ? 7 : 5, y: expanded ? 3 : 2)
 
                 if viewModel.isTranscribing {
                     TimelineView(.animation) { context in
@@ -1174,7 +1174,7 @@ struct InlineVoiceInputView: View {
                         let angle = Angle(degrees: (t / 0.9).truncatingRemainder(dividingBy: 1) * 360)
                         // [T-voice-ring-inside] Inside the white disc, flush with
                         // its rim, fading toward its tail - see TranscribingRingArc.
-                        TranscribingRingArc(color: .accentColor, disc: micDiameter)
+                        TranscribingRingArc(color: PokiTheme.aiAccent, disc: micDiameter)
                             .rotationEffect(angle)
                     }
                 }
@@ -1187,11 +1187,11 @@ struct InlineVoiceInputView: View {
                     if showCancelIcon {
                         Image(systemName: "xmark")
                             .font(.system(size: expanded ? 22 : 16, weight: .semibold))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(PokiTheme.primaryButtonText)
                     } else {
                         Image(systemName: "mic.fill")
                             .font(.system(size: expanded ? 24 : 18, weight: .medium))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(PokiTheme.primaryButtonText)
                     }
                 }
             }
@@ -1472,7 +1472,7 @@ private struct InlineMiniWaveform: View {
         HStack(spacing: 3) {
             ForEach(Array(levels.suffix(7).enumerated()), id: \.offset) { _, level in
                 Capsule()
-                    .fill(Color.black.opacity(0.85))
+                    .fill(PokiTheme.primaryButtonText.opacity(0.85))
                     .frame(width: 3, height: max(5, CGFloat(level) * 26))
                     .animation(.spring(response: 0.18, dampingFraction: 0.6), value: level)
             }

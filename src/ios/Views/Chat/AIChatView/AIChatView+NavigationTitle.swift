@@ -524,7 +524,7 @@ extension AIChatView {
         .foregroundStyle(ChatColors.secondaryText)
         .padding(.horizontal, 4)
         .padding(.vertical, 1)
-        .background(Capsule().fill(Color.secondary.opacity(0.10)))
+        .background(Capsule().fill(PokiTheme.secondaryText.opacity(0.10)))
         .onTapGesture {
             showThinkingLevelSheet = true
         }
@@ -592,16 +592,16 @@ struct AIChatHeaderAvatar: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(.ultraThinMaterial)
+                .fill(isThinking ? PokiTheme.aiAccent : PokiTheme.surface)
                 .frame(width: 44, height: 44)
-                .overlay(Circle().strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5))
+                .overlay(Circle().strokeBorder(PokiTheme.divider, lineWidth: 0.5))
             Image(systemName: "sparkles")
                 .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(.primary.opacity(0.85))
+                .foregroundStyle(isThinking ? PokiTheme.tagText : PokiTheme.primaryText)
                 .opacity(isThinking ? (pulse ? 1.0 : 0.55) : 1.0)
         }
         .scaleEffect(isThinking && pulse ? 1.04 : 1.0)
-        .shadow(color: Color.black.opacity(isThinking ? 0.10 : 0.05), radius: isThinking ? 10 : 6, y: 2)
+        .shadow(color: PokiTheme.shadowSoft, radius: isThinking ? 10 : 6, y: 2)
         .animation(isThinking ? .easeInOut(duration: 1.1).repeatForever(autoreverses: true) : .easeOut(duration: 0.25), value: pulse)
         .onAppear { pulse = isThinking }
         .onChange(of: isThinking) { now in pulse = now }

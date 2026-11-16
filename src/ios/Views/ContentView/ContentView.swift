@@ -609,7 +609,7 @@ struct ContentView: View {
                 }
             }
             .background(PokiTheme.background)
-            .tint(PokiTheme.aiAccentStrong)
+            .tint(PokiTheme.primaryText)
             .onAppear { PokiTheme.applyGlobalAppearance() }
             .overlay(alignment: .top) {
                 if let toast = forceSyncToast {
@@ -1000,19 +1000,19 @@ struct ContentView: View {
                         // how dark mode looks today.
                         ProgressView()
                             .controlSize(.large)
-                            .tint(ChatColors.primaryText)
+                            .tint(PokiTheme.primaryText)
                         if let p = exportProgress, p.total > 0 {
                             Text(AppLocalized("Exporting… \(p.done) / \(p.total)"))
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         } else {
                             Text(AppLocalized("Exporting…"))
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                     .padding(24)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    .background(PokiTheme.surface, in: RoundedRectangle(cornerRadius: 16))
                 }
                 .transition(.opacity)
                 .animation(.easeInOut(duration: 0.2), value: isExporting)

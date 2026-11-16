@@ -32,33 +32,41 @@ struct EnvironmentVariablesView: View {
                 Toggle("Privacy Mode", isOn: $privacy.enabled)
             } footer: {
                 Text("When enabled, any environment variable value that appears in shell-execute output is replaced with a masked form (e.g. `sk-1********ajhks`) before reaching the model. Values shorter than 8 characters become all `*`. The user-visible output in chat is unchanged.")
+                .foregroundStyle(PokiTheme.secondaryText)
             }
+            .listRowBackground(PokiTheme.surface)
 
             if store.entries.isEmpty {
                 Section {
                     VStack(spacing: 8) {
                         Image(systemName: "terminal")
                             .font(.largeTitle)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                         Text("No Environment Variables")
                             .font(.headline)
                         Text("Add variables like API keys or tokens that will be available in the shell environment.")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.secondaryText)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
                 }
+                .listRowBackground(PokiTheme.surface)
             } else {
                 ForEach(filteredEntries) { entry in
                     envVarRow(entry)
                 }
                 .onDelete(perform: deleteEntries)
+                .listRowBackground(PokiTheme.surface)
             }
         }
         .listStyle(.insetGrouped)
         .searchable(text: $searchText, prompt: "Filter by name")
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Environment Variables")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -137,11 +145,11 @@ struct EnvironmentVariablesView: View {
                     Text(entry.key)
                         .font(.system(.body, design: .monospaced))
                         .fontWeight(.medium)
-                        .foregroundStyle(isEnabled ? .primary : .secondary)
+                        .foregroundStyle(isEnabled ? PokiTheme.primaryText : PokiTheme.secondaryText)
                     if !isEnabled {
                         // Own key, not the shared "Disabled": zh-Hans reads 已禁用
                         // here (matching Android), while other screens keep 已停用.
-                        EnvVarBadge(text: AppLocalized("Disabled (environment variable)"), color: .secondary)
+                        EnvVarBadge(text: AppLocalized("Disabled (environment variable)"), color: PokiTheme.secondaryText)
                     }
                     if isDuplicate {
                         EnvVarBadge(text: AppLocalized("Duplicate name"), color: .orange)
@@ -149,14 +157,14 @@ struct EnvironmentVariablesView: View {
                 }
                 Text(isRevealed ? currentValue : String(repeating: "\u{2022}", count: min(currentValue.count, 20)))
                     .font(.system(.caption, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PokiTheme.secondaryText)
                     // [T-shortcut-envvar] Shortcut-stored values can be long,
                     // multi-line text; keep the row compact when revealed.
                     .lineLimit(6)
                 if !entry.note.isEmpty {
                     Text(entry.note)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -173,7 +181,7 @@ struct EnvironmentVariablesView: View {
                 } label: {
                     Image(systemName: isRevealed ? "eye.slash" : "eye")
                         .font(.system(size: 14))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
                 .buttonStyle(.plain)
 
@@ -186,7 +194,7 @@ struct EnvironmentVariablesView: View {
                 } label: {
                     Image(systemName: copiedId == entry.id ? "checkmark" : "doc.on.clipboard")
                         .font(.system(size: 13))
-                        .foregroundStyle(copiedId == entry.id ? .green : .secondary)
+                        .foregroundStyle(copiedId == entry.id ? PokiTheme.primaryText : PokiTheme.secondaryText)
                 }
                 .buttonStyle(.plain)
             }
@@ -212,7 +220,7 @@ struct EnvironmentVariablesView: View {
                 Label(isEnabled ? AppLocalized("Disable") : AppLocalized("Enable"),
                       systemImage: isEnabled ? "pause.circle" : "play.circle")
             }
-            .tint(isEnabled ? .gray : .green)
+            .tint(isEnabled ? PokiTheme.secondaryText : PokiTheme.primaryButton)
         }
     }
 
@@ -271,12 +279,14 @@ private struct EnvVarFormSheet: View {
                     .onSubmit { focusedField = .value }
                 } header: {
                     Text("Name")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } footer: {
                     if !key.isEmpty && !isValid {
                         Text("Must start with a letter and contain only letters, digits, and underscores.")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(PokiTheme.danger)
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
 
                 Section("Value") {
                     if EnvVarStore.isShortcutKey(key) {
@@ -297,12 +307,13 @@ private struct EnvVarFormSheet: View {
                             .onSubmit { focusedField = .note }
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
 
                 Section("Note") {
                     ZStack(alignment: .topLeading) {
                         if note.isEmpty {
                             Text("Describe what this variable is for (optional)")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 8)
                                 .allowsHitTesting(false)
@@ -313,6 +324,7 @@ private struct EnvVarFormSheet: View {
                             .scrollContentBackground(.hidden)
                     }
                 }
+                .listRowBackground(PokiTheme.surface)
 
                 if mode == .edit, initialEnabled != nil {
                     Section {
@@ -320,6 +332,7 @@ private struct EnvVarFormSheet: View {
                             .listRowBackground(highlightEnabled && !enabled
                                                ? Color.orange.opacity(0.18) : nil)
                     }
+                    .listRowBackground(PokiTheme.surface)
                 }
 
                 if mode == .edit, onDelete != nil {
@@ -332,14 +345,19 @@ private struct EnvVarFormSheet: View {
                             } icon: {
                                 Image(systemName: "trash.fill")
                                     .font(.system(size: 9))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(PokiTheme.primaryButtonText)
                                     .frame(width: 21, height: 21)
-                                    .background(.red, in: Circle())
+                                    .background(PokiTheme.danger, in: Circle())
                             }
                         }
                     }
+                    .listRowBackground(PokiTheme.surface)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(PokiTheme.background)
+            .foregroundStyle(PokiTheme.primaryText)
+            .tint(PokiTheme.primaryButton)
             .navigationTitle(mode == .add ? "Add Variable" : "Edit Variable")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

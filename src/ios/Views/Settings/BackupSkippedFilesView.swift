@@ -54,10 +54,13 @@ struct BackupSkippedFilesView: View {
                 // numbers quietly disagree with the rows below.
                 if shownCount < record.skippedFiles {
                     Text("Showing the \(shownCount) largest of \(record.skippedFiles) excluded files. Their contents are not in the backup — the backup records that they existed.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 } else {
                     Text("These files' contents are not in the backup — it records that they existed, at these sizes.")
+                    .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             ForEach(groups) { group in
                 Section {
@@ -71,14 +74,20 @@ struct BackupSkippedFilesView: View {
                             Text(ByteCountFormatter.string(fromByteCount: e.size,
                                                            countStyle: .file))
                                 .font(.caption.monospacedDigit())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
                     }
                 } header: {
                     Text(group.title)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Excluded Files")
         .navigationBarTitleDisplayMode(.inline)
     }

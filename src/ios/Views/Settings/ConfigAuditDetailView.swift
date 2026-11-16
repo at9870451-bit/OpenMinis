@@ -34,12 +34,14 @@ struct ConfigAuditDetailView: View {
                     }
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             if let caption = entry.caption, !caption.isEmpty {
                 Section("Note from the assistant") {
                     Text(verbatim: caption)
                         .textSelection(.enabled)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
 
             Section("What changed") {
@@ -51,15 +53,17 @@ struct ConfigAuditDetailView: View {
                     Label("This record predates readable descriptions, so only the raw change is shown.",
                           systemImage: "clock.arrow.circlepath")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
+            .listRowBackground(PokiTheme.surface)
 
             Section("Raw change") {
                 rawBlock("Setting", entry.key)
                 rawBlock("Before", Self.prettyJSON(entry.oldValueJSON))
                 rawBlock("After", Self.prettyJSON(entry.newValueJSON))
             }
+            .listRowBackground(PokiTheme.surface)
 
             if status == .applied {
                 Section {
@@ -70,14 +74,20 @@ struct ConfigAuditDetailView: View {
                     }
                     .disabled(reverting)
                 }
+                .listRowBackground(PokiTheme.surface)
             } else if status == .reverted {
                 Section {
                     Label("Reverted", systemImage: "arrow.uturn.backward.circle.fill")
-                        .foregroundStyle(.purple)
+                        .foregroundStyle(PokiTheme.secondaryText)
                 }
+                .listRowBackground(PokiTheme.surface)
             }
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(PokiTheme.background)
+        .foregroundStyle(PokiTheme.primaryText)
+        .tint(PokiTheme.primaryButton)
         .navigationTitle("Change Details")
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("Revert this change?", isPresented: $confirmRevert, titleVisibility: .visible) {
@@ -101,7 +111,7 @@ struct ConfigAuditDetailView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.secondaryText)
             Text(verbatim: value)
                 .font(.system(.footnote, design: .monospaced))
                 .textSelection(.enabled)
@@ -161,7 +171,7 @@ struct ConfigAuditStatusBadge: View {
     var body: some View {
         Text(status.rawValue.uppercased())
             .font(.system(.caption2, design: .monospaced))
-            .foregroundStyle(.white)
+            .foregroundStyle(PokiTheme.primaryButtonText)
             .padding(.horizontal, 5)
             .padding(.vertical, 1)
             .background(color, in: Capsule())
@@ -169,10 +179,10 @@ struct ConfigAuditStatusBadge: View {
 
     private var color: Color {
         switch status {
-        case .applied: return .green
-        case .rejected: return .gray
+        case .applied: return PokiTheme.primaryButton
+        case .rejected: return PokiTheme.secondaryText
         case .timeout: return .orange
-        case .reverted: return .purple
+        case .reverted: return PokiTheme.primaryButton
         }
     }
 }
