@@ -212,7 +212,7 @@ extension ContentView {
     // MARK: - Stack Layout (iPhone / narrow window)
 
     var stackLayout: some View {
-        let drawerWidth = UIScreen.main.bounds.width * 0.88
+        let drawerWidth = UIScreen.main.bounds.width
         let p = min(1, max(0, drawerProgress))
 
         return ZStack(alignment: .leading) {
@@ -377,6 +377,15 @@ extension ContentView {
                     drawerNavRow(.subAgents)
                     drawerNavRow(.skills)
                     drawerNavRow(.memory)
+                    Button {
+                        withAnimation(.easeOut(duration: 0.2)) { showHistoryDrawer = false }
+                        showTerminal = true
+                    } label: {
+                        Label(AppLocalized("Terminal"), systemImage: "terminal")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .buttonStyle(DrawerRowButtonStyle())
+                    drawerNavRow(.rootfs)
                     localBotNavRow
                 }
                 .padding(.horizontal, 10)
@@ -611,6 +620,7 @@ extension ContentView {
             case .memory:    return (AppLocalized("Memory"), "brain.head.profile")
             case .localBot:  return ("SnowLuma + QQBot", "antenna.radiowaves.left.and.right")
             case .soul:      return ("Personalize Amore", "sparkles")
+            case .rootfs:    return (AppLocalized("Rootfs"), "externaldrive")
             }
         }()
         Button {
@@ -710,6 +720,7 @@ extension ContentView {
         case .memory:    MemoryManagementView()
         case .localBot:  LocalBotDeploymentView(showTerminal: $showTerminal, localBotCommand: $localBotCommand)
         case .soul:      SoulSettingsView()
+        case .rootfs:    RootfsManagementView()
         }
     }
 
