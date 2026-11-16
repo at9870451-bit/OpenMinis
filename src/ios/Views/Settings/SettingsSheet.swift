@@ -901,6 +901,23 @@ struct AmoreMarketplaceView: View {
                 }
             }
         }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            Button {
+                showPicker = true
+            } label: {
+                Label(AppLocalized("Install from Files (.zip or folder)"), systemImage: "square.and.arrow.down")
+                    .font(.callout.weight(.medium))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(PokiTheme.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .strokeBorder(PokiTheme.divider, lineWidth: 0.5))
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(PokiTheme.background)
+        }
         .navigationTitle(AppLocalized("Plugin Marketplace"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
