@@ -71,7 +71,10 @@ struct ConfigConfirmSheet: View {
                             }
                         } header: {
                             Text("Summary of approved changes")
+                                .foregroundStyle(PokiTheme.secondaryText)
                         }
+                        .listRowBackground(PokiTheme.surface)
+                        .listRowSeparatorTint(PokiTheme.divider)
                     }
                 }
                 .listStyle(.insetGrouped)
@@ -94,6 +97,7 @@ struct ConfigConfirmSheet: View {
                         gate.userApprove(items: workingItems)
                     }
                     .bold()
+                    .tint(approvedCount == 0 ? PokiTheme.danger : PokiTheme.primaryButton)
                     .disabled(workingItems.isEmpty)
                 }
             }
@@ -151,6 +155,7 @@ private struct ConfigConfirmRow: View {
                     .foregroundStyle(PokiTheme.primaryText)
                 Spacer()
                 Toggle("", isOn: $item.isApproved)
+                    .tint(PokiTheme.tagText)
                     .labelsHidden()
                     .scaleEffect(0.85)
             }
@@ -165,7 +170,7 @@ private struct ConfigConfirmRow: View {
                         .foregroundStyle(PokiTheme.secondaryText)
                     Image(systemName: "arrow.right")
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(PokiTheme.secondaryText.opacity(0.75))
                 }
                 if !item.newDisplay.isEmpty {
                     Text(item.newDisplay)
@@ -203,7 +208,7 @@ private struct ConfigConfirmRow: View {
             } else if item.risk == .sensitive {
                 Label("Reversible, but worth a quick look.", systemImage: "exclamationmark.circle")
                     .font(.caption2)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(PokiTheme.tagText)
             }
         }
         .padding(.vertical, 4)

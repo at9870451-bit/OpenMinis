@@ -107,6 +107,7 @@ struct BrowserSheetView: View {
                 if !isFullscreen {
                     // Separator
                     Divider()
+                        .overlay(PokiTheme.divider)
 
                     // Bottom navigation toolbar
                     HStack(spacing: 0) {
@@ -173,7 +174,7 @@ struct BrowserSheetView: View {
             }
             .toolbar(isFullscreen ? .hidden : .visible, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     HStack(spacing: 12) {
                         Button {
                             _ = pool.newTab()
@@ -262,7 +263,7 @@ struct BrowserSheetView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
         }
-        .background(Color(UIColor.tertiarySystemBackground))
+        .background(PokiTheme.background)
     }
 
     private func tabButton(for tab: BrowserTabPool.Tab) -> some View {
@@ -319,7 +320,7 @@ private struct BrowserAddressBarIcon: View {
         ZStack {
             Image(systemName: "globe")
                 .font(.system(size: 14))
-                .foregroundStyle(isLoading ? PokiTheme.tagText : .secondary)
+                .foregroundStyle(isLoading ? PokiTheme.tagText : PokiTheme.secondaryText)
 
             if isLoading {
                 Circle()
@@ -356,16 +357,16 @@ private struct AgentBrowsingOverlay: View {
                     .fill(PokiTheme.tagText)
                     .frame(width: 8, height: 8)
                     .opacity(breathing ? 1.0 : 0.3)
-                    .shadow(color: PokiTheme.tagText.opacity(breathing ? 0.8 : 0), radius: breathing ? 8 : 0)
+                    .shadow(color: PokiTheme.shadowSoft.opacity(breathing ? 1 : 0), radius: breathing ? 4 : 0)
 
                 Text("Minis is browsing")
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(PokiTheme.primaryText)
 
                 if let onTakeover {
                     Divider()
                         .frame(height: 14)
-                        .overlay(Color.white.opacity(0.3))
+                        .overlay(PokiTheme.divider)
 
                     Button("Takeover") {
                         onTakeover()
@@ -378,7 +379,8 @@ private struct AgentBrowsingOverlay: View {
             .padding(.vertical, 12)
             .background(
                 Capsule()
-                    .fill(Color.black.opacity(0.7))
+                    .fill(PokiTheme.surface)
+                    .shadow(color: PokiTheme.shadowSoft, radius: 5, y: 2)
             )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -445,23 +447,20 @@ struct BrowserDownloadFloatingButton: View {
             Button(action: action) {
                 Image(systemName: "arrow.down.circle")
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(FloatingCircleButtonSurface.glyphStyle)
+                    .foregroundStyle(PokiTheme.primaryText)
                     .modifier(DownloadPulseModifier(active: downloading, legacyPulse: $legacyPulse))
                     .frame(width: 36, height: 36)
-                    .modifier(FloatingCircleButtonSurface(
-                        legacyLightOpacity: 0.5,
-                        legacyStrokeOpacity: 0.25,
-                        legacyShadowOpacity: 0.12,
-                        legacyShadowRadius: 4
-                    ))
+                    .background(PokiTheme.surface, in: Circle())
+                    .overlay(Circle().stroke(PokiTheme.divider, lineWidth: 0.5))
+                    .shadow(color: PokiTheme.shadowSoft, radius: 4, y: 2)
                     .overlay(alignment: .topTrailing) {
                         if badge > 0 {
                             Text("\(badge)")
                                 .font(.system(size: 10, weight: .bold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PokiTheme.primaryButtonText)
                                 .padding(.horizontal, badge > 9 ? 4 : 0)
                                 .frame(minWidth: 16, minHeight: 16)
-                                .background(Color.red, in: Capsule())
+                                .background(PokiTheme.primaryButton, in: Capsule())
                                 .offset(x: 5, y: -5)
                         }
                     }
@@ -532,9 +531,12 @@ struct BrowserDownloadPanelSheet: View {
                                 onLocate: { onLocate(entry.filename) },
                                 onClear: { center.dismiss(id: entry.id) }
                             )
+                            .listRowBackground(PokiTheme.surface)
+                            .listRowSeparatorTint(PokiTheme.divider)
                         }
                     }
                     .listStyle(.plain)
+                    .pokiScreen()
                 }
             }
             .navigationTitle(Text("Downloads", comment: "Downloads panel title"))
@@ -618,7 +620,7 @@ private struct BrowserDownloadPanelRow: View {
                 case .failed(let reason):
                     Text(reason)
                         .font(.system(size: 12))
-                        .foregroundStyle(.red)
+                        .foregroundStyle(PokiTheme.danger)
                         .lineLimit(3)
                 }
             }
@@ -667,10 +669,10 @@ private struct BrowserDownloadPanelRow: View {
                 .symbolEffectPulseIfAvailable()
         case .completed:
             Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.green)
+                .foregroundStyle(PokiTheme.tagText)
         case .failed:
             Image(systemName: "xmark.circle.fill")
-                .foregroundStyle(.red)
+                .foregroundStyle(PokiTheme.danger)
         }
     }
 }
@@ -725,8 +727,9 @@ struct BrowserDownloadCardRow: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
-        .shadow(color: .black.opacity(0.12), radius: 8, y: 2)
+        .foregroundStyle(PokiTheme.primaryText)
+        .background(PokiTheme.surface, in: RoundedRectangle(cornerRadius: 14))
+        .shadow(color: PokiTheme.shadowSoft, radius: 5, y: 2)
         .contentShape(Rectangle())
         .onTapGesture { onTap?() }
     }
@@ -739,10 +742,10 @@ struct BrowserDownloadCardRow: View {
                 .symbolEffectPulseIfAvailable()
         case .completed:
             Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.green)
+                .foregroundStyle(PokiTheme.tagText)
         case .failed:
             Image(systemName: "xmark.circle.fill")
-                .foregroundStyle(.red)
+                .foregroundStyle(PokiTheme.danger)
         }
     }
 
@@ -763,7 +766,7 @@ struct BrowserDownloadCardRow: View {
         case .failed(let reason):
             Text(reason)
                 .font(.system(size: 11))
-                .foregroundStyle(.red)
+                .foregroundStyle(PokiTheme.danger)
                 .lineLimit(2)
         }
     }

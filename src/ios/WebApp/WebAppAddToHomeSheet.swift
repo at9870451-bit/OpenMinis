@@ -37,10 +37,16 @@ struct WebAppAddToHomeSheet: View {
             Form {
                 if unsupportedScope {
                     unsupportedSection
+                        .listRowBackground(PokiTheme.surface)
+                        .listRowSeparatorTint(PokiTheme.divider)
                 } else {
                     previewSection
                     titleSection
+                        .listRowBackground(PokiTheme.surface)
+                        .listRowSeparatorTint(PokiTheme.divider)
                     categorySection
+                        .listRowBackground(PokiTheme.surface)
+                        .listRowSeparatorTint(PokiTheme.divider)
                     if let sid = sourceSessionId,
                        classification?.scope != .shared,
                        classification?.scope != .mount {
@@ -54,11 +60,15 @@ struct WebAppAddToHomeSheet: View {
                                     .foregroundStyle(PokiTheme.secondaryText)
                             }
                         }
+                        .listRowBackground(PokiTheme.surface)
+                        .listRowSeparatorTint(PokiTheme.divider)
                     }
                     if let err = errorMessage {
                         Section {
                             Text(err).foregroundStyle(PokiTheme.danger).font(.caption)
                         }
+                        .listRowBackground(PokiTheme.surface)
+                        .listRowSeparatorTint(PokiTheme.divider)
                     }
                     Section {
                         Button {
@@ -110,7 +120,7 @@ struct WebAppAddToHomeSheet: View {
                 }
             } icon: {
                 Image(systemName: "exclamationmark.triangle")
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(PokiTheme.tagText)
             }
         }
     }
@@ -164,7 +174,7 @@ struct WebAppAddToHomeSheet: View {
                             }
                             Text(c.label)
                                 .font(.caption2)
-                                .foregroundStyle(category == c ? c.color : .secondary)
+                                .foregroundStyle(category == c ? PokiTheme.tagText : PokiTheme.secondaryText)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.8)
                         }
@@ -399,7 +409,7 @@ private struct LauncherTilePreview: View {
             .frame(width: tile, height: tile)
             Text(title.isEmpty ? category.label : title)
                 .font(.caption)
-                .foregroundStyle(.primary)
+                .foregroundStyle(PokiTheme.primaryText)
                 .lineLimit(1)
                 .truncationMode(.middle)
                 .frame(maxWidth: tile + 30)

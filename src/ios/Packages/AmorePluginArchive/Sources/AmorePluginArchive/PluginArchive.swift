@@ -149,10 +149,29 @@ public enum PluginArchive {
         }
         let parts = path.split(separator: "/")
         guard !parts.contains(".."), !parts.isEmpty else { throw PluginArchiveError.unsafePath(path) }
-        let canonicalRoot = root.standardizedFileURL.resolvingSymlinksInPath()
-        let target = canonicalRoot.appendingPathComponent(path).standardizedFileURL.resolvingSymlinksInPath()
-        guard target.path.hasPrefix(canonicalRoot.path + "/") else { throw PluginArchiveError.unsafePath(path) }
+        let target = root.standardizedFileURL.appendingPathComponent(path).standardizedFileURL
+        let canonicalRoot = canonicalPathIncludingMissingTail(root)
+        let canonicalTarget = canonicalPathIncludingMissingTail(target)
+        guard canonicalTarget.path.hasPrefix(canonicalRoot.path + "/") else {
+            throw PluginArchiveError.unsafePath(path)
+        }
         return target
+    }
+
+    /// `resolvingSymlinksInPath()` does not resolve an absent leaf. Resolve the
+    /// deepest existing ancestor, then append the missing components back.
+    private static func canonicalPathIncludingMissingTail(_ url: URL) -> URL {
+        var probe = url.standardizedFileURL
+        var tail: [String] = []
+        while !FileManager.default.fileExists(atPath: probe.path) {
+            let parent = probe.deletingLastPathComponent()
+            if parent.path == probe.path { break }
+            tail.insert(probe.lastPathComponent, at: 0)
+            probe = parent
+        }
+        return tail.reduce(probe.resolvingSymlinksInPath()) {
+            $0.appendingPathComponent($1)
+        }.standardizedFileURL
     }
 
     private static func coordinatedCopy(_ source: URL, to target: URL, folder: Bool = false) throws {
