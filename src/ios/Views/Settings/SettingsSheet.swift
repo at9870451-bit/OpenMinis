@@ -852,11 +852,13 @@ struct AmoreMarketplaceView: View {
                 }
             case .loaded:
                 if store.items.isEmpty {
-                    ContentUnavailableView(
-                        AppLocalized("No plugins yet"),
-                        systemImage: "shippingbox",
-                        description: Text(AppLocalized("No public repository carries the amore-plugin topic."))
-                    )
+                    VStack(spacing: 8) {
+                        Image(systemName: "shippingbox").font(.largeTitle).foregroundStyle(.secondary)
+                        Text(AppLocalized("No plugins yet")).font(.headline)
+                        Text(AppLocalized("No public repository carries the amore-plugin topic."))
+                            .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity).padding(.vertical, 24)
                 } else {
                     Section {
                         ForEach(store.items) { item in
