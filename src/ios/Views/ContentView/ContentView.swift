@@ -78,6 +78,7 @@ enum RuntimePage: String, Identifiable {
     case memory
     case localBot
     case soul
+    case rootfs
     var id: String { rawValue }
 }
 
@@ -472,6 +473,9 @@ struct ContentView: View {
     @State var homeSessionId: String? = nil
     @State var homeDraftId: String = "__new__home"
     @State var showHistoryDrawer = false
+    /// Root tab selection. Chat is mounted permanently (see `tabbedContent`),
+    /// so switching tabs never reloads the conversation.
+    @State var activeTab: AppTab = .chat
     /// Non-nil only while a drawer drag is in flight; drives live follow.
     @State var drawerDragProgress: CGFloat? = nil
     @State var drawerSearch = ""
