@@ -1,5 +1,4 @@
 import Foundation
-import NaturalLanguage
 
 // MARK: - Memory Tools
 
@@ -236,9 +235,6 @@ extension AIChatViewModel {
             let matchedCount: Int
             let totalKeywords: Int
             let timestamp: Date
-            /// Cosine similarity between the query and this entry, 0…1.
-            /// 0 when on-device embeddings are unavailable.
-            let semantic: Double
         }
 
         // Parse timestamp from entry text (<!-- 2026-03-04 17:00:00 -->) or fall back to
@@ -271,27 +267,6 @@ extension AIChatViewModel {
             return Date.distantPast
         }
 
-        // Semantic recall: keyword-only matching misses entries that say the
-        // same thing in different words. When the system sentence embedding is
-        // available we also admit entries by cosine similarity; if it is not,
-        // everything below degrades to the previous keyword behaviour.
-        let semanticEmbedding = NLEmbedding.sentenceEmbedding(for: .english)
-        let queryVector = semanticEmbedding?.vector(for: keywords.joined(separator: " "))
-
-        func cosine(_ a: [Double], _ b: [Double]) -> Double {
-            guard a.count == b.count, !a.isEmpty else { return 0 }
-            var dot = 0.0, normA = 0.0, normB = 0.0
-            for index in a.indices {
-                dot += a[index] * b[index]
-                normA += a[index] * a[index]
-                normB += b[index] * b[index]
-            }
-            guard normA > 0, normB > 0 else { return 0 }
-            return dot / (sqrt(normA) * sqrt(normB))
-        }
-
-        let semanticFloor = 0.55
-
         var allEntries: [ScoredEntry] = []
         var totalEntryCount = 0
 
@@ -302,19 +277,14 @@ extension AIChatViewModel {
             for (fileLabel, entryText) in entries {
                 let lower = entryText.lowercased()
                 let matchedCount = keywords.filter { lower.contains($0) }.count
-                var semantic = 0.0
-                if let queryVector, let vector = semanticEmbedding?.vector(for: entryText) {
-                    semantic = cosine(queryVector, vector)
-                }
-                if matchedCount > 0 || semantic >= semanticFloor {
+                if matchedCount > 0 {
                     let ts = extractTimestamp(from: entryText, fileLabel: fileLabel)
                     allEntries.append(ScoredEntry(
                         fileLabel: fileLabel,
                         text: entryText,
                         matchedCount: matchedCount,
                         totalKeywords: keywords.count,
-                        timestamp: ts,
-                        semantic: semantic
+                        timestamp: ts
                     ))
                 }
             }
@@ -342,15 +312,7 @@ extension AIChatViewModel {
             } else {
                 recencyScore = 1.0  // all same age — treat equally
             }
-            // Semantic recall only earns weight when a vector actually exists;
-            // otherwise the old 50/50 blend is preserved exactly.
-            let combined: Double
-            if queryVector != nil {
-                let semanticScore = min(max(entry.semantic, 0), 1)
-                combined = 0.30 * confScore + 0.25 * recencyScore + 0.45 * semanticScore
-            } else {
-                combined = 0.5 * confScore + 0.5 * recencyScore
-            }
+            let combined = 0.5 * confScore + 0.5 * recencyScore
             return (entry, combined)
         }
 
