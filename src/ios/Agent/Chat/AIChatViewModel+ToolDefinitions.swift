@@ -884,3 +884,4 @@ enum AmoreJSPluginHTTP {
         _ = semaphore.wait(timeout: .now() + 20)
         return payload
     }
+}
