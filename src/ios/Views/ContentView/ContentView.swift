@@ -608,6 +608,8 @@ struct ContentView: View {
                     stackLayout
                 }
             }
+            .background(PokiTheme.background)
+            .onAppear { PokiTheme.applyGlobalAppearance() }
             .overlay(alignment: .top) {
                 if let toast = forceSyncToast {
                     ForceSyncToastBanner(text: toast)
