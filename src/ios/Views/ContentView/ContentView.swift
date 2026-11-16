@@ -609,6 +609,7 @@ struct ContentView: View {
                 }
             }
             .background(PokiTheme.background)
+            .tint(PokiTheme.aiAccentStrong)
             .onAppear { PokiTheme.applyGlobalAppearance() }
             .overlay(alignment: .top) {
                 if let toast = forceSyncToast {
