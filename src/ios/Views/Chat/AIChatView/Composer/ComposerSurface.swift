@@ -100,7 +100,7 @@ struct FloatingCircleButtonSurface: ViewModifier {
 /// that lifts the bar off the message list.
 struct ComposerSurface: ViewModifier {
     private var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 20, style: .continuous)
+        RoundedRectangle(cornerRadius: PokiTheme.Radius.composer, style: .continuous)
     }
 
     func body(content: Content) -> some View {
@@ -108,12 +108,18 @@ struct ComposerSurface: ViewModifier {
             content
                 .glassEffect(.regular, in: shape)
                 .clipShape(shape)
+                .overlay(shape.strokeBorder(PokiTheme.divider, lineWidth: 0.5))
         } else {
             content
-                .background(shape.fill(ChatColors.inputBg))
+                .background {
+                    ZStack {
+                        shape.fill(.ultraThinMaterial)
+                        shape.fill(PokiTheme.floatingSurface)
+                    }
+                }
                 .clipShape(shape)
-                .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 2)
-                .shadow(color: Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0, alpha: 0.5) : UIColor(white: 0, alpha: 0) }), radius: 8, x: 0, y: -4)
+                .overlay(shape.strokeBorder(PokiTheme.divider, lineWidth: 0.5))
+                .shadow(color: PokiTheme.shadowFloating, radius: 10, x: 0, y: 3)
         }
     }
 }
