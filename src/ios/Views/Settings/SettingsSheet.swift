@@ -771,13 +771,12 @@ struct AmoreMarketplaceItem: Identifiable, Decodable, Sendable {
 }
 
 @MainActor
-@Observable
-final class AmoreMarketplaceStore {
+final class AmoreMarketplaceStore: ObservableObject {
     enum Phase { case idle, loading, loaded, failed(String) }
 
-    var phase: Phase = .idle
-    var items: [AmoreMarketplaceItem] = []
-    var isRateLimited = false
+    @Published var phase: Phase = .idle
+    @Published var items: [AmoreMarketplaceItem] = []
+    @Published var isRateLimited = false
 
     private let session: URLSession
 
@@ -839,7 +838,7 @@ final class AmoreMarketplaceStore {
 }
 
 struct AmoreMarketplaceView: View {
-    @State private var store = AmoreMarketplaceStore()
+    @StateObject private var store = AmoreMarketplaceStore()
 
     var body: some View {
         List {
