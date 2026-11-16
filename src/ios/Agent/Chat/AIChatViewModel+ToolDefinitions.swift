@@ -649,6 +649,38 @@ final class AmorePluginInstaller {
         try writeInstalled(list)
     }
 
+    /// Installs a plugin folder picked from Files. The manifest is validated and
+    /// the copy is atomic; the record is marked as not registry-verified because a
+    /// local folder carries no Ed25519 signature.
+    @discardableResult
+    func installLocal(from pickedURL: URL) throws -> AmoreInstalledPlugin {
+        let scoped = pickedURL.startAccessingSecurityScopedResource()
+        defer { if scoped { pickedURL.stopAccessingSecurityScopedResource() } }
+        let manifestURL = pickedURL.appendingPathComponent("manifest.json")
+        guard let data = try? Data(contentsOf: manifestURL),
+              let manifest = try? JSONDecoder().decode(AmorePluginManifest.self, from: data) else {
+            throw AmorePluginInstallError.missingManifest
+        }
+        _ = try AmorePluginValidation.validate(manifest)
+        let destination = pluginsRoot
+            .appendingPathComponent(manifest.id, isDirectory: true)
+            .appendingPathComponent(manifest.version, isDirectory: true)
+        try fm.createDirectory(at: destination.deletingLastPathComponent(),
+                               withIntermediateDirectories: true)
+        if fm.fileExists(atPath: destination.path) { try fm.removeItem(at: destination) }
+        try fm.copyItem(at: pickedURL, to: destination)
+        let record = AmoreInstalledPlugin(id: manifest.id,
+                                          version: manifest.version,
+                                          enabled: false,
+                                          installedAt: Date(),
+                                          previousVersion: nil,
+                                          permissions: manifest.permissions)
+        var all = installedPlugins().filter { $0.id != manifest.id }
+        all.append(record)
+        try writeInstalled(all)
+        return record
+    }
+
     func uninstall(id: String) throws {
         let list = installedPlugins().filter { $0.id != id }
         try writeInstalled(list)
