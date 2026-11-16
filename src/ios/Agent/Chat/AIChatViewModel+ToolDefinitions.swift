@@ -653,6 +653,58 @@ final class AmorePluginInstaller {
     /// the copy is atomic; the record is marked as not registry-verified because a
     /// local folder carries no Ed25519 signature.
     @discardableResult
+    /// Installs a plugin from a `.zip` by unpacking it inside the iSH guest
+    /// (Alpine mirror) with `unzip`, then reusing the directory installer.
+    /// The archive never gets unpacked by the app process, so zip-slip style
+    /// paths are contained by the guest filesystem sandbox.
+    func installZip(from pickedURL: URL, timeout: TimeInterval = 60) throws -> AmoreInstalledPlugin {
+        let fm = FileManager.default
+        let scoped = pickedURL.startAccessingSecurityScopedResource()
+        defer { if scoped { pickedURL.stopAccessingSecurityScopedResource() } }
+
+        let guestTmp = RootfsManager.shared.dataPath
+            .appendingPathComponent("tmp", isDirectory: true)
+            .appendingPathComponent("amore-plugin-\(UUID().uuidString)", isDirectory: true)
+        try fm.createDirectory(at: guestTmp, withIntermediateDirectories: true)
+
+        let hostZip = guestTmp.appendingPathComponent("package.zip")
+        try fm.copyItem(at: pickedURL, to: hostZip)
+
+        let guestDir = "/tmp/" + guestTmp.lastPathComponent
+        let command = "mkdir -p \(guestDir)/out && unzip -o -q \(guestDir)/package.zip -d \(guestDir)/out"
+        let result = ISHShellExecutor.executeCommandSync(command, timeout: timeout, lineCallback: nil)
+        guard result.exitCode == 0 else {
+            try? fm.removeItem(at: guestTmp)
+            throw AmorePluginInstallError.invalidManifest(
+                detail: (result.errorOutput.isEmpty ? result.output : result.errorOutput)
+            )
+        }
+
+        // Unpacked trees usually nest one folder (id-version/); find manifest.json.
+        let outDir = guestTmp.appendingPathComponent("out", isDirectory: true)
+        guard let manifestDir = Self.findPluginDirectory(under: outDir, depth: 3) else {
+            try? fm.removeItem(at: guestTmp)
+            throw AmorePluginInstallError.invalidManifest(detail: "manifest.json not found in archive")
+        }
+        let installed = try installLocal(from: manifestDir)
+        try? fm.removeItem(at: guestTmp)
+        return installed
+    }
+
+    private static func findPluginDirectory(under root: URL, depth: Int) -> URL? {
+        let fm = FileManager.default
+        if fm.fileExists(atPath: root.appendingPathComponent("manifest.json").path) { return root }
+        guard depth > 0,
+              let children = try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: [.isDirectoryKey]) else {
+            return nil
+        }
+        for child in children {
+            let isDir = (try? child.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory ?? false
+            if isDir, let found = findPluginDirectory(under: child, depth: depth - 1) { return found }
+        }
+        return nil
+    }
+
     func installLocal(from pickedURL: URL) throws -> AmoreInstalledPlugin {
         let scoped = pickedURL.startAccessingSecurityScopedResource()
         defer { if scoped { pickedURL.stopAccessingSecurityScopedResource() } }
