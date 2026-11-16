@@ -124,7 +124,10 @@ enum PokiTheme {
         UITableView.appearance().backgroundColor = bg
         UICollectionView.appearance().backgroundColor = .clear
         UIScrollView.appearance().backgroundColor = .clear
-        UITableViewCell.appearance().backgroundColor = .clear
+        // Rows sit on the Surface token so lists read as warm paper cards
+        // rather than pure white sheets.
+        UITableViewCell.appearance().backgroundColor = surface
+        UITableView.appearance().separatorColor = divider
 
         // Controls.
         UISwitch.appearance().onTintColor = accent
