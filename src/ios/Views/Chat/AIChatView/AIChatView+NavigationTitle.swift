@@ -577,3 +577,34 @@ extension AIChatView {
         }
     }
 }
+
+
+// MARK: - Poki-style header avatar
+
+/// Centred AI avatar above the message list. Deliberately small (44pt) so it
+/// reads as an identity anchor rather than content: it never pushes the
+/// transcript down, because it is an overlay on the message area.
+struct AIChatHeaderAvatar: View {
+    let isThinking: Bool
+
+    @State private var pulse = false
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(.ultraThinMaterial)
+                .frame(width: 44, height: 44)
+                .overlay(Circle().strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5))
+            Image(systemName: "sparkles")
+                .font(.system(size: 18, weight: .medium))
+                .foregroundStyle(.primary.opacity(0.85))
+                .symbolEffect(.pulse, isActive: isThinking)
+        }
+        .scaleEffect(isThinking && pulse ? 1.04 : 1.0)
+        .shadow(color: Color.black.opacity(isThinking ? 0.10 : 0.05), radius: isThinking ? 10 : 6, y: 2)
+        .animation(isThinking ? .easeInOut(duration: 1.1).repeatForever(autoreverses: true) : .easeOut(duration: 0.25), value: pulse)
+        .onAppear { pulse = isThinking }
+        .onChange(of: isThinking) { _, now in pulse = now }
+        .accessibilityLabel(Text(AppLocalized("AI assistant")))
+    }
+}
