@@ -552,6 +552,11 @@ struct AIChatView: View {
             // y = 0, under the status bar's clock and battery. They now live in
             // `topBanners`, below the bar, with the scheduled-task banner.
             messagesArea
+                .overlay(alignment: .top) {
+                    AIChatHeaderAvatar(isThinking: vm.messages.last?.shouldShowTypingIndicator ?? false)
+                        .padding(.top, 6)
+                        .allowsHitTesting(false)
+                }
                 .overlay(alignment: .bottom) {
                     // Tool preview + input bar stacked at the bottom.
                     // Both overlay on top of the message list for immersive scrolling.
