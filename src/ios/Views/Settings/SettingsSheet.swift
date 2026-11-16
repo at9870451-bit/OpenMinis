@@ -161,6 +161,11 @@ struct SettingsSheet: View {
                         }
                     }
                     NavigationLink {
+                        AmoreMarketplaceView()
+                    } label: {
+                        Label(AppLocalized("Plugin Marketplace"), systemImage: "shippingbox")
+                    }
+                    NavigationLink {
                         MemoryManagementView()
                     } label: {
                         Label {
@@ -742,4 +747,149 @@ struct ContextCompressionSettingsView: View {
 
 #Preview {
     ContentView()
+}
+// MARK: - Plugin Marketplace (GitHub-backed, real network)
+
+/// Discovers community plugins through the public GitHub Search API.
+/// No fake entries: when the call fails or the rate limit is hit, the UI says so.
+struct AmoreMarketplaceItem: Identifiable, Decodable, Sendable {
+    struct Owner: Decodable, Sendable { let login: String }
+    let id: Int
+    let name: String
+    let fullName: String
+    let htmlURL: String
+    let description: String?
+    let stars: Int
+    let owner: Owner
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, description, owner
+        case fullName = "full_name"
+        case htmlURL = "html_url"
+        case stars = "stargazers_count"
+    }
+}
+
+@MainActor
+@Observable
+final class AmoreMarketplaceStore {
+    enum Phase { case idle, loading, loaded, failed(String) }
+
+    var phase: Phase = .idle
+    var items: [AmoreMarketplaceItem] = []
+    var isRateLimited = false
+
+    private let session: URLSession
+
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+
+    func load() async {
+        guard case .loading = phase else { phase = .loading; return await fetch() }
+    }
+
+    func reload() async {
+        phase = .loading
+        await fetch()
+    }
+
+    private func fetch() async {
+        // topic:amore-plugin is the registry-wide discovery convention.
+        var comps = URLComponents(string: "https://api.github.com/search/repositories")
+        comps?.queryItems = [
+            URLQueryItem(name: "q", value: "topic:amore-plugin"),
+            URLQueryItem(name: "sort", value: "stars"),
+            URLQueryItem(name: "order", value: "desc"),
+            URLQueryItem(name: "per_page", value: "30"),
+        ]
+        guard let url = comps?.url else {
+            phase = .failed(AppLocalized("Invalid marketplace URL"))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+        request.setValue("Amore-iOS", forHTTPHeaderField: "User-Agent")
+
+        do {
+            let (data, response) = try await session.data(for: request)
+            guard let http = response as? HTTPURLResponse else {
+                phase = .failed(AppLocalized("No response from GitHub"))
+                return
+            }
+            if http.statusCode == 403 || http.statusCode == 429 {
+                isRateLimited = true
+                let reset = http.value(forHTTPHeaderField: "X-RateLimit-Reset") ?? "?"
+                phase = .failed("GitHub rate limit reached (reset \(reset))")
+                return
+            }
+            guard (200..<300).contains(http.statusCode) else {
+                phase = .failed("GitHub returned \(http.statusCode)")
+                return
+            }
+            struct Envelope: Decodable { let items: [AmoreMarketplaceItem] }
+            let envelope = try JSONDecoder().decode(Envelope.self, from: data)
+            items = envelope.items
+            phase = .loaded
+        } catch {
+            phase = .failed(error.localizedDescription)
+        }
+    }
+}
+
+struct AmoreMarketplaceView: View {
+    @State private var store = AmoreMarketplaceStore()
+
+    var body: some View {
+        List {
+            switch store.phase {
+            case .idle, .loading:
+                HStack { ProgressView(); Text(AppLocalized("Searching GitHub…")) }
+            case .failed(let message):
+                Section {
+                    Text(message).font(.footnote).foregroundStyle(.secondary)
+                    Button(AppLocalized("Retry")) { Task { await store.reload() } }
+                }
+            case .loaded:
+                if store.items.isEmpty {
+                    ContentUnavailableView(
+                        AppLocalized("No plugins yet"),
+                        systemImage: "shippingbox",
+                        description: Text(AppLocalized("No public repository carries the amore-plugin topic."))
+                    )
+                } else {
+                    Section {
+                        ForEach(store.items) { item in
+                            Link(destination: URL(string: item.htmlURL) ?? URL(fileURLWithPath: "/")) {
+                                VStack(alignment: .leading, spacing: 3) {
+                                    HStack(spacing: 6) {
+                                        Text(item.name).font(.body.weight(.medium))
+                                        Text(AppLocalized("Unverified"))
+                                            .font(.caption2.weight(.semibold))
+                                            .padding(.horizontal, 6).padding(.vertical, 2)
+                                            .background(Color.red.opacity(0.12), in: Capsule())
+                                            .foregroundStyle(.red)
+                                    }
+                                    Text(item.fullName).font(.caption).foregroundStyle(.secondary)
+                                    if let description = item.description, !description.isEmpty {
+                                        Text(description).font(.caption2).foregroundStyle(.secondary).lineLimit(2)
+                                    }
+                                    Text("★ \(item.stars)").font(.caption2).foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    } header: {
+                        Text(AppLocalized("Community plugins"))
+                    } footer: {
+                        Text(AppLocalized("These repositories are not reviewed by Amore. Install only what you can audit."))
+                    }
+                }
+            }
+        }
+        .navigationTitle(AppLocalized("Plugin Marketplace"))
+        .navigationBarTitleDisplayMode(.inline)
+        .refreshable { await store.reload() }
+        .task { await store.load() }
+    }
 }
