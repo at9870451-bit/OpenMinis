@@ -190,7 +190,6 @@ private struct SteppedSlider: View {
 }
 
 struct AppearanceSettingsView: View {
-    @AppStorage("appearanceMode") private var appearanceMode: Int = 0
     @AppStorage("appIconMode") private var appIconMode: Int = 0
     @AppStorage("appLanguage") private var appLanguage: String = ""
     @AppStorage("launchScreen") private var launchScreen: Int = 0  // 0=Auto, 1=Last Session, 2=New Chat, 3=Home
@@ -251,27 +250,6 @@ struct AppearanceSettingsView: View {
 
     var body: some View {
         List {
-            Section {
-                Picker("Theme", selection: $appearanceMode) {
-                    Text("System").tag(0)
-                    Text("Light").tag(1)
-                    Text("Dark").tag(2)
-                }
-                .pickerStyle(.segmented)
-            } header: {
-                Text("Theme")
-                .foregroundStyle(PokiTheme.secondaryText)
-            } footer: {
-                Text("Override the system appearance for this app.")
-                .foregroundStyle(PokiTheme.secondaryText)
-            }
-            .listRowBackground(PokiTheme.surface)
-            .onChange(of: appearanceMode) { _ in
-                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
-                windowScene.windows.forEach { window in
-                    window.overrideUserInterfaceStyle = appearanceMode == 1 ? .light : appearanceMode == 2 ? .dark : .unspecified
-                }
-            }
 
             Section {
                 Picker("Launch Session", selection: $launchScreen) {

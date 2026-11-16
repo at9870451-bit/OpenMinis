@@ -700,7 +700,6 @@ struct MinisSafariView: View {
     let isLocalFile: Bool
     let onCollapse: (() -> Void)?
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("appearanceMode") private var appearanceMode: Int = 0
 
     @State private var showShareSheet: Bool = false
 
@@ -746,7 +745,6 @@ struct MinisSafariView: View {
         }
         .statusBarHidden(true)
         .persistentSystemOverlays(.hidden)
-        .preferredColorScheme(appearanceMode == 1 ? .light : appearanceMode == 2 ? .dark : nil)
         .sheet(isPresented: $showShareSheet) {
             MinisShareSheet(url: shareURL)
         }
@@ -842,7 +840,6 @@ struct MinisLinkPreviewView: View {
     let browserPool: BrowserTabPool?
     var onExpand: ((WebViewHolder) -> Void)? = nil
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("appearanceMode") private var appearanceMode: Int = 0
     @StateObject private var holder: WebViewHolder
     @State private var showShareSheet = false
     @State private var desktopMode: Bool = false
@@ -917,7 +914,6 @@ struct MinisLinkPreviewView: View {
         // page content — fast flicks included. No `.interactiveDismissDisabled`
         // binding here: that SwiftUI round-trip was too slow to catch a flick,
         // and leaving dismiss enabled preserves nav-bar pull-down + xmark.
-        .preferredColorScheme(appearanceMode == 1 ? .light : appearanceMode == 2 ? .dark : nil)
         .sheet(isPresented: $showShareSheet) {
             MinisShareSheet(url: url)
         }

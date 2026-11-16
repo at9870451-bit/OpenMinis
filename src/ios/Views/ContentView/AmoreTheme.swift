@@ -17,36 +17,73 @@ enum PokiTheme {
         }
     }
 
-    static let uiBackground = pair(0xFAFAF9, 0x0C0C0D)
-    static let uiPrimaryText = pair(0x111110, 0xF4F4F1)
-    static let uiSecondaryText = pair(0x6F6F69, 0x8D8D87)
-    static let uiSurface = pair(0xEFEFEC, 0x1C1C1E)
-    static let uiDivider = pair(0x000000, 0xFFFFFF, lightAlpha: 0.13, darkAlpha: 0.14)
-    static let uiAIAccent = pair(0xC4CEFB, 0x3A4270)
-    static let uiTagBackground = pair(0xDEE3FD, 0x2A3052)
-    static let uiTagText = pair(0x262D63, 0xD5DAFB)
-    static let uiPrimaryButton = pair(0x111110, 0xF4F4F1)
-    static let uiPrimaryButtonText = pair(0xFAFAF9, 0x0C0C0D)
-    static let uiDanger = pair(0xB3261E, 0xF2B8B5)
-    static let uiSelection = pair(0xDEE3FD, 0x2A3052)
+    // Palette verified against JosssphZhou/poki App/Theme.swift, commit
+    // 77254611596335464927258f62c7641b95ef2d02. No brand artwork is copied.
+    static let uiBackground = pair(0xF5F8FC, 0x05070D)
+    static let uiPrimaryText = UIColor.label
+    static let uiSecondaryText = UIColor.secondaryLabel
+    static let uiSurface = UIColor.secondarySystemBackground
+    static let uiDivider = UIColor.systemGray5
+    static let uiBlue = pair(0x0177FD, 0x0177FD)
+    static let uiBlueText = pair(0x0177FD, 0x4C9DFF)
+    static let uiBlueSoft = pair(0xE6F1FF, 0x0C2748)
+    static let uiBlueLine = pair(0xB9D8FF, 0x1D4F8F)
+    static let uiSidebar = pair(0xEFF4FC, 0x081329)
+    static let uiSidebarHeading = pair(0x7D8BA6, 0x6F82AA)
+    static let uiSidebarInk = pair(0x1B2F57, 0xC9D7F2)
+    static let uiSelection = pair(0x0177FD, 0x3A8CFE, lightAlpha: 0.08, darkAlpha: 0.18)
+    static let uiPortrait = pair(0xE3EEFF, 0x0C2748)
+    static let uiAmber = pair(0xFFB020, 0xFFB020)
+    static let uiAmberSoft = pair(0xFFF4DC, 0x33270A)
+    static let uiAmberInk = pair(0x7A4B00, 0xFFD280)
+    static let uiGreen = pair(0x1FB86A, 0x1FB86A)
+    static let uiGreenSoft = pair(0xE4F6EC, 0x0D2E1D)
+    static let uiGreenInk = pair(0x0E6B3C, 0x74E3A8)
+    static let uiDanger = pair(0xE5484D, 0xF2555A)
+    static let uiRedSoft = pair(0xFDECEC, 0x3A1517)
+    static let uiRedInk = pair(0x8C1D22, 0xFFA3A6)
+    // Compatibility tokens now keep real colour instead of flattening every
+    // action/status into label black or label white.
+    static let uiAIAccent = uiPortrait
+    static let uiTagBackground = uiBlueSoft
+    static let uiTagText = uiBlueText
+    static let uiPrimaryButton = uiBlue
+    static let uiPrimaryButtonText = UIColor.white
 
     static let background = Color(uiBackground)
     static let primaryText = Color(uiPrimaryText)
     static let secondaryText = Color(uiSecondaryText)
     static let surface = Color(uiSurface)
     static let divider = Color(uiDivider)
-    static let aiAccent = Color(uiAIAccent)
-    static let tagBackground = Color(uiTagBackground)
-    static let tagText = Color(uiTagText)
-    static let primaryButton = Color(uiPrimaryButton)
-    static let primaryButtonText = Color(uiPrimaryButtonText)
-    static let selection = Color(uiSelection)
+    static let blue = Color(uiBlue)
+    static let blueText = Color(uiBlueText)
+    static let blueSoft = Color(uiBlueSoft)
+    static let blueLine = Color(uiBlueLine)
+    static let sidebar = Color(uiSidebar)
+    static let sidebarHeading = Color(uiSidebarHeading)
+    static let sidebarInk = Color(uiSidebarInk)
+    static let portrait = Color(uiPortrait)
+    static let amber = Color(uiAmber)
+    static let amberSoft = Color(uiAmberSoft)
+    static let amberInk = Color(uiAmberInk)
+    static let green = Color(uiGreen)
+    static let greenSoft = Color(uiGreenSoft)
+    static let greenInk = Color(uiGreenInk)
     static let danger = Color(uiDanger)
-    /// Legacy name maps to the specified accessible lavender foreground.
-    static let aiAccentStrong = tagText
-    static let floatingSurface = Color(pair(0xFAFAF9, 0x1C1C1E, lightAlpha: 0.86, darkAlpha: 0.86))
+    static let redSoft = Color(uiRedSoft)
+    static let redInk = Color(uiRedInk)
+    static let solid = Color(uiPrimaryText)
+    static let onSolid = Color(UIColor.systemBackground)
+    static let aiAccent = portrait
+    static let tagBackground = blueSoft
+    static let tagText = blueText
+    static let primaryButton = blue
+    static let primaryButtonText = Color.white
+    static let selection = Color(uiSelection)
+    static let aiAccentStrong = blueText
+    static let floatingSurface = Color(pair(0xFFFFFF, 0x101C30, lightAlpha: 0.78, darkAlpha: 0.76))
     static let shadowSoft = Color.black.opacity(0.04)
-    static let shadowFloating = Color.black.opacity(0.06)
+    static let shadowFloating = Color.black.opacity(0.07)
 
     enum Radius {
         static let chip: CGFloat = 12
@@ -115,7 +152,7 @@ private struct PokiScreenModifier: ViewModifier {
             .scrollContentBackground(.hidden)
             .background(PokiTheme.background.ignoresSafeArea())
             .foregroundStyle(PokiTheme.primaryText)
-            .tint(PokiTheme.primaryButton)
+            .tint(PokiTheme.blueText)
             .toolbarBackground(PokiTheme.background, for: .navigationBar)
     }
 }
@@ -137,8 +174,8 @@ enum AmoreTheme {
     static let textDisabled = PokiTheme.secondaryText.opacity(0.6)
     static let separator = PokiTheme.divider
     static let accent = PokiTheme.tagText
-    static let success = PokiTheme.tagText
-    static let warning = PokiTheme.secondaryText
+    static let success = PokiTheme.green
+    static let warning = PokiTheme.amber
     static let danger = PokiTheme.danger
     enum Radius {
         static let chip = PokiTheme.Radius.chip

@@ -42,7 +42,7 @@ enum AmorePluginValidation {
     static let fixedPermissions: Set<String> = ["storage", "secrets", "notify"]
 
     static func validate(_ manifest: AmorePluginManifest,
-                         hostVersion: String = "1.25.0") throws -> [String] {
+                         hostVersion: String = "1.26.0") throws -> [String] {
         guard manifest.schemaVersion == 1 else {
             throw NSError(domain: "AmorePlugin", code: 1,
                           userInfo: [NSLocalizedDescriptionKey: "unsupported schemaVersion"])

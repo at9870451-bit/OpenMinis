@@ -4,6 +4,11 @@ import UIKit
 
 /// File mode accepts any Files-provider item so a ZIP tagged as public.data is
 /// not greyed out. The archive's bytes, not the provider's UTI, determine validity.
+enum AmorePluginPickerMode: String, Identifiable {
+    case archive, folder
+    var id: String { rawValue }
+}
+
 struct AmorePluginDocumentPicker: UIViewControllerRepresentable {
     let folder: Bool
     let onSelection: (Result<URL, Error>) -> Void
@@ -13,8 +18,10 @@ struct AmorePluginDocumentPicker: UIViewControllerRepresentable {
         Coordinator(onSelection: onSelection, onCancel: onCancel)
     }
 
+    static func contentTypes(folder: Bool) -> [UTType] { folder ? [.folder] : [.item] }
+
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
-        let picker = UIDocumentPickerViewController(forOpeningContentTypes: folder ? [.folder] : [.item], asCopy: !folder)
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: Self.contentTypes(folder: folder), asCopy: !folder)
         picker.delegate = context.coordinator
         picker.allowsMultipleSelection = false
         picker.shouldShowFileExtensions = true

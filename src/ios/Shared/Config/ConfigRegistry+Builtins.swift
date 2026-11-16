@@ -1233,15 +1233,6 @@ extension ConfigRegistry {
     @MainActor
     private static func registerAppearance(into r: ConfigRegistry) {
         r.register(AppStorageIntCodedEnumField(
-            path: "appearance.theme",
-            displayName: "Theme",
-            description: "Light / Dark / System color scheme.",
-            userDefaultsKey: "appearanceMode",
-            cases: ["system", "light", "dark"],
-            valueLabels: ["system": "System", "light": "Light", "dark": "Dark"],
-            defaultIndex: 0
-        ))
-        r.register(AppStorageIntCodedEnumField(
             path: "appearance.appIcon",
             displayName: "App icon",
             description: "Home screen icon variant.",

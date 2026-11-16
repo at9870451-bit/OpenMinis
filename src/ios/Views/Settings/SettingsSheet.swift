@@ -44,7 +44,6 @@ struct SettingsSheet: View {
     /// When shown as a bottom-tab page instead of a sheet, hide the Done
     /// button — there is nothing to dismiss.
     var embedded: Bool = false
-    @AppStorage("appearanceMode") private var appearanceMode: Int = 0
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var deepLink = DeepLinkCoordinator.shared
     @State private var navPath = NavigationPath()
@@ -505,7 +504,6 @@ struct SettingsSheet: View {
                 applyPendingDeepLink()
             }
         }
-        .preferredColorScheme(appearanceMode == 1 ? .light : appearanceMode == 2 ? .dark : nil)
         .appFontScale()
     }
 
@@ -851,8 +849,7 @@ final class AmoreMarketplaceStore: ObservableObject {
 struct AmoreMarketplaceView: View {
     @StateObject private var store = AmoreMarketplaceStore()
     @StateObject private var importer = AmorePluginImportStore()
-    @State private var showPicker = false
-    @State private var pickFolder = false
+    @State private var pickerMode: AmorePluginPickerMode?
     @State private var recordToDelete: AmoreInstalledPlugin?
     @State private var queuedSelection: URL?
     @State private var queuedFolder = false
@@ -861,8 +858,7 @@ struct AmoreMarketplaceView: View {
         List {
             Section {
                 Button {
-                    pickFolder = false
-                    showPicker = true
+                    pickerMode = .archive
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "doc.zipper").font(.title2)
@@ -884,8 +880,7 @@ struct AmoreMarketplaceView: View {
                 .listRowSeparator(.hidden)
                 .disabled(importer.isWorking)
                 Button {
-                    pickFolder = true
-                    showPicker = true
+                    pickerMode = .folder
                 } label: {
                     Label(AppLocalized("Import plugin folder"), systemImage: "folder.badge.plus")
                         .foregroundStyle(PokiTheme.primaryText)
@@ -969,21 +964,25 @@ struct AmoreMarketplaceView: View {
         .pokiScreen()
         .navigationTitle(AppLocalized("Plugin Marketplace"))
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showPicker, onDismiss: {
+        .sheet(item: $pickerMode, onDismiss: {
             if let selected = queuedSelection {
                 queuedSelection = nil
                 importer.selected(selected, folder: queuedFolder)
             }
-        }) {
-            AmorePluginDocumentPicker(folder: pickFolder, onSelection: { result in
-                showPicker = false
+        }) { mode in
+            AmorePluginDocumentPicker(folder: mode == .folder, onSelection: { result in
                 switch result {
                 case .success(let url):
                     queuedSelection = url
-                    queuedFolder = pickFolder
+                    queuedFolder = mode == .folder
                 case .failure(let error): importer.pickerFailed(error)
                 }
-            }, onCancel: { showPicker = false })
+                pickerMode = nil
+            }, onCancel: {
+                queuedSelection = nil
+                pickerMode = nil
+            })
+            .id(mode.id)
         }
         .sheet(item: $importer.pending, onDismiss: { importer.confirmationDismissed() }) { selection in
             AmorePluginImportConfirmation(selection: selection,

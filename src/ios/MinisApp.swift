@@ -88,7 +88,6 @@ struct MinisApp: App {
     // `UIApplicationShortcutItem` events (Home Screen Quick Actions).
     // SwiftUI's pure App lifecycle has no equivalent surface.
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @AppStorage("appearanceMode") private var appearanceMode: Int = 0
     @AppStorage("appLanguage") private var appLanguage: String = ""
     @StateObject private var shareCoordinator = ShareCoordinator.shared
     @ObservedObject private var fontSettings = FontSettings.shared
@@ -313,10 +312,7 @@ struct MinisApp: App {
                     }
                 }
                 .environmentObject(shareCoordinator)
-                .tint(PokiTheme.primaryButton)
-                .preferredColorScheme(
-                    appearanceMode == 1 ? .light : appearanceMode == 2 ? .dark : nil
-                )
+                .tint(PokiTheme.blueText)
                 .environment(\.locale, appLanguage.isEmpty ? .current : Locale(identifier: appLanguage))
                 .dynamicTypeSize(fontSettings.appBaseScale.dynamicTypeSize)
                 .onOpenURL { url in

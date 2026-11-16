@@ -35,7 +35,7 @@ enum ChatColors {
     static let tertiaryText = PokiTheme.secondaryText.opacity(0.7)
     /// Assistant replies are deliberately bubble-less; the user side keeps a
     /// low-contrast paper tint so the two roles stay distinguishable.
-    static let userBubble = PokiTheme.selection
+    static let userBubble = PokiTheme.surface
     static let toolBg = PokiTheme.surface
     static let toolBorder = PokiTheme.divider
     static let accent = PokiTheme.aiAccentStrong

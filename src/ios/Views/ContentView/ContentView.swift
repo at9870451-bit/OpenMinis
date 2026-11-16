@@ -473,11 +473,15 @@ struct ContentView: View {
     @State var homeSessionId: String? = nil
     @State var homeDraftId: String = "__new__home"
     @State var showHistoryDrawer = false
-    /// Root tab selection. Chat is mounted permanently (see `tabbedContent`),
-    /// so switching tabs never reloads the conversation.
-    @State var activeTab: AppTab = .chat
     /// Non-nil only while a drawer drag is in flight; drives live follow.
     @State var drawerDragProgress: CGFloat? = nil
+    @State var drawerCloseStart: CGFloat?
+    @State var drawerIsSliding = false
+    @State var drawerPresentationActive = false
+    @State var drawerCleanupTask: Task<Void, Never>?
+    @GestureState var drawerGestureActive = false
+    @Environment(\.accessibilityReduceMotion) var drawerReduceMotion
+    @Environment(\.colorScheme) var drawerColorScheme
     @State var drawerSearch = ""
     /// Cached Today/Yesterday/… buckets. Grouping is Calendar work over every
     /// session; computing it inside the drawer body meant it re-ran on every
@@ -609,7 +613,7 @@ struct ContentView: View {
                 }
             }
             .background(PokiTheme.background)
-            .tint(PokiTheme.primaryText)
+            .tint(PokiTheme.blueText)
             .onAppear { PokiTheme.applyGlobalAppearance() }
             .overlay(alignment: .top) {
                 if let toast = forceSyncToast {
@@ -1000,7 +1004,7 @@ struct ContentView: View {
                         // how dark mode looks today.
                         ProgressView()
                             .controlSize(.large)
-                            .tint(PokiTheme.primaryText)
+                            .tint(PokiTheme.blueText)
                         if let p = exportProgress, p.total > 0 {
                             Text(AppLocalized("Exporting… \(p.done) / \(p.total)"))
                                 .font(.subheadline)

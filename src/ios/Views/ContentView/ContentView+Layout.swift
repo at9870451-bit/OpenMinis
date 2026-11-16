@@ -23,67 +23,6 @@ struct DrawerSessionGroup: Identifiable, Equatable {
 private let shareLog = AppLogger(category: "Share")
 private let draftLog = AppLogger(category: "DraftSession")
 
-// MARK: - Root tabs
-
-/// Bottom-tab roots. Every tab maps to a surface that already exists in the
-/// app — no tab is a placeholder.
-enum AppTab: String, CaseIterable, Identifiable {
-    case chat, agent, tasks, memory, profile
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .chat:    return AppLocalized("Chat")
-        case .agent:   return AppLocalized("Agent")
-        case .tasks:   return AppLocalized("Tasks")
-        case .memory:  return AppLocalized("Memory")
-        case .profile: return AppLocalized("Profile")
-        }
-    }
-
-    var symbol: String {
-        switch self {
-        case .chat:    return "bubble.left.and.bubble.right.fill"
-        case .agent:   return "person.2.wave.2.fill"
-        case .tasks:   return "checklist"
-        case .memory:  return "brain.head.profile"
-        case .profile: return "person.crop.circle"
-        }
-    }
-}
-
-/// Floating glass tab bar (Apple-material, no gradients).
-struct AmoreTabBar: View {
-    @Binding var selection: AppTab
-
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(AppTab.allCases) { tab in
-                Button {
-                    selection = tab
-                } label: {
-                    VStack(spacing: 3) {
-                        Image(systemName: tab.symbol)
-                            .font(.system(size: 17, weight: .semibold))
-                        Text(tab.title)
-                            .font(.system(size: 10, weight: .medium))
-                            .lineLimit(1)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .foregroundStyle(selection == tab ? PokiTheme.tagText : PokiTheme.secondaryText)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(selection == tab ? [.isSelected] : [])
-            }
-        }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 6)
-        .background(PokiTheme.surface, in: Capsule())
-        .overlay(Capsule().strokeBorder(PokiTheme.divider, lineWidth: 0.5))
-    }
-}
-
 /// Local execution history. Reads `AgentJobRegistry` directly — these are the
 /// same jobs the agent loop and the scheduler create, not placeholder rows.
 struct TasksCenterView: View {
@@ -214,61 +153,88 @@ extension ContentView {
     // MARK: - Stack Layout (iPhone / narrow window)
 
     var stackLayout: some View {
-        let drawerWidth = UIScreen.main.bounds.width
-        let p = min(1, max(0, drawerProgress))
+        GeometryReader { geometry in
+            let drawerWidth = PokiDrawerMetrics.travel(for: geometry.size.width)
+            let progress = min(1, max(0, drawerProgress))
+            let radius = min(1, progress / 0.15) * max(34, max(geometry.safeAreaInsets.top, geometry.safeAreaInsets.bottom))
+            ZStack(alignment: .leading) {
+                PokiTheme.sidebar.ignoresSafeArea()
+                historyDrawer
+                    .frame(width: drawerWidth, height: geometry.size.height)
+                    .offset(x: drawerReduceMotion ? 0 : -24 * (1 - progress))
+                    .opacity(drawerReduceMotion ? progress : (progress > 0 ? 0.55 + 0.45 * progress : 0))
+                    .allowsHitTesting(showHistoryDrawer && !drawerIsSliding)
+                    .accessibilityHidden(!showHistoryDrawer)
+                    .zIndex(drawerReduceMotion ? 2 : 0)
 
-        return ZStack(alignment: .leading) {
-            // Conversation panel: recedes behind the drawer as it opens,
-            // shrinking and shifting right so the glass panel reads as a
-            // foreground layer with real depth.
-            chatStack
-            .background {
-                EdgeSwipeCatcher(
-                    onProgress: { fraction in
-                        drawerDragProgress = fraction
-                    },
-                    onEnd: { fraction, velocity in
-                        snapDrawer(open: fraction > 0.5 || velocity > 500)
+                chatStack
+                    .accessibilityHidden(showHistoryDrawer)
+                    .background {
+                        EdgeSwipeCatcher(enabled: !showHistoryDrawer && runtimePage == nil && activeToolSheet == nil,
+                            onProgress: { fraction in
+                                drawerCleanupTask?.cancel()
+                                drawerPresentationActive = true
+                                drawerIsSliding = true
+                                drawerDragProgress = fraction
+                            }, onEnd: { fraction, velocity in
+                                drawerIsSliding = false
+                                let projected = fraction + velocity / max(1, drawerWidth) / 6
+                                snapDrawer(open: projected > 0.45)
+                            })
+                            .allowsHitTesting(false)
                     }
-                )
-                .allowsHitTesting(false)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-            // A small shift (not a full drawer-width one) keeps the page's
-            // trailing rounded corner on screen, which is what reads as depth.
-            .offset(x: drawerWidth * 0.14 * p)
-            .overlay(Color.black.opacity(0.18 * p))
-            .zIndex(0)
-
-            // Close catcher: tap/drag anywhere on the conversation closes the
-            // drawer. Drawn under the panel so drawer controls stay tappable.
-            if p > 0.001 {
-                Color.white.opacity(0.001)
-                    .ignoresSafeArea()
-                    .contentShape(Rectangle())
-                    .onTapGesture { snapDrawer(open: false) }
-                    .gesture(
-                        DragGesture(minimumDistance: 12)
-                            .onChanged { value in
-                                let fraction = 1 + value.translation.width / drawerWidth
-                                drawerDragProgress = min(1, max(0, fraction))
-                            }
-                            .onEnded { value in
-                                let projected = 1 + value.predictedEndTranslation.width / drawerWidth
-                                snapDrawer(open: projected > 0.5)
-                            }
-                    )
+                    .overlay {
+                        if drawerPresentationActive {
+                            PokiConversationCover(progress: progress) { snapDrawer(open: false) }
+                                .ignoresSafeArea()
+                        }
+                    }
+                    .overlay {
+                        if drawerPresentationActive && !drawerReduceMotion {
+                            PokiConversationCorners(radius: radius)
+                                .fill(PokiTheme.sidebar, style: FillStyle(eoFill: true))
+                                .ignoresSafeArea().allowsHitTesting(false)
+                            RoundedRectangle(cornerRadius: radius, style: .continuous)
+                                .strokeBorder(PokiTheme.divider, lineWidth: 0.5)
+                                .ignoresSafeArea().allowsHitTesting(false)
+                        }
+                    }
+                    .background {
+                        if drawerPresentationActive && !drawerReduceMotion {
+                            RoundedRectangle(cornerRadius: radius, style: .continuous)
+                                .fill(PokiTheme.background)
+                                .shadow(color: .black.opacity(drawerColorScheme == .dark ? 0.22 : 0.07),
+                                        radius: 20, x: -2, y: 0)
+                                .ignoresSafeArea()
+                        }
+                    }
+                    .offset(x: drawerReduceMotion ? 0 : drawerWidth * progress)
                     .zIndex(1)
             }
-
-            // Drawer panel on TOP: glass material blurs the conversation behind
-            // it, giving a true floating surface rather than flat overlay.
-            historyDrawer
-                .frame(width: drawerWidth)
-                .frame(maxHeight: .infinity)
-                // Parked off-screen when closed; slides in with the gesture.
-                .offset(x: -drawerWidth * (1 - p))
-                .zIndex(2)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 16, coordinateSpace: .global)
+                    .updating($drawerGestureActive) { _, active, _ in active = true }
+                    .onChanged { value in
+                        guard showHistoryDrawer || drawerCloseStart != nil else { return }
+                        guard abs(value.translation.width) > abs(value.translation.height) * 1.5 else { return }
+                        if drawerCloseStart == nil { drawerCloseStart = drawerProgress }
+                        drawerIsSliding = true
+                        let fraction = (drawerCloseStart ?? 1) + value.translation.width / drawerWidth
+                        drawerDragProgress = min(1, max(0, fraction))
+                    }
+                    .onEnded { value in
+                        guard let start = drawerCloseStart else { return }
+                        drawerCloseStart = nil
+                        drawerIsSliding = false
+                        let projected = start + value.predictedEndTranslation.width / drawerWidth
+                        snapDrawer(open: projected > 0.55)
+                    },
+                including: showHistoryDrawer ? .all : .subviews
+            )
+            .onChange(of: drawerGestureActive) { active in
+                if !active, drawerCloseStart != nil { snapDrawer(open: showHistoryDrawer) }
+            }
+            .background(PokiTheme.sidebar.ignoresSafeArea())
         }
         .sheet(item: $runtimePage) { page in
             NavigationStack {
@@ -288,67 +254,74 @@ extension ContentView {
     }
 
     func snapDrawer(open: Bool) {
-        drawerDragProgress = nil
-        withAnimation(.spring(response: 0.34, dampingFraction: 0.86)) {
+        drawerCleanupTask?.cancel()
+        if open {
+            drawerPresentationActive = true
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
+        drawerCloseStart = nil
+        drawerIsSliding = false
+        withAnimation(drawerReduceMotion ? .easeOut(duration: 0.22)
+                      : .interactiveSpring(response: 0.42, dampingFraction: 0.88)) {
+            drawerDragProgress = nil
             showHistoryDrawer = open
+        }
+        if !open {
+            drawerCleanupTask = Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 550_000_000)
+                guard !Task.isCancelled, !showHistoryDrawer, drawerDragProgress == nil else { return }
+                drawerPresentationActive = false
+            }
         }
     }
 
-    // MARK: - ChatGPT-style history drawer
+    // MARK: - Poki-inspired solid history drawer
 
     @ViewBuilder
     private var historyDrawer: some View {
         ZStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 0) {
-                // ChatGPT-style header: brand mark, compose, and search.
-                HStack(alignment: .center, spacing: 10) {
-                    HStack(spacing: 9) {
-                        Image("AmoreLogo")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 32, height: 32)
-                            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                    .strokeBorder(Color.white.opacity(0.22), lineWidth: 0.5)
-                            }
-                        Text("Amore")
-                            .font(.system(size: 25, weight: .bold))
-                            .foregroundStyle(PokiTheme.primaryText)
-                            .lineLimit(1)
-                    }
-                    Spacer(minLength: 4)
-                    Button {
-                        snapDrawer(open: false)
-                        startHomeChat()
-                    } label: {
-                        Image(systemName: "square.and.pencil")
-                            .font(.system(size: 17, weight: .medium))
-                            .foregroundStyle(PokiTheme.primaryText)
-                            .frame(width: 40, height: 40)
-                            .background(Circle().fill(PokiTheme.surface))
-                    }
-                    .buttonStyle(DrawerIconButtonStyle())
-                    .accessibilityLabel(Text("New Chat"))
-                    Button {
-                        withAnimation(.easeOut(duration: 0.18)) {
-                            showDrawerSearch.toggle()
-                            if !showDrawerSearch { drawerSearch = "" }
+                HStack(spacing: 12) {
+                    Button { showDrawerAccountMenu = true } label: {
+                        HStack(spacing: 10) {
+                            Image("AmoreLogo")
+                                .resizable().scaledToFit()
+                                .frame(width: 32, height: 32)
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            Text("Amore")
+                                .font(.system(size: 28, weight: .bold))
+                                .foregroundStyle(PokiTheme.primaryText)
                         }
-                        if showDrawerSearch { drawerSearchFocused = true }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text(AppLocalized("Account")))
+                    .confirmationDialog(AppLocalized("Account"), isPresented: $showDrawerAccountMenu, titleVisibility: .visible) {
+                        Button(AppLocalized("Personalize Amore")) {
+                            snapDrawer(open: false)
+                            runtimePage = .soul
+                        }
+                        Button(AppLocalized("Settings")) {
+                            snapDrawer(open: false)
+                            activeToolSheet = .settings
+                        }
+                        Button(AppLocalized("Cancel"), role: .cancel) { }
+                    }
+                    Spacer()
+                    Button {
+                        showDrawerSearch.toggle()
+                        if !showDrawerSearch { drawerSearch = "" }
                     } label: {
                         Image(systemName: "magnifyingglass")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(PokiTheme.primaryText)
-                            .frame(width: 40, height: 40)
-                            .background(Circle().fill(PokiTheme.surface))
+                            .font(.system(size: 17, weight: .medium))
+                            .foregroundStyle(PokiTheme.sidebarInk)
+                            .frame(width: 44, height: 44)
                     }
-                    .buttonStyle(DrawerIconButtonStyle())
-                    .accessibilityLabel(Text("Search"))
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text(AppLocalized("Search chats")))
                 }
-                .padding(.horizontal, 18)
-                .padding(.top, 14)
-                .padding(.bottom, 10)
+                .padding(.horizontal, 24)
+                .padding(.top, 8)
+                .padding(.bottom, 12)
 
                 if showDrawerSearch {
                     HStack(spacing: 8) {
@@ -379,14 +352,6 @@ extension ContentView {
                     drawerNavRow(.subAgents)
                     drawerNavRow(.skills)
                     drawerNavRow(.memory)
-                    Button {
-                        withAnimation(.easeOut(duration: 0.2)) { showHistoryDrawer = false }
-                        showTerminal = true
-                    } label: {
-                        Label(AppLocalized("Terminal"), systemImage: "terminal")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .buttonStyle(DrawerRowButtonStyle())
                     drawerNavRow(.rootfs)
                     localBotNavRow
                 }
@@ -433,9 +398,9 @@ extension ContentView {
                         } else {
                             ForEach(groups, id: \.label) { group in
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(group.label)
-                                        .font(.system(size: 13, weight: .semibold))
-                                        .foregroundStyle(PokiTheme.secondaryText)
+                                    Text(LocalizedStringKey(group.label))
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(PokiTheme.sidebarHeading)
                                         .padding(.horizontal, 20)
                                         .padding(.top, 6)
                                     ForEach(group.sessions) { session in
@@ -447,109 +412,54 @@ extension ContentView {
                     }
                     .padding(.bottom, 10)
                 }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.immediately)
 
                 Rectangle()
                     .fill(PokiTheme.divider)
                     .frame(height: 0.5)
                     .padding(.horizontal, 18)
 
-                // Fixed account/profile area; independent of the history scroll.
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     Button {
-                        showDrawerAccountMenu = true
+                        guard !drawerIsSliding else { return }
+                        startHomeChat()
+                        snapDrawer(open: false)
                     } label: {
-                        HStack(spacing: 10) {
-                            Group {
-                                if SoulStore.cachedMetadata.iconIsImage,
-                                   let image = SoulIconImage.decode(SoulStore.cachedMetadata.icon) {
-                                    Image(uiImage: image).resizable().scaledToFill()
-                                } else {
-                                    Text(SoulStore.cachedMetadata.displayIcon)
-                                        .font(.system(size: 20))
-                                }
-                            }
-                            .frame(width: 38, height: 38)
-                            .background(Circle().fill(PokiTheme.surface))
-                            .clipShape(Circle())
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(soulName.isEmpty ? "Amore" : soulName)
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundStyle(PokiTheme.primaryText)
-                                    .lineLimit(1)
-                                Text("Personal account")
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(PokiTheme.secondaryText)
-                                    .lineLimit(1)
-                            }
-                            Spacer(minLength: 0)
+                        ViewThatFits(in: .horizontal) {
+                            Label(AppLocalized("New Conversation"), systemImage: "square.and.pencil")
+                                .font(.callout.weight(.semibold))
+                                .padding(.horizontal, 16)
+                                .frame(height: 48)
+                            Image(systemName: "square.and.pencil")
+                                .font(.body.weight(.semibold)).frame(width: 48, height: 48)
                         }
-                        .contentShape(Rectangle())
+                        .foregroundStyle(.white)
+                        .background(PokiTheme.blue, in: Capsule())
+                        .overlay(Capsule().strokeBorder(Color.white.opacity(0.3), lineWidth: 0.5))
                     }
-                    .buttonStyle(DrawerRowButtonStyle())
-                    .confirmationDialog("Account", isPresented: $showDrawerAccountMenu, titleVisibility: .visible) {
-                        Button("Settings") {
-                            // Dismiss instantly, then present. Running a spring close and a
-                            // sheet presentation at once was the visible hitch.
-                            drawerDragProgress = nil
-                            showHistoryDrawer = false
-                            activeToolSheet = .settings
-                        }
-                        Button("Personalize Amore") {
-                            drawerDragProgress = nil
-                            showHistoryDrawer = false
-                            runtimePage = .soul
-                        }
-                        Button("Cancel", role: .cancel) {}
-                    } message: {
-                        Text("Personal account · Free")
-                    }
+                    .buttonStyle(.plain)
+                    Spacer(minLength: 0)
                     Button {
-                        drawerDragProgress = nil
-                        showHistoryDrawer = false
+                        snapDrawer(open: false)
                         activeToolSheet = .settings
                     } label: {
                         Image(systemName: "gearshape")
-                            .font(.system(size: 17, weight: .medium))
-                            .foregroundStyle(PokiTheme.primaryText)
-                            .frame(width: 40, height: 40)
-                            .background(Circle().fill(PokiTheme.surface))
+                            .font(.system(size: 19, weight: .medium))
+                            .foregroundStyle(PokiTheme.sidebarInk)
+                            .frame(width: 48, height: 48)
+                            .background(Circle().fill(PokiTheme.blueSoft))
+                            .overlay(Circle().strokeBorder(PokiTheme.divider, lineWidth: 0.5))
                     }
-                    .buttonStyle(DrawerIconButtonStyle())
-                    .accessibilityLabel(Text("Settings"))
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text(AppLocalized("Settings")))
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.top, 8)
                 .padding(.bottom, 6)
             }
-            .frame(maxWidth: .infinity)
-            .frame(maxHeight: .infinity)
-            .background {
-                // Flat Poki paper keeps history readable in both appearances.
-                // The full-screen drawer geometry and swipe handling stay unchanged.
-                PokiTheme.background
-                    .ignoresSafeArea(edges: .vertical)
-            }
-            // Rounded only on the trailing edge: the panel slides out from the
-            // screen edge, so the leading corners must stay square.
-            .clipShape(
-                UnevenRoundedRectangle(
-                    topLeadingRadius: 0,
-                    bottomLeadingRadius: 0,
-                    bottomTrailingRadius: 24,
-                    topTrailingRadius: 24,
-                    style: .continuous
-                )
-            )
-            .overlay {
-                UnevenRoundedRectangle(
-                    topLeadingRadius: 0,
-                    bottomLeadingRadius: 0,
-                    bottomTrailingRadius: 24,
-                    topTrailingRadius: 24,
-                    style: .continuous
-                )
-                .strokeBorder(PokiTheme.divider, lineWidth: 0.5)
-            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(PokiTheme.sidebar.ignoresSafeArea())
             .onAppear { rebuildDrawerGroups() }
             .onChange(of: sessions) { _ in rebuildDrawerGroups() }
             .onChange(of: drawerSearch) { _ in rebuildDrawerGroups() }
@@ -671,13 +581,13 @@ extension ContentView {
     private func drawerSessionRow(_ session: ChatSession) -> some View {
         let selected = homeSessionId == session.id
         Button {
-            drawerDragProgress = nil
-            showHistoryDrawer = false
+            guard !drawerIsSliding else { return }
+            snapDrawer(open: false)
             homeSessionId = session.id
         } label: {
             HStack(spacing: 10) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(session.title?.isEmpty == false ? session.title! : "New Chat")
+                    Text(session.title?.isEmpty == false ? (session.title ?? AppLocalized("New Chat")) : AppLocalized("New Chat"))
                         .font(.system(size: 15.5, weight: .regular))
                         .foregroundStyle(PokiTheme.primaryText)
                         .lineLimit(1)

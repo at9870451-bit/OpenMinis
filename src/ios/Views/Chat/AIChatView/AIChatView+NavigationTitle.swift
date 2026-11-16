@@ -592,12 +592,12 @@ struct AIChatHeaderAvatar: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(isThinking ? PokiTheme.aiAccent : PokiTheme.surface)
+                .fill(PokiTheme.portrait)
                 .frame(width: 44, height: 44)
                 .overlay(Circle().strokeBorder(PokiTheme.divider, lineWidth: 0.5))
             Image(systemName: "sparkles")
                 .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(isThinking ? PokiTheme.tagText : PokiTheme.primaryText)
+                .foregroundStyle(PokiTheme.blueText)
                 .opacity(isThinking ? (pulse ? 1.0 : 0.55) : 1.0)
         }
         .scaleEffect(isThinking && pulse ? 1.04 : 1.0)

@@ -45,15 +45,30 @@ public enum PluginArchive {
         let scoped = selected.startAccessingSecurityScopedResource()
         defer { if scoped { selected.stopAccessingSecurityScopedResource() } }
         do {
+            let snapshot = workspace.appendingPathComponent("selection")
+            try coordinatedCopy(selected, to: snapshot, folder: folder)
+            let values = try snapshot.resourceValues(forKeys: [.isDirectoryKey, .fileSizeKey])
+            let isFolder = values.isDirectory == true
+            if !isFolder {
+                let archiveSize = values.fileSize ?? 0
+                guard archiveSize <= maximumBytes else { throw PluginArchiveError.tooLarge }
+                let handle = try FileHandle(forReadingFrom: snapshot)
+                let signature = try handle.read(upToCount: 4) ?? Data()
+                try? handle.close()
+                guard signature.starts(with: Data([0x50, 0x4b])),
+                      signature.count == 4,
+                      (signature[2] == 0x03 && signature[3] == 0x04
+                       || signature[2] == 0x05 && signature[3] == 0x06
+                       || signature[2] == 0x07 && signature[3] == 0x08) else {
+                    throw PluginArchiveError.invalid("Selected file is not a ZIP archive")
+                }
+            }
             let output = workspace.appendingPathComponent("contents", isDirectory: true)
-            if folder {
-                try coordinatedCopy(selected, to: output, folder: true)
+            if isFolder {
+                try validateDirectory(snapshot)
+                try fm.moveItem(at: snapshot, to: output)
             } else {
-                let archiveURL = workspace.appendingPathComponent("package.zip")
-                try coordinatedCopy(selected, to: archiveURL)
-                let size = try archiveURL.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-                guard size <= maximumBytes else { throw PluginArchiveError.tooLarge }
-                try extract(archiveURL, to: output)
+                try extract(snapshot, to: output)
             }
             let plugin = try locateManifest(in: output)
             try validateDirectory(plugin)
@@ -174,24 +189,32 @@ public enum PluginArchive {
         }.standardizedFileURL
     }
 
+    /// Selection mode is only a picker hint. File Provider metadata and stale
+    /// SwiftUI presentation state must never classify an ordinary ZIP as a folder.
     private static func coordinatedCopy(_ source: URL, to target: URL, folder: Bool = false) throws {
         let coordinator = NSFileCoordinator()
         var coordinationError: NSError?
         var copyError: Error?
         coordinator.coordinate(readingItemAt: source, options: [], error: &coordinationError) { readable in
             do {
-                if folder { try validateDirectory(readable) }
-                else {
-                    let info = try readable.resourceValues(forKeys: [.fileSizeKey, .isRegularFileKey, .isSymbolicLinkKey])
-                    guard info.isRegularFile == true, info.isSymbolicLink != true else {
-                        throw PluginArchiveError.invalid("Choose a ZIP file")
-                    }
-                    guard (info.fileSize ?? 0) <= maximumBytes else { throw PluginArchiveError.tooLarge }
+                let fm = FileManager.default
+                let resolved = readable.standardizedFileURL.resolvingSymlinksInPath()
+                var isDirectory: ObjCBool = false
+                guard fm.fileExists(atPath: resolved.path, isDirectory: &isDirectory) else {
+                    throw CocoaError(.fileReadNoSuchFile)
                 }
-                try FileManager.default.copyItem(at: readable, to: target)
-                if folder { try validateDirectory(target) }
-            }
-            catch { copyError = error }
+                if isDirectory.boolValue {
+                    try validateDirectory(resolved)
+                } else {
+                    let values = try resolved.resourceValues(forKeys: [.fileSizeKey, .isRegularFileKey])
+                    guard values.isRegularFile == true else {
+                        throw PluginArchiveError.invalid("Choose a ZIP file or a plugin folder")
+                    }
+                    guard (values.fileSize ?? 0) <= maximumBytes else { throw PluginArchiveError.tooLarge }
+                }
+                try fm.copyItem(at: resolved, to: target)
+                if isDirectory.boolValue { try validateDirectory(target) }
+            } catch { copyError = error }
         }
         if let coordinationError { throw coordinationError }
         if let copyError { throw copyError }

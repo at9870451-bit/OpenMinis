@@ -759,7 +759,7 @@ struct AIChatView: View {
         })
         .background(ChatColors.background)
         .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryText)
+        .tint(PokiTheme.blueText)
         .onDrop(of: [.image, .movie, .fileURL, .data], isTargeted: $isDropTargeted) { providers in
             handleDropProviders(providers)
             return true

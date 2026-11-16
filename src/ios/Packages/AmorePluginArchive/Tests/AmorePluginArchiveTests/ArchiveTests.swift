@@ -31,6 +31,50 @@ final class ArchiveTests: XCTestCase {
         defer { PluginArchive.discard(prepared) }
         XCTAssertFalse(prepared.manifestData.isEmpty)
     }
+    func testEvansRepoZIPIsNotMisclassifiedByFolderPickerMode() throws {
+        let folder = root
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let selected = folder.appendingPathComponent("evans-repo.zip")
+        try FileManager.default.copyItem(at: fixture("wrapped-release"), to: selected)
+        for folderHint in [false, true] {
+            let prepared = try PluginArchive.prepare(from: selected, folder: folderHint)
+            XCTAssertTrue(FileManager.default.fileExists(atPath: prepared.pluginDirectory.appendingPathComponent("index.js").path))
+            PluginArchive.discard(prepared)
+        }
+    }
+    func testSelectedProviderAliasToZIPCanBeRead() throws {
+        let folder = root
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let alias = folder.appendingPathComponent("evans-repo.zip")
+        try FileManager.default.createSymbolicLink(at: alias, withDestinationURL: fixture("valid-deflated"))
+        let prepared = try PluginArchive.prepare(from: alias, folder: true)
+        defer { PluginArchive.discard(prepared) }
+        XCTAssertFalse(prepared.manifestData.isEmpty)
+    }
+    func testInvalidZIPReportsArchiveErrorNotUnsafeFilename() throws {
+        let folder = root
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let selected = folder.appendingPathComponent("evans-repo.zip")
+        try Data("not a zip".utf8).write(to: selected)
+        XCTAssertThrowsError(try PluginArchive.prepare(from: selected, folder: true)) { error in
+            guard case PluginArchiveError.invalid = error else {
+                XCTFail("Wrong failure classification: \(error)")
+                return
+            }
+        }
+    }
+    func testFolderIsDetectedWithoutFolderPickerHint() throws {
+        let source = root
+        try FileManager.default.createDirectory(at: source, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: source) }
+        try Data("{}".utf8).write(to: source.appendingPathComponent("manifest.json"))
+        let prepared = try PluginArchive.prepare(from: source, folder: false)
+        defer { PluginArchive.discard(prepared) }
+        XCTAssertEqual(prepared.manifestData, Data("{}".utf8))
+    }
     func testFolderImport() throws {
         let source = root
         try FileManager.default.createDirectory(at: source, withIntermediateDirectories: true)
