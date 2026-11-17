@@ -529,7 +529,12 @@ struct AIChatView: View {
     /// (file was deleted, the session was pruned, or iCloud hasn't synced yet).
     @State var missingMinisFileName: String?
 
-    var body: some View {
+    /// Fixed semantic boundaries keep SwiftUI's generic type checker below
+    /// its Release-build complexity limit. Modifier order and all original
+    /// actions/state owners are unchanged; no new model or navigation tree.
+    var body: some View { chatForegroundContent }
+
+    private var chatMessageCanvas: AnyView {
         // [T-ios-chat-body-stack-erase] Type-erase the page's content before
         // the ~80-modifier chain below. Most of those modifiers (.sheet,
         // .onChange, .onReceive, .alert, ...) return an opaque `some View`
@@ -752,6 +757,11 @@ struct AIChatView: View {
             // Full-screen kernel boot overlay
             kernelBootOverlay
         })
+
+    }
+
+    private var chatNavigationContent: AnyView {
+        AnyView(chatMessageCanvas
         .background { AmoreChatBackdrop(home: vm.messages.isEmpty && !vm.isLoadingSession) }
         .foregroundStyle(PokiTheme.primaryText)
         .tint(PokiTheme.blueText)
@@ -820,6 +830,11 @@ struct AIChatView: View {
         // [T-ios-navbar-menu-baritem] Outside the equatable host on purpose:
         // its update pass is what refreshes the menu's action closures.
         .background(navBarMenuInstaller)
+        )
+    }
+
+    private var chatPermissionContent: AnyView {
+        AnyView(chatNavigationContent
         .sheet(item: $titlePillEditSession) { session in
             SessionEditSheet(session: session) { newTitle, newCategory in
                 Task {
@@ -1014,6 +1029,11 @@ struct AIChatView: View {
         .modifier(RerunFromToolBlockListener(vm: vm))
         .modifier(ChatSearchHostModifier(search: vm.chatSearch, isActive: $isChatSearchActive,
                                          inputFocused: $inputFocused))
+        )
+    }
+
+    private var chatMediaContent: AnyView {
+        AnyView(chatPermissionContent
         .fullScreenCover(item: $previewVideoFile) { fileURL in
             MinisVideoFullscreenPlayer(fileURL: fileURL)
         }
@@ -1136,6 +1156,11 @@ struct AIChatView: View {
                   target.sessionId == vm.sessionId else { return }
             openSharePicker(selecting: target.messageId)
         }
+        )
+    }
+
+    private var chatSessionContent: AnyView {
+        AnyView(chatMediaContent
         .sheet(isPresented: $showSessionSkills) {
             // Pass the real id (nil for a draft) plus an ensure-session closure
             // so a pre-first-message toggle binds its override to the session
@@ -1262,6 +1287,11 @@ struct AIChatView: View {
                 }
             )
         }
+        )
+    }
+
+    private var chatImportContent: AnyView {
+        AnyView(chatSessionContent
         .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhotoItems,
                       maxSelectionCount: 50, matching: .any(of: [.images, .videos]))
         .onChange(of: selectedPhotoItems) { items in
@@ -1350,6 +1380,11 @@ struct AIChatView: View {
                 AlwaysOnController.shared.chatKeyChanged(from: vm.draftId, to: newId)
             }
         }
+        )
+    }
+
+    private var chatMountContent: AnyView {
+        AnyView(chatImportContent
         .onAppear {
             wireComposerActions()
             // [OpenMinis#433] Back on screen with a page popped off it: this
@@ -1602,6 +1637,11 @@ struct AIChatView: View {
         // somewhere else on screen. One modifier for both conditions — a
         // second, outer `.ignoresSafeArea` could not undo an inner one that
         // respects the keyboard.
+        )
+    }
+
+    private var chatForegroundContent: AnyView {
+        AnyView(chatMountContent
         .ignoresSafeArea(
             .keyboard,
             edges: ((voiceInputActive && !voiceVM.isEditingTranscript) || keyboardUndocked) ? .bottom : []
@@ -1817,5 +1857,7 @@ struct AIChatView: View {
         // descendants (e.g. ToolCapsuleView's long-press menu) can react to
         // `vm.isProcessing` without threading the vm through every level.
         .environmentObject(vm)
+        )
     }
+
 }
