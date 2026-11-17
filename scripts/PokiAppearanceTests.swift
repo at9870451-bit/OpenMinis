@@ -66,29 +66,51 @@ final class PokiAppearanceTests: XCTestCase {
         for dark in [false, true] {
             for home in [false, true] {
                 let view = AppearanceChatReference(home: home, drawer: false)
-                try snapshot(view, dark: dark, name: "Amore-" + (home ? "Home" : "Chat") + (dark ? "-Dark" : "-Light"))
+                try await snapshot(view, dark: dark, name: "Amore-" + (home ? "Home" : "Chat") + (dark ? "-Dark" : "-Light"))
             }
-            try snapshot(AppearanceChatReference(home: false, drawer: true), dark: dark,
+            try await snapshot(AppearanceChatReference(home: false, drawer: true), dark: dark,
                          name: "Amore-Drawer" + (dark ? "-Dark" : "-Light"))
-            try snapshot(AppearanceReference(), dark: dark,
+            try await snapshot(AppearanceReference(), dark: dark,
                          name: "Amore-Appearance" + (dark ? "-Dark" : "-Light"))
         }
     }
 
-    private func snapshot<V: View>(_ view: V, dark: Bool, name: String) throws {
+    private func snapshot<V: View>(_ view: V, dark: Bool, name: String) async throws {
+        let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
+        let previous = scene.windows.first(where: { $0.isKeyWindow })
         let host = UIHostingController(rootView: view.environment(\.colorScheme, dark ? .dark : .light))
-        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        let window = UIWindow(windowScene: scene)
+        window.frame = CGRect(x: 0, y: 0, width: 390, height: 844)
         window.overrideUserInterfaceStyle = dark ? .dark : .light
         window.rootViewController = host
-        window.isHidden = false
-        defer { window.isHidden = true; window.rootViewController = nil }
+        host.loadViewIfNeeded()
+        host.view.frame = window.bounds
+        window.makeKeyAndVisible()
+        defer { window.isHidden = true; window.rootViewController = nil; previous?.makeKey() }
         window.layoutIfNeeded()
-        RunLoop.main.run(until: Date().addingTimeInterval(0.10))
+        // Yield rather than spin RunLoop.main from an async MainActor test:
+        // SwiftUI must get a display transaction to create hosted content.
+        try await Task.sleep(nanoseconds: 250_000_000)
+        host.view.setNeedsLayout()
+        host.view.layoutIfNeeded()
+        window.layoutIfNeeded()
         let format = UIGraphicsImageRendererFormat(); format.scale = 2
+        var didDraw = false
         let image = UIGraphicsImageRenderer(bounds: window.bounds, format: format).image { _ in
-            window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
+            didDraw = window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
         }
-        XCTAssertNotNil(image.cgImage)
+        XCTAssertTrue(didDraw, "UIKit could not render " + name)
+        let cg = try XCTUnwrap(image.cgImage)
+        var rgba = [UInt8](repeating: 0, count: 20 * 40 * 4)
+        let context = try XCTUnwrap(CGContext(data: &rgba, width: 20, height: 40,
+            bitsPerComponent: 8, bytesPerRow: 80, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+        context.draw(cg, in: CGRect(x: 0, y: 0, width: 20, height: 40))
+        var colors = Set<Int>()
+        for i in stride(from: 0, to: rgba.count, by: 4) {
+            colors.insert((Int(rgba[i]) / 16) * 256 + (Int(rgba[i + 1]) / 16) * 16 + Int(rgba[i + 2]) / 16)
+        }
+        XCTAssertGreaterThan(colors.count, 8, "Blank/empty snapshot must not count as visual acceptance: " + name)
         let attachment = XCTAttachment(image: image)
         attachment.name = name
         attachment.lifetime = .keepAlways
