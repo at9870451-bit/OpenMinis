@@ -36,6 +36,22 @@ struct PokiConversationPanel: Shape {
     }
 }
 
+/// Compatibility surface used by component tests and small preview hosts.
+/// Production uses the same material inside PokiDrawerConversationPanel.
+struct PokiConversationCover: View {
+    let progress: CGFloat
+    let onClose: () -> Void
+    var body: some View {
+        Rectangle()
+            .fill(.ultraThinMaterial)
+            .opacity(Double(min(1, max(0, progress))))
+            .contentShape(Rectangle())
+            .onTapGesture(perform: onClose)
+            .allowsHitTesting(progress > 0.001)
+            .accessibilityHidden(progress <= 0.001)
+    }
+}
+
 /// Keeps the live chat mounted for streaming continuity. At a fully open drawer
 /// only the independent material cover is visible; no chat pixels leak through.
 struct PokiDrawerConversationPanel<Chat: View>: View {
@@ -73,16 +89,7 @@ struct PokiDrawerConversationPanel<Chat: View>: View {
                 .allowsHitTesting(phase <= 0.001)
                 .accessibilityHidden(phase > 0.001)
             if phase > 0.001 || presentationActive {
-                Rectangle()
-                    .fill(.ultraThinMaterial)
-                    .opacity(Double(phase))
-                    .contentShape(Rectangle())
-                    .onTapGesture(perform: onClose)
-                    .allowsHitTesting(phase > 0.001)
-                    .accessibilityHidden(phase <= 0.001)
-                    .accessibilityLabel(Text(AppLocalized("Close conversations")))
-                    .accessibilityAddTraits(.isButton)
-                    .accessibilityAction { onClose() }
+                PokiConversationCover(progress: phase, onClose: onClose)
             }
         }
         .frame(width: bounds.size.width, height: bounds.size.height)
