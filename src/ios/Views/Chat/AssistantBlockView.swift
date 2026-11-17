@@ -28,12 +28,11 @@ struct AssistantBlockView: View {
         switch block.kind {
         case .text:
             if !block.content.isEmpty {
+                // Paint-only surface: V3 firstDisplaySeed/precalc add exactly
+                // these 4 pt; keep the text width and TextKit insets unchanged.
                 textBlockView
                     .padding(.vertical, 2)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(ChatColors.accent.opacity(isHighlighted ? 0.10 : 0))
-                    )
+                    .background(PokiAssistantMessageSurface(isHighlighted: isHighlighted))
             }
         case .thinking:
             ThinkingBlockView(

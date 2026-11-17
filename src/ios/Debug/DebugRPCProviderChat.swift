@@ -1608,13 +1608,9 @@ enum DebugRPCChat {
         let mode = try require(params["mode"] as? Int, "mode")
         guard (0...2).contains(mode) else { throw DebugRPCErr(-32602, "mode must be 0(system)/1(light)/2(dark)") }
         await MainActor.run {
-            UserDefaults.standard.set(mode, forKey: "appearanceMode")
-            for scene in UIApplication.shared.connectedScenes {
-                guard let ws = scene as? UIWindowScene else { continue }
-                for window in ws.windows {
-                    window.overrideUserInterfaceStyle = mode == 1 ? .light : mode == 2 ? .dark : .unspecified
-                }
-            }
+            let appearance: AmoreAppearance = mode == 1 ? .light : mode == 2 ? .dark : .automatic
+            UserDefaults.standard.set(appearance.rawValue, forKey: AmoreAppearance.storageKey)
+            appearance.applyToAppWindows()
         }
         return ["mode": mode]
     }

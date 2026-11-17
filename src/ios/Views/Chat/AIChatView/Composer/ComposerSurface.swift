@@ -81,27 +81,12 @@ struct FloatingCircleButtonSurface: ViewModifier {
 /// preserves the invariant rather than reintroducing the bug. Verified on device
 /// by long-pressing composer text to raise the edit menu — see the task notes.
 ///
-/// The two hand-rolled shadows are dropped on the glass path (Liquid Glass
-/// renders its own edge and shadow; stacking the old ones reads as a dark halo —
-/// the same finding as the FAB conversion). The sub-26 branch keeps the original
-/// fill and BOTH shadows byte-for-byte, including the dark-mode-only top shadow
-/// that lifts the bar off the message list.
+/// Poki's single-sheet input surface: current iOS uses native regular glass;
+/// iOS16/17/18 use bar material and a system-grey hairline. No additional solid
+/// tint or shadow is stacked over it, and no editor geometry is changed.
 struct ComposerSurface: ViewModifier {
-    private var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: PokiTheme.Radius.composer, style: .continuous)
-    }
-
     func body(content: Content) -> some View {
-        content
-            .background {
-                ZStack {
-                    shape.fill(.ultraThinMaterial)
-                    shape.fill(PokiTheme.floatingSurface)
-                }
-            }
-            .clipShape(shape)
-            .overlay(shape.strokeBorder(PokiTheme.divider, lineWidth: 0.5))
-            .shadow(color: PokiTheme.shadowSoft, radius: 10, x: 0, y: 3)
+        content.modifier(PokiComposerMaterial())
     }
 }
 
@@ -140,7 +125,7 @@ struct ComposerContextGlow: View {
     /// Must match ComposerSurface's shape exactly: it is the stroke path and
     /// the clip that keeps the glow inside the wall.
     private var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 24, style: .continuous)
+        RoundedRectangle(cornerRadius: PokiTheme.Radius.composer, style: .continuous)
     }
     private var color: Color {
         tier == .critical ? Color(UIColor.systemRed) : Color(UIColor.systemOrange)

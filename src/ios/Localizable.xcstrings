@@ -39064,6 +39064,29 @@
         }
       }
     },
+    "Automatic follows the iPhone’s appearance setting.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic follows the iPhone’s appearance setting."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动模式会跟随 iPhone 的系统外观设置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動模式會跟隨 iPhone 的系統外觀設定。"
+          }
+        }
+      }
+    },
     "Automatic retry": {
       "extractionState": "manual",
       "localizations": {

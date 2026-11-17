@@ -312,6 +312,7 @@ struct MinisApp: App {
                     }
                 }
                 .environmentObject(shareCoordinator)
+                .modifier(AmoreAppearanceHost())
                 .tint(PokiTheme.blueText)
                 .environment(\.locale, appLanguage.isEmpty ? .current : Locale(identifier: appLanguage))
                 .dynamicTypeSize(fontSettings.appBaseScale.dynamicTypeSize)

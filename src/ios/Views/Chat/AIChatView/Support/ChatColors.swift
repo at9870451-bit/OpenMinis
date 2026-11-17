@@ -29,13 +29,15 @@ enum ChatColors {
     static let inputIconBg = PokiTheme.surface
     static let inputIconBorder = PokiTheme.divider
     static let inputBg = PokiTheme.floatingSurface
-    static let inputBorder = PokiTheme.divider
+    static let inputBorder = PokiTheme.fieldEdge
+    static let placeholder = PokiTheme.homePlaceholder
     static let primaryText = PokiTheme.primaryText
     static let secondaryText = PokiTheme.secondaryText
     static let tertiaryText = PokiTheme.secondaryText.opacity(0.7)
-    /// Assistant replies are deliberately bubble-less; the user side keeps a
-    /// low-contrast paper tint so the two roles stay distinguishable.
-    static let userBubble = PokiTheme.surface
+    /// Poki outgoing blue stays identical in light and dark; queued messages
+    /// keep their original provisional treatment and assistant text uses its
+    /// own neutral adaptive surface.
+    static let userBubble = PokiTheme.blue
     static let toolBg = PokiTheme.surface
     static let toolBorder = PokiTheme.divider
     static let accent = PokiTheme.aiAccentStrong

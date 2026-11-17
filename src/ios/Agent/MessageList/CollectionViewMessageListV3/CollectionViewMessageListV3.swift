@@ -133,7 +133,7 @@ struct CollectionViewMessageListV3: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> MessageListViewController {
         let vc = MessageListViewController()
         context.coordinator.attach(to: vc, vm: vm)
-        let messageBackground = PokiTheme.uiBackground
+        let messageBackground = UIColor.clear
         vc.view.backgroundColor = messageBackground
         vc.collectionView.backgroundColor = messageBackground
         // Drops are handled exclusively by the SwiftUI `.onDrop` on the chat
@@ -146,7 +146,7 @@ struct CollectionViewMessageListV3: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ vc: MessageListViewController, context: Context) {
-        let messageBackground = PokiTheme.uiBackground
+        let messageBackground = UIColor.clear
         vc.view.backgroundColor = messageBackground
         vc.collectionView.backgroundColor = messageBackground
         let coord = context.coordinator

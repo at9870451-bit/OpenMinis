@@ -1771,7 +1771,7 @@ struct PastableTextView: UIViewRepresentable {
         let placeholderLabel = UILabel()
         placeholderLabel.text = placeholder
         placeholderLabel.font = UIFont.systemFont(ofSize: FontSettings.shared.scaledChatInput(16.5))
-        placeholderLabel.textColor = PokiTheme.uiSecondaryText
+        placeholderLabel.textColor = PokiTheme.uiHomePlaceholder
         placeholderLabel.tag = 999
         placeholderLabel.numberOfLines = 0
         placeholderLabel.lineBreakMode = .byWordWrapping

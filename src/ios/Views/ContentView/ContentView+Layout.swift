@@ -420,10 +420,9 @@ extension ContentView {
                                 .font(.body.weight(.semibold)).frame(width: 48, height: 48)
                         }
                         .foregroundStyle(.white)
-                        .background(PokiTheme.blue, in: Capsule())
-                        .overlay(Capsule().strokeBorder(Color.white.opacity(0.3), lineWidth: 0.5))
                     }
                     .buttonStyle(.plain)
+                    .pokiControl(in: Capsule(), tint: PokiTheme.blue)
                     Spacer(minLength: 0)
                     Button {
                         snapDrawer(open: false)
@@ -433,10 +432,9 @@ extension ContentView {
                             .font(.system(size: 19, weight: .medium))
                             .foregroundStyle(PokiTheme.sidebarInk)
                             .frame(width: 48, height: 48)
-                            .background(Circle().fill(PokiTheme.blueSoft))
-                            .overlay(Circle().strokeBorder(PokiTheme.divider, lineWidth: 0.5))
                     }
                     .buttonStyle(.plain)
+                    .pokiControl(in: Circle())
                     .accessibilityLabel(Text(AppLocalized("Settings")))
                 }
                 .padding(.horizontal, 20)

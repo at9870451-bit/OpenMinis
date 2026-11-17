@@ -79,24 +79,16 @@ struct NavBarStyleModifier: ViewModifier {
             // starting below the bar.
             content
                 .ignoresSafeArea(.container, edges: .top)
-                .toolbarBackgroundVisibility(.visible, for: .navigationBar)
-                // [T-macos27-liquid-glass-navbar] See MacOS27GlassWorkaround in
-                // ContentView. `toolbarBackgroundVisibility(.visible)` only
-                // declares "there should be a backdrop"; the material is still
-                // produced by glass sampling — which does not render in a
-                // foreground window on macOS 27, leaving the bar fully
-                // transparent. Pin an opaque colour here instead (the same one
-                // the iOS 16–18 branch below uses). The message list is a
-                // UIKit-hosted UICollectionView, so the modifier's
-                // scrollEdgeEffectHidden is a no-op for it; what does the work
-                // here is toolbarBackground. No change needed in
-                // MessageListViewController.
+                .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
+                // Poki's controls float over the page rather than a full-width
+                // opaque header. Keep only the existing macOS glass workaround;
+                // real iOS uses the same background as the transcript.
                 .modifier(MacOS27OpaqueNavigationBar(background: ChatColors.background))
         } else {
-            // iOS 16–18: opaque navbar background
+            // iOS 16–18: same floating-control treatment, retaining the
+            // original safe-area observer and keyboard layout behavior.
             content
-                .toolbarBackground(ChatColors.background, for: .navigationBar)
-                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarBackground(.hidden, for: .navigationBar)
                 .overlay(alignment: .top) {
                     if measuresSafeArea {
                         // [T-ios-geometry-observer-crash] onGeometryChange

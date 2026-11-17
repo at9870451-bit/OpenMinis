@@ -4,28 +4,21 @@ import SwiftUI
 
 /// Opaque rounded-card preview shown under a message's long-press context menu.
 ///
-/// [T-ios-longpress-menu-preview-background] The message cells are hosted with a
-/// clear background (host.view / cell backgroundColor = .clear), and the message
-/// `.contextMenu`s are attached either to a zero-size `Color.clear` overlay
-/// (assistant block/footer) or to a bubble whose fill is the translucent
-/// `tertiarySystemFill` (user). Without an explicit `preview:`, SwiftUI snapshots
-/// that (transparent) attached view, so the long-press preview platter shows
-/// through to the messages below — the reported "transparent preview" bug.
+/// [T-ios-longpress-menu-preview-background] Cells have clear backgrounds and
+/// assistant menus attach to a zero-size Color.clear overlay. Keep an explicit
+/// opaque preview so its platter never shows messages underneath. User previews
+/// use the same blue/queued fill as their bubble; assistant previews use the
+/// adaptive white/system-grey surface.
 ///
-/// Supplying this as the `.contextMenu(preview:)` gives the platter an opaque
-/// `systemBackground` rounded card with the message text, so it reads as a
-/// floating card. System colors only, so dark mode stays correct.
-///
-/// [T-ios-longpress-preview-full-content-card] The earlier version hard-capped
-/// the text at 1500 chars with a trailing "…", which is what users saw as a
-/// "truncated" preview on long assistant messages. It now renders the FULL
-/// message content inside a vertical ScrollView: short messages size to their
-/// content, long ones are capped to a fraction of the screen height and scroll
-/// inside the platter, so the preview is both opaque
-/// and complete. An explicit measured height is required because a ScrollView
-/// has no intrinsic height — without it the context-menu platter would collapse.
+/// [T-ios-longpress-preview-full-content-card] Short previews hug their content;
+/// long ones scroll within a screen-height cap. The existing watchdog cap below
+/// still limits preview typesetting to 2000 characters (not the message itself).
+/// An explicit measured height is needed because ScrollView has no intrinsic
+/// height — without it the platter would collapse.
 struct MessageContextMenuPreview: View {
     let text: String
+    var isOutgoing = false
+    var isQueued = false
 
     /// [T-ios-usermsg-preview-adaptive-width] Width is now a CAP, not a fixed
     /// size. A short user bubble ("ok") previously lifted into a full 360pt
@@ -78,7 +71,9 @@ struct MessageContextMenuPreview: View {
             // which starts at the cap and shrinks to the measured content.
             Text(shown)
                 .font(.system(size: FontSettings.shared.scaledMessage(16.5)))
-                .foregroundStyle(ChatColors.primaryText)
+                .foregroundStyle(isOutgoing
+                                 ? (isQueued ? ChatColors.secondaryText : PokiTheme.outgoingText)
+                                 : ChatColors.primaryText)
                 .multilineTextAlignment(.leading)
                 .padding(16)
                 .background(
@@ -99,59 +94,27 @@ struct MessageContextMenuPreview: View {
             width: contentSize.width > 0 ? min(max(contentSize.width, 60), maxCardWidth) : maxCardWidth,
             height: contentSize.height > 0 ? min(contentSize.height, maxCardHeight) : maxCardHeight
         )
-        .modifier(ContextMenuPreviewSurface())
+        .modifier(ContextMenuPreviewSurface(isOutgoing: isOutgoing, isQueued: isQueued))
     }
 }
 
-/// Background for the long-press preview platter.
-///
-/// Matches `UserBubbleSurface` so lifting a bubble doesn't jump from Liquid
-/// Glass to a flat colour card — the shape (`RoundedRectangle(cornerRadius: 18)`,
-/// non-`.continuous`) is deliberately the same one the bubble and the row's
-/// `.contentShape(.contextMenuPreview, …)` already use.
-///
-/// **The opaque base stays.** [T-ios-longpress-menu-preview-background] exists
-/// because the platter was showing through to the messages underneath: cells are
-/// hosted on a clear background and the menus hang off either a zero-size
-/// `Color.clear` overlay or a `tertiarySystemFill` bubble, so SwiftUI's snapshot
-/// of the attached view was effectively transparent. Glass is a translucent
-/// material, so using it ALONE would risk re-opening exactly that bug. Painting
-/// it over `ChatColors.background` keeps the platter opaque no matter what the
-/// system composites behind it, while the material still supplies the glass
-/// highlight and edge that make it read as continuous with the bubble.
+/// Opaque, layout-neutral background for the long-press platter. Match the
+/// message direction and queued state instead of reviving the old glass fill.
 private struct ContextMenuPreviewSurface: ViewModifier {
-    private var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 18)
-    }
+    let isOutgoing: Bool
+    let isQueued: Bool
 
     func body(content: Content) -> some View {
-        content.background(shape.fill(PokiTheme.surface))
+        if isOutgoing {
+            content.modifier(UserBubbleSurface(isQueued: isQueued))
+        } else {
+            content.background(PokiAssistantMessageSurface())
+        }
     }
 }
 
-/// Preference key carrying the laid-out preview text size up to the platter.
-/// Background for the user message bubble.
-///
-/// Two states that must stay tellable apart at a glance:
-///
-///  - **Sent** (`isQueued == false`) — Liquid Glass on iOS 26+. These bubbles
-///    scroll over other messages, images and code blocks, so the material has
-///    genuinely varied content to sample; this is the case glass is for, the
-///    same as the tool-status bar and unlike `FolderSurface`, which had to fall
-///    back to a sampled constant for want of anything behind it.
-///  - **Queued** (`isQueued == true`) — deliberately NOT glass, on either OS.
-///    Glass reads as a settled, physical surface, which is the opposite of what
-///    a not-yet-sent message means. It keeps the existing empty fill + dashed
-///    border, so "queued" still looks provisional next to the solid glass of
-///    everything already sent.
-///
-/// The text is the modified content rather than an `.overlay`, which is what
-/// keeps it above the material: `.glassEffect` composites the material over the
-/// view it modifies, so an overlaid label would be painted underneath it and
-/// disappear (the FAB regression).
-/// [T-multi-select-share] True while chat rows are drawn for the share picker or an
-/// export: surfaces that only the live compositor can draw (Liquid Glass) fall back
-/// to their plain fill, so an offscreen `layer.render` still shows them.
+/// [T-multi-select-share] Preserve the export environment contract. Bubble
+/// surfaces now use flat fills on every OS, including offscreen snapshots.
 private struct ChatSnapshotRenderingKey: EnvironmentKey {
     static let defaultValue = false
 }
@@ -165,28 +128,26 @@ extension EnvironmentValues {
 
 private struct UserBubbleSurface: ViewModifier {
     let isQueued: Bool
-    @Environment(\.chatSnapshotRendering) private var snapshotRendering
 
-    /// Matches `.contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 18))`
-    /// on the row exactly — including the default (non-`.continuous`) corner
-    /// style. A `.continuous` bubble against a circular-arc preview clip would
-    /// show the corners subtly change shape as the long-press lift begins.
-    private var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 18)
+    /// Same outline as the row's context-menu preview clip. This is a paint-only
+    /// change: userRow and measureUserBubbleHeight keep their existing metrics.
+    private var shape: PokiMessageBubbleShape {
+        PokiMessageBubbleShape(direction: .outgoing)
     }
 
     func body(content: Content) -> some View {
         if isQueued {
-            // Provisional look, identical on every OS version.
+            // Still provisional, never blue/white like a delivered message.
             content
-                .background(shape.fill(Color.clear))
+                .background(shape.fill(PokiTheme.queuedBubble))
                 .overlay(
                     shape
                         .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [6, 4]))
                         .foregroundStyle(ChatColors.secondaryText.opacity(0.5))
+                        .allowsHitTesting(false)
                 )
         } else {
-            content.background(shape.fill(PokiTheme.surface))
+            content.background(shape.fill(PokiTheme.blue))
         }
     }
 }
@@ -433,7 +394,7 @@ struct ChatMessageRow: View {
                     HStack(spacing: 6) {
                         SearchHighlightText(userDisplayText, key: searchKey())
                             .font(.system(size: FontSettings.shared.scaledMessage(16.5)))
-                            .foregroundStyle(message.isQueued ? ChatColors.secondaryText : ChatColors.primaryText)
+                            .foregroundStyle(message.isQueued ? ChatColors.secondaryText : PokiTheme.outgoingText)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 10)
                             .modifier(UserBubbleSurface(isQueued: message.isQueued))
@@ -454,13 +415,9 @@ struct ChatMessageRow: View {
             }
             .modifier(MinisOpenURLHandler())
             .contentShape(Rectangle())
-            // [T-ios-usermsg-contextmenu-preview-shape] The hit-test shape above
-            // stays a full Rectangle (so the whole row is long-pressable), but
-            // the context-menu PREVIEW must clip to the bubble's rounded shape —
-            // otherwise the lifted preview shows square corners while the bubble
-            // is RoundedRectangle(cornerRadius: 18). iOS 16+ lets us specify the
-            // preview clip shape independently from the interaction shape.
-            .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 18))
+            // Keep the interaction area broad (attachments and withdraw button
+            // included), but the lifted bubble uses the same 22/7 pt outline.
+            .contentShape(.contextMenuPreview, PokiMessageBubbleShape(direction: .outgoing))
             .contextMenu {
                 Button {
                     UIPasteboard.general.string = message.content
@@ -520,7 +477,8 @@ struct ChatMessageRow: View {
             } preview: {
                 // [T-ios-longpress-menu-preview-background] Opaque card so the
                 // long-press preview isn't transparent (see MessageContextMenuPreview).
-                MessageContextMenuPreview(text: message.content)
+                MessageContextMenuPreview(text: message.content,
+                                          isOutgoing: true, isQueued: message.isQueued)
             }
         }
         .padding(.horizontal, 16)

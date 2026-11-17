@@ -7,7 +7,14 @@ cp "$ROOT/src/ios/Views/ContentView/AmoreTheme.swift" "$HOST/App/"
 cp "$ROOT/src/ios/Views/ContentView/PokiDrawerMotion.swift" "$HOST/App/"
 cp "$ROOT/src/ios/Views/ContentView/PluginImportPicker.swift" "$HOST/App/"
 cp "$ROOT/src/ios/Views/ContentView/DrawerShortcut.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/ContentView/AmoreAppearance.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/ContentView/AmoreChatBackdrop.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/ContentView/PokiMessageSurface.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/ContentView/PokiComposerMaterial.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/ContentView/PokiControlSurface.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/Chat/AIChatView/Support/ChatColors.swift" "$HOST/App/"
 cp "$ROOT/scripts/PokiComponentTests.swift" "$HOST/Tests/"
+cp "$ROOT/scripts/PokiAppearanceTests.swift" "$HOST/Tests/"
 cat > "$HOST/App/HostApp.swift" <<'EOF'
 import SwiftUI
 import UIKit

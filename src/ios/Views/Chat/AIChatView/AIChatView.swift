@@ -552,11 +552,6 @@ struct AIChatView: View {
             // y = 0, under the status bar's clock and battery. They now live in
             // `topBanners`, below the bar, with the scheduled-task banner.
             messagesArea
-                .overlay(alignment: .top) {
-                    AIChatHeaderAvatar(isThinking: vm.messages.last?.shouldShowTypingIndicator ?? false)
-                        .padding(.top, 6)
-                        .allowsHitTesting(false)
-                }
                 .overlay(alignment: .bottom) {
                     // Tool preview + input bar stacked at the bottom.
                     // Both overlay on top of the message list for immersive scrolling.
@@ -757,7 +752,7 @@ struct AIChatView: View {
             // Full-screen kernel boot overlay
             kernelBootOverlay
         })
-        .background(ChatColors.background)
+        .background { AmoreChatBackdrop(home: vm.messages.isEmpty && !vm.isLoadingSession) }
         .foregroundStyle(PokiTheme.primaryText)
         .tint(PokiTheme.blueText)
         .onDrop(of: [.image, .movie, .fileURL, .data], isTargeted: $isDropTargeted) { providers in
@@ -784,7 +779,12 @@ struct AIChatView: View {
         // below it. The banner observes the job registry and ticks in its own
         // view, so this body re-renders only when its height changes.
         .safeAreaInset(edge: .top, spacing: 0) {
-            topBanners
+            VStack(spacing: 0) {
+                AIChatHeaderAvatar(isThinking: vm.isProcessing && (vm.messages.last?.shouldShowTypingIndicator ?? true))
+                    .padding(.vertical, 6)
+                    .allowsHitTesting(false)
+                topBanners
+            }
                 .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
                     if abs(height - topBannersHeight) > 0.5 { topBannersHeight = height }
                 }

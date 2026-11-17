@@ -21,6 +21,19 @@ enum PokiTheme {
     // 77254611596335464927258f62c7641b95ef2d02. No brand artwork is copied.
     static let uiBackground = pair(0xF5F8FC, 0x05070D)
     static let uiPrimaryText = UIColor.label
+    static let uiAssistantBubble = UIColor.secondarySystemGroupedBackground
+    static let uiSettingsBackground = UIColor.systemGroupedBackground
+    static let uiSettingsCard = UIColor.secondarySystemGroupedBackground
+    static let uiFieldEdge = UIColor.systemGray4
+    static let uiHomeSecondary = pair(0x5F676C, 0x8E959A)
+    static let uiHomePlaceholder = pair(0x3D4549, 0xC7CCD6)
+    static let uiHomeNote = pair(0x444C51, 0xC7CCD6)
+    static let uiBubbleRing = UIColor { traits in
+        UIColor.white.withAlphaComponent(traits.userInterfaceStyle == .dark ? 0.18 : 0)
+    }
+    static let uiBubbleShadow = UIColor { traits in
+        rgba(0x11191C, alpha: traits.userInterfaceStyle == .dark ? 0 : 0.05)
+    }
     static let uiSecondaryText = UIColor.secondaryLabel
     static let uiSurface = UIColor.secondarySystemBackground
     static let uiDivider = UIColor.systemGray5
@@ -59,6 +72,17 @@ enum PokiTheme {
 
     static let background = Color(uiBackground)
     static let primaryText = Color(uiPrimaryText)
+    static let assistantBubble = Color(uiAssistantBubble)
+    static let settingsBackground = Color(uiSettingsBackground)
+    static let settingsCard = Color(uiSettingsCard)
+    static let fieldEdge = Color(uiFieldEdge)
+    static let homeSecondary = Color(uiHomeSecondary)
+    static let homePlaceholder = Color(uiHomePlaceholder)
+    static let homeNote = Color(uiHomeNote)
+    static let bubbleRing = Color(uiBubbleRing)
+    static let bubbleShadow = Color(uiBubbleShadow)
+    static let outgoingText = Color.white
+    static let queuedBubble = Color(uiSurface)
     static let secondaryText = Color(uiSecondaryText)
     static let surface = Color(uiSurface)
     static let divider = Color(uiDivider)
@@ -102,7 +126,7 @@ enum PokiTheme {
         static let chip: CGFloat = 12
         static let row: CGFloat = 12
         static let card: CGFloat = 20
-        static let composer: CGFloat = 24
+        static let composer: CGFloat = 28
         static let panel: CGFloat = 24
         static let screen: CGFloat = 28
     }

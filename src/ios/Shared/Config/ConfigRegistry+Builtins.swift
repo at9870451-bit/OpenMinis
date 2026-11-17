@@ -1232,6 +1232,24 @@ extension ConfigRegistry {
 
     @MainActor
     private static func registerAppearance(into r: ConfigRegistry) {
+        r.register(ClosureField(
+            path: "appearance.theme",
+            displayName: "Theme",
+            description: "Automatic system appearance, or a user-selected light or dark look.",
+            valueSchema: .stringEnum(["system", "light", "dark"]),
+            readable: ConfigReadable(.enumLabels(["system": "Automatic", "light": "Light", "dark": "Dark"])),
+            reader: {
+                let raw = UserDefaults.standard.string(forKey: AmoreAppearance.storageKey) ?? ""
+                let mode = AmoreAppearance.resolved(raw)
+                return .string(mode == .automatic ? "system" : mode.rawValue)
+            },
+            writer: { value in
+                guard case .string(let raw) = value else { throw ConfigError.typeMismatch(expected: "string") }
+                let mode = AmoreAppearance.resolved(raw == "system" ? "" : raw)
+                UserDefaults.standard.set(mode.rawValue, forKey: AmoreAppearance.storageKey)
+                mode.applyToAppWindows()
+            }
+        ))
         r.register(AppStorageIntCodedEnumField(
             path: "appearance.appIcon",
             displayName: "App icon",

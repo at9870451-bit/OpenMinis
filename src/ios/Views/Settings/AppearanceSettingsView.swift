@@ -250,6 +250,7 @@ struct AppearanceSettingsView: View {
 
     var body: some View {
         List {
+            AmoreAppearanceSection()
 
             Section {
                 Picker("Launch Session", selection: $launchScreen) {
@@ -265,7 +266,7 @@ struct AppearanceSettingsView: View {
                 Text("Choose what to show when the app starts. \"Auto\" opens a new chat if the last session is older than 15 minutes.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
             // Auto-grouping default is OFF on principle: it costs nothing
             // extra (it rides the title-generation call), but it moves user
@@ -282,7 +283,7 @@ struct AppearanceSettingsView: View {
                 Text("When a chat's title is first generated, also file it into a matching existing group. Runs once per chat, only uses groups you already created, and leaves the chat ungrouped when nothing matches.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
             Section {
                 Picker(AppLocalized("Return Key"), selection: $returnKeyBehavior) {
@@ -297,7 +298,7 @@ struct AppearanceSettingsView: View {
                 Text("Choose whether the Return key in the chat input inserts a newline or sends the message. Hardware Shift+Return always inserts a newline.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
             Section {
                 Toggle(AppLocalized("Keep Screen Awake"), isOn: $keepScreenAwakeDuringTasks)
@@ -325,7 +326,7 @@ struct AppearanceSettingsView: View {
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
             Section {
                 Toggle(AppLocalized("Auto-Focus Input After Reply"), isOn: $autoFocusAfterReply)
@@ -336,7 +337,7 @@ struct AppearanceSettingsView: View {
                 Text("When on, the keyboard pops up automatically after the model finishes replying so the input is ready for a follow-up. On by default; turn off if you prefer to read the response without an unexpected keyboard.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
             Section {
                 Toggle(AppLocalized("Confirm Before Stopping"), isOn: $confirmBeforeStopping)
@@ -347,7 +348,7 @@ struct AppearanceSettingsView: View {
                 Text("Ask for confirmation when you tap the stop button while a task is running, so an accidental tap does not end a long run. Off by default. You can also long-press the stop button to switch.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
             Section {
                 Toggle(AppLocalized("Tool Preview Window"), isOn: $toolPreviewEnabled)
@@ -358,7 +359,7 @@ struct AppearanceSettingsView: View {
                 Text("Show a live preview thumbnail alongside the tool status bar during agent execution.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
             // [T-thinking-auto-expand-toggle] Whether a NEW streaming thinking
             // block opens expanded (historical behavior, default) or stays
@@ -373,7 +374,7 @@ struct AppearanceSettingsView: View {
                 Text("When on, a new thinking block expands automatically while the model is reasoning and collapses when it finishes. When off, thinking blocks stay collapsed — tap one to read it.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
             // [T-fold-consecutive-tools] Fold a run of 3+ tool calls that a
             // reply follows into one "Ran N tools" line.
@@ -390,7 +391,7 @@ struct AppearanceSettingsView: View {
                 Text("Consecutive tool calls are shown as one line. Tap it to see each call.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
             Section {
                 FontScaleRow(
@@ -419,7 +420,7 @@ struct AppearanceSettingsView: View {
                 Text("Scale fonts for chat input, message content, and general app text. Changes apply immediately.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
             if UIApplication.shared.supportsAlternateIcons {
                 Section {
@@ -473,7 +474,7 @@ struct AppearanceSettingsView: View {
                     Text("\"Automatic\" uses the system icon which adapts to Dark Mode on iOS 18+.")
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .listRowBackground(PokiTheme.settingsCard)
             }
 
             Section {
@@ -527,11 +528,11 @@ struct AppearanceSettingsView: View {
                 Text("Override the display language for this app. \"System\" follows your device language.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .listRowBackground(PokiTheme.settingsCard)
 
         }
         .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
+        .background { AmoreChatBackdrop(home: true) }
         .foregroundStyle(PokiTheme.primaryText)
         .tint(PokiTheme.primaryButton)
         .navigationTitle("Appearance")
