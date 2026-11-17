@@ -1028,3 +1028,114 @@ struct AmoreMarketplaceView: View {
         .task { await importer.refreshInstalled(); await store.load() }
     }
 }
+
+struct SettingsFeatureIcon: View {
+    let symbol: String
+    let color: Color
+    var body: some View {
+        Image(systemName: symbol)
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(.white)
+            .frame(width: 24, height: 24)
+            .background(color, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+    }
+}
+
+struct DeveloperConnectionView: View {
+    @ObservedObject private var mcp = MCPStore.shared
+    @State private var showTerminal = false
+
+    var body: some View {
+        List {
+            Section {
+                NavigationLink { MCPIntegrationsView() } label: {
+                    Label { Text(AppLocalized("MCP integrations")) } icon: {
+                        SettingsFeatureIcon(symbol: "point.3.connected.trianglepath.dotted", color: PokiTheme.agentPurple)
+                    }
+                }
+                NavigationLink { RootfsManagementView() } label: {
+                    Label(AppLocalized("Runtime environment"), systemImage: "shippingbox")
+                }
+                NavigationLink { NodeOfflineRuntimeSection() } label: {
+                    Label(AppLocalized("Offline Node.js and npm"), systemImage: "shippingbox.and.arrow.down")
+                }
+            } header: {
+                Text(AppLocalized("Amore connection"))
+            } footer: {
+                Text(AppLocalized("This page connects Amore services only. It does not enable Poki Runner, DeepSeek Harness, Cordis, or external automation without an Amore-compatible adapter."))
+            }
+            Section {
+                Button { showTerminal = true } label: {
+                    Label(AppLocalized("Open Amore terminal"), systemImage: "terminal")
+                }
+            }
+        }
+        .pokiScreen()
+        .navigationTitle(AppLocalized("Connect developer tools"))
+        .sheet(isPresented: $showTerminal) {
+            NavigationStack {
+                ISHTerminalView()
+                    .toolbar { ToolbarItem(placement: .topBarTrailing) {
+                        Button(AppLocalized("Done")) { showTerminal = false }
+                    }}
+            }
+        }
+    }
+}
+
+struct HomeShortcutsSettingsView: View {
+    @ObservedObject private var store = AmoreHomeShortcutStore.shared
+    @State private var title = ""
+    @State private var prompt = ""
+    @State private var showingAdd = false
+
+    var body: some View {
+        List {
+            Section {
+                ForEach(store.items) { item in
+                    HStack(spacing: 12) {
+                        Image(systemName: item.symbol).foregroundStyle(PokiTheme.blueText).frame(width: 26)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(item.title).foregroundStyle(PokiTheme.primaryText)
+                            Text(item.action.kind == .prompt ? AppLocalized("Prompt") : item.action.value)
+                                .font(.footnote).foregroundStyle(PokiTheme.secondaryText).lineLimit(2)
+                        }
+                        Spacer()
+                        Button { store.setVisible(item.hidden, id: item.id) } label: {
+                            Image(systemName: item.hidden ? "eye.slash" : "eye")
+                                .foregroundStyle(item.hidden ? PokiTheme.secondaryText : PokiTheme.green)
+                        }.buttonStyle(.plain)
+                    }
+                    .padding(.vertical, 4)
+                    .swipeActions { Button(role: .destructive) { store.remove(id: item.id) } label: {
+                        Label(AppLocalized("Delete"), systemImage: "trash")
+                    }}
+                }
+            } header: { Text(AppLocalized("Home shortcuts")) } footer: {
+                Text(AppLocalized("These buttons fill the existing chat composer or open an Amore page. They do not send a message automatically."))
+            }
+            Section { Button { showingAdd = true } label: {
+                Label(AppLocalized("Add shortcut"), systemImage: "plus.circle.fill")
+            }}
+        }
+        .pokiScreen().navigationTitle(AppLocalized("Home shortcuts"))
+        .sheet(isPresented: $showingAdd) {
+            NavigationStack {
+                Form {
+                    TextField(AppLocalized("Button title"), text: $title)
+                    TextField(AppLocalized("Prompt"), text: $prompt, axis: .vertical)
+                }
+                .navigationTitle(AppLocalized("Add shortcut"))
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) { Button(AppLocalized("Cancel")) { showingAdd = false } }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(AppLocalized("Add")) {
+                            let item = AmoreHomeShortcut(id: "custom-" + UUID().uuidString, appName: "Amore", title: title, symbol: "sparkles", action: .init(kind: .prompt, value: prompt))
+                            try? store.add(item); title = ""; prompt = ""; showingAdd = false
+                        }.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                }
+            }
+        }
+    }
+}
