@@ -14,6 +14,7 @@ concurrency:
 jobs:
   build:
     name: Build iOS IPA (arm64 device)
+    needs: [components, node_runtime, original_poki]
     runs-on: macos-26
     timeout-minutes: 115
     steps:
@@ -135,7 +136,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: at9870451-bit/OpenMinis
-          ref: POKI_COMMIT
+          ref: 3994c488edb49111f750e061d58c0290c6e06cab
       - name: Prepare tools
         run: brew install xcodegen ripgrep
       - name: Cache native sources
@@ -159,3 +160,14 @@ jobs:
             build-poki/Build/Products/Release-iphoneos/WebRTC.framework
           if-no-files-found: error
           retention-days: 7
+
+  original_host:
+    name: Original-page host integration checks
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: at9870451-bit/OpenMinis
+          ref: 3994c488edb49111f750e061d58c0290c6e06cab
+      - run: bash scripts/test-original-poki-host.sh
