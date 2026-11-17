@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A29E50000000000000000001 /* NodeRuntime in Resources */ = {isa = PBXBuildFile; fileRef = A29E50000000000000000002 /* NodeRuntime */; };
 		97A38024E8114E1CB1F9B001 /* AmorePluginArchive in Frameworks */ = {isa = PBXBuildFile; productRef = 97A38024E8114E1CB1F9B003 /* AmorePluginArchive */; };
 		21FED4B7BB6F6D9476C9992E /* VoiceProvider+System.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88993FC8E3F0199C6638F664 /* VoiceProvider+System.swift */; };
 		241D530017827D7F0EB604DE /* VoiceProviderFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2941B643B8A2F048A2B154E /* VoiceProviderFactory.swift */; };
@@ -723,6 +724,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A29E50000000000000000002 /* NodeRuntime */ = {isa = PBXFileReference; lastKnownFileType = folder; path = NodeRuntime; sourceTree = "<group>"; };
 		0ED149397BEA7E0408C92688 /* GroupVoiceModelsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GroupVoiceModelsView.swift; sourceTree = "<group>"; };
 		0F5379380323FA8C6477708C /* GroupSlotPicker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GroupSlotPicker.swift; sourceTree = "<group>"; };
 		16FF3462D09402F14B610CD6 /* VoiceWaveformView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceWaveformView.swift; sourceTree = "<group>"; };
@@ -1705,6 +1707,7 @@
 				E5AS00010 /* AppShortcuts.strings */,
 				E5A000011 /* default_mount */,
 				E5A000A11 /* AOJITRestore */,
+				A29E50000000000000000002 /* NodeRuntime */,
 				E5U000012 /* KaTeX */,
 				E5V000012 /* AlternateIcons */,
 				E5D00060 /* models-dev-api.json */,
@@ -2970,6 +2973,7 @@
 				AA0838D22F3B941A00049557 /* RootfsPatch.bundle in Resources */,
 				E5A000001 /* default_mount in Resources */,
 				E5A000A01 /* AOJITRestore in Resources */,
+				A29E50000000000000000001 /* NodeRuntime in Resources */,
 				E5U000002 /* KaTeX in Resources */,
 				E5V000002 /* AlternateIcons in Resources */,
 				AA71B0222F44BEB200A28A5E /* Launch Screen.storyboard in Resources */,
@@ -3742,7 +3746,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -3751,7 +3755,7 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -3766,12 +3770,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -3786,7 +3790,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -3814,7 +3818,7 @@
 					"$(BUILT_PRODUCTS_DIR)/Minis.app/Frameworks",
 					"$(BUILT_PRODUCTS_DIR)/PackageFrameworks",
 				);
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(BUILT_PRODUCTS_DIR)/Minis.app/Minis.debug.dylib",
@@ -3834,7 +3838,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -3858,7 +3862,7 @@
 					"$(BUILT_PRODUCTS_DIR)/Minis.app/Frameworks",
 					"$(BUILT_PRODUCTS_DIR)/PackageFrameworks",
 				);
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(BUILT_PRODUCTS_DIR)/Minis.app/Minis.debug.dylib",
@@ -4011,7 +4015,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Minis.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
@@ -4043,7 +4047,7 @@
 				ISH_LIBS_DIR = "$(SRCROOT)/../../deps/libs";
 				"ISH_LIBS_DIR[sdk=iphonesimulator*]" = "$(SRCROOT)/../../deps/libs/iphonesimulator";
 				LIBRARY_SEARCH_PATHS = "$(ISH_LIBS_DIR)";
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				OTHER_LDFLAGS = (
 					"-lish_emu",
 					"-lish",
@@ -4070,7 +4074,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Minis.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
@@ -4102,7 +4106,7 @@
 				ISH_LIBS_DIR = "$(SRCROOT)/../../deps/libs";
 				"ISH_LIBS_DIR[sdk=iphonesimulator*]" = "$(SRCROOT)/../../deps/libs/iphonesimulator";
 				LIBRARY_SEARCH_PATHS = "$(ISH_LIBS_DIR)";
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				OTHER_LDFLAGS = (
 					"-lish_emu",
 					"-lish",
@@ -4125,7 +4129,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -4137,7 +4141,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4152,7 +4156,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -4164,7 +4168,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4179,7 +4183,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FileProvider/FileProvider.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FileProvider/Info.plist;
@@ -4191,7 +4195,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.FileProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4206,7 +4210,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FileProvider/FileProvider.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FileProvider/Info.plist;
@@ -4218,7 +4222,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.FileProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4233,7 +4237,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = AgentWidget/AgentWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgentWidget/Info.plist;
@@ -4245,7 +4249,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.AgentWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4260,7 +4264,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = AgentWidget/AgentWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgentWidget/Info.plist;
@@ -4272,7 +4276,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.AgentWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4286,7 +4290,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_DEBUG_DYLIB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4297,7 +4301,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisTestHost;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -4311,7 +4315,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_DEBUG_DYLIB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4322,7 +4326,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisTestHost;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;

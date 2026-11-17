@@ -31956,6 +31956,52 @@
         }
       }
     },
+    "Amore JavaScriptCore cannot run Node.js, Cordis or browser plugins. An Amore port is required.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore JavaScriptCore cannot run Node.js, Cordis or browser plugins. An Amore port is required."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 的 JavaScriptCore 不能运行 Node.js、Cordis 或浏览器插件。需要提供适配 Amore 的版本，不能仅重命名或补一个 JSON 清单。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 的 JavaScriptCore 不能執行 Node.js、Cordis 或瀏覽器外掛。需要提供適配 Amore 的版本，不能僅重新命名或補一個 JSON 清單。"
+          }
+        }
+      }
+    },
+    "Amore scans JSON configuration files in the package. Compatible Amore JSON can have any filename; Node.js and Cordis packages need a port.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore scans JSON configuration files in the package. Compatible Amore JSON can have any filename; Node.js and Cordis packages need a port."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 会自动识别包内 JSON 配置，不限制文件名。Node.js、Cordis 等其他宿主的插件需要适配。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 會自動識別套件內 JSON 配置，不限制檔名。Node.js、Cordis 等其他宿主的外掛需要適配。"
+          }
+        }
+      }
+    },
     "An http(s) Redirect URI must use localhost, e.g. %@.": {
       "localizations": {
         "de": {
@@ -32396,6 +32442,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "分析睡眠"
+          }
+        }
+      }
+    },
+    "Another Node installation is running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another Node installation is running."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一项 Node 安装正在进行。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一項 Node 安裝正在進行。"
           }
         }
       }
@@ -34057,6 +34126,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "逾時時採用模型給的預設值"
+          }
+        }
+      }
+    },
+    "Archived": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archived"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已封存"
           }
         }
       }
@@ -44748,6 +44840,121 @@
         }
       }
     },
+    "Bundled Node checksum failed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bundled Node checksum failed."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内置 Node 包校验失败。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "內建 Node 套件驗證失敗。"
+          }
+        }
+      }
+    },
+    "Bundled Node package is missing or damaged.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bundled Node package is missing or damaged."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内置 Node 包缺失或损坏。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "內建 Node 套件遺失或損毀。"
+          }
+        }
+      }
+    },
+    "Bundled Node runtime is missing. Reinstall this version of Amore.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bundled Node runtime is missing. Reinstall this version of Amore."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内置 Node 资源缺失，请重新安装此版本 Amore。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "內建 Node 資源遺失，請重新安裝此版本 Amore。"
+          }
+        }
+      }
+    },
+    "Bundled Node runtime metadata is invalid.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bundled Node runtime metadata is invalid."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内置 Node 资源清单无效。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "內建 Node 資源清單無效。"
+          }
+        }
+      }
+    },
+    "Bundled Node.js runtime": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bundled Node.js runtime"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内置 Node.js 运行环境"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "內建 Node.js 執行環境"
+          }
+        }
+      }
+    },
     "BusyBox provides /bin/sh and the basic commands (ls, cp, grep, sed and more).": {
       "extractionState": "manual",
       "localizations": {
@@ -52109,6 +52316,52 @@
         }
       }
     },
+    "Choose a ZIP file or a plugin folder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a ZIP file or a plugin folder"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请选择 ZIP 文件或插件文件夹"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請選取 ZIP 檔案或外掛資料夾"
+          }
+        }
+      }
+    },
+    "Choose a ZIP from Files or iCloud Drive": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a ZIP from Files or iCloud Drive"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从“文件”或 iCloud 云盘选择 ZIP"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從「檔案」或 iCloud 雲碟選取 ZIP"
+          }
+        }
+      }
+    },
     "Choose a specific voice for each language. Download more voices in Settings > Accessibility > Spoken Content > Voices.": {
       "localizations": {
         "de": {
@@ -52786,6 +53039,29 @@
         }
       }
     },
+    "Choose plugin JSON": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose plugin JSON"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择插件 JSON"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇插件 JSON"
+          }
+        }
+      }
+    },
     "Choose the models you want to use": {
       "localizations": {
         "de": {
@@ -53230,6 +53506,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "選擇本裝置推送到 iCloud 的資料類型。API 金鑰和機密資訊透過 iCloud 鑰匙圈安全同步。"
+          }
+        }
+      }
+    },
+    "Choose which plugin configuration to install. JSON files are configuration, not executable code.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose which plugin configuration to install. JSON files are configuration, not executable code."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发现多个插件配置，请选择要安装的一项。JSON 是配置文件，不会作为代码执行。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "發現多個外掛配置，請選擇要安裝的一項。JSON 是配置檔案，不會作為程式碼執行。"
           }
         }
       }
@@ -56930,6 +57229,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "關閉預覽小窗"
+          }
+        }
+      }
+    },
+    "Close conversations": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close conversations"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返回会话面板"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返回對話面板"
           }
         }
       }
@@ -60936,6 +61258,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "連線"
+          }
+        }
+      }
+    },
+    "Connects only to the declared HTTPS host.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connects only to the declared HTTPS host."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅允许连接插件声明的 HTTPS 域名。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅允許連線至外掛聲明的 HTTPS 網域。"
           }
         }
       }
@@ -111359,6 +111704,29 @@
         }
       }
     },
+    "I understand and approve these permissions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I understand and approve these permissions"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我已了解并同意以上权限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我已瞭解並同意以上權限"
+          }
+        }
+      }
+    },
     "I understand and want to continue": {
       "extractionState": "manual",
       "localizations": {
@@ -114417,6 +114785,29 @@
         }
       }
     },
+    "Import ZIP plugin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import ZIP plugin"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入 ZIP 插件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯入 ZIP 外掛"
+          }
+        }
+      }
+    },
     "Import a provider configuration that was exported from another device.": {
       "localizations": {
         "de": {
@@ -114638,6 +115029,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "匯入為供應商"
+          }
+        }
+      }
+    },
+    "Import plugin folder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import plugin folder"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入插件文件夹"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯入外掛資料夾"
           }
         }
       }
@@ -115719,6 +116133,29 @@
         }
       }
     },
+    "Incompatible plugin package": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incompatible plugin package"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "插件包不兼容"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外掛套件不相容"
+          }
+        }
+      }
+    },
     "Indefinitely": {
       "extractionState": "manual",
       "localizations": {
@@ -116597,6 +117034,29 @@
         }
       }
     },
+    "Install Node.js and npm offline": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install Node.js and npm offline"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "离线安装 Node.js 和 npm"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "離線安裝 Node.js 與 npm"
+          }
+        }
+      }
+    },
     "Install Rootfs": {
       "localizations": {
         "de": {
@@ -116709,6 +117169,52 @@
         }
       }
     },
+    "Install bundled Node.js and npm offline": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install bundled Node.js and npm offline"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "离线安装内置 Node.js 和 npm"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "離線安裝內建 Node.js 與 npm"
+          }
+        }
+      }
+    },
+    "Install bundled Node.js and npm?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install bundled Node.js and npm?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安装内置 Node.js 和 npm？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安裝內建 Node.js 與 npm？"
+          }
+        }
+      }
+    },
     "Install failed": {
       "extractionState": "manual",
       "localizations": {
@@ -116751,6 +117257,75 @@
           "stringUnit": {
             "state": "translated",
             "value": "從檔案安裝"
+          }
+        }
+      }
+    },
+    "Install offline": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install offline"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "离线安装"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "離線安裝"
+          }
+        }
+      }
+    },
+    "Install only plugins from authors you trust. Installation does not enable or execute the plugin.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install only plugins from authors you trust. Installation does not enable or execute the plugin."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅安装可信作者的插件。安装不会自动启用或执行插件。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅安裝可信作者的外掛。安裝不會自動啟用或執行外掛。"
+          }
+        }
+      }
+    },
+    "Install plugin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install plugin"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安装插件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安裝外掛"
           }
         }
       }
@@ -116863,6 +117438,98 @@
           "stringUnit": {
             "state": "translated",
             "value": "已安裝"
+          }
+        }
+      }
+    },
+    "Installed disabled. No plugin code was executed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installed disabled. No plugin code was executed."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已安装，默认未启用。没有执行插件代码。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已安裝，預設未啟用。沒有執行外掛程式碼。"
+          }
+        }
+      }
+    },
+    "Installed plugins": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installed plugins"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已安装插件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已安裝外掛"
+          }
+        }
+      }
+    },
+    "Installed · disabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installed · disabled"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已安装 · 未启用"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已安裝 · 未啟用"
+          }
+        }
+      }
+    },
+    "Installing plugin…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installing plugin…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在安装插件…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在安裝外掛…"
           }
         }
       }
@@ -116999,6 +117666,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在安裝…"
+          }
+        }
+      }
+    },
+    "Installs official signed Alpine packages into your Shell Container, including required dependency updates. It does not reset your rootfs or download anything. Start the terminal first. Node's runtime and AOJIT match status are checked separately.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installs official signed Alpine packages into your Shell Container, including required dependency updates. It does not reset your rootfs or download anything. Start the terminal first. Node's runtime and AOJIT match status are checked separately."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将官方签名的 Alpine 包及必要依赖更新安装到 Shell 容器，不重置 Rootfs，也不下载文件。请先启动终端。Node 可运行状态与 AOJIT 匹配状态分开检查。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將官方簽章的 Alpine 套件與必要依賴更新安裝至 Shell 容器，不重設 Rootfs，也不下載檔案。請先啟動終端機。Node 可執行狀態與 AOJIT 匹配狀態分開檢查。"
+          }
+        }
+      }
+    },
+    "Installs the Node.js and npm packages bundled with Amore without downloading from a mirror. Required dependency updates may be included. AOJIT matching is checked separately; this is not the recorded Node build.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installs the Node.js and npm packages bundled with Amore without downloading from a mirror. Required dependency updates may be included. AOJIT matching is checked separately; this is not the recorded Node build."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用 Amore 内置的 Node.js、npm 包离线安装，不从镜像源下载，可能包含必要依赖更新。AOJIT 匹配另行检查；该包不是 AOJIT 记录的旧版 Node。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用 Amore 內建的 Node.js、npm 套件離線安裝，不從鏡像來源下載，可能包含必要依賴更新。AOJIT 匹配另行檢查；此套件不是 AOJIT 記錄的舊版 Node。"
           }
         }
       }
@@ -117694,6 +118407,29 @@
         }
       }
     },
+    "Invalid manifest.json. Missing field": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid manifest.json. Missing field"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "manifest.json 无效，缺少字段"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "manifest.json 無效，缺少欄位"
+          }
+        }
+      }
+    },
     "Invalid marketplace URL": {
       "extractionState": "manual",
       "localizations": {
@@ -117713,6 +118449,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "市集位址無效"
+          }
+        }
+      }
+    },
+    "Invalid plugin JSON. Missing field": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid plugin JSON. Missing field"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "插件 JSON 无效，缺少字段"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外掛 JSON 無效，缺少欄位"
+          }
+        }
+      }
+    },
+    "Invalid plugin package": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid plugin package"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无效的插件包"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無效的外掛套件"
           }
         }
       }
@@ -118562,6 +119344,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "JavaScript"
+          }
+        }
+      }
+    },
+    "JavaScript entry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript entry"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript 入口"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript 入口"
           }
         }
       }
@@ -120496,6 +121301,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "大"
+          }
+        }
+      }
+    },
+    "Last 7 Days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last 7 Days"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近七天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近七天"
           }
         }
       }
@@ -126831,6 +127659,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "已移除本機副本 — 在這台 iPhone 上釋出 %@"
+          }
+        }
+      }
+    },
+    "Local package · signature not verified": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local package · signature not verified"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地插件包 · 未验证作者签名"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本機外掛套件 · 未驗證作者簽章"
+          }
+        }
+      }
+    },
+    "Local plugins": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local plugins"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地插件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本機外掛"
           }
         }
       }
@@ -141975,6 +142849,52 @@
         }
       }
     },
+    "Multiple plugin configurations found. Choose one to continue.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Multiple plugin configurations found. Choose one to continue."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发现多个插件 JSON 配置，请选择一项继续。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "發現多個外掛 JSON 配置，請選擇一項繼續。"
+          }
+        }
+      }
+    },
+    "Multiple plugins found. Import one plugin package at a time.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Multiple plugins found. Import one plugin package at a time."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发现多个插件。请一次只导入一个插件包。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "發現多個外掛。請一次只匯入一個外掛套件。"
+          }
+        }
+      }
+    },
     "Must start with a letter and contain only letters, digits, and underscores.": {
       "localizations": {
         "de": {
@@ -143889,6 +144809,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "選擇模型組新建對話"
+          }
+        }
+      }
+    },
+    "New Conversation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Conversation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建会话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新增對話"
           }
         }
       }
@@ -147385,6 +148328,52 @@
         }
       }
     },
+    "No additional permissions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No additional permissions"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无需额外权限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不需額外權限"
+          }
+        }
+      }
+    },
+    "No archived chats": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No archived chats"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无归档会话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無封存對話"
+          }
+        }
+      }
+    },
     "No audio data": {
       "comment": "Voice provider missing audio",
       "extractionState": "stale",
@@ -148309,6 +149298,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "未選取任何類別"
+          }
+        }
+      }
+    },
+    "No compatible plugin configuration was found among the JSON files.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No compatible plugin configuration was found among the JSON files."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已检查包内 JSON 文件，未找到兼容的 Amore 插件配置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已檢查套件內 JSON 檔案，未找到相容的 Amore 外掛配置。"
           }
         }
       }
@@ -149293,6 +150305,29 @@
         }
       }
     },
+    "No installed plugins": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No installed plugins"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无已安装插件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無已安裝外掛"
+          }
+        }
+      }
+    },
     "No key required": {
       "extractionState": "manual",
       "localizations": {
@@ -149650,6 +150685,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "這次執行沒有記錄。"
+          }
+        }
+      }
+    },
+    "No manifest.json found in this plugin package.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No manifest.json found in this plugin package."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "插件包中找不到 manifest.json。请检查是否为 Amore 插件包。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外掛套件中找不到 manifest.json。請確認是否為 Amore 外掛套件。"
           }
         }
       }
@@ -157473,6 +158531,75 @@
           "stringUnit": {
             "state": "translated",
             "value": "官方串流事件"
+          }
+        }
+      }
+    },
+    "Offline JavaScript environment": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline JavaScript environment"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "离线 JavaScript 环境"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "離線 JavaScript 環境"
+          }
+        }
+      }
+    },
+    "Offline Node installation failed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline Node installation failed."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Node 离线安装失败。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Node 離線安裝失敗。"
+          }
+        }
+      }
+    },
+    "Offline Node installer could not finish.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline Node installer could not finish."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Node 离线安装器未能完成。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Node 離線安裝程式未能完成。"
           }
         }
       }
@@ -167912,6 +169039,29 @@
         }
       }
     },
+    "Personalize Amore": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalize Amore"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "个性化 Amore"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "個人化 Amore"
+          }
+        }
+      }
+    },
     "Phase": {
       "localizations": {
         "de": {
@@ -169836,6 +170986,75 @@
           "stringUnit": {
             "state": "translated",
             "value": "外掛市集"
+          }
+        }
+      }
+    },
+    "Plugin configuration JSON": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plugin configuration JSON"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "插件配置 JSON"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外掛配置 JSON"
+          }
+        }
+      }
+    },
+    "Plugin package exceeds 10 MB.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plugin package exceeds 10 MB."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "插件包超过 10 MB 上限。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外掛套件超過 10 MB 上限。"
+          }
+        }
+      }
+    },
+    "Plugin package exceeds 500 files.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plugin package exceeds 500 files."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "插件包超过 500 个文件上限。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外掛套件超過 500 個檔案上限。"
           }
         }
       }
@@ -178886,6 +180105,29 @@
         }
       }
     },
+    "Reading and validating plugin…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading and validating plugin…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在读取并校验插件…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在讀取並驗證外掛…"
+          }
+        }
+      }
+    },
     "Reading manifest…": {
       "extractionState": "manual",
       "localizations": {
@@ -179018,6 +180260,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在讀取備份包…"
+          }
+        }
+      }
+    },
+    "Reads secrets you explicitly configure for this plugin.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reads secrets you explicitly configure for this plugin."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "读取你明确为此插件配置的密钥。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "讀取你明確為此外掛設定的密鑰。"
           }
         }
       }
@@ -186777,6 +188042,29 @@
         }
       }
     },
+    "Requests permission to show local notifications.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requests permission to show local notifications."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请求显示本地通知的权限。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要求顯示本機通知的權限。"
+          }
+        }
+      }
+    },
     "Require %@ to open Minis.": {
       "localizations": {
         "de": {
@@ -187111,6 +188399,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "必填"
+          }
+        }
+      }
+    },
+    "Required host or runtime": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Required host or runtime"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要的宿主或运行环境"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要的宿主或執行環境"
           }
         }
       }
@@ -201303,6 +202614,29 @@
         }
       }
     },
+    "Search chats": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search chats"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索会话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜尋對話"
+          }
+        }
+      }
+    },
     "Search chats...": {
       "localizations": {
         "de": {
@@ -202920,6 +204254,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "已選備份"
+          }
+        }
+      }
+    },
+    "Selected file is not a ZIP archive": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selected file is not a ZIP archive"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选文件不是有效的 ZIP 压缩包"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選取的檔案不是有效的 ZIP 壓縮檔"
           }
         }
       }
@@ -210442,6 +211799,29 @@
         }
       }
     },
+    "Show archived chats": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show archived chats"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示归档会话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示封存對話"
+          }
+        }
+      }
+    },
     "Show in Files": {
       "comment": "Completed download row hint",
       "extractionState": "stale",
@@ -211109,6 +212489,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "展開"
+          }
+        }
+      }
+    },
+    "Show recent chats": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show recent chats"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示最近会话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示最近對話"
           }
         }
       }
@@ -222268,6 +223671,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "存儲"
+          }
+        }
+      }
+    },
+    "Stores data in this plugin’s private local folder.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stores data in this plugin’s private local folder."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在该插件独立的本地文件夹内保存数据。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此外掛獨立的本機資料夾內儲存資料。"
           }
         }
       }
@@ -234577,6 +236003,29 @@
         }
       }
     },
+    "The selected JSON does not match the Amore plugin format.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The selected JSON does not match the Amore plugin format."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选 JSON 不符合 Amore 插件格式。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所選 JSON 不符合 Amore 外掛格式。"
+          }
+        }
+      }
+    },
     "The selection is too long for one image, so it is shared as a PDF.": {
       "extractionState": "manual",
       "localizations": {
@@ -235233,6 +236682,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Shell 與基礎工具：sh 腳本與迴圈、ls、cat、grep、sed、awk、find、sort、xargs、tar、gzip 等 BusyBox 命令。"
+          }
+        }
+      }
+    },
+    "The signed Node.js, npm and dependency packages are included in this App. No mirror download is needed. This does not install DeepSeek Harness or make Cordis plugins compatible.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The signed Node.js, npm and dependency packages are included in this App. No mirror download is needed. This does not install DeepSeek Harness or make Cordis plugins compatible."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本 App 已包含带签名的 Node.js、npm 及依赖包，无需从镜像源下载。这不会安装 DeepSeek Harness，也不会自动兼容 Cordis 插件。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本 App 已包含有簽章的 Node.js、npm 及依賴套件，無須從鏡像來源下載。這不會安裝 DeepSeek Harness，也不會自動相容 Cordis 外掛。"
           }
         }
       }
@@ -251770,6 +253242,52 @@
         }
       }
     },
+    "Uninstall": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uninstall"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "卸载"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解除安裝"
+          }
+        }
+      }
+    },
+    "Uninstall plugin?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uninstall plugin?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "卸载此插件？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解除安裝此外掛？"
+          }
+        }
+      }
+    },
     "Unknown": {
       "comment": "Location permission status",
       "localizations": {
@@ -253214,6 +254732,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "無法讀取"
+          }
+        }
+      }
+    },
+    "Unsafe path in plugin package": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unsafe path in plugin package"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "插件包含不安全路径"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外掛包含不安全路徑"
           }
         }
       }
@@ -260727,6 +262268,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "「详细」会额外记录高频追踪(文件系统、渲染、上下文),适合复现具体问题时开启。日志增长极快,排查完请切回「常规」。"
+          }
+        }
+      }
+    },
+    "Verifying and installing bundled Node packages…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifying and installing bundled Node packages…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在校验并安装内置 Node 包…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在驗證並安裝內建 Node 套件…"
           }
         }
       }
@@ -271492,6 +273056,52 @@
         }
       }
     },
+    "ZIP checksum failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ZIP checksum failed"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ZIP 完整性校验失败"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ZIP 完整性驗證失敗"
+          }
+        }
+      }
+    },
+    "ZIP import works without starting Terminal or downloading a Linux image. Maximum 10 MB and 500 files.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ZIP import works without starting Terminal or downloading a Linux image. Maximum 10 MB and 500 files."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ZIP 导入无需启动终端或下载 Linux 镜像。上限为 10 MB、500 个文件。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ZIP 匯入不需啟動終端機或下載 Linux 映像。上限為 10 MB、500 個檔案。"
+          }
+        }
+      }
+    },
     "about %d hr left": {
       "extractionState": "manual",
       "localizations": {
@@ -276153,6 +277763,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "已完成 %lld"
+          }
+        }
+      }
+    },
+    "manifest.json does not match the Amore plugin format.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "manifest.json does not match the Amore plugin format."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "manifest.json 不符合 Amore 插件格式。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "manifest.json 不符合 Amore 外掛格式。"
           }
         }
       }
@@ -283330,1248 +284963,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定鬧鐘"
-          }
-        }
-      }
-    },
-    "Import ZIP plugin": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Import ZIP plugin"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "导入 ZIP 插件"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "匯入 ZIP 外掛"
-          }
-        }
-      }
-    },
-    "Choose a ZIP from Files or iCloud Drive": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose a ZIP from Files or iCloud Drive"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "从“文件”或 iCloud 云盘选择 ZIP"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "從「檔案」或 iCloud 雲碟選取 ZIP"
-          }
-        }
-      }
-    },
-    "Import plugin folder": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Import plugin folder"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "导入插件文件夹"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "匯入外掛資料夾"
-          }
-        }
-      }
-    },
-    "Local plugins": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Local plugins"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本地插件"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本機外掛"
-          }
-        }
-      }
-    },
-    "Installed plugins": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Installed plugins"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已安装插件"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已安裝外掛"
-          }
-        }
-      }
-    },
-    "No installed plugins": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No installed plugins"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "暂无已安装插件"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "尚無已安裝外掛"
-          }
-        }
-      }
-    },
-    "Installed · disabled": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Installed · disabled"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已安装 · 未启用"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已安裝 · 未啟用"
-          }
-        }
-      }
-    },
-    "Uninstall": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uninstall"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "卸载"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "解除安裝"
-          }
-        }
-      }
-    },
-    "Uninstall plugin?": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uninstall plugin?"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "卸载此插件？"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "解除安裝此外掛？"
-          }
-        }
-      }
-    },
-    "Reading and validating plugin…": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reading and validating plugin…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在读取并校验插件…"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在讀取並驗證外掛…"
-          }
-        }
-      }
-    },
-    "Installing plugin…": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Installing plugin…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在安装插件…"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在安裝外掛…"
-          }
-        }
-      }
-    },
-    "Installed disabled. No plugin code was executed.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Installed disabled. No plugin code was executed."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已安装，默认未启用。没有执行插件代码。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已安裝，預設未啟用。沒有執行外掛程式碼。"
-          }
-        }
-      }
-    },
-    "ZIP import works without starting Terminal or downloading a Linux image. Maximum 10 MB and 500 files.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ZIP import works without starting Terminal or downloading a Linux image. Maximum 10 MB and 500 files."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ZIP 导入无需启动终端或下载 Linux 镜像。上限为 10 MB、500 个文件。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ZIP 匯入不需啟動終端機或下載 Linux 映像。上限為 10 MB、500 個檔案。"
-          }
-        }
-      }
-    },
-    "No manifest.json found in this plugin package.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No manifest.json found in this plugin package."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "插件包中找不到 manifest.json。请检查是否为 Amore 插件包。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外掛套件中找不到 manifest.json。請確認是否為 Amore 外掛套件。"
-          }
-        }
-      }
-    },
-    "Multiple plugins found. Import one plugin package at a time.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Multiple plugins found. Import one plugin package at a time."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "发现多个插件。请一次只导入一个插件包。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "發現多個外掛。請一次只匯入一個外掛套件。"
-          }
-        }
-      }
-    },
-    "Plugin package exceeds 10 MB.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Plugin package exceeds 10 MB."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "插件包超过 10 MB 上限。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外掛套件超過 10 MB 上限。"
-          }
-        }
-      }
-    },
-    "Plugin package exceeds 500 files.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Plugin package exceeds 500 files."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "插件包超过 500 个文件上限。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外掛套件超過 500 個檔案上限。"
-          }
-        }
-      }
-    },
-    "Unsafe path in plugin package": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unsafe path in plugin package"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "插件包含不安全路径"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外掛包含不安全路徑"
-          }
-        }
-      }
-    },
-    "ZIP checksum failed": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ZIP checksum failed"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ZIP 完整性校验失败"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ZIP 完整性驗證失敗"
-          }
-        }
-      }
-    },
-    "Invalid plugin package": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Invalid plugin package"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无效的插件包"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "無效的外掛套件"
-          }
-        }
-      }
-    },
-    "Invalid manifest.json. Missing field": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Invalid manifest.json. Missing field"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "manifest.json 无效，缺少字段"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "manifest.json 無效，缺少欄位"
-          }
-        }
-      }
-    },
-    "manifest.json does not match the Amore plugin format.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "manifest.json does not match the Amore plugin format."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "manifest.json 不符合 Amore 插件格式。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "manifest.json 不符合 Amore 外掛格式。"
-          }
-        }
-      }
-    },
-    "Local package · signature not verified": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Local package · signature not verified"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本地插件包 · 未验证作者签名"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本機外掛套件 · 未驗證作者簽章"
-          }
-        }
-      }
-    },
-    "Install only plugins from authors you trust. Installation does not enable or execute the plugin.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Install only plugins from authors you trust. Installation does not enable or execute the plugin."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "仅安装可信作者的插件。安装不会自动启用或执行插件。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "僅安裝可信作者的外掛。安裝不會自動啟用或執行外掛。"
-          }
-        }
-      }
-    },
-    "No additional permissions": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No additional permissions"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无需额外权限"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "不需額外權限"
-          }
-        }
-      }
-    },
-    "I understand and approve these permissions": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "I understand and approve these permissions"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "我已了解并同意以上权限"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "我已瞭解並同意以上權限"
-          }
-        }
-      }
-    },
-    "Install plugin": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Install plugin"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "安装插件"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "安裝外掛"
-          }
-        }
-      }
-    },
-    "Connects only to the declared HTTPS host.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connects only to the declared HTTPS host."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "仅允许连接插件声明的 HTTPS 域名。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "僅允許連線至外掛聲明的 HTTPS 網域。"
-          }
-        }
-      }
-    },
-    "Stores data in this plugin’s private local folder.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stores data in this plugin’s private local folder."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在该插件独立的本地文件夹内保存数据。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在此外掛獨立的本機資料夾內儲存資料。"
-          }
-        }
-      }
-    },
-    "Reads secrets you explicitly configure for this plugin.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reads secrets you explicitly configure for this plugin."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "读取你明确为此插件配置的密钥。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "讀取你明確為此外掛設定的密鑰。"
-          }
-        }
-      }
-    },
-    "Requests permission to show local notifications.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Requests permission to show local notifications."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "请求显示本地通知的权限。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要求顯示本機通知的權限。"
-          }
-        }
-      }
-    },
-    "New Conversation": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "New Conversation"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "新建会话"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "新增對話"
-          }
-        }
-      }
-    },
-    "Close conversations": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Close conversations"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "返回会话面板"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "返回對話面板"
-          }
-        }
-      }
-    },
-    "Search chats": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Search chats"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "搜索会话"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "搜尋對話"
-          }
-        }
-      }
-    },
-    "Personalize Amore": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Personalize Amore"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "个性化 Amore"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "個人化 Amore"
-          }
-        }
-      }
-    },
-    "Choose a ZIP file or a plugin folder": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose a ZIP file or a plugin folder"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "请选择 ZIP 文件或插件文件夹"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "請選取 ZIP 檔案或外掛資料夾"
-          }
-        }
-      }
-    },
-    "Selected file is not a ZIP archive": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Selected file is not a ZIP archive"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "所选文件不是有效的 ZIP 压缩包"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "選取的檔案不是有效的 ZIP 壓縮檔"
-          }
-        }
-      }
-    },
-    "Last 7 Days": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Last 7 Days"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最近七天"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最近七天"
-          }
-        }
-      }
-    },
-    "Archived": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Archived"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已归档"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已封存"
-          }
-        }
-      }
-    },
-    "No archived chats": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No archived chats"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "暂无归档会话"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "尚無封存對話"
-          }
-        }
-      }
-    },
-    "Show recent chats": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show recent chats"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "显示最近会话"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "顯示最近對話"
-          }
-        }
-      }
-    },
-    "Show archived chats": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show archived chats"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "显示归档会话"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "顯示封存對話"
-          }
-        }
-      }
-    },
-    "Choose plugin JSON": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose plugin JSON"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选择插件 JSON"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "選擇插件 JSON"
-          }
-        }
-      }
-    },
-    "Choose which plugin configuration to install. JSON files are configuration, not executable code.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose which plugin configuration to install. JSON files are configuration, not executable code."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "发现多个插件配置，请选择要安装的一项。JSON 是配置文件，不会作为代码执行。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "發現多個外掛配置，請選擇要安裝的一項。JSON 是配置檔案，不會作為程式碼執行。"
-          }
-        }
-      }
-    },
-    "Plugin configuration JSON": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Plugin configuration JSON"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "插件配置 JSON"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外掛配置 JSON"
-          }
-        }
-      }
-    },
-    "JavaScript entry": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "JavaScript entry"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "JavaScript 入口"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "JavaScript 入口"
-          }
-        }
-      }
-    },
-    "Invalid plugin JSON. Missing field": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Invalid plugin JSON. Missing field"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "插件 JSON 无效，缺少字段"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外掛 JSON 無效，缺少欄位"
-          }
-        }
-      }
-    },
-    "The selected JSON does not match the Amore plugin format.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The selected JSON does not match the Amore plugin format."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "所选 JSON 不符合 Amore 插件格式。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "所選 JSON 不符合 Amore 外掛格式。"
-          }
-        }
-      }
-    },
-    "Incompatible plugin package": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Incompatible plugin package"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "插件包不兼容"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外掛套件不相容"
-          }
-        }
-      }
-    },
-    "Required host or runtime": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Required host or runtime"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "需要的宿主或运行环境"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "需要的宿主或執行環境"
-          }
-        }
-      }
-    },
-    "Amore JavaScriptCore cannot run Node.js, Cordis or browser plugins. An Amore port is required.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Amore JavaScriptCore cannot run Node.js, Cordis or browser plugins. An Amore port is required."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Amore 的 JavaScriptCore 不能运行 Node.js、Cordis 或浏览器插件。需要提供适配 Amore 的版本，不能仅重命名或补一个 JSON 清单。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Amore 的 JavaScriptCore 不能執行 Node.js、Cordis 或瀏覽器外掛。需要提供適配 Amore 的版本，不能僅重新命名或補一個 JSON 清單。"
-          }
-        }
-      }
-    },
-    "No compatible plugin configuration was found among the JSON files.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No compatible plugin configuration was found among the JSON files."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已检查包内 JSON 文件，未找到兼容的 Amore 插件配置。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已檢查套件內 JSON 檔案，未找到相容的 Amore 外掛配置。"
-          }
-        }
-      }
-    },
-    "Multiple plugin configurations found. Choose one to continue.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Multiple plugin configurations found. Choose one to continue."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "发现多个插件 JSON 配置，请选择一项继续。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "發現多個外掛 JSON 配置，請選擇一項繼續。"
-          }
-        }
-      }
-    },
-    "Amore scans JSON configuration files in the package. Compatible Amore JSON can have any filename; Node.js and Cordis packages need a port.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Amore scans JSON configuration files in the package. Compatible Amore JSON can have any filename; Node.js and Cordis packages need a port."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Amore 会自动识别包内 JSON 配置，不限制文件名。Node.js、Cordis 等其他宿主的插件需要适配。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Amore 會自動識別套件內 JSON 配置，不限制檔名。Node.js、Cordis 等其他宿主的外掛需要適配。"
           }
         }
       }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RootfsManagementView: View {
     @StateObject private var viewModel = RootfsManagementViewModel()
+    @StateObject private var nodeInstall = NodeOfflineRuntimeStore.shared
     @State private var showFileBrowser = false
 
     var body: some View {
@@ -73,6 +74,8 @@ struct RootfsManagementView: View {
 
             // [T-ios-aojit] AOT-compiled JIT images for the Shell Container.
             if viewModel.isInstalled {
+                NodeOfflineRuntimeSection()
+                    .disabled(viewModel.isProcessing)
                 AOJITSettingsSection()
             }
 
@@ -170,6 +173,7 @@ struct RootfsManagementView: View {
                 }
             }
         }
+        .disabled(nodeInstall.isInstalling)
         .scrollContentBackground(.hidden)
         .background(PokiTheme.background)
         .pokiScreen()

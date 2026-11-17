@@ -538,6 +538,21 @@ final class AOJITSettingsModel: ObservableObject {
     /// Only called from the confirmation dialog (AOJITSettingsSection).
     func fix(_ image: AOJITImage) {
         guard let spec = image.apkSpec, fixing == nil else { return }
+        if image.module == "/usr/bin/node" {
+            guard !NodeOfflineRuntimeStore.shared.isInstalling else { return }
+            NodeOfflineRuntimeStore.shared.isInstalling = true
+            fixing = image.id
+            fixError = nil
+            fixNotice = nil
+            Task {
+                do { fixNotice = try await NodeOfflineRuntime.shared.install() }
+                catch { fixError = error.localizedDescription }
+                NodeOfflineRuntimeStore.shared.isInstalling = false
+                fixing = nil
+                refresh()
+            }
+            return
+        }
         guard ISHKernel.shared.isBooted else {
             fixError = AppLocalized("The Shell Container is not running yet. Open the terminal once, then try again.")
             return
@@ -660,15 +675,19 @@ struct AOJITSettingsSection: View {
         // user's container, which can replace (even downgrade) an installed
         // package. Say exactly what will be installed and let the user confirm.
         .confirmationDialog(
-            pendingFix.map { AppLocalized("Install \($0.build.package)?") } ?? "",
+            pendingFix.map { $0.module == "/usr/bin/node" ? AppLocalized("Install bundled Node.js and npm?") : AppLocalized("Install \($0.build.package)?") } ?? "",
             isPresented: Binding(get: { pendingFix != nil }, set: { if !$0 { pendingFix = nil } }),
             titleVisibility: .visible,
             presenting: pendingFix
         ) { image in
-            Button("Install \(image.build.package)") { model.fix(image) }
+            Button(image.module == "/usr/bin/node" ? AppLocalized("Install offline") : AppLocalized("Install \(image.build.package)")) { model.fix(image) }
             Button("Cancel", role: .cancel) {}
         } message: { image in
-            Text("Runs “apk add \(image.apkSpec ?? "")” in the Shell Container. If that exact build is no longer in the repository, it installs the repository's current \(image.name) build instead. Another installed version is replaced, which may be older. Other packages are not changed.")
+            if image.module == "/usr/bin/node" {
+                Text(AppLocalized("Installs the Node.js and npm packages bundled with Amore without downloading from a mirror. Required dependency updates may be included. AOJIT matching is checked separately; this is not the recorded Node build."))
+            } else {
+                Text("Runs “apk add \(image.apkSpec ?? "")” in the Shell Container. If that exact build is no longer in the repository, it installs the repository's current \(image.name) build instead. Required dependency updates may be included.")
+            }
         }
         // [T-aojit-restore] Plan B for a core package: a warning, not a plain
         // confirmation. The destructive button is the only way to start it.
@@ -739,6 +758,12 @@ struct AOJITSettingsSection: View {
                 } label: {
                     if model.fixing == image.id {
                         HStack(spacing: 6) { ProgressView().controlSize(.small); Text("Installing…") }
+                    } else if image.module == "/usr/bin/node" {
+                        Text(AppLocalized("Install bundled Node.js and npm offline"))
+                    } else if image.module == "/usr/bin/node" {
+                        Text(AppLocalized("Install bundled Node.js and npm offline"))
+                    } else if image.module == "/usr/bin/node" {
+                        Text(AppLocalized("Install bundled Node.js and npm offline"))
                     } else if case .family = state {
                         Text("Install \(image.build.package) for full speed")
                     } else {

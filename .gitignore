@@ -16,6 +16,7 @@ captures/
 *.apk
 # [T-aojit-restore] original signed Alpine packages bundled with the iOS app
 !src/ios/AOJITRestore/*.apk
+!src/ios/NodeRuntime/*.apk
 output-metadata.json
 
 # IntelliJ
