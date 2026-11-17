@@ -330,12 +330,19 @@ final class MirrorSpeedTestViewModel: ObservableObject {
         }
 
         var request = URLRequest(url: url)
-        request.httpMethod = "HEAD"
+        // Many regional APK/PyPI/npm mirrors reject HEAD (403/405) while
+        // serving normal package GET requests. Probe the same public endpoint
+        // with a bounded range so a mirror is not falsely marked unusable.
+        request.httpMethod = "GET"
+        request.setValue("bytes=0-1023", forHTTPHeaderField: "Range")
         request.timeoutInterval = 8
 
         let start = CFAbsoluteTimeGetCurrent()
         do {
-            let (_, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard !data.isEmpty else {
+                return MirrorTestResult(mirror: mirror, latencyMs: nil, error: "Empty probe response")
+            }
             let elapsed = CFAbsoluteTimeGetCurrent() - start
             let ms = Int(elapsed * 1000)
             let httpStatus = (response as? HTTPURLResponse)?.statusCode ?? 0
@@ -353,6 +360,12 @@ final class MirrorSpeedTestViewModel: ObservableObject {
     func selectMirror(_ mirror: MirrorEntry) {
         selectedMirrorId[mirror.category] = mirror.id
         persistSelection(for: mirror.category)
+        // Selecting a mirror must change the effective source immediately.
+        // Previously this only moved the checkmark, so the container kept
+        // fetching from the old mirror and installs still failed.
+        if useCustomMirror[mirror.category] == true {
+            applyMirror(for: mirror.category)
+        }
     }
 
     func setUseCustom(_ enabled: Bool, for category: MirrorCategory) {
@@ -390,7 +403,7 @@ final class MirrorSpeedTestViewModel: ObservableObject {
         let content: String
         switch category {
         case .alpine:
-            content = "\(mirror.baseURL)v3.21/main\n\(mirror.baseURL)v3.21/community\n"
+            content = "\(mirror.baseURL)v\(Self.alpineBranch())/main\n\(mirror.baseURL)v\(Self.alpineBranch())/community\n"
         case .pip:
             let host = URL(string: mirror.baseURL)?.host ?? ""
             content = """
@@ -411,6 +424,18 @@ final class MirrorSpeedTestViewModel: ObservableObject {
         } catch {
             logger.error("Failed to write \(category.configPath): \(error)")
         }
+    }
+
+    /// Alpine repositories must match the installed rootfs branch. Hard-coding
+    /// v3.21 sends a 3.22 container to a v3.21 index, which then reports every
+    /// package as missing.
+    static func alpineBranch() -> String {
+        let release = RootfsManager.shared.dataPath.appendingPathComponent("etc/alpine-release")
+        if let text = try? String(contentsOf: release, encoding: .utf8) {
+            let parts = text.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: ".")
+            if parts.count >= 2 { return "\(parts[0]).\(parts[1])" }
+        }
+        return "3.21"
     }
 
     /// Restore original config from .bak file.

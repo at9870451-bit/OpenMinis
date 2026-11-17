@@ -54,6 +54,25 @@ struct AOJITImage: Identifiable, Equatable {
     /// busybox, zlib, OpenSSL): their bundled builds are no longer in the
     /// repository, and other versions are served by family matching.
     let apkSpec: String?
+
+    /// Packages that must be installed with `apkSpec`. Node's `npm`/`npx`
+    /// entry points live in a separate `npm` package on current Alpine, so
+    /// installing only `nodejs` leaves the row "Not installed" while the user
+    /// believes the fix succeeded.
+    var companionPackages: [String] {
+        module == "/usr/bin/node" ? ["npm"] : []
+    }
+
+    /// What to try when the recorded build has already left the mirror.
+    /// Without this, an index bump (22.23.2 -> 22.23.5) makes every install fail.
+    var installFallbackSpec: String {
+        // Drop only the "=version" pin; keep the package name(s).
+        let base = (apkSpec ?? "")
+            .split(separator: " ")
+            .map { $0.split(separator: "=").first.map(String.init) ?? String($0) }
+            .filter { !$0.isEmpty }
+        return (base + companionPackages).joined(separator: " ")
+    }
     /// [T-aojit-restore] Plan B for core packages, only offered when the
     /// installed file is not in the image's family at all: put these packages
     /// back to the build bundled with the app, from the original signed Alpine
@@ -526,12 +545,21 @@ final class AOJITSettingsModel: ObservableObject {
         fixing = image.id
         fixError = nil
         Task.detached(priority: .userInitiated) {
-            let result = ISHShellExecutor.executeCommandSync("apk add \(spec) 2>&1", timeout: 600, lineCallback: nil)
+            // Alpine indexes move; a pinned build disappears and the install
+            // fails with "no such package". Try the recorded build first, then
+            // install the mirror's current package so the entry actually works.
+            var result = ISHShellExecutor.executeCommandSync(
+                "apk add \(spec) 2>&1", timeout: 600, lineCallback: nil)
+            if result.exitCode != 0 {
+                let current = image.installFallbackSpec
+                result = ISHShellExecutor.executeCommandSync(
+                    "apk add \(current) 2>&1", timeout: 600, lineCallback: nil)
+            }
             await MainActor.run {
                 self.fixing = nil
                 if result.exitCode != 0 {
-                    let tail = result.output.split(separator: "\n").suffix(3).joined(separator: "\n")
-                    self.fixError = AppLocalized("apk add \(spec) failed: \(tail)")
+                    let tail = result.output.split(separator: "\n").suffix(4).joined(separator: "\n")
+                    self.fixError = AppLocalized("apk add failed: \(tail)")
                 }
                 self.refresh()
             }
@@ -640,7 +668,7 @@ struct AOJITSettingsSection: View {
             Button("Install \(image.build.package)") { model.fix(image) }
             Button("Cancel", role: .cancel) {}
         } message: { image in
-            Text("Runs “apk add \(image.apkSpec ?? "")” in the Shell Container. If another version of \(image.name) is installed, it is replaced with this one, which may be older. Other packages are not changed.")
+            Text("Runs “apk add \(image.apkSpec ?? "")” in the Shell Container. If that exact build is no longer in the repository, it installs the repository's current \(image.name) build instead. Another installed version is replaced, which may be older. Other packages are not changed.")
         }
         // [T-aojit-restore] Plan B for a core package: a warning, not a plain
         // confirmation. The destructive button is the only way to start it.
