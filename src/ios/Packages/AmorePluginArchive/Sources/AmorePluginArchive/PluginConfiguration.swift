@@ -23,8 +23,10 @@ enum PluginConfigurationDiscovery {
 
     static func candidates(in root: URL) throws -> [PluginConfigurationCandidate] {
         let fm = FileManager.default
+        let canonicalRoot = root.standardizedFileURL.resolvingSymlinksInPath()
+        let rootComponents = canonicalRoot.pathComponents
         var enumerationError: Error?
-        guard let walker = fm.enumerator(at: root,
+        guard let walker = fm.enumerator(at: canonicalRoot,
             includingPropertiesForKeys: [.isRegularFileKey, .fileSizeKey], options: [],
             errorHandler: { _, error in enumerationError = error; return false }) else {
             throw PluginArchiveError.missingManifest
@@ -38,7 +40,12 @@ enum PluginConfigurationDiscovery {
             guard file.pathExtension.lowercased() == "json" else { continue }
             let info = try file.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey])
             guard info.isRegularFile == true else { continue }
-            let relative = String(file.path.dropFirst(root.path.count + 1))
+            let components = file.standardizedFileURL.resolvingSymlinksInPath().pathComponents
+            guard components.count > rootComponents.count,
+                  Array(components.prefix(rootComponents.count)) == rootComponents else {
+                throw PluginArchiveError.unsafePath(file.lastPathComponent)
+            }
+            let relative = components.dropFirst(rootComponents.count).joined(separator: "/")
             if file.lastPathComponent.lowercased() == "manifest.json" { canonical.append(relative) }
             guard (info.fileSize ?? 0) <= maximumJSONBytes else {
                 if file.lastPathComponent.lowercased() == "manifest.json" { throw PluginArchiveError.tooLarge }
