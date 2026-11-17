@@ -149,10 +149,17 @@ private struct AmoreFogMesh: View {
                [0.76,0.80,0.75,0.81],[1,1,1,1]]
             : [[0,0,0,0],[0.75,0.76,0.75,0.76],[0.84,0.86,0.83,0.85],
                [0.93,0.94,0.92,0.94],[1,1,1,1]]
-        return (0..<5).flatMap { row in
-            (0..<4).map { col in
-                SIMD2<Float>(x[row][col], y[row][col] + (home && dark && (row == 2 || row == 3) ? 0.02 : 0))
+        var result: [SIMD2<Float>] = []
+        result.reserveCapacity(20)
+        for row in 0..<5 {
+            let shifted = home && dark && (row == 2 || row == 3)
+            let drop: Float = shifted ? 0.02 : 0
+            for col in 0..<4 {
+                let px: Float = x[row][col]
+                let py: Float = y[row][col] + drop
+                result.append(SIMD2<Float>(px, py))
             }
         }
+        return result
     }
 }
