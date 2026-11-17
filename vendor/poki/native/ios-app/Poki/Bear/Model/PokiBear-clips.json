@@ -1,0 +1,26 @@
+{
+ "note": "第 15 轮 PokiBear_r15 和 PokiBear_r15_light 的动作区间（两者相同）。GLB 里另有三段独立动画 Idle、Wave、Blink（各自从第 0 帧开始）；USDZ 只有一条完整时间轴 PokiR13Timeline，按下表帧号截取。",
+ "fps": 30,
+ "total_frames": 136,
+ "clips": {
+  "idle": [
+   95,
+   105
+  ],
+  "wave": [
+   20,
+   94
+  ],
+  "blink": [
+   5,
+   12
+  ]
+ },
+ "design_hello_frame": 42,
+ "glb_animations": [
+  "PokiR13Timeline",
+  "Idle",
+  "Wave",
+  "Blink"
+ ]
+}

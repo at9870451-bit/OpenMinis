@@ -470,6 +470,7 @@ struct ContentView: View {
     @State var isWideLayout = false
 
     /// ChatGPT-style home: the chat shown full-screen, and its history drawer.
+    @AppStorage("amore.originalPokiChat") var originalPokiChat = true
     @State var homeSessionId: String? = nil
     @State var homeDraftId: String = "__new__home"
     @State var showHistoryDrawer = false

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Poki Setup",
+  "version": "0.2.4",
+  "identifier": "nz.zheha.poki.setup",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "windows": [
+      {
+        "title": "Poki Setup",
+        "label": "main",
+        "width": 980,
+        "height": 680,
+        "minWidth": 820,
+        "minHeight": 560,
+        "resizable": true,
+        "transparent": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "trafficLightPosition": { "x": 16, "y": 18 },
+        "decorations": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["dmg", "app", "msi", "nsis"],
+    "category": "Utility",
+    "shortDescription": "Installs Poki on an iPhone and keeps it signed.",
+    "longDescription": "Poki Setup installs the Poki iPhone app with your Apple ID, pairs the iPhone, keeps the app signed, and manages your relay and connector links.",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "macOS": {
+      "minimumSystemVersion": "12.0",
+      "entitlements": "entitlements.plist"
+    },
+    "windows": {
+      "wix": { "language": ["en-US", "zh-CN"] },
+      "nsis": { "languages": ["English", "SimpChinese"], "installMode": "currentUser" }
+    }
+  },
+  "plugins": {}
+}

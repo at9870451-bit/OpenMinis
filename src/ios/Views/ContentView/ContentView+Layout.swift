@@ -94,6 +94,15 @@ extension ContentView {
     /// torn down and reloaded just because the user looked at Memory.
     @ViewBuilder
     var chatStack: some View {
+        if #available(iOS 18.0, *), originalPokiChat && OriginalPokiScreen.isAvailable {
+            OriginalPokiChatEntry()
+        } else {
+            legacyAmoreChatStack
+        }
+    }
+
+    @ViewBuilder
+    private var legacyAmoreChatStack: some View {
             NavigationStack {
                 Group {
                     if let id = homeSessionId {
@@ -175,7 +184,7 @@ extension ContentView {
                 ) {
                     chatStack
                         .background {
-                            EdgeSwipeCatcher(enabled: !showHistoryDrawer && runtimePage == nil && activeToolSheet == nil,
+                            EdgeSwipeCatcher(enabled: !originalPokiChat && !showHistoryDrawer && runtimePage == nil && activeToolSheet == nil,
                                 onProgress: { fraction in
                                     drawerCleanupTask?.cancel()
                                     drawerPresentationActive = true

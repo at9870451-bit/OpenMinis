@@ -1,0 +1,69 @@
+[package]
+name = "poki-setup-core"
+description = "Everything Poki Setup does: the phone over USB or Wi-Fi, the Apple account, signing, keeping Poki alive, relay and MCP links, logs."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+repository.workspace = true
+
+[dependencies]
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+plist.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+rustls.workspace = true
+webpki-roots.workspace = true
+rustls-pemfile.workspace = true
+reqwest.workspace = true
+sha1.workspace = true
+sha2.workspace = true
+ed25519-dalek = "2.2"
+hmac.workspace = true
+pbkdf2.workspace = true
+aes.workspace = true
+cbc.workspace = true
+aes-gcm.workspace = true
+num-bigint.workspace = true
+num-traits.workspace = true
+rand.workspace = true
+base64.workspace = true
+hex.workspace = true
+uuid.workspace = true
+time.workspace = true
+zip.workspace = true
+walkdir.workspace = true
+tempfile.workspace = true
+directories.workspace = true
+qrcode = { workspace = true, optional = true }
+local-ip-address = { workspace = true, optional = true }
+futures-util.workspace = true
+tokio-tungstenite.workspace = true
+keyring = { workspace = true, optional = true }
+rsa.workspace = true
+x509-certificate.workspace = true
+x509-cert.workspace = true
+rcgen.workspace = true
+pkcs8.workspace = true
+spki.workspace = true
+der.workspace = true
+cms.workspace = true
+apple-codesign.workspace = true
+idevice = { workspace = true, optional = true }
+
+[features]
+# Desktop builds: everything, as before. Poki on the iPhone (native/launcher) turns these off: it
+# reaches its own phone through the launcher's idevice and keeps secrets in a Vault it installs.
+default = ["device", "os-keychain"]
+device = ["dep:idevice", "dep:qrcode", "dep:local-ip-address"]
+os-keychain = ["dep:keyring"]
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSString", "NSObject", "NSDictionary", "NSValue"] }
+libloading = "0.8"
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }

@@ -1,0 +1,21 @@
+[package]
+name = "poki-setup-bridge"
+description = "Poki Setup's core behind a JSON-lines pipe, for the native macOS app"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "poki-setup-bridge"
+path = "src/main.rs"
+
+[dependencies]
+poki-setup-core.workspace = true
+tokio = { workspace = true, features = ["io-std"] }
+serde_json.workspace = true
+serde.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+reqwest.workspace = true
+base64.workspace = true

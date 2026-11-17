@@ -1,0 +1,23 @@
+[package]
+name = "poki-setup-cli"
+description = "poki-setup: the command line over Poki Setup's core, for maintainers and CI."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "poki-setup"
+path = "src/main.rs"
+
+[dependencies]
+poki-setup-core.workspace = true
+tokio.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+clap = { version = "4", features = ["derive"] }
+tracing-subscriber.workspace = true
+rpassword = "7"
+qrcode.workspace = true
+serde.workspace = true

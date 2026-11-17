@@ -1,0 +1,326 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Action Button": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作按钮"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "動作按鈕"
+          }
+        }
+      }
+    },
+    "Opens Poki and starts talking.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 Amore 并开始说话。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打開 Amore 並開始說話。"
+          }
+        }
+      }
+    },
+    "Opens Poki and starts talking. If Poki is doing a task, it shows that task and leaves it running.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 Amore 并开始说话。Amore 正在做任务时，显示这个任务，任务继续进行。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打開 Amore 並開始說話。Amore 正在做任務時，顯示這個任務，任務繼續進行。"
+          }
+        }
+      }
+    },
+    "Poki couldn’t start the task. The chat says why.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 没能开始这个任务，原因在聊天里。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 沒能開始這個任務，原因在聊天裡。"
+          }
+        }
+      }
+    },
+    "Poki is still busy, so this task didn’t start. Here is what Poki is doing.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 还在忙，这个任务没有开始。这里是 Amore 正在做的事。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 還在忙，這個任務沒有開始。這裡是 Amore 正在做的事。"
+          }
+        }
+      }
+    },
+    "Poki is busy. Wait for the current task to finish and try again.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 正在忙，请等当前任务结束后再试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 正在忙，請等目前的任務結束後再試。"
+          }
+        }
+      }
+    },
+    "Choose a model in Poki’s settings, then return to Split View and try again.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先在 Amore 的设置里选择模型，再回到分屏重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請先在 Amore 的設定裡選擇模型，再回到分割顯示重試。"
+          }
+        }
+      }
+    },
+    "Poki started the task. Turn Poki on so it can act on the phone.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 已开始这个任务。开启 Amore 后它才能操作手机。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 已開始這個任務。開啟 Amore 後它才能操作手機。"
+          }
+        }
+      }
+    },
+    "Poki starts the task on this iPhone and tells you when it is done.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 在这台 iPhone 上开始做这个任务，做完后告诉你。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 在這台 iPhone 上開始做這個任務，做完後告訴你。"
+          }
+        }
+      }
+    },
+    "Poki wasn’t ready. Try again in a moment.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 还没准备好，请稍后再试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 還沒準備好，請稍後再試。"
+          }
+        }
+      }
+    },
+    "Press and hold the Action button to open Poki and start talking. To type a task instead, choose Shortcut there, then Send Task. Control Center and the Lock Screen can hold Talk to Poki too.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按住操作按钮，就会打开 Amore 并开始说话。想改成输入任务，就在那里选「快捷指令」，再选「发任务」。控制中心和锁定屏幕也可以放「和 Amore 说话」。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按住動作按鈕，就會打開 Amore 並開始說話。想改成輸入任務，就在那裡選「捷徑」，再選「發任務」。控制中心和鎖定畫面也可以放「和 Amore 說話」。"
+          }
+        }
+      }
+    },
+    "Send ${task} to Poki": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把 ${task} 发给 Amore"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把 ${task} 發給 Amore"
+          }
+        }
+      }
+    },
+    "Send Task": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发任务"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "發任務"
+          }
+        }
+      }
+    },
+    "Turn on Poki with on-device automation, then open the two apps in Split View and run the shortcut again.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先打开 Amore 并启用本机自动化，再将两个 App 摆成分屏，然后重新运行快捷指令。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先開啟 Amore 並啟用裝置上的自動化，再以分割顯示開啟兩個 App，然後重新執行捷徑。"
+          }
+        }
+      }
+    },
+    "Use Split View": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用分屏"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用分割顯示"
+          }
+        }
+      }
+    },
+    "Send Task to Poki": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "给 Amore 发任务"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "給 Amore 發任務"
+          }
+        }
+      }
+    },
+    "Settings › Action Button › Controls › Talk to Poki": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置 › 操作按钮 › 控制 › 和 Amore 说话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定 › 動作按鈕 › 控制項目 › 和 Amore 說話"
+          }
+        }
+      }
+    },
+    "Talk to Poki": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "和 Amore 说话"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "和 Amore 說話"
+          }
+        }
+      }
+    },
+    "Task": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任务"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任務"
+          }
+        }
+      }
+    },
+    "What should Poki do?": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要 Amore 做什么？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要 Amore 做什麼？"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

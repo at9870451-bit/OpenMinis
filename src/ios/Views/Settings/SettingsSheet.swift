@@ -50,6 +50,7 @@ struct SettingsSheet: View {
     @ObservedObject private var deepLink = DeepLinkCoordinator.shared
     @State private var navPath = NavigationPath()
     @State private var showFeedbackDialog = false
+    @AppStorage("amore.originalPokiChat") private var originalPokiChat = true
 
     var body: some View {
         NavigationStack(path: $navPath) {
@@ -83,6 +84,9 @@ struct SettingsSheet: View {
                 }
 
                 Section("Appearance") {
+                    Toggle(isOn: $originalPokiChat) {
+                        Label(AppLocalized("Use original conversation page"), systemImage: "bubble.left.and.bubble.right")
+                    }
                     NavigationLink {
                         DeveloperConnectionView()
                     } label: {
@@ -1042,46 +1046,13 @@ struct SettingsFeatureIcon: View {
 }
 
 struct DeveloperConnectionView: View {
-    @ObservedObject private var mcp = MCPStore.shared
-    @State private var showTerminal = false
-
     var body: some View {
-        List {
-            Section {
-                NavigationLink { MCPIntegrationsView() } label: {
-                    Label { Text(AppLocalized("MCP integrations")) } icon: {
-                        SettingsFeatureIcon(symbol: "point.3.connected.trianglepath.dotted", color: PokiTheme.agentPurple)
-                    }
-                }
-                NavigationLink { RootfsManagementView() } label: {
-                    Label(AppLocalized("Runtime environment"), systemImage: "shippingbox")
-                }
-                NavigationLink { NodeOfflineRuntimeSection() } label: {
-                    Label(AppLocalized("Offline Node.js and npm"), systemImage: "shippingbox.and.arrow.down")
-                }
-            } header: {
-                Text(AppLocalized("Amore connection"))
-            } footer: {
-                Text(AppLocalized("This page connects Amore services only. It does not enable Poki Runner, DeepSeek Harness, Cordis, or external automation without an Amore-compatible adapter."))
-            }
-            Section {
-                Button { showTerminal = true } label: {
-                    Label(AppLocalized("Open Amore terminal"), systemImage: "terminal")
-                }
-            }
-        }
-        .pokiScreen()
-        .navigationTitle(AppLocalized("Connect developer tools"))
-        .sheet(isPresented: $showTerminal) {
-            NavigationStack {
-                ISHTerminalView()
-                    .toolbar { ToolbarItem(placement: .topBarTrailing) {
-                        Button(AppLocalized("Done")) { showTerminal = false }
-                    }}
-            }
-        }
+        OriginalPokiScreen(page: .connection)
+            .navigationTitle(AppLocalized("Connection"))
+            .navigationBarTitleDisplayMode(.inline)
     }
 }
+
 
 struct HomeShortcutsSettingsView: View {
     @ObservedObject private var store = AmoreHomeShortcutStore.shared

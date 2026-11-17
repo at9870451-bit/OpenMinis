@@ -1,0 +1,136 @@
+# Isolated, dynamically loaded original pages. Do not include project-base.yml:
+# that spec also builds/signs the standalone app, widgets and app entitlements.
+name: PokiOriginal
+options:
+  bundleIdPrefix: app.amore.original
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+packages:
+  PokiCore:
+    path: ../ios/PokiCore
+  WebRTC:
+    url: https://github.com/stasel/WebRTC.git
+    exactVersion: 155.0.0
+  PiSwift:
+    url: https://github.com/xibbon/PiSwift.git
+    revision: f8696524cf41ca0a7f42f5b230eafa443daececd
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    SUPPORTED_PLATFORMS: iphoneos
+    SUPPORTS_MACCATALYST: NO
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGN_IDENTITY: ""
+    CODE_SIGN_ENTITLEMENTS: ""
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    DEBUG_INFORMATION_FORMAT: dwarf
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  # Swift frameworks cannot use a bridging header. Compile the original ObjC
+  # implementations once and import their existing Clang module instead.
+  PokiNative:
+    type: library.static
+    platform: iOS
+    sources:
+      - path: Poki/Native
+        excludes: [module.modulemap]
+        headerVisibility: public
+    settings:
+      base:
+        PRODUCT_NAME: PokiNative
+        PRODUCT_MODULE_NAME: PokiNative
+        DEFINES_MODULE: YES
+        CLANG_ENABLE_MODULES: YES
+        CLANG_ENABLE_OBJC_ARC: YES
+        MODULEMAP_FILE: $(SRCROOT)/Poki/Native/module.modulemap
+        PUBLIC_HEADERS_FOLDER_PATH: include/PokiNative
+        HEADER_SEARCH_PATHS:
+          - $(inherited)
+          - $(SRCROOT)/Poki/Native
+          - $(SRCROOT)/../launcher/include
+        SKIP_INSTALL: YES
+  Poki:
+    type: framework
+    platform: iOS
+    sources:
+      - path: Poki
+        excludes:
+          - Native
+          - Runtime/Poki-Bridging-Header.h
+          - "**/*.entitlements"
+          - Info.plist
+      - path: Shared
+      - path: ../ios-gym/check/GymScorecard.swift
+        group: Poki/Debug
+    dependencies:
+      - target: PokiNative
+        link: true
+        embed: false
+      - package: PokiCore
+      - package: WebRTC
+      - package: PiSwift
+        product: PiSwiftAgent
+      - package: PiSwift
+        product: PiSwiftAI
+    settings:
+      base:
+        PRODUCT_NAME: Poki
+        # LoopbackMonitor explicitly calls Poki.probe; do not rename this module.
+        PRODUCT_MODULE_NAME: Poki
+        PRODUCT_BUNDLE_IDENTIFIER: app.amore.original.Poki
+        MACH_O_TYPE: mh_dylib
+        DEFINES_MODULE: YES
+        CLANG_ENABLE_MODULES: YES
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Amore
+        INFOPLIST_KEY_CFBundleDevelopmentRegion: en
+        SWIFT_OBJC_BRIDGING_HEADER: ""
+        SWIFT_INSTALL_OBJC_HEADER: YES
+        SWIFT_OBJC_INTERFACE_HEADER_NAME: Poki-Swift.h
+        # Loaded via Bundle.load / AmorePokiEntry, not linked to the iOS16 host.
+        SKIP_INSTALL: NO
+        BUILD_LIBRARY_FOR_DISTRIBUTION: NO
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) POKI_APP
+        HEADER_SEARCH_PATHS:
+          - $(inherited)
+          - $(SRCROOT)/Poki/Native
+          - $(SRCROOT)/../launcher/include
+        # Lets Swift's Clang importer discover the real, existing module map.
+        SWIFT_INCLUDE_PATHS:
+          - $(inherited)
+          - $(SRCROOT)/Poki/Native
+        LIBRARY_SEARCH_PATHS:
+          - $(inherited)
+          - $(SRCROOT)/../launcher/target/aarch64-apple-ios/release
+        OTHER_LDFLAGS:
+          - $(inherited)
+          - -ObjC
+          - -lpoki_launcher
+          - -lc++
+          - -framework
+          - Security
+          - -framework
+          - SystemConfiguration
+        # Upstream XCTest/DDI paths, plus the host's sibling Frameworks folder.
+        LD_RUNPATH_SEARCH_PATHS:
+          - $(inherited)
+          - "@loader_path/.."
+          - "@executable_path/Frameworks"
+          - /System/Developer/usr/lib
+          - /System/Developer/Library/PrivateFrameworks
+          - /System/Developer/Library/Frameworks
+        # Resources are already rebranded. Do not regenerate upstream assets.
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: ""
+schemes:
+  Poki:
+    build:
+      targets:
+        Poki: all
+    archive:
+      config: Release

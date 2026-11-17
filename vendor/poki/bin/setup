@@ -1,0 +1,45 @@
+#!/bin/sh
+set -eu
+project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if [ "$(uname -s)" != Darwin ]; then
+  echo 'Poki MCP requires macOS and a full Xcode installation.' >&2
+  exit 1
+fi
+require_tools() {
+  install=$1
+  shift
+  for tool in "$@"; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+      echo "Missing prerequisite: $tool. $install Then run ./bin/setup again." >&2
+      exit 1
+    fi
+  done
+}
+require_tools 'Install the full Xcode from the App Store and open it once. It includes this tool.' git python3 xcrun xcodebuild
+require_tools 'Install Node.js 24 or newer from https://nodejs.org or with: brew install node.' node npm
+require_tools 'Install the Rust toolchain from https://rustup.rs and open a new terminal.' cargo rustc
+require_tools 'Install FFmpeg, which includes ffprobe, with: brew install ffmpeg.' ffmpeg ffprobe
+node -e 'if (Number(process.versions.node.split(".")[0]) < 24) { console.error("Poki MCP requires Node.js 24 or newer. Install it from https://nodejs.org or with: brew install node."); process.exit(1); }'
+if ! xcodebuild -version >/dev/null 2>&1 || ! xcrun --find swiftc >/dev/null 2>&1 || ! xcrun --find clang >/dev/null 2>&1; then
+  echo 'Poki MCP needs the full Xcode. The Command Line Tools alone are not enough. Install Xcode from the App Store, then run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer && sudo xcodebuild -runFirstLaunch' >&2
+  exit 1
+fi
+idevice_dir="$project_dir/.deps/idevice"
+revision=89702099f4d7552f704f93b4526756abda319ceb
+mkdir -p "$project_dir/.deps"
+if [ ! -e "$idevice_dir" ]; then
+  git clone https://github.com/jkcoxson/idevice.git "$idevice_dir"
+  git -C "$idevice_dir" checkout --detach "$revision"
+fi
+if [ ! -d "$idevice_dir/.git" ] || [ "$(git -C "$idevice_dir" rev-parse HEAD)" != "$revision" ]; then
+  echo 'The existing .deps/idevice checkout is not the required revision; it was left unchanged.' >&2
+  exit 1
+fi
+if [ -n "$(git -C "$idevice_dir" status --porcelain)" ]; then
+  echo 'The existing .deps/idevice checkout has local changes; it was left unchanged. Use an unmodified checkout of the pinned revision.' >&2
+  exit 1
+fi
+(cd "$idevice_dir" && cargo build --locked --release -p idevice-tools --bin idevice-tools --bin idevice_id -j 4)
+cd "$project_dir"
+npm ci --no-audit --no-fund
+npm run build:native

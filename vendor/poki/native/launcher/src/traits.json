@@ -1,0 +1,78 @@
+[
+  [
+    0,
+    "Button"
+  ],
+  [
+    1,
+    "Link"
+  ],
+  [
+    2,
+    "Image"
+  ],
+  [
+    3,
+    "Selected"
+  ],
+  [
+    4,
+    "Plays Sound"
+  ],
+  [
+    5,
+    "Keyboard Key"
+  ],
+  [
+    6,
+    "Static Text"
+  ],
+  [
+    7,
+    "Summary Element"
+  ],
+  [
+    8,
+    "Not Enabled"
+  ],
+  [
+    9,
+    "Updates Frequently"
+  ],
+  [
+    10,
+    "Search Field"
+  ],
+  [
+    11,
+    "Starts Media Session"
+  ],
+  [
+    12,
+    "Adjustable"
+  ],
+  [
+    13,
+    "Allows Direct Interaction"
+  ],
+  [
+    14,
+    "Causes Page Turn"
+  ],
+  [
+    15,
+    "Tab Bar"
+  ],
+  [
+    16,
+    "Header"
+  ],
+  [
+    17,
+    "Supports Zoom"
+  ],
+  [
+    53,
+    "Toggle"
+  ]
+]

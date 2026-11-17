@@ -1,0 +1,59 @@
+[workspace]
+resolver = "2"
+members = ["core", "cli", "bridge", "app/src-tauri"]
+default-members = ["core", "cli", "bridge"]
+
+[workspace.package]
+version = "0.2.4"
+edition = "2024"
+license = "AGPL-3.0-only"
+publish = false
+repository = "https://github.com/JosssphZhou/poki"
+
+[workspace.dependencies]
+poki-setup-core = { path = "core" }
+tokio = { version = "1.43", features = ["rt-multi-thread", "macros", "net", "time", "sync", "io-util", "fs", "process"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+plist = "1.7"
+thiserror = "2"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "stream", "gzip", "multipart"] }
+sha1 = "0.10"
+sha2 = "0.10"
+hmac = "0.12"
+pbkdf2 = { version = "0.12", default-features = false, features = ["hmac"] }
+aes = "0.8"
+cbc = { version = "0.1", features = ["alloc"] }
+aes-gcm = "0.10"
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+rand = "0.8"
+base64 = "0.22"
+hex = "0.4"
+uuid = { version = "1", features = ["v4"] }
+time = { version = "0.3", features = ["formatting", "parsing", "macros", "serde", "local-offset"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+walkdir = "2"
+tempfile = "3"
+directories = "6"
+qrcode = { version = "0.14", default-features = false, features = ["svg"] }
+local-ip-address = "0.6"
+futures-util = "0.3"
+tokio-tungstenite = { version = "0.26", features = ["rustls-tls-webpki-roots"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std"] }
+webpki-roots = "1"
+rustls-pemfile = "2"
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+rsa = { version = "0.9", features = ["sha2", "pem"] }
+x509-certificate = "0.24"
+x509-cert = { version = "0.2", features = ["builder", "pem"] }
+rcgen = "0.13"
+pkcs8 = { version = "0.10", features = ["pem"] }
+spki = "0.7"
+der = "0.7"
+cms = { version = "0.2", features = ["std"] }
+apple-codesign = { version = "0.29", default-features = false }
+idevice = { version = "0.1.68", default-features = false, features = ["aws-lc", "usbmuxd", "tcp", "pair", "remote_pairing", "afc", "house_arrest", "installation_proxy", "misagent", "amfi", "mobile_image_mounter", "tss", "syslog_relay", "crashreportcopymobile", "springboardservices", "heartbeat"] }

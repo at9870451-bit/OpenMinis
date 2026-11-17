@@ -1,0 +1,221 @@
+// Drives PokiCore's look/do through its MCP handler against a real WebDriverAgent (the iOS
+// Simulator in CI), in Settings only, and prints what each call answered and how long it took.
+// Exits non-zero when a check fails. macOS only; elsewhere it says so and exits.
+import Foundation
+#if os(macOS)
+import PokiCore
+import ImageIO
+import UniformTypeIdentifiers
+
+// Every line out at once: a crash must not take the last steps' output with it.
+setvbuf(stdout, nil, _IOLBF, 0)
+
+final class Host: CoreHost, @unchecked Sendable {
+    struct NoKey: Error {}
+    func signingKey() throws -> RelayKey { throw NoKey() }
+    func accessHashes() -> [String] { [] }
+    func jpeg(fromPNG png: Data, width: Int, quality: Double) throws -> Data {
+        guard let source = CGImageSourceCreateWithData(png as CFData, nil),
+              let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [kCGImageSourceCreateThumbnailFromImageAlways: true, kCGImageSourceThumbnailMaxPixelSize: width * 3] as CFDictionary) else { throw NoKey() }
+        let out = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(out, UTType.jpeg.identifier as CFString, 1, nil) else { throw NoKey() }
+        CGImageDestinationAddImage(destination, image, [kCGImageDestinationLossyCompressionQuality: quality] as CFDictionary)
+        CGImageDestinationFinalize(destination)
+        return out as Data
+    }
+    func runnerState() -> RunnerState { .running }
+    func restartRunner() {}
+    /// The simulator's own screenshot, apart from WDA (what the Poki app does with the phone's
+    /// screenshot service): `simctl io booted screenshot`, a few hundred ms, over 2 s on a loaded runner.
+    func screenshotWithoutRunner() async -> Data? {
+        let path = FileManager.default.temporaryDirectory.appendingPathComponent("poki-sim-check-\(UUID().uuidString).png")
+        defer { try? FileManager.default.removeItem(at: path) }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")
+        process.arguments = ["simctl", "io", "booted", "screenshot", "--type=png", path.path]
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        let began = Date()
+        do {
+            try await withCheckedThrowingContinuation { (done: CheckedContinuation<Void, Error>) in
+                process.terminationHandler = { _ in done.resume() }
+                do { try process.run() } catch { done.resume(throwing: error) }
+            }
+        } catch { return nil }
+        let data = try? Data(contentsOf: path)
+        print("host: simctl screenshot \(data.map { "\($0.count / 1024) KB" } ?? "none") in \(Int(Date().timeIntervalSince(began) * 1000)) ms")
+        return data
+    }
+}
+
+let url = URL(string: ProcessInfo.processInfo.environment["POKI_WDA_URL"] ?? "http://127.0.0.1:8100")!
+let treeFormat = ProcessInfo.processInfo.environment["POKI_TREE_FORMAT"] ?? "xml"
+let axDeadline = Double(ProcessInfo.processInfo.environment["POKI_AX_DEADLINE"] ?? "") ?? 2
+let core = PokiCore(config: CoreConfig(runnerURL: url, treeFormat: treeFormat, accessibilityDeadline: axDeadline), host: Host())
+print("tree format: \(treeFormat), accessibilityDeadline: \(axDeadline)")
+var session: String?
+var rows: [(String, Int, String)] = []
+var failures: [String] = []
+
+@MainActor func rpc(_ method: String, _ params: JSON) async -> JSON? {
+    let body: JSON = ["jsonrpc": "2.0", "id": 1, "method": .string(method), "params": params]
+    let reply = await core.handle(RelayRequest(id: "1", method: "POST", headers: session.map { ["mcp-session-id": $0] } ?? [:], body: body.serialized()))
+    if session == nil { session = reply.headers["mcp-session-id"] }
+    return try? JSON.parse(reply.body)
+}
+
+var errorAnswers: [String] = []
+var pictureless: [String] = []
+
+@discardableResult @MainActor
+func call(_ label: String, _ name: String, _ args: JSON = .object([:])) async -> String {
+    let started = Date()
+    let reply = await rpc("tools/call", ["name": .string(name), "arguments": args])
+    let ms = Int(Date().timeIntervalSince(started) * 1000)
+    let text = reply?["result"]?["content"]?[0]?["text"]?.string ?? "no answer: \(reply?.serialized() ?? "nil")"
+    // The owner's rule: with the runner up, no answer halts the model (isError) and every look/do
+    // carries the picture.
+    if reply?["result"]?["isError"]?.bool == true { errorAnswers.append(label) }
+    if name != "status", !(reply?["result"]?["content"]?.array ?? []).contains(where: { $0["type"]?.string == "image" }) { pictureless.append(label) }
+    let pictures = reply?["result"]?["content"]?.array?.filter { $0["type"]?.string == "image" } ?? []
+    let images = pictures.count
+    // Every picture the model would have seen, numbered by step, for reading a failure afterwards.
+    if let folder = ProcessInfo.processInfo.environment["POKI_PICTURES"] {
+        try? FileManager.default.createDirectory(atPath: folder, withIntermediateDirectories: true)
+        for (i, image) in pictures.enumerated() {
+            let safe = label.replacingOccurrences(of: "[^A-Za-z0-9]+", with: "-", options: .regularExpression)
+            if let b64 = image["data"]?.string, let data = Data(base64Encoded: b64) {
+                try? data.write(to: URL(fileURLWithPath: folder).appendingPathComponent(String(format: "%02d-%@%@.jpg", rows.count + 1, safe, i == 0 ? "" : "-\(i + 1)")))
+            }
+        }
+    }
+    print("=== \(label): \(ms) ms, \(images) image(s)\n\(text)\n")
+    rows.append((label, ms, text.split(separator: "\n").first.map(String.init) ?? ""))
+    return text
+}
+
+@MainActor func check(_ ok: Bool, _ what: String) {
+    print(ok ? "PASS \(what)" : "FAIL \(what)")
+    if !ok { failures.append(what) }
+}
+
+_ = await rpc("initialize", ["protocolVersion": "2025-06-18", "capabilities": .object([:]), "clientInfo": ["name": "poki-sim-check", "version": "1"]])
+
+/// The number of the first listed element whose line holds `text`, from a look/do answer.
+func ref(in answer: String, _ text: String) -> Int? {
+    for line in answer.split(separator: "\n") where line.contains(text) {
+        let head = line.trimmingCharacters(in: .whitespaces).trimmingCharacters(in: CharacterSet(charactersIn: "+~ "))
+        if let n = Int(head.prefix { $0.isNumber }), !head.prefix { $0.isNumber }.isEmpty { return n }
+    }
+    return nil
+}
+
+
+await call("look (cold: opens the session)", "look")
+let launched = await call("launch Settings fresh", "do", ["actions": [["launch": ["bundle": "com.apple.Preferences", "fresh": true]]]])
+// A cold app's first tree can take longer than a read waits on a CI simulator; the reply then says
+// so. What must hold: Settings is in front by the next look.
+let warm = await call("look (warm)", "look")
+let warm2 = await call("look (warm, again)", "look")
+check([launched, warm, warm2].contains { $0.contains("app: Settings") }, "Settings is in front after launch")
+let swiped = await call("swipe up", "do", ["actions": [["swipe": "up"]]])
+check(swiped.contains("screen_changed: true"), "a swipe up scrolls Settings")
+let back = await call("swipe down", "do", ["actions": [["swipe": "down"]]])
+check(back.contains("screen_changed: true"), "a swipe down scrolls back")
+let dragged = await call("drag up 300 points", "do", ["actions": [["drag": [200, 650, 200, 350]]]])
+check(dragged.contains("screen_changed: true"), "a drag scrolls Settings")
+let found = await call("scroll_to Privacy", "do", ["actions": [["scroll_to": "Privacy"]]])
+check(found.contains("found at"), "scroll_to finds Privacy")
+// The list settles first: a wait right after the scroll reads the deceleration as a change.
+let waited = await call("wait_until settled", "do", ["actions": [["wait_until": "settled"]]])
+check(waited.contains("wait_until: the screen held still"), "wait_until settled")
+let same = await call("no-op wait", "do", ["actions": [["wait": 300]]])
+// Simulator tolerance: the drag's scroll indicator can still be fading when this read comes, so a
+// picture-only change confined to a strip at the right edge, under 5 % of the picture, passes.
+let smallStrip = same.range(of: #"only the picture changed, in ([0-9]+) % of it, within \[([0-9]+), [0-9]+, ([0-9]+), [0-9]+\]"#, options: .regularExpression).map { r -> Bool in
+    let parts = same[r].split(whereSeparator: { !$0.isNumber }).compactMap { Int($0) }  // share, x, y, width, height
+    return parts.count >= 5 && parts[0] < 5 && parts[1] > 350 && parts[3] <= 40
+} ?? false
+check(same.contains("screen_changed: false") || smallStrip, "nothing done: screen_changed false (or only the scroll indicator faded)")
+await call("swipe down to the top", "do", ["actions": [["swipe": "down"], ["swipe": "down"]]])
+// Diagnostic only: how long Vision's text recognition takes here on a whole screenshot (the fallback
+// when the tree is late gets up to 3.5 s).
+if let shot = try? await URLSession.shared.data(from: url.appendingPathComponent("screenshot")).0,
+   let b64 = (try? JSON.parse(shot))?["value"]?.string, let png = Data(base64Encoded: b64) {
+    let began = Date()
+    let texts = await Host().recognizeText(inPNG: png)
+    print("diag: Vision read \(texts.map { "\($0.count) texts" } ?? "nothing (nil)") from a \(png.count / 1024) KB screenshot in \(Int(Date().timeIntervalSince(began) * 1000)) ms\n")
+}
+// Settings' search field: typing, read back exactly.
+let list = await call("look for the search field", "look")
+let searchRef = list.split(separator: "\n").first { $0.contains("SearchField") }.flatMap { line in line.split(separator: " ").first { Int($0.trimmingCharacters(in: CharacterSet(charactersIn: "+~"))) != nil } }.map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "+~")) }
+if let searchRef, let fieldRef = Int(searchRef) {
+    let text = "Wi-Fi 你好 123"
+    var typed = await call("type mixed text in search", "do", ["actions": [["type": .string(text), "ref": .number(Double(fieldRef))]]])
+    // Nothing typed because the runner was still busy (the keyboard's first use on a fresh simulator
+    // held it for seconds): sent again, as an agent would, once.
+    if typed.contains("nothing was typed") {
+        // As an agent would: the field's number from the latest read (the refused call's read may
+        // have failed; then the numbers before it stand), else from a fresh look.
+        var fieldAgain = ref(in: typed, "SearchField")
+        if fieldAgain == nil, typed.contains("keep their numbers") { fieldAgain = fieldRef }
+        if fieldAgain == nil { fieldAgain = ref(in: await call("look for the search field again", "look"), "SearchField") }
+        typed = await call("type again (the runner was busy)", "do", ["actions": [["type": .string(text), "ref": .number(Double(fieldAgain ?? fieldRef))]]])
+    }
+    // The read-back can miss its time while the keyboard comes up; the next read shows the field then.
+    // Simulator tolerance: on a fresh simulator Settings' own main loop can stop answering for a while
+    // after the first search (WDA's log: "did not confirm its main run loop is responsive"), so the
+    // check looks up to three more times. Each look's answer stays in the log and the table.
+    var reads = [typed]
+    for attempt in 1...4 {
+        let after = await call(attempt == 1 ? "look at the field" : "look at the field (\(attempt))", "look")
+        reads.append(after)
+        // The keyboard's first-use intro (QuickPath, "Continue") on a fresh simulator: dismissed as
+        // an agent would, then the field is read again.
+        if let intro = ref(in: after, "Button \"Continue\""), after.contains("UIContinuousPathIntroductionView") {
+            reads.append(await call("dismiss the keyboard intro", "do", ["actions": [["tap": .number(Double(intro))]]]))
+            continue
+        }
+        if !after.contains("no element tree") { break }
+    }
+    // With the tree late, the text read from the picture stands in; it must show the typed text.
+    check(reads.contains { $0.contains("the field now reads \"\(text)\"") || $0.contains("SearchField \"Search = \(text)\"") || $0.contains("Text \"\(text)\"") }, "typed text reads back exactly")
+} else {
+    check(false, "Settings shows a search field")
+}
+// ESP-176: the owner asks from one app (Safari stands in for Grok Bot), the work goes on in another,
+// and the phone is back in the first when the task ends, however long the agent thinks in between.
+_ = await core.finishTask()
+// The owner opens Safari; the switch animates for a moment, with SpringBoard in front meanwhile.
+let owner = Runner(url: url)
+_ = try? await owner.call("POST", "/wda/apps/activate", ["bundleId": "com.apple.mobilesafari"], timeout: 9)
+for _ in 0..<20 where (try? await owner.call("GET", "/wda/activeAppInfo", timeout: 2))?["bundleId"]?.string != "com.apple.mobilesafari" {
+    try? await Task.sleep(nanoseconds: 250_000_000)
+}
+let asked = await call("look (the owner asks from Safari)", "look")
+check(asked.contains("app: Safari"), "Safari is in front when the task begins")
+await call("launch Settings", "do", ["actions": [["launch": "com.apple.Preferences"]]])
+// Longer than an agent's thinking that must not move the phone (ESP-176: over 20 s).
+try? await Task.sleep(nanoseconds: 21_000_000_000)
+let thought = await call("look after 21 s of thinking", "look")
+check(thought.contains("app: Settings"), "the phone stays in Settings while the agent thinks")
+let finished = await call("finish", "do", ["actions": [], "finish": true])
+check(finished.contains("finish: back in Safari"), "finish brings back the app the task began in")
+let after = await call("look after finish", "look")
+check(after.contains("app: Safari"), "Safari is in front after finish")
+let home = await call("home", "do", ["actions": [["button": "home"]]])
+check(home.contains("(sent,"), "home is pressed")
+await call("status", "status")
+check(errorAnswers.isEmpty, "no answer was an error while the runner was up (\(errorAnswers.joined(separator: ", ")))")
+check(pictureless.isEmpty, "every look/do carried the picture (\(pictureless.joined(separator: ", ")))")
+
+print("\n| call | ms | first line |\n|---|---:|---|")
+for (label, ms, line) in rows { print("| \(label) | \(ms) | \(line.replacingOccurrences(of: "|", with: "/")) |") }
+if !failures.isEmpty {
+    print("\n\(failures.count) check(s) failed: \(failures.joined(separator: "; "))")
+    exit(1)
+}
+print("\nall checks passed")
+#else
+print("poki-sim-check runs on macOS only")
+#endif

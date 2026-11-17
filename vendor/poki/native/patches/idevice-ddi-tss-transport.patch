@@ -1,0 +1,248 @@
+diff --git a/idevice/src/http.rs b/idevice/src/http.rs
+index 15a8516..203626a 100644
+--- a/idevice/src/http.rs
++++ b/idevice/src/http.rs
+@@ -36,6 +36,7 @@ pub struct HttpRequest {
+     url: String,
+     headers: Vec<(String, String)>,
+     body: Vec<u8>,
++    follow_redirects: bool,
+ }
+
+ impl HttpRequest {
+@@ -53,9 +54,16 @@ impl HttpRequest {
+             url: url.into(),
+             headers: Vec::new(),
+             body: Vec::new(),
++            follow_redirects: true,
+         }
+     }
+
++    #[must_use]
++    pub fn follow_redirects(mut self, follow: bool) -> Self {
++        self.follow_redirects = follow;
++        self
++    }
++
+     /// Adds a request header. Duplicate names are preserved and sent in order.
+     #[must_use]
+     pub fn header(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
+@@ -71,6 +79,9 @@ impl HttpRequest {
+
+     /// Sends the request, following redirects, and returns the final response.
+     pub async fn send(self) -> Result<HttpResponse, IdeviceError> {
++        if !self.follow_redirects {
++            return send_once(self.method, &self.url, &self.headers, &self.body).await;
++        }
+         let mut method = self.method;
+         let mut url = self.url;
+         let mut headers = self.headers;
+@@ -315,11 +326,12 @@ async fn read_response(stream: &mut Box<dyn ReadWrite>) -> Result<HttpResponse,
+     } else if let Some(len) = content_length {
+         while buf.len() < body_start + len {
+             if !read_more(stream, &mut buf).await? {
+-                break; // truncated; return what we have
++                return Err(IdeviceError::Http(
++                    "connection closed before HTTP body was complete".into(),
++                ));
+             }
+         }
+-        let end = (body_start + len).min(buf.len());
+-        buf[body_start..end].to_vec()
++        buf[body_start..body_start + len].to_vec()
+     } else {
+         // No framing info: read until the peer closes.
+         while read_more(stream, &mut buf).await? {}
+diff --git a/idevice/src/services/cryptexd.rs b/idevice/src/services/cryptexd.rs
+index 9bc7854..e0744d0 100644
+--- a/idevice/src/services/cryptexd.rs
++++ b/idevice/src/services/cryptexd.rs
+@@ -402,9 +402,7 @@ pub async fn install_ddi(
+
+     let mut request = crate::tss::TSSRequest::new();
+     request.add_cryptex1_tags(&assets.build_identity, &chip_instance, &nonce)?;
+-    let response = request
+-        .send()
+-        .await?
++    let response = ddi_signing_response(request.send().await)?
+         .into_dictionary()
+         .ok_or(CryptexdError::MissingField("(TSS response)"))?;
+     // Cryptex1 responses carry the ticket under its own key on current releases
+@@ -433,6 +431,28 @@ pub async fn install_ddi(
+         .ok_or(IdeviceError::ImageNotMounted)
+ }
+
++/// Classifies the result at the DDI signing-request boundary, before device errors are combined.
++/// Request bodies, redirect targets, and non-TSS response bodies are never included.
++#[cfg(feature = "tss")]
++#[doc(hidden)]
++pub fn ddi_signing_response(result: Result<plist::Value, IdeviceError>) -> Result<plist::Value, IdeviceError> {
++    result.map_err(|error| match error {
++        IdeviceError::Socket(io) => IdeviceError::Http(format!(
++            "Apple signing server socket failed ({:?})", io.kind()
++        )),
++        IdeviceError::UnexpectedResponse(text) => match crate::tss::tss_error_status(&text) {
++            Some(crate::tss::TSS_STATUS_NOT_ELIGIBLE) => IdeviceError::UnexpectedResponse(text),
++            Some(status) => IdeviceError::Http(format!(
++                "Apple signing server returned STATUS={status}"
++            )),
++            None => IdeviceError::Http(
++                "Apple signing server returned an unexpected response".into()
++            ),
++        },
++        other => other,
++    })
++}
++
+ /// The installed DeveloperDiskImage cryptex, if there is one.
+ #[cfg(feature = "rsd")]
+ pub async fn installed_ddi(
+diff --git a/idevice/src/tss.rs b/idevice/src/tss.rs
+index 163b2dd..d6448a9 100644
+--- a/idevice/src/tss.rs
++++ b/idevice/src/tss.rs
+@@ -15,10 +15,53 @@ use crate::IdeviceError;
+ const TSS_CLIENT_VERSION_STRING: &str = "libauthinstall-1033.0.2";
+ /// Apple's TSS endpoint URL
+ const TSS_CONTROLLER_ACTION_URL: &str = "http://gs.apple.com/TSS/controller?action=2";
++/// TSS status returned when Apple refuses to sign the requested build for the device.
++pub const TSS_STATUS_NOT_ELIGIBLE: i32 = 94;
++const NON_APPLE_REPLY_PREFIX: &str = "non-Apple TSS reply: ";
++
++#[derive(Debug, Clone, Copy)]
++struct TssFrame<'a> {
++    status: i32,
++    message: &'a str,
++    request_string: Option<&'a str>,
++}
++
++fn parse_tss_frame(body: &str) -> Option<TssFrame<'_>> {
++    let rest = body.trim().strip_prefix("STATUS=")?;
++    let (status, rest) = rest.split_once("&MESSAGE=")?;
++    let status = status.parse::<i32>().ok()?;
++    let (message, request_string) = match rest.split_once("&REQUEST_STRING=") {
++        Some((message, request_string)) => (message, Some(request_string)),
++        None => (rest, None),
++    };
++    Some(TssFrame {
++        status,
++        message,
++        request_string,
++    })
++}
++
++fn non_apple_reply(reason: impl std::fmt::Display) -> IdeviceError {
++    IdeviceError::Http(format!("{NON_APPLE_REPLY_PREFIX}{reason}"))
++}
++
++pub fn is_non_apple_tss_reply(text: &str) -> bool {
++    text.starts_with(NON_APPLE_REPLY_PREFIX)
++}
++
++pub fn tss_error_status(text: &str) -> Option<i32> {
++    if !text.contains("TSS server responded") {
++        return None;
++    }
++    let rest = text.split_once("STATUS=")?.1;
++    let end = rest.find(['&', ')']).unwrap_or(rest.len());
++    rest[..end].parse().ok()
++}
+
+ /// Represents a TSS request to Apple's signing server
+ #[derive(Debug)]
+ pub struct TSSRequest {
++    url: String,
+     /// The underlying plist dictionary containing request parameters
+     inner: plist::Dictionary,
+ }
+@@ -36,7 +79,16 @@ impl TSSRequest {
+             "@VersionInfo": TSS_CLIENT_VERSION_STRING,
+             "@UUID": uuid::Uuid::new_v4().to_string().to_uppercase()
+         });
+-        Self { inner }
++        Self {
++            url: TSS_CONTROLLER_ACTION_URL.to_string(),
++            inner,
++        }
++    }
++
++    #[must_use]
++    pub fn with_url(mut self, url: impl Into<String>) -> Self {
++        self.url = url.into();
++        self
+     }
+
+     /// Inserts a key-value pair into the TSS request
+@@ -73,40 +125,47 @@ impl TSSRequest {
+             "Sending TSS request: {}",
+             crate::pretty_print_dictionary(&self.inner)
+         );
+-        // The TSS controller is plain HTTP, so no TLS/crypto provider is needed.
+-        let res = crate::http::HttpRequest::post(TSS_CONTROLLER_ACTION_URL)
++        // Following a redirect on a signing POST either visits a captive portal or downgrades
++        // POST to a bodyless GET that TSS answers with STATUS=93.
++        let resp = crate::http::HttpRequest::post(&self.url)
++            .follow_redirects(false)
+             .header("Cache-Control", "no-cache")
+             .header("Content-type", "text/xml; charset=\"utf-8\"")
+             .header("User-Agent", "InetURL/1.0")
+             .body(plist_to_xml_bytes(&self.inner))
+             .send()
+-            .await?
+-            .text();
+-
+-        debug!("Apple responded with {res}");
+-        let trimmed = res.trim_start_matches("STATUS=0&");
+-        let trimmed = trimmed.trim_start_matches("MESSAGE=");
+-        if !trimmed.starts_with("SUCCESS") {
+-            // On failure Apple returns `STATUS=<n>&MESSAGE=<text>` (no
+-            // REQUEST_STRING); surface it so the caller sees why it was rejected.
+-            let detail = res
+-                .split("&REQUEST_STRING=")
+-                .next()
+-                .unwrap_or(res.as_str())
+-                .trim();
+-            warn!("TSS responded with non-success value: {detail}");
++            .await?;
++
++        if resp.status != 200 {
++            return Err(non_apple_reply(format_args!("HTTP {}", resp.status)));
++        }
++
++        let body = std::str::from_utf8(&resp.body)
++            .map_err(|_| non_apple_reply("non-UTF-8 body"))?;
++        let Some(frame) = parse_tss_frame(body) else {
++            return Err(non_apple_reply("non-TSS body"));
++        };
++
++        debug!("Apple responded with STATUS={}&MESSAGE={}", frame.status, frame.message);
++        if frame.status != 0 {
++            warn!(
++                "TSS responded with non-success status {}: {}",
++                frame.status, frame.message
++            );
+             return Err(IdeviceError::UnexpectedResponse(format!(
+-                "TSS server responded with non-success status ({detail})"
++                "TSS server responded with non-success status (STATUS={}&MESSAGE={})",
++                frame.status, frame.message
+             )));
+         }
+-        let res = res.split("REQUEST_STRING=").collect::<Vec<&str>>();
+-        if res.len() < 2 {
+-            warn!("Response didn't contain a request string");
+-            return Err(IdeviceError::UnexpectedResponse(
+-                "TSS response missing REQUEST_STRING".into(),
+-            ));
++        if !frame.message.starts_with("SUCCESS") {
++            return Err(non_apple_reply("invalid STATUS=0 message"));
+         }
+-        Ok(plist::from_bytes(res[1].as_bytes())?)
++        let Some(request_string) = frame.request_string else {
++            warn!("Response didn't contain a request string");
++            return Err(non_apple_reply("missing REQUEST_STRING"));
++        };
++        plist::from_bytes(request_string.as_bytes())
++            .map_err(|_| non_apple_reply("invalid plist body"))
+     }
+
+     /// Sets the `@ApImg4Ticket` request flag.

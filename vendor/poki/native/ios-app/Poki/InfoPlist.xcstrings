@@ -1,0 +1,174 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "Info.plist",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Amore"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore"
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription": {
+      "comment": "Info.plist",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore uses the camera to take photos you send in a message, and to scan the pairing code from Amore Setup on your computer."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 使用相机拍摄你在消息里发送的照片，以及扫描电脑上 Amore Setup 显示的配对码。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 使用相機拍攝你在訊息裡傳送的照片，以及掃描電腦上 Amore Setup 顯示的配對碼。"
+          }
+        }
+      }
+    },
+    "NSFaceIDUsageDescription": {
+      "comment": "Info.plist",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore uses Face ID to unlock Screen History, so only you can open it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 使用面容 ID 解锁屏幕历史，确保只有你能打开。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 使用 Face ID 解鎖螢幕歷史，確保只有你能打開。"
+          }
+        }
+      }
+    },
+    "NSLocalNetworkUsageDescription": {
+      "comment": "Info.plist",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore connects to developer services on this iPhone for pairing and automation, and to the voice bridge on your Mac."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 会连接此 iPhone 的开发者服务以完成配对和自动化，并连接 Mac 上的语音桥接。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 會連線此 iPhone 的開發者服務以完成配對與自動化，並連線 Mac 上的語音橋接。"
+          }
+        }
+      }
+    },
+    "NSLocationAlwaysAndWhenInUseUsageDescription": {
+      "comment": "Info.plist",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore stays active in the background while on so agents can reach this iPhone. Amore never records or sends your location."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 开启时会在后台保持运行，以便智能体连接此 iPhone。Amore 不会记录或发送你的位置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 開啟時會在背景保持執行，以便智慧體連線此 iPhone。Amore 不會記錄或傳送你的位置。"
+          }
+        }
+      }
+    },
+    "NSLocationWhenInUseUsageDescription": {
+      "comment": "Info.plist",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore stays active in the background while on so agents can reach this iPhone. Amore never records or sends your location."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 开启时会在后台保持运行，以便智能体连接此 iPhone。Amore 不会记录或发送你的位置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore 開啟時會在背景保持執行，以便智慧體連線此 iPhone。Amore 不會記錄或傳送你的位置。"
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription": {
+      "comment": "Info.plist",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amore listens when you talk in Voice and sends the audio to OpenAI to understand your request."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你在“语音”中与 Amore 交谈时，Amore 会收音并将音频发给 OpenAI 以理解你的请求。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你在「語音」中與 Amore 交談時，Amore 會收音並將音訊傳送給 OpenAI 以理解你的請求。"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

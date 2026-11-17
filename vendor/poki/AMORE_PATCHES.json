@@ -1,0 +1,20 @@
+{
+  "revision": "69585293051fee03c7ad110f037d8f4dd2a4e96f",
+  "modifiedFiles": [
+    "Poki/App/AppIconStore.swift",
+    "Poki/App/AppModel.swift",
+    "Poki/App/PokiApp.swift",
+    "Poki/App/SetupState.swift",
+    "Poki/App/SiteUI.swift",
+    "Poki/Chat/HomeView.swift",
+    "Poki/Debug/InProcessProbe.swift",
+    "Poki/Debug/PathBenchmark.swift",
+    "Poki/History/HistoryBridge.swift",
+    "Poki/Runtime/DiskImageStore.swift",
+    "Poki/Runtime/InProcessWDA.swift",
+    "Poki/Runtime/RustLauncher.swift",
+    "Poki/Sessions/SessionsView.swift",
+    "Poki/Setup/SetupView.swift",
+    "Poki/Signing/SelfSigner.swift"
+  ]
+}

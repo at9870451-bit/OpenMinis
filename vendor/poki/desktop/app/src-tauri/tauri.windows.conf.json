@@ -1,0 +1,5 @@
+{
+  "bundle": {
+    "resources": { "../../target/release/poki-setup.exe": "poki-setup.exe" }
+  }
+}

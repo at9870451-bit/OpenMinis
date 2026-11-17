@@ -37,6 +37,19 @@
 				<string>com.openAmroe.app.minisbak</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Mobile Device Pairing</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.apple.property-list</string>
+				<string>com.openAmroe.app.pairing</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleIcons</key>
 	<dict>
@@ -185,6 +198,14 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>minis-mcp</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>Amore original Connection import</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>poki</string>
 			</array>
 		</dict>
 	</array>
@@ -381,6 +402,45 @@
 		<string>A0000008580102</string>
 		<string>A0000008580201</string>
 		<string>00000000000000</string>
+	</array>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_remotepairing-pairable-host._tcp</string>
+		<string>_remotepairing-manual-pairing._tcp</string>
+		<string>_remotepairing._tcp</string>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>karing</string>
+		<string>surge</string>
+		<string>loon</string>
+		<string>shadowrocket</string>
+		<string>sing-box</string>
+		<string>stash</string>
+		<string>quantumult-x</string>
+		<string>clashmi</string>
+	</array>
+	<key>PokiAppGroup</key>
+	<string>group.com.openAmroe.app</string>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.openAmroe.app.pairing</string>
+			<key>UTTypeDescription</key>
+			<string>iOS device pairing file</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>mobiledevicepairing</string>
+				</array>
+			</dict>
+		</dict>
 	</array>
 </dict>
 </plist>

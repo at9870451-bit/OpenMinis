@@ -1,0 +1,2401 @@
+{
+  "repository": "https://github.com/JosssphZhou/poki",
+  "revision": "69585293051fee03c7ad110f037d8f4dd2a4e96f",
+  "files": [
+    {
+      "path": "native/ios-app/Poki/AppShortcuts.xcstrings",
+      "sha256": "2efdd398aad6f9f7194c6fb3f25263edbbc41a5f6b08db65e1012a666ce8dd55",
+      "bytes": 1703
+    },
+    {
+      "path": "native/ios-app/Poki/LaunchScreen.storyboard",
+      "sha256": "10cfd37979786ea508f9a32fe3d1d853f245f6da77df716e8fe5def64f4b85d8",
+      "bytes": 2724
+    },
+    {
+      "path": "native/ios-app/Poki/InfoPlist.xcstrings",
+      "sha256": "0aaad2564d98b2ea2d9aebc00ba21d7c8bafcb8ccc4188d05d739608fb42786b",
+      "bytes": 5760
+    },
+    {
+      "path": "native/ios-app/Poki/Setup/PairingScanner.swift",
+      "sha256": "b2396c9af5edabb0575d4c5e20af96d629671071876751fd5be09af01c4db630",
+      "bytes": 2998
+    },
+    {
+      "path": "native/ios-app/Poki/Setup/PokiUpdateInfo.swift",
+      "sha256": "8fa75eae637a1c5b38e8e40cbb2b05f218dddd5c1c0a21afa63f154211e136cd",
+      "bytes": 2917
+    },
+    {
+      "path": "native/ios-app/Poki/Setup/ModelKeySeal.swift",
+      "sha256": "30b5d9489b7923469195fa2cb1f95862de2a13d939fe55872aaae5fd01a9047a",
+      "bytes": 3692
+    },
+    {
+      "path": "native/ios-app/Poki/Setup/PokiHandoff.swift",
+      "sha256": "fc6378112834d2284340558960fd899cea8d647bbb35f484bad50cee5ed9f6a5",
+      "bytes": 6840
+    },
+    {
+      "path": "native/ios-app/Poki/Setup/SetupView.swift",
+      "sha256": "fccfeb17bf76972cdde7e938b8fbe773d2c2b3daa3a3255cc58bd98339a18428",
+      "bytes": 45311
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/ModelCatalog.swift",
+      "sha256": "a508d925e364417388d26db4d56a640d5f35efa1b8aed2dee44033a1790dddb0",
+      "bytes": 9051
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/TaskCard.swift",
+      "sha256": "74006c4e35ced6686a39fa486357104b09881bee8c887e2bc680a4ae0451c4a2",
+      "bytes": 31016
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/ChatModel.swift",
+      "sha256": "0a5c20520d025abb797869b51bea233f96817764fd8e8a5adae62005a40d0f3c",
+      "bytes": 81000
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/ModelClient.swift",
+      "sha256": "820e8f576133160990c513313855de96e34f555ead91d57a8e0fec936caea2e6",
+      "bytes": 7623
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/TalkEdgeGlow.swift",
+      "sha256": "6e3bc18111e033807c2433f6128e631041af58ca1fd3148768f09d4fc092a4ef",
+      "bytes": 6320
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/VoicePage.swift",
+      "sha256": "0c6e73885a1985442ddec73fde98611931a288ba5a491292aae07228a8606b8b",
+      "bytes": 10084
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/ChatView.swift",
+      "sha256": "1d203687a1aafe3b97a706bb494d5c4e6006c1adb6a2391a75e10bee4eeafcc8",
+      "bytes": 86076
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/PlanMotion.swift",
+      "sha256": "7238b71d8e751667fb98b670f3637538f99209b6f751a752c54970ed8cf8711a",
+      "bytes": 7665
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/ShortcutEditor.swift",
+      "sha256": "566124467da4e3edc20af6ea75e69ab4d6d809d372601acb432f4843fc8a32ca",
+      "bytes": 11386
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/PiLoop.swift",
+      "sha256": "b7441089be766c92c0529cc1460abf8d28733f47f0703e7d64381465735b296c",
+      "bytes": 10632
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/PokiDetailsView.swift",
+      "sha256": "9814de99da8aec1afd0efd19695f96055cbe8a4573f30f8a06b2f322a41a9287",
+      "bytes": 47420
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/HomeBackdrop.swift",
+      "sha256": "4f589298e46f8c2e051654d8d20380653874e81d8a24c50f71c99ea51e63360a",
+      "bytes": 18393
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/TalkBars.swift",
+      "sha256": "f3fefc7c276a62a612b5eaed8d8badb6599a866d77c04ae32f6568f21bd912ca",
+      "bytes": 6685
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/ModelKeys.swift",
+      "sha256": "e59a53420d6c2c6a2e83c6598b740ec12d6f98814b39fadbd0d9ea731e40c992",
+      "bytes": 13683
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/ModelSettingsView.swift",
+      "sha256": "3ad9d23d9711b4c2c4124e5cbc785868c330383628323b86afec1a0b503ef804",
+      "bytes": 26407
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/ComposerLayout.swift",
+      "sha256": "cd91b4476c54c3825597db7d21a83fb1f83925b46a573a7eba84a76cb47e7d98",
+      "bytes": 2329
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/OpenAIClient.swift",
+      "sha256": "29f0812919a2c117591ce046f67f48513f1db9b91f4c640b490f19edb438a98d",
+      "bytes": 4840
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/HomeView.swift",
+      "sha256": "bf90944f52f838e6e06a289a816bcdcea672b3de0f7343f8db1c4c711ba55830",
+      "bytes": 43310
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/HomeShortcuts.swift",
+      "sha256": "dccbef6a98ab11bf968ba412854e143c7d9a41c582a3a804ee7ce1e08eb63227",
+      "bytes": 21534
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/Marquee.swift",
+      "sha256": "7b1409bf9476b7f52099631cddbc83e5b28f6d8af5fb6e70d248e0d78efe2969",
+      "bytes": 13667
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/TalkViews.swift",
+      "sha256": "c82e07d31c84f4e72ed91ba9b3957d967e0042df121121fe97450bd32ef402df",
+      "bytes": 12333
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/Attachments.swift",
+      "sha256": "c89321083e52537a990bf5d2d7130e7361e2af07548df1560bede7cdafb00715",
+      "bytes": 13445
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/ConnectionCheck.swift",
+      "sha256": "a4dc601d6089fa973d6532b7166a6ebcb0207b3ebb7ced6baa9ed37b70981039",
+      "bytes": 13175
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/ChatGPTLogin.swift",
+      "sha256": "4b1e2c516880817463350e096117fd964ee184d15f20e7f9fea71810dc1a33ad",
+      "bytes": 9916
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/MessageBubble.swift",
+      "sha256": "fcbcb2bfb4f51a03063144710ea4497d46cffa33ef9a32d5607e8063d2395523",
+      "bytes": 26937
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/Chat.xcstrings",
+      "sha256": "1f55a8021de1a00cfd686763e78087087f88dfd5d3ac123d0c9b468f54c5614e",
+      "bytes": 553
+    },
+    {
+      "path": "native/ios-app/Poki/ProxyIcons/stash.png",
+      "sha256": "e5d84b9321f6ea5cf0a7481f9197794e3e1dfaaa7c126910803f41356a264e1b",
+      "bytes": 23641
+    },
+    {
+      "path": "native/ios-app/Poki/ProxyIcons/loon.png",
+      "sha256": "ba6a0ad317c36d9244a05546465005e55debd54ef70712bb7d48ed9990cb6838",
+      "bytes": 9536
+    },
+    {
+      "path": "native/ios-app/Poki/ProxyIcons/clashmi.png",
+      "sha256": "3c5668845a0c71dfec5d00a5eda515756acd8ca04d00c84530bce69c1afcd327",
+      "bytes": 13499
+    },
+    {
+      "path": "native/ios-app/Poki/ProxyIcons/ProxyIcons.md",
+      "sha256": "a4e90140eebd8b7ede2184001280004bdbbb29b3fef2222f823720d0dbdda462",
+      "bytes": 264
+    },
+    {
+      "path": "native/ios-app/Poki/ProxyIcons/shadowrocket.png",
+      "sha256": "e6f041209fe424a02f82c381d271ee8f6752fa2b00e65c0300f91b0df7d45806",
+      "bytes": 13145
+    },
+    {
+      "path": "native/ios-app/Poki/ProxyIcons/localdevvpn.png",
+      "sha256": "d187d24eb71f85c8b017d7991f846d814904dc71828e00846502f3443f9825a4",
+      "bytes": 26754
+    },
+    {
+      "path": "native/ios-app/Poki/ProxyIcons/surge.png",
+      "sha256": "dc5a3a9775be0a49449dacee3acafb9762d9fbe9f73b1fd81ed15a90d2fbaea9",
+      "bytes": 8041
+    },
+    {
+      "path": "native/ios-app/Poki/ProxyIcons/quantumult-x.png",
+      "sha256": "50d8f7cddb2fa849c39d2af6b1c6fe005f174743e896d6b3d614bcbc94600942",
+      "bytes": 23846
+    },
+    {
+      "path": "native/ios-app/Poki/ProxyIcons/sing-box.png",
+      "sha256": "4ee26013a98cdb2e921dcbf09397be8aadb6c6443e0f983f436e72d4c37fb117",
+      "bytes": 25600
+    },
+    {
+      "path": "native/ios-app/Poki/ProxyIcons/karing.png",
+      "sha256": "cc6f9494bf4fef8aa6f4916be7be2ef8ad4c6e64c8178f9b001ed616be4c874b",
+      "bytes": 21689
+    },
+    {
+      "path": "native/ios-app/Poki/ActivityBears/README.md",
+      "sha256": "25ce6404929f40a20eb4cb863dea97e671ac278fe6b897861873deab955e4486",
+      "bytes": 1458
+    },
+    {
+      "path": "native/ios-app/Poki/Entry/ActionButtonSection.swift",
+      "sha256": "bcece69527bad3f48f97552710b913480c314e4a5816b24e38929da0938644d5",
+      "bytes": 768
+    },
+    {
+      "path": "native/ios-app/Poki/Entry/SendTaskIntent.swift",
+      "sha256": "64914abeee1dbc24d2e1588bd0a131b8ca9654da22cabd1ef0acecf834b0f84c",
+      "bytes": 4933
+    },
+    {
+      "path": "native/ios-app/Poki/Entry/MessageFieldAsk.swift",
+      "sha256": "d22756bdff2237c0eaa962312beb2b2ae24120ede12564502c93f9e919369db1",
+      "bytes": 488
+    },
+    {
+      "path": "native/ios-app/Poki/Signing/UpdateFinishView.swift",
+      "sha256": "c415ab19d6ae7e15c2ba8707dae37d955a0fd729bafb1f5600dc545780744a81",
+      "bytes": 999
+    },
+    {
+      "path": "native/ios-app/Poki/Signing/SelfSigner.swift",
+      "sha256": "f6fab97df091bf67d133a2301c2fa15cafbb44daae63dc38929d41e2c6664652",
+      "bytes": 33755
+    },
+    {
+      "path": "native/ios-app/Poki/Signing/SigningViews.swift",
+      "sha256": "37dcc1900dd39b1d66cb7f7ccdc5a69f68449404b5db7f8552f1360f2b22e833",
+      "bytes": 18625
+    },
+    {
+      "path": "native/ios-app/Poki/Activity/ActivityController.swift",
+      "sha256": "32b976afc06bb96a18b009306639719ad5c9316151be523d711803398eab88ac",
+      "bytes": 31718
+    },
+    {
+      "path": "native/ios-app/Poki/Activity/ApprovalNotice.swift",
+      "sha256": "80d0bb585d1d5a1327717d2a24be255c5f87e4cd782b08c5c6debd912598e8d4",
+      "bytes": 8274
+    },
+    {
+      "path": "native/ios-app/Poki/Runtime/InProcessWDA.swift",
+      "sha256": "416ef5b5ea1e58c99f269dca5d22c8c1bd77bd9376f784d3749a4a1195197039",
+      "bytes": 27982
+    },
+    {
+      "path": "native/ios-app/Poki/Runtime/BackgroundKeeper.swift",
+      "sha256": "718c6b620c6a57901a0b7997cf376f1649ac711ffa43dc6e815d74c87758697c",
+      "bytes": 7619
+    },
+    {
+      "path": "native/ios-app/Poki/Runtime/RustLauncher.swift",
+      "sha256": "d068234b537767408a3eeb9b7e15d89040eadeb246040602195d0e7405245576",
+      "bytes": 6445
+    },
+    {
+      "path": "native/ios-app/Poki/Runtime/CoreBridge.swift",
+      "sha256": "c669edc874aedec488d4bc77d2c1f87ea437faec99fd382e1998589565553a87",
+      "bytes": 4064
+    },
+    {
+      "path": "native/ios-app/Poki/Runtime/LiveCore.swift",
+      "sha256": "de544f1fbb9ed7fcbc6476adec2f717f2948baae6c3826ce9e352ccd0cf5002d",
+      "bytes": 12090
+    },
+    {
+      "path": "native/ios-app/Poki/Runtime/KeepAlive.swift",
+      "sha256": "b162e1a6e05e245c24605513da34254d9d76b7ef600578eb22148e8005e872cd",
+      "bytes": 2924
+    },
+    {
+      "path": "native/ios-app/Poki/Runtime/Poki-Bridging-Header.h",
+      "sha256": "919e33084d1664812d2847cb7696bbcb8480073a9211b08b75b9c15d35b23835",
+      "bytes": 127
+    },
+    {
+      "path": "native/ios-app/Poki/Runtime/AppLog.swift",
+      "sha256": "64c2dde0dbe258aa87ad8a3513ace8409480a9ef3dc3c2dbd5e24020bcecc8d4",
+      "bytes": 2860
+    },
+    {
+      "path": "native/ios-app/Poki/Runtime/DiskImageStore.swift",
+      "sha256": "7b0112df1806aa208fd1e39fe841ede77fa95712f73684287ec918939364b2ac",
+      "bytes": 6020
+    },
+    {
+      "path": "native/ios-app/Poki/Runtime/ContinuedRun.swift",
+      "sha256": "6c7a21e7bfff2ced1544766a565dcf971a722b215318d3f5341f7c3ff83ddf79",
+      "bytes": 4913
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/spotify.png",
+      "sha256": "d052d8b8f97819c44294e56f4f1215302ba633becc0b42563304e9c7317719da",
+      "bytes": 25427
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/didi.png",
+      "sha256": "d4a0cab870f9f973f3de00d1c360826a1b48ad1dfb8c8966d9cc4026ea4b271b",
+      "bytes": 13764
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/qq-music.png",
+      "sha256": "a32177b00cc0302140b3fc9c417ca03cb855eda132ce6728e018ce0c81931b5f",
+      "bytes": 30812
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/xiaohongshu.png",
+      "sha256": "986b60c8bd36846204b96e49ff11dbfa0c40802e11bbbd4064598f90bae15b9b",
+      "bytes": 16850
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/testflight.png",
+      "sha256": "973e79ff82272c4b8ecd62a114666573b472631119afe95d89794c5cce9711cb",
+      "bytes": 43494
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/telegram.png",
+      "sha256": "d0a4e4a94ffaca6ce1697c4dfd362e6c84a0ccaf5c01d59ae15b8c02351405fe",
+      "bytes": 27813
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/netease-music.png",
+      "sha256": "e5d8b2ce056ac0cc586c22e5948734a786600610e55150437e13aaeb3ef6322d",
+      "bytes": 23652
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/dianping.png",
+      "sha256": "666345f6056ba85865424220f025bf68d995ca3b4148fcfd6e5897cd8c19515e",
+      "bytes": 25201
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/ctrip.png",
+      "sha256": "634b76ba1ee0d7db08cedf244f94b8e20d30d55eb0ab3dd683482f7d4b58f912",
+      "bytes": 22236
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/mail.png",
+      "sha256": "14b6b0934abc51277160738a78e14dcb193b64c44d485737b962385b29684614",
+      "bytes": 24943
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/safari.png",
+      "sha256": "ae67213cce65c1cd7f499854f31e1076f9ed3852b888bcae14f083d4d82339e6",
+      "bytes": 42270
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/instacart.png",
+      "sha256": "41125fff2f473b36874f3899d4190fa70063940f8fc36d8a2a7c64262c221afe",
+      "bytes": 6817
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/zoom.png",
+      "sha256": "5ddeb6fea3eb7be85fcccaf9de5d9d31d33ca4ab54a58800dfebcf6094a19d45",
+      "bytes": 20072
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/threads.png",
+      "sha256": "810a9607d820fe7c1dd0bdc61de70183a1fac1896b9d2c20af535d34d103c1e1",
+      "bytes": 24168
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/instagram.png",
+      "sha256": "6ce8e73c5f1bd1f3df4c47a80a4603c71ba40b0999b1e8fad4df8a710f55d4e6",
+      "bytes": 41476
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/x.png",
+      "sha256": "ba1867172326a093ef664670f539af85c95d0564a128e5d1e69765a82e6ceba8",
+      "bytes": 5220
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/douyin.png",
+      "sha256": "8084bf2b970e1021e8f739da83e57ba89668081855187a7ea5235dbc1629f0ed",
+      "bytes": 9338
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/files.png",
+      "sha256": "fdfa5426d6b328c5d14f10af72e74d6fa36b24afa8cfe1706639220517d1c136",
+      "bytes": 17471
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/outlook.png",
+      "sha256": "377d1998fed53de499b3e4701c857d1d28e2bcf2ec13ebc394e83bff4db6d8bd",
+      "bytes": 16328
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/rails12306.png",
+      "sha256": "9f79e2172a06eb58b5cf279ecf3574e7ada558c6e0ce067ffe5d3f69e2dd4174",
+      "bytes": 13298
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/github.png",
+      "sha256": "e64ebf23cc17813126bcbebe16321017e34c365653f83b5711435c87c90dc694",
+      "bytes": 4735
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/google-maps.png",
+      "sha256": "d0c17a2a2527ca2fdaf947a3e38cbbfacb6b04b14f776bebc4f578f7a9449747",
+      "bytes": 28554
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/music.png",
+      "sha256": "8baad33ef44d517c2892dd5114ef1d0d55e64058b9b584369bc47b0a47321100",
+      "bytes": 15527
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/weibo.png",
+      "sha256": "e4dabfb5fde8c2422f941c72c4bd0b77c9700df76ed1b32a383a67d1753afaed",
+      "bytes": 20797
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/gmail.png",
+      "sha256": "db63784aac9bf825c2f2194b783cd4a8ddae0325b7a98b4b8368d612b730cef4",
+      "bytes": 23111
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/dingtalk.png",
+      "sha256": "0da9d3138436b59c3113b2ae44fc780a7c6d0614d52a7110915e867f46503bf7",
+      "bytes": 14212
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/jd.png",
+      "sha256": "884958e8102f5bd358edb2e4e10ae1be13eb810c69cc5293444bd93a0ba728a0",
+      "bytes": 55850
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/airbnb.png",
+      "sha256": "1c25e24070f1a9fbbf79c36c28c495e708af8b3fd1e651f14dccf8fcaf345b96",
+      "bytes": 18688
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/yelp.png",
+      "sha256": "17220a3aeef491606a10023552e044e6a70b6e0cd11073e9a1d295feb76ec128",
+      "bytes": 34461
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/bilibili.png",
+      "sha256": "2f6abda271760795b7678bea1edddeb0a088244fe8e4a786fb9736e936db61c9",
+      "bytes": 30246
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/opentable.png",
+      "sha256": "ffd4bc1b38d5a5b3d1ea4b8008ff631fea4094f40b80e4c8af92d42e906aa307",
+      "bytes": 6180
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/uber-eats.png",
+      "sha256": "69828093318476d1678494500b089fa8205f665ed22281a47b3ea1ab897cf269",
+      "bytes": 8727
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/doordash.png",
+      "sha256": "b312ec81ea0b60b8af3f91c6008b34e239142ad037fd7dcfff3b33637c1e569c",
+      "bytes": 21361
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/weather.png",
+      "sha256": "ce71d05efba38d81150e83f05df9e828d4b9aabc0e18e30d880957d635d35329",
+      "bytes": 30430
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/notes.png",
+      "sha256": "7cb811d2a6a4c2dc26282ebe643a09d3cabbbdf04c76d352eee07591350a9738",
+      "bytes": 18555
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/amap.png",
+      "sha256": "caed35d3464831bc25d1dbead5b28c1f7770b0aff49c106d7a2f91a3a4f2dffb",
+      "bytes": 31470
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/baidu-maps.png",
+      "sha256": "60b190aba81565a5f615d766ee17c86082bd9676ec6e89b7c25bc94739522791",
+      "bytes": 28912
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/taobao.png",
+      "sha256": "253a9d2cc3e9d2b7b3f339231277761a32741bb82e41eb3b5e865a9e664b08b6",
+      "bytes": 48398
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/tiktok.png",
+      "sha256": "984100b56ca6d3ee66f6ff2d9a5257392eb69465a95f5229312ccad9b93328c6",
+      "bytes": 14404
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/netflix.png",
+      "sha256": "7eecfeba8c77b766f591140ad98deafd0888ca8b8eec565e7f11ba37ea6c70b0",
+      "bytes": 15308
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/calculator.png",
+      "sha256": "5948c95984055a158807f42b3d25874723921c4270a0a06679d342dd694e5e2f",
+      "bytes": 23364
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/chrome.png",
+      "sha256": "8d8169d3d99a92e66fab244340ef978c9e8874c6ec78f636a8473448ee362b58",
+      "bytes": 30980
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/baidu.png",
+      "sha256": "b62f68c0b0b724492e5306042f286b148834a56373b2c973b1469153d60df038",
+      "bytes": 13717
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/messenger.png",
+      "sha256": "ebf0aad8bd5340b1dcde2c9bea5aa4c9928f9e00f2f71d5ab33e4d763b57fe95",
+      "bytes": 7067
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/zhihu.png",
+      "sha256": "588badb061885defac7d52586af31948a865bf162ecd659ba1f5ef6d8ba24269",
+      "bytes": 12244
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/slack.png",
+      "sha256": "2d1833ebcb05e6833096952d341244743e4f486a25bfa019359cc722b6a5fe08",
+      "bytes": 27138
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/tencent-video.png",
+      "sha256": "1c8890be76f4c2063e175fd059a0f35101fb0af0e24a40c4af5846263abc2565",
+      "bytes": 15185
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/kuaishou.png",
+      "sha256": "cb62971be96ce515a81f69745daa83d01b367c9f7ba392bebbe00892c1e78bab",
+      "bytes": 8502
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/calendar.png",
+      "sha256": "439861cfad7c1ef52a95838ff22d8cad63339fb640d2d4d794d9d23bfbf4a247",
+      "bytes": 14197
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/discord.png",
+      "sha256": "1c3b9dd6614da538e09ffc5ece41bfce233c5f79fd1ea4d696935ba97e8d0e41",
+      "bytes": 28769
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/linkedin.png",
+      "sha256": "edf23f1f505ff1c3fe23e0921819ee90ada16f4941172b2bafd2ec6ce43437e5",
+      "bytes": 4283
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/meituan.png",
+      "sha256": "c311aa8d0f1968415756ab771a150958abc8f07baefc01af5bfc99bd44de4f1c",
+      "bytes": 6109
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/qq.png",
+      "sha256": "ea234baaef467c0f9f3a0966d537bae5b8fae096c4da57566d126a25a624f040",
+      "bytes": 31114
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/reminders.png",
+      "sha256": "50e00c3d11aebb8326de5f03481c746baf88daf1bcc3e78a46d64e556226ae1e",
+      "bytes": 21343
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/wecom.png",
+      "sha256": "506c7b62366826b198b9658f91da707160de399c5a6705be4a172a84870f0a70",
+      "bytes": 23996
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/phone.png",
+      "sha256": "b9d6dfd8a0685260738a999cfbb4cc5995921cb115ab9e198fa650f0a5c9c536",
+      "bytes": 26771
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/uber.png",
+      "sha256": "abd21ba54ea3cb2596f26dada7f48c74bf8133d897a4aa6d1ff4da9c5d3c3655",
+      "bytes": 4594
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/clock.png",
+      "sha256": "9081a3afad2c7da89c70427271db1e4304e3e996e1aee0c7f95244deee6a9946",
+      "bytes": 28929
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/alipay.png",
+      "sha256": "821dbc21a693b891fcb274c08f88d3cd63095d103647f2ba00e7a898d1167095",
+      "bytes": 11279
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/reddit.png",
+      "sha256": "aee3f791a865e691321a79da81c464922217bbd43c2f55ef49da7c0ffdd69f4f",
+      "bytes": 14351
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/github-mark.svg",
+      "sha256": "eb7d8d5b403dabb9cc3d9d54a3e051ca92554dadcf2a2d35e3f048451b8726dc",
+      "bytes": 1157
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/feishu.png",
+      "sha256": "99da767866f511c3ac78fe7f4049811ef7eb63873d308dfff91edabec3a8cf9b",
+      "bytes": 6783
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/youtube.png",
+      "sha256": "5582e7b74ebdb43a02c53d7f29b8457fc8387af1c40c4422f25a88f6bbeabe0a",
+      "bytes": 4731
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/xianyu.png",
+      "sha256": "9313089092b4e0f8a07656bc6aa5e91c6cb7c7457b2212a7caa4d06e6783ade3",
+      "bytes": 39930
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/starbucks.png",
+      "sha256": "797ce3e23cc2e43de492dc291845edd00f88bef413bdb9b1a2bc7c0856dc809a",
+      "bytes": 27044
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/pinduoduo.png",
+      "sha256": "b184101b5120fd3a39e3da4b7c2fd676f70032b3f9545fdf8ad48bd447e782d4",
+      "bytes": 55578
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/iqiyi.png",
+      "sha256": "3e25422472d52d0c8a2cc62ac83d4f499cbbe504a038c7faabcd3378c02d6e22",
+      "bytes": 33699
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/pinterest.png",
+      "sha256": "c4c25626c8643957bd6fa27c2d81d81b1b214c7c339a973e4a6700b9031ec254",
+      "bytes": 10732
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/shortcuts.png",
+      "sha256": "72cca6ec44d5680b01ab8127dc7932083659f3351c8a6463daa7fa4544565a08",
+      "bytes": 37162
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/whatsapp.png",
+      "sha256": "bbb1e9f7d52981a896cc6c1fc8c9787a3f1fe1016f8a547215363fe58a49c188",
+      "bytes": 18585
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/wechat.png",
+      "sha256": "c7ad377456edb254a3c7e43990a15f6ec68611e4b41c7dd80c6af655a4609ee7",
+      "bytes": 16330
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/facebook.png",
+      "sha256": "f2ed5ec490eab94e267e28881f415f1abcb582fc02ef4010c7e1721bcf3ff139",
+      "bytes": 3276
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/AppIcons.md",
+      "sha256": "008768ef35f9ff3b20f6cd044b96de637cf21f963ed719c2c82909f6200920b5",
+      "bytes": 2396
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/camera.png",
+      "sha256": "b0daaf966217c8f52db4fdd3da2ba62a5e920b33b36baae8a51e0f29612424ac",
+      "bytes": 36968
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/amazon.png",
+      "sha256": "d27a041f59f0ace0b123e7f7601f5b32bcc0c858d7dc8998a0f62ed990379969",
+      "bytes": 21522
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/paypal.png",
+      "sha256": "517b48e59bc147011a96eb9b4bd43d57574a7da76172398ebc50436ec10e6279",
+      "bytes": 5224
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/photos.png",
+      "sha256": "fe46da782d693aff6d55143edc509076ad6f01be7e591958c52aef0b4f9364b5",
+      "bytes": 37979
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/messages.png",
+      "sha256": "9970794cbbd5baca8c17c74baf40afc7fc006d556909b0cd0d562b130d59a828",
+      "bytes": 27052
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/teams.png",
+      "sha256": "86eedc444bc6dc48b59dd09a0a2f8ab0e40e97eb12259c5e8f43b489a14b445f",
+      "bytes": 14390
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/snapchat.png",
+      "sha256": "011569b04d535e4e0b66356b64767e4dc4dd7e5e8c3ef277f8b4ba96867c08b1",
+      "bytes": 7115
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/lyft.png",
+      "sha256": "a068fa37ed69465cc8947ff1ee6c4630d2c1510c7e550fcca83edf1901207111",
+      "bytes": 19976
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/maps.png",
+      "sha256": "c403ed42c7b7b09131dcd335d1e8864ad84bb309538709b639ff22cd82d4f190",
+      "bytes": 46494
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/eleme.png",
+      "sha256": "0799b8be37f3e6acb0a6a22f9140ac698706468ac3778e8b3df80591734283e5",
+      "bytes": 21891
+    },
+    {
+      "path": "native/ios-app/Poki/AppIcons/meituan-waimai.png",
+      "sha256": "39d282cf742e762a7af57df9e3dfe264fd4556d1ca62509dcb400506917877c3",
+      "bytes": 22875
+    },
+    {
+      "path": "native/ios-app/Poki/Capsule/PillTextAttachmentData.swift",
+      "sha256": "5d97b79a31c356f402af9cb0d9e26cc8532b3d26d9b22bbe38bfbbf4e3ad7288",
+      "bytes": 1815
+    },
+    {
+      "path": "native/ios-app/Poki/Capsule/PillTextAttachment.swift",
+      "sha256": "e52d7850e74441ff55b8fd0a933e2cb920b0d7f4c20b31f278d5ad3fb568ca0a",
+      "bytes": 2275
+    },
+    {
+      "path": "native/ios-app/Poki/Capsule/CapsuleField.swift",
+      "sha256": "d459f2a7f7bac27c4976d2a48a7bdf3e341557258deb7ed2166e6d023e51f414",
+      "bytes": 14196
+    },
+    {
+      "path": "native/ios-app/Poki/Capsule/PillView.swift",
+      "sha256": "666c661c24f2a297a087eb1ff345c6e0c86875ae58789c193efdc4f46ac3b130",
+      "bytes": 4140
+    },
+    {
+      "path": "native/ios-app/Poki/Capsule/AppCapsules.swift",
+      "sha256": "1e10f992d8a840bf4a7927c05d79d235932c45f143846221d02352ce810403cf",
+      "bytes": 6729
+    },
+    {
+      "path": "native/ios-app/Poki/App/SetupState.swift",
+      "sha256": "92110e3f91c30e886c4f60c08fd5da4da43cb2f0171ab8b2b258ad89bf8c4d26",
+      "bytes": 9672
+    },
+    {
+      "path": "native/ios-app/Poki/App/PerfSwitch.swift",
+      "sha256": "8a1bdc62474a0da4c0f5f1ce244aed016db15b32bc51427adfbbefde5f9b2035",
+      "bytes": 1941
+    },
+    {
+      "path": "native/ios-app/Poki/App/Theme.swift",
+      "sha256": "3666af7c1428a7f93e5dcac0cd47e09739eb8a1908ee525dda20e258d7c0e339",
+      "bytes": 4992
+    },
+    {
+      "path": "native/ios-app/Poki/App/PokiApp.swift",
+      "sha256": "6953932277b0d08515c9fe19dee450b333f6755f7358c1925b527ec14db7a135",
+      "bytes": 24377
+    },
+    {
+      "path": "native/ios-app/Poki/App/AppModel.swift",
+      "sha256": "b034c62b16821dc328cc9d29db5a8e0657baa21188f1159c31fdfd910c60ceae",
+      "bytes": 143048
+    },
+    {
+      "path": "native/ios-app/Poki/App/SettingsVault.swift",
+      "sha256": "f97ac4f6e401ca75cb25da611338c494c9595f4bf5c59f290fec46f86c41750f",
+      "bytes": 2682
+    },
+    {
+      "path": "native/ios-app/Poki/App/Health.swift",
+      "sha256": "0854703a0a0c1648e8de02f4d1ebe278bb3c2ea1422e492a40ee92034291390d",
+      "bytes": 8825
+    },
+    {
+      "path": "native/ios-app/Poki/App/MainTabs.swift",
+      "sha256": "172747fcc459a0e48c9c0c3b4b8b4efa7df81f9e911e3cfa549f27b3d5042632",
+      "bytes": 15554
+    },
+    {
+      "path": "native/ios-app/Poki/App/AllStepsView.swift",
+      "sha256": "7119fae8fb976867dc87de611481f45851213475f6d50e6e557b06c3e281b99a",
+      "bytes": 4108
+    },
+    {
+      "path": "native/ios-app/Poki/App/SiteUI.swift",
+      "sha256": "6c9c618566941e9c5d8664bfdec5c6e6e8af1efb26a182d0b5e437d7207c1507",
+      "bytes": 9232
+    },
+    {
+      "path": "native/ios-app/Poki/App/Glass.swift",
+      "sha256": "f31e99c1fddf1579ab5f37b60bdd8d86b95a38f2480fb0b7e4e4ac4bf7ff4396",
+      "bytes": 6740
+    },
+    {
+      "path": "native/ios-app/Poki/App/AppIconStore.swift",
+      "sha256": "824344067dcb96affd0351a094c04926d60f6fbcee299bf880a8c7ce668a6f75",
+      "bytes": 14887
+    },
+    {
+      "path": "native/ios-app/Poki/App/DeviceStrain.swift",
+      "sha256": "0f73bc9d5beefb4f3d08ad8e8fb55a134b4c0b3bafea497074082755e8b633b7",
+      "bytes": 2290
+    },
+    {
+      "path": "native/ios-app/Poki/App/FirstRun.swift",
+      "sha256": "a43717ea468f299d7238367d48a0184b0d4eb626f20baf0d1e5a900158d3ab4e",
+      "bytes": 18650
+    },
+    {
+      "path": "native/ios-app/Poki/App/LanguageNavigationFonts.swift",
+      "sha256": "0118a07275b7f41fc9a515b5536f5b46387776de93854ec0b40b2782bb170037",
+      "bytes": 1725
+    },
+    {
+      "path": "native/ios-app/Poki/App/AppInterfaceSize.swift",
+      "sha256": "19f773178456eb160f372d9d3247a3bd1a5d79fcaaf02090664434a70fab54f5",
+      "bytes": 12023
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/raycast.svg",
+      "sha256": "0daad0147951c8835e424ee2099e314a33d1c6c7f9b19eaa501504f6c89a06a4",
+      "bytes": 531
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/claude.svg",
+      "sha256": "2d6fda79eb18ddccca35b799eeb3cece0dfabc22520ce3b10abd25668df9fa93",
+      "bytes": 1921
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/cline.svg",
+      "sha256": "9003d2cdce82b016147b732abb4def60af55c348ba2cea2ba0b69a3c7d159b19",
+      "bytes": 750
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/githubcopilot.svg",
+      "sha256": "c72c1e0018e84b3128c5a1ac43ec2be135ac6ec4eb9c0ea18ed76416d23f2af3",
+      "bytes": 1744
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/huggingface.svg",
+      "sha256": "aa81744034eecf4ac6b3fb7108dd71223965c7af3c534932391314563b150109",
+      "bytes": 3027
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/googlegemini.svg",
+      "sha256": "b83039964c9253af6bc46277455485bc2eb9f1521c97acee1e7b89a665188cf8",
+      "bytes": 424
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/copilot.svg",
+      "sha256": "5d8f86934fb4d7a85686dfbc6f12625567b15f92424030259dcc2e73b92ea943",
+      "bytes": 1019
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/zapier.svg",
+      "sha256": "51fa9cca6198c74f924600e6972520541261e2f74ff80b6bec5bbd60a4bdcc73",
+      "bytes": 2832
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/openai.svg",
+      "sha256": "dd7495053fa0d552aca63ab5fd8f990802559d0439507c1719a4d7189e86d916",
+      "bytes": 1593
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/kimi.svg",
+      "sha256": "ed08131b46acf70e6e2144eceb775e74098b58ea65fa21eaee04be7b05cfe63b",
+      "bytes": 786
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/cursor.svg",
+      "sha256": "0cb51bddf264ae108926fd554c063ef40fc1aac3c5c921ddb39ad184e4e5d0ef",
+      "bytes": 547
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/openclaw.svg",
+      "sha256": "8ef4de8032b06492af52a2070fc044ce7cc0c1dcef70471b386571eb1c3b2b63",
+      "bytes": 2179
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/ProviderIcons.md",
+      "sha256": "2cdefd0d30f5e4af476fb6a7a97b068131f36c7cf9ed0243544d58695c596c55",
+      "bytes": 718
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/mistral.svg",
+      "sha256": "a06cfa54e7deff7f7544175b006b7f8a03fbc5624c44f7d553a44d07ea96e629",
+      "bytes": 418
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/deepseek.svg",
+      "sha256": "bf79334527198b4dfcf90726f42ad302636abdfddbd79dd762fcca6138ba3d2e",
+      "bytes": 2150
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/n8n.svg",
+      "sha256": "f5a606188c78bf134fe7d85ae3d1310f6f4b7beafcd1d2fbdef2af02c92240a8",
+      "bytes": 1573
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/qwen.svg",
+      "sha256": "b2c16efc3bd32b88a941842d41222e1e1e0e40441222218b725afc0aef6d9a36",
+      "bytes": 1041
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/manus.svg",
+      "sha256": "8f70464df09b5b9e1643dcb7c0f2c6a2cfe3322b965b35d8e78b041f858b81b0",
+      "bytes": 3224
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/windsurf.svg",
+      "sha256": "6a084cb5c1a82bbf3eeda54e3bf450bf8d4a9368d80b815db22116b6b00a2aae",
+      "bytes": 813
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/metaai.svg",
+      "sha256": "656b4db71eb226ad2f6734c115f93b0bec917a911b5157e8e332829876b9d7d0",
+      "bytes": 2349
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/grok.svg",
+      "sha256": "9175fc90c22655160231976c849f25a03b888d7cc0e04c5f1b987b659bb07c95",
+      "bytes": 756
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/anthropic.svg",
+      "sha256": "e1f2c87332a35eb3cc6c0ae6ec1289da9804c20268271ec4379391229f62dc89",
+      "bytes": 304
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/openrouter.svg",
+      "sha256": "a5144ce58b45fafc804e1d30dd21052588c4d92b08e48d1ca119faddbc0094f6",
+      "bytes": 343
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/lmstudio.svg",
+      "sha256": "4a575e8382b52ce742ac5d21d361a7d2a08cea7c12390ee1bbb755ef7d3cc25b",
+      "bytes": 1253
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/ollama.svg",
+      "sha256": "9c62bf0159ee96c8b58c86a732f33b002b4b3bb165ec86e8ecca51ad6a82dab6",
+      "bytes": 4769
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/goose.svg",
+      "sha256": "8779d9a61c5b0be78a3d36cab6843ba5af86218ba2ff1b18eb918c7a8d25bb99",
+      "bytes": 1807
+    },
+    {
+      "path": "native/ios-app/Poki/ProviderIcons/perplexity.svg",
+      "sha256": "57220c29378ce5e615e7244d2fdfcf5a44fad40dad81a99f2e0e4260c726ca74",
+      "bytes": 618
+    },
+    {
+      "path": "native/ios-app/Poki/Settings/SettingsEntryRow.swift",
+      "sha256": "7b2d1f5014ced2e69e38108464bd608fa0623f039223b8ad398a5e454f8aaed5",
+      "bytes": 2312
+    },
+    {
+      "path": "native/ios-app/Poki/Settings/PokiSettingsKit.swift",
+      "sha256": "8c44aed87944d2bc5ac81fac2bc1860646a19bb6371375430960108945b8ad81",
+      "bytes": 11734
+    },
+    {
+      "path": "native/ios-app/Poki/Settings/PokiStatusCard.swift",
+      "sha256": "4d02a3807e6f8d61b6217f2ae425baaf6a7d021dc0932ded7bc8a25f06b631c5",
+      "bytes": 15037
+    },
+    {
+      "path": "native/ios-app/Poki/Bear/BlinkingFace.swift",
+      "sha256": "71780cbcd4a4a6d6d5c8c69a4e4befca9501991071904555339e161a72b797b2",
+      "bytes": 6541
+    },
+    {
+      "path": "native/ios-app/Poki/Bear/BearIdle.swift",
+      "sha256": "a091ece153fd8f74768ff14499570b243477857302fac4a2283d2b1a1da95151",
+      "bytes": 22050
+    },
+    {
+      "path": "native/ios-app/Poki/Bear/BearAct.swift",
+      "sha256": "f8db72e2368161387bf8c5974ae18e158ade50b492433e0a3e88e9181c90eaba",
+      "bytes": 9894
+    },
+    {
+      "path": "native/ios-app/Poki/Bear/BearAssets.md",
+      "sha256": "2ccd0ec13f3ae3a3c33279c775b6451a5909ecc71b919c50789dadc7f81ab495",
+      "bytes": 796
+    },
+    {
+      "path": "native/ios-app/Poki/Bear/PokiMood.swift",
+      "sha256": "bc893051fe9512ec560562a6be96e8b510a4149030f6461ad47f71ef69d2e545",
+      "bytes": 9246
+    },
+    {
+      "path": "native/ios-app/Poki/Bear/LiveBear.swift",
+      "sha256": "f3a0743c4f06e8cb5fbf344508bef7147f4af2a8bbb27ad64dae0c81fe1b35b0",
+      "bytes": 37148
+    },
+    {
+      "path": "native/ios-app/Poki/Browser/BrowserPanel.swift",
+      "sha256": "d378c8a3c1448d606e7664d6519e17dc6a02b25f700d8ded81304b66f6dd9df9",
+      "bytes": 13081
+    },
+    {
+      "path": "native/ios-app/Poki/Browser/BrowserAddress.swift",
+      "sha256": "cf02c87dbfccf5cc3a49ce89c36a3c4d217fb7f083b424e2bedda472bb467b45",
+      "bytes": 3471
+    },
+    {
+      "path": "native/ios-app/Poki/Browser/PageReader.swift",
+      "sha256": "c867ee9d5e4ebd44e68b6249cc64f966e9dc22c1e156eb7173807546d4c03082",
+      "bytes": 27580
+    },
+    {
+      "path": "native/ios-app/Poki/Browser/WebTools.swift",
+      "sha256": "f1d8c137f180394d35ebbde8cfd87354c49171a973798504f3738235d3dd65d7",
+      "bytes": 19576
+    },
+    {
+      "path": "native/ios-app/Poki/Browser/PokiBrowser.swift",
+      "sha256": "00e6c743091c19f3bb1861dc03eec6b9468e621cd005e778eaad4722200ece88",
+      "bytes": 10836
+    },
+    {
+      "path": "native/ios-app/Poki/Debug/DiagnosticsView.swift",
+      "sha256": "a5ea8e8a2133c78ec8b3989036c4e77640551a800507919891c9b717e2cc5fd5",
+      "bytes": 7409
+    },
+    {
+      "path": "native/ios-app/Poki/Debug/PathBenchmark.swift",
+      "sha256": "d9eacc66c6d0c4f2e4926f3b427f0cd870ab2b20039c63ab463e6ae5f418e5f9",
+      "bytes": 9115
+    },
+    {
+      "path": "native/ios-app/Poki/Debug/Probe.swift",
+      "sha256": "c5df57e043c78633bbf1c2b210154cd758c611b855874c59ef5d1f672fe6324e",
+      "bytes": 7583
+    },
+    {
+      "path": "native/ios-app/Poki/Debug/ActivityPreview.swift",
+      "sha256": "75ae8e9d0629817f0b6ad7c92defbaec7aaf16cdd909e3a20945b23243cb6c90",
+      "bytes": 23022
+    },
+    {
+      "path": "native/ios-app/Poki/Debug/TalkRehearsal.swift",
+      "sha256": "f23a5f5c9bba17fcd05db3faf6e10c48673cb2644e2aa4fe6570cc64640f59f6",
+      "bytes": 6452
+    },
+    {
+      "path": "native/ios-app/Poki/Debug/InProcessProbe.swift",
+      "sha256": "f7e4de4f9737357a28c2d19e21e31fcc77b5a1bf69d1728f104bca9bf5c11674",
+      "bytes": 59184
+    },
+    {
+      "path": "native/ios-app/Poki/Debug/Hold.swift",
+      "sha256": "4da6fd44f448d4ed69df9b4870bda385e7e91795d7fc420a6b1074b2afae648b",
+      "bytes": 7883
+    },
+    {
+      "path": "native/ios-app/Poki/Debug/WebDemo.swift",
+      "sha256": "5aa7308dfe5ef1f6be0c5b46f0b5409cf01f335a730254dd9578f59d53c1a905",
+      "bytes": 4930
+    },
+    {
+      "path": "native/ios-app/Poki/History/BacktapeWriter.swift",
+      "sha256": "540aa1ac1ea74ad30c497942ec322c6ce5f7af47129b147abc20da47e5c5dd01",
+      "bytes": 3567
+    },
+    {
+      "path": "native/ios-app/Poki/History/HistoryBridge.swift",
+      "sha256": "6b4c31c2a6a932f41dd4156178394c7f72be605323f5edf06fd6dad31e3e248d",
+      "bytes": 3034
+    },
+    {
+      "path": "native/ios-app/Poki/History/HistoryLock.swift",
+      "sha256": "272e2151fa2b88b2137a0f818ba72468e3d2f76f4a3e4bbd6b816a0689d47758",
+      "bytes": 17554
+    },
+    {
+      "path": "native/ios-app/Poki/History/HistoryView.swift",
+      "sha256": "0f0a4a500ee24eb7f71a9b40c841ffe2e61b1404b45144e87e2a4985182c876f",
+      "bytes": 14457
+    },
+    {
+      "path": "native/ios-app/Poki/History/BacktapeLibrary.swift",
+      "sha256": "93ca8b552b12c73a5f7d1da8c09118d18d9a3f9b1772d5e4ed1460ca5c739c25",
+      "bytes": 36430
+    },
+    {
+      "path": "native/ios-app/Poki/History/HistoryStore.swift",
+      "sha256": "d4182d5bec42f6a0de09215b2306bcca2d401fe4e03682abf8af7f5b3b5ce01b",
+      "bytes": 15385
+    },
+    {
+      "path": "native/ios-app/Poki/History/HistoryCapture.swift",
+      "sha256": "496a50478c318c519e14faa551e79116888cb91048dd4362aba6bb371f5ecfa8",
+      "bytes": 12517
+    },
+    {
+      "path": "native/ios-app/Poki/Voice/TalkState.swift",
+      "sha256": "bd3360b588cb5625c54203034be3ea5998b6d074d432e97e7e58a6a6b89816f7",
+      "bytes": 1965
+    },
+    {
+      "path": "native/ios-app/Poki/Voice/TalkActivity.swift",
+      "sha256": "1eb328eddbd389b1a03c1c69d9d0fb677c05f9480c9100e454f90bdac8279938",
+      "bytes": 3661
+    },
+    {
+      "path": "native/ios-app/Poki/Voice/VoiceModel.swift",
+      "sha256": "7fc4a4e1e62fc4e766931f745f0688c2aac416be632470ad91c763c80e174c2b",
+      "bytes": 53882
+    },
+    {
+      "path": "native/ios-app/Poki/Voice/VoiceLink.swift",
+      "sha256": "46d8a1b62225196878124fbb24ffe10f56f3ecc583d36b8afafee843afba1805",
+      "bytes": 15548
+    },
+    {
+      "path": "native/ios-app/Poki/Voice/VoiceView.swift",
+      "sha256": "1462937ee770d0d30906f27ff144b3f6f38645731206171f3e515b5b1cf639e9",
+      "bytes": 7042
+    },
+    {
+      "path": "native/ios-app/Poki/Voice/VoiceDirect.swift",
+      "sha256": "8c98c3eda4270d88bc130632cc2d028b8e93e6b462cf98493e232ee0e9965751",
+      "bytes": 11435
+    },
+    {
+      "path": "native/ios-app/Poki/Connect/RelayIdentity.swift",
+      "sha256": "b1a06b5cd6cd3f52e5c39a115e12bba67f174c6edcb28ed9d947bf78a0e84005",
+      "bytes": 7669
+    },
+    {
+      "path": "native/ios-app/Poki/Connect/SettingsView.swift",
+      "sha256": "dc70cf5929a51391c1123ff95e8fe2a7913ca36f727665002e50293a86236780",
+      "bytes": 15646
+    },
+    {
+      "path": "native/ios-app/Poki/Connect/MemoryView.swift",
+      "sha256": "a17b9357c928d07be0d1b07af569c7bab4e5d6052820d131a4fdb131fe076164",
+      "bytes": 6380
+    },
+    {
+      "path": "native/ios-app/Poki/Loopback/RemotePairingPort.swift",
+      "sha256": "bff1eb24a531f874c2988ff36e744aeb573a4669b1a539750d5c72d0a846c033",
+      "bytes": 7146
+    },
+    {
+      "path": "native/ios-app/Poki/Loopback/LoopbackTunnel.swift",
+      "sha256": "aa36c01c12dc4ef875b9f7aa277dd933fbb9a8ad97c8ce13fcfb3af53cd3f9e2",
+      "bytes": 14148
+    },
+    {
+      "path": "native/ios-app/Poki/Loopback/LoopbackMonitor.swift",
+      "sha256": "91c9a11dd3cbf0db73857edc94164fb8c286fbb1204bfc11200a5ab4c3ec01b7",
+      "bytes": 12694
+    },
+    {
+      "path": "native/ios-app/Poki/Loopback/ProxyApps.swift",
+      "sha256": "1e7c334231f9c9a9fd4aeb712d220c8d630570b99537b799b8f770b3a7fa8121",
+      "bytes": 4577
+    },
+    {
+      "path": "native/ios-app/Poki/Native/RecoveredNative.h",
+      "sha256": "f15d906153334820c4599bbd5cf070faf180d4abef9f5f44f5d6cf69b364d924",
+      "bytes": 2881
+    },
+    {
+      "path": "native/ios-app/Poki/Native/InProcess.m",
+      "sha256": "c5f5e0e8c52d7fd68cd3bd37abcaafede82c1ef2ac9469c93b05029e8fa24984",
+      "bytes": 126395
+    },
+    {
+      "path": "native/ios-app/Poki/Native/RecoveredNative.m",
+      "sha256": "d75a4edb1750a0c1cceeed10543b53d125cba3eec932f182cc15afd6903355ce",
+      "bytes": 27627
+    },
+    {
+      "path": "native/ios-app/Poki/Native/InProcess.h",
+      "sha256": "021ba93f47ef6ab00e8011852bbbf3a53120aaf1fb3bd0162b2e878981abb80f",
+      "bytes": 8488
+    },
+    {
+      "path": "native/ios-app/Poki/Sessions/ThreadsDrawer.swift",
+      "sha256": "f5d71dd074ae9e447897a345991720b95b72de77ad4592f089026f70c1fbbc09",
+      "bytes": 16237
+    },
+    {
+      "path": "native/ios-app/Poki/Sessions/SessionStore.swift",
+      "sha256": "98c23d55ed653b0c6666df85f7753422872a013f49a29e9a5f9ac24c6f0ac68f",
+      "bytes": 50404
+    },
+    {
+      "path": "native/ios-app/Poki/Sessions/ActionLog.swift",
+      "sha256": "207b6375b44508de8eb8adb4eb0dd0895aa6dc3fb35b3f332fe64649bec9f3b9",
+      "bytes": 15338
+    },
+    {
+      "path": "native/ios-app/Poki/Sessions/AskPoki.swift",
+      "sha256": "c6e8a707444098b3db6c99a1032d4eadfda2cf769498bac94447260ba636a774",
+      "bytes": 7011
+    },
+    {
+      "path": "native/ios-app/Poki/Sessions/SessionsView.swift",
+      "sha256": "3d430adcfc83ca2169f2e97ed8fefe4f273b9c4806ad51fc7b6e008172d3cbc1",
+      "bytes": 27339
+    },
+    {
+      "path": "native/ios-app/Poki/Sessions/TaskApps.swift",
+      "sha256": "141a195eddcbfb5c9f26bf84bf0c79ae3a86f85dfeb2d560154d04cf6282d4be",
+      "bytes": 3789
+    },
+    {
+      "path": "native/ios-app/Poki/Sessions/SessionApp.swift",
+      "sha256": "8ebb94a187a1ea79b14364abeddf75e311fa609aa12da1b74cb8615baa0df6ba",
+      "bytes": 717
+    },
+    {
+      "path": "native/ios-app/Poki/Sessions/ApprovalClassifier.swift",
+      "sha256": "6569d831c2a01b10f85baf70873853c757f08a85690d3dd9eef146a439a68f87",
+      "bytes": 11340
+    },
+    {
+      "path": "native/ios-app/Poki/Sessions/SessionNamer.swift",
+      "sha256": "867f3f2552d435e316a771acecbb9bf1081d1f46a955e050ae3b45ed50491aeb",
+      "bytes": 1412
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/AnswerTable/TableCell.swift",
+      "sha256": "531dd276e342bd13fa2f717c70168f7faaa8a8dd575146797df71526ed35c16c",
+      "bytes": 2045
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/AnswerTable/TableView.swift",
+      "sha256": "d8382508201bdd9f7a9553b25f24245891411bc5262e2ab4b739a33a6ac77500",
+      "bytes": 2183
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/AnswerTable/TableBorderSelector.swift",
+      "sha256": "26eb0fddc6ca94f9306eac8eef260a5dedfa05adc908fe8c1420ce80b427aa5c",
+      "bytes": 3445
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/AnswerTable/Environment+Table.swift",
+      "sha256": "bbf23a6480f5577111a30b74cf4a5f36636d205a5b0a85b0857799e1bdaeb1f8",
+      "bytes": 1712
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/AnswerTable/TableBounds.swift",
+      "sha256": "db00287180bd1ba738c94def20ca464a05455afa9d7507e5b992f47c4815324d",
+      "bytes": 3575
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/AnswerTable/TableBackgroundStyle.swift",
+      "sha256": "1bd683d5d806f1a140c4d55659329184389a37b435fe04c3b063c4ebdce8be3f",
+      "bytes": 2294
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/AnswerTable/TableBorderStyle.swift",
+      "sha256": "36a5889562869288d476b728719dc0368cb54643b3159bf1364a286cf769e71e",
+      "bytes": 2329
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/AnswerTable/TableBackgroundView.swift",
+      "sha256": "14bb061468db6f2d7f2797046a8ea90106d030c0b0071fdf7782f437640931d4",
+      "bytes": 963
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/AnswerTable/TableBorderView.swift",
+      "sha256": "2cb55f9263fa59d574691aa4ecc2403e31956ea17a3e8e45a6596db9b1d8813c",
+      "bytes": 1054
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/Harness/agent-system.md",
+      "sha256": "f6952c25075d861cb884f97878f5f220482c2e458e934bdde295488a23753b3f",
+      "bytes": 3463
+    },
+    {
+      "path": "native/ios-app/Poki/Chat/Harness/Harness.swift",
+      "sha256": "abe0b680c8e940e33d35362580f2ecb9c2acb1fcd86f93adfc18f4b0e7f6fb4c",
+      "bytes": 12470
+    },
+    {
+      "path": "native/ios-app/Poki/Bear/Model/PokiBear-clips.json",
+      "sha256": "7be6a27948d5a9613ea1eb29bd9c7972b9a2ba230acd5fe114665d4e07ac9479",
+      "bytes": 500
+    },
+    {
+      "path": "native/ios-app/Shared/ActivityTheme.swift",
+      "sha256": "d6e2638fbf3064c0452cb45d1e1e2210f4aec46c17eee78fe34966800bbb36c6",
+      "bytes": 10858
+    },
+    {
+      "path": "native/ios-app/Shared/TunnelStopSignal.swift",
+      "sha256": "781b8d1fe55d2e35837316667f00f8ee0b4753aaf8ced7f18a7b03f3b920bb5d",
+      "bytes": 473
+    },
+    {
+      "path": "native/ios-app/Shared/PokiEntry.swift",
+      "sha256": "a8e33e9c5caa760a3b8216a22bdb969fe3a5c23895b79fcb03a4814f1dba2c44",
+      "bytes": 1835
+    },
+    {
+      "path": "native/ios-app/Shared/ActivityViews.swift",
+      "sha256": "fdc1fa0c68f038328078b9e9e439db1d4257c0547aa76965a4b4850932c3b558",
+      "bytes": 48908
+    },
+    {
+      "path": "native/ios-app/Shared/TalkIntents.swift",
+      "sha256": "2ffa9718fd97ddfd9b272ef3a6c52c87576c9d7341a905c50bebdd44228893b0",
+      "bytes": 1282
+    },
+    {
+      "path": "native/ios-app/Shared/ActivityCardGround.swift",
+      "sha256": "65d1575c872dcc43a0495cd6630d4cf6598dc382ab656ccc736685e981b140ad",
+      "bytes": 8732
+    },
+    {
+      "path": "native/ios-app/Shared/ActivityFace.swift",
+      "sha256": "8ee99be270a49b2bd5d25ff008d8e96d1b47f9dbbf28a832fdcb3818831d6353",
+      "bytes": 26743
+    },
+    {
+      "path": "native/ios-app/Shared/AppName.swift",
+      "sha256": "89f20bd9606711e9797f4586e1c5de177adbbe470f150dd42a6b7f4c54e33e42",
+      "bytes": 1315
+    },
+    {
+      "path": "native/ios-app/Shared/Status.xcstrings",
+      "sha256": "c8554f804770a8ba77e06031f258a52b3801b751dc4e4f2ede26f1f86dabaf18",
+      "bytes": 7773
+    },
+    {
+      "path": "native/ios-app/Shared/StatusWord.swift",
+      "sha256": "9a050c9f06d85baec0bddf1fd38dcdab7997aef7a7ebe43566077f0b3fdd5eb2",
+      "bytes": 2456
+    },
+    {
+      "path": "native/ios-app/Shared/PokiActivityAttributes.swift",
+      "sha256": "c86ba86c89c0e908a62ac94c4dd82e02cfb1b4d3471fac81d44c2d4c9fa5eb8f",
+      "bytes": 8447
+    },
+    {
+      "path": "native/ios-app/Shared/ActivityWords.swift",
+      "sha256": "bdfa1e9f4a995c2c4eda922f77fa42177b3a1ccd2d1a5d3b4ecb3c1c2310ad42",
+      "bytes": 6750
+    },
+    {
+      "path": "native/ios-app/Shared/KnownApps.swift",
+      "sha256": "e8afb1d4cf09212b1bd129247dfab2b6531793b8364da562f4a048794beb355e",
+      "bytes": 11732
+    },
+    {
+      "path": "native/ios-app/Shared/ApprovalIntents.swift",
+      "sha256": "c62733a543ba6957ae4434cd89627d8914332cfbf1ba196b90aab9fe7130a2d4",
+      "bytes": 8127
+    },
+    {
+      "path": "native/ios-app/Shared/ProminentFont.swift",
+      "sha256": "569f518394d7d116533d3d752e9fc317aa4f803d30fca74bdf9a89c2301e39f3",
+      "bytes": 2689
+    },
+    {
+      "path": "native/ios-app/Shared/Localizable.xcstrings",
+      "sha256": "610b9fc1c601637b8ecdf9a0646434fb2acd5bd954d2383849b6535ee1c1a31b",
+      "bytes": 989982
+    },
+    {
+      "path": "native/ios-app/Shared/Entry.xcstrings",
+      "sha256": "87094a49d11e1c24dc848ed08b75d09d4f7d6556759191c0743519d30687a8bb",
+      "bytes": 9529
+    },
+    {
+      "path": "native/ios-app/Shared/AppLocalization.swift",
+      "sha256": "badbb0b6648357b6b50bd14055e431aeb58b9c9d4f0d859e9127bf36d50abd28",
+      "bytes": 4883
+    },
+    {
+      "path": "native/ios-app/Shared/DefaultAppIcon.swift",
+      "sha256": "bea5db8a4b32cea0fdc39f387c07c4948dddef7afc1603edd57b3eb2185199af",
+      "bytes": 375
+    },
+    {
+      "path": "native/ios-app/Shared/LiveActivity.xcstrings",
+      "sha256": "2debf59e364dd83a00e7bc1aa4ba93e142741c177daa50899c832297c26a25ad",
+      "bytes": 107038
+    },
+    {
+      "path": "native/ios-app/Shared/CallerBadge.swift",
+      "sha256": "dba22f3a350d8cdc247e71f14c485f03fb62e7584ab26a6fd58271024a7ddca9",
+      "bytes": 5268
+    },
+    {
+      "path": "native/ios-app/Shared/Fonts/Geist-Black.ttf",
+      "sha256": "fe536ec28d8071f87ee3a694b770de22a73ade6de89ab87a45f340363ac0a31a",
+      "bytes": 108064
+    },
+    {
+      "path": "native/ios-app/Shared/Fonts/Geist-SemiBold.ttf",
+      "sha256": "4e462ed71ed2609356fb590d8810a46e851989bae94d200f018e39009b8d2ee3",
+      "bytes": 105492
+    },
+    {
+      "path": "native/ios-app/Shared/Fonts/LICENSE-Geist.txt",
+      "sha256": "930853ee1daa68554d9e35c8a9175affb74f699fad9a5da6ee5ebe76379d9137",
+      "bytes": 4368
+    },
+    {
+      "path": "native/ios-app/Shared/Fonts/Geist-Regular.ttf",
+      "sha256": "5443f0c7e853354f2c8ce3a7a33678fb8b35958695267b930af961380240db9e",
+      "bytes": 103636
+    },
+    {
+      "path": "native/ios-app/Shared/Fonts/Geist-Medium.ttf",
+      "sha256": "abc1b5e5b7df49995f096a63d41070b8134d37062a62b7042bbc43db9549fa0e",
+      "bytes": 106024
+    },
+    {
+      "path": "native/ios-app/Shared/Fonts/Geist-Bold.ttf",
+      "sha256": "0212c10d3134d9f55ad136b88830f193fd54073caacb3d57e6dcd60f37872159",
+      "bytes": 106404
+    },
+    {
+      "path": "native/ios/PokiCore/Package.swift",
+      "sha256": "713541f9f45bda29b9b0ee26add345603cc05e42ae5e6768221c3b8e4317944e",
+      "bytes": 718
+    },
+    {
+      "path": "native/ios/PokiCore/NOTE-FOR-UPSTREAM.md",
+      "sha256": "b7ec682db8561ac76773571f73812b63013370585a78ee0a6f96d6ecd023378c",
+      "bytes": 9549
+    },
+    {
+      "path": "native/ios/PokiCore/.gitignore",
+      "sha256": "99921edb369e12a35a87d768ae481f8c944573626abd4b8f3a1fe78846f30ba7",
+      "bytes": 8
+    },
+    {
+      "path": "native/ios/PokiCore/UNVERIFIED.md",
+      "sha256": "b0fe94b6903054c5aca19819945967abc69fbf9abd2a2679b5c34c343d631743",
+      "bytes": 7564
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/LocalRunnerTests.swift",
+      "sha256": "4ac03c43915bf284f129eb80ef4ed57419d790609ac0974a9def0e0ebf97eaf1",
+      "bytes": 10771
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/LookDoTests.swift",
+      "sha256": "24907e22a0a18f64011de8dcaf2eb7aecbfe374eee6dad57b134f2cdc0063a41",
+      "bytes": 54192
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/ChatSendTests.swift",
+      "sha256": "b6cef7006e1fe08a7e67e7a8f84486885ecb3bb5aef411d84d98213902706b52",
+      "bytes": 9520
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/SensitivityTests.swift",
+      "sha256": "3be3d8b30f73a17b70f85d5492119705835ca11c1f351131774f99a3abfe52a3",
+      "bytes": 5901
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/ApprovalChoiceTests.swift",
+      "sha256": "a6c8934435a1035fbfd8cd272932bd1025860f2cc393b8ecaee7a5cc9a49431c",
+      "bytes": 7837
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/HumanizeTests.swift",
+      "sha256": "508990501a91bc191e7f0db806f4a6bbfd486e295fc9dc75ea3eb5e3e31e8bc4",
+      "bytes": 18824
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/ReconnectTests.swift",
+      "sha256": "0beca92d58545b114b5abda954be479342f5bb858fe5693d38d18150544ffb5b",
+      "bytes": 2050
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/PokiFrontTests.swift",
+      "sha256": "8f548997a9d1a5dba7e4f51733b352e99ba5f50cba0bcb1bbca3deffdbe8d459",
+      "bytes": 2490
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/RoutineTests.swift",
+      "sha256": "28c8e65f98f90d534fa118d370b8e8074bf797f646122e4d5232e8f0f29c9aea",
+      "bytes": 12442
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/Fakes.swift",
+      "sha256": "0508774e4bea040c322229568e996ac5d48b79ccb29be59931f3bed557d12817",
+      "bytes": 14995
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/CoreTests.swift",
+      "sha256": "cd365779addeb0f739d756dd05dcd67c2351586234be5963dbb7dc2697647f6b",
+      "bytes": 96380
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/FaultTests.swift",
+      "sha256": "84649ef45f78dcf84056c89859fee965b3cf2357a5e309204acb76b5b1be7438",
+      "bytes": 110404
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/SoakTests.swift",
+      "sha256": "e8b0820f85c165e994f9353308b9dfa1e46fa14387d5b6d47eabd6e539cbf824",
+      "bytes": 9241
+    },
+    {
+      "path": "native/ios/PokiCore/Tests/PokiCoreTests/RelaySoakTests.swift",
+      "sha256": "61b6b297344fdeae3813524c59de4bfbaa3098e7b375662c47fd18c5e76a9af3",
+      "bytes": 5348
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/poki-sim-check/main.swift",
+      "sha256": "ff6220195536b63dd69dce8267be21335efff79a957f7b50473987957c58bdde",
+      "bytes": 14455
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Relay.swift",
+      "sha256": "6bdbe9eca93ec6f0c9d25329aa02166791f130fdeae4c47f60ccdbd1d4171c34",
+      "bytes": 13946
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Runner.swift",
+      "sha256": "bb6353ede2a058a39a16ff163af164a97c75207faa419da439b64625655f2a35",
+      "bytes": 29788
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Actions.swift",
+      "sha256": "1a3c34b7a96743ae0ed5286f225e8052653c080f1ea97c694d974e5306672e7e",
+      "bytes": 71338
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Humanize.swift",
+      "sha256": "185d82a465ac345f203fee8bd6b797eb97c553a44bc7222a65eb159f0c51d4ff",
+      "bytes": 14621
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/ApprovalChoice.swift",
+      "sha256": "b5f7404906b41cd72f118bf6e430384fa6323ae7dbaa8317df44cda7abd7f59f",
+      "bytes": 4392
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Computer.swift",
+      "sha256": "db01c9ee35f4aa9db444ef4667a702e889b5fd45065386a65fc921e16c22aa62",
+      "bytes": 109580
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/LocalRunner.swift",
+      "sha256": "593071a3c2d6c1b345876988894e055d66a9d265c8b525a01bdbf667d5459654",
+      "bytes": 11274
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Layout.swift",
+      "sha256": "41945c1eb50175e7679ceb0c4543a896efee7e2560fd2f0d1c31fb5d04dcba04",
+      "bytes": 10747
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/DDI.swift",
+      "sha256": "38aff0cd89585119ff085e995bddc7ed885ccd631e9b49e2a8ac4cf65ed2ab27",
+      "bytes": 8072
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/JSON.swift",
+      "sha256": "9e285cccb831a90e29f016f5e7afdba721dc9e94924a7b2fe9f5529080c679d3",
+      "bytes": 4168
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Picture.swift",
+      "sha256": "1155a8c99e3a54ee105668b1b3f08663f3eddc528c277df1f3e17eefbfce883a",
+      "bytes": 3169
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Deadline.swift",
+      "sha256": "2e83cc57fb955c415201d268560497df288f08991f6b2970a298f1194d6c12bf",
+      "bytes": 2940
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Reconnect.swift",
+      "sha256": "1b6d3618776a8995553796891bfb2716450b3e480f1d5f24e7ff90e91d54b81d",
+      "bytes": 2505
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Screen.swift",
+      "sha256": "110f80e326a4e01a4d2dbac9a2f39d81a7328b49f550a2e5126c508bd7b53db2",
+      "bytes": 22043
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Routines.swift",
+      "sha256": "d59dd41f6a1fc29b8259dbc1cbe0a1c3e071b57395862fa63c2c8fbcec60cd04",
+      "bytes": 48591
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Approvals.swift",
+      "sha256": "c8cdae68e4a19c4097204d3f0c046a7d541abce7967fb93fbc4e46b45cae90e1",
+      "bytes": 13762
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/StepLabels.swift",
+      "sha256": "a27451b7080d2121e514950ef507f3c73cae278e3c57e50e8bfe54a9a9f910bf",
+      "bytes": 6396
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/TextRecognition.swift",
+      "sha256": "dc354ab16c6f3925d773b6548def5fa2b1d954f4f671c4d3e08d17726be136ff",
+      "bytes": 1940
+    },
+    {
+      "path": "native/ios/PokiCore/Sources/PokiCore/Core.swift",
+      "sha256": "a2d46615f2cba4e06505f8b97e9ef0c07640a52dc6876efc7a6277cd5a0c05c2",
+      "bytes": 50351
+    },
+    {
+      "path": "native/ios/PokiLoopback/Package.swift",
+      "sha256": "3c5c39f924429c4ef2e77c40613e057a696d43073314e38e655b3d3875aeef86",
+      "bytes": 365
+    },
+    {
+      "path": "native/ios/PokiLoopback/.gitignore",
+      "sha256": "acc718146d21aae829cba1761475e05de39d73209d83af2ab8487a74843cead0",
+      "bytes": 18
+    },
+    {
+      "path": "native/ios/PokiLoopback/Tests/PokiLoopbackTests/LoopbackTests.swift",
+      "sha256": "0d73b825abfb5398713860e27dd15418714c9b1416e708e79d956844d2388a28",
+      "bytes": 3632
+    },
+    {
+      "path": "native/ios/PokiLoopback/Sources/PokiLoopback/LoopbackPacket.swift",
+      "sha256": "544baba39da2dbdbde208ff58934254b0352558504d7fa21754727d2e8d191bf",
+      "bytes": 1138
+    },
+    {
+      "path": "native/ios/PokiLoopback/Sources/PokiLoopback/LoopbackNetworkSettings.swift",
+      "sha256": "b85d32d0cac452e2ae04ff2af1ec540707f73035ddeab3d88ef5b098208de549",
+      "bytes": 593
+    },
+    {
+      "path": "native/ios/PokiLoopback/Sources/PokiLoopback/TunnelStop.swift",
+      "sha256": "bd4bdb963a44bbf504314ef8a6eda58e669148d67649fac7c1366beffa436b90",
+      "bytes": 623
+    },
+    {
+      "path": "native/ios-gym/check/GymScorecard.swift",
+      "sha256": "76fe526b2eab36577c5356542e39cd5558e818512fb56a3f10365ea06b12c721",
+      "bytes": 55503
+    },
+    {
+      "path": "native/launcher/fetch-idevice.sh",
+      "sha256": "ab75ce9a6a0b70d3ab3f38076e75fe224c87d7a9b96c165a3933ba1cb6571b4a",
+      "bytes": 1437
+    },
+    {
+      "path": "native/launcher/Cargo.lock",
+      "sha256": "4432fe4bfac674d9b1d384c2a5ee84cb867a2ad6c961f678c210eaa1d64e2977",
+      "bytes": 117002
+    },
+    {
+      "path": "native/launcher/Cargo.toml",
+      "sha256": "11a09d5eeb3aac76e4e16f508c20d32c5eac5292ac4270c41124ee90cde63a95",
+      "bytes": 1419
+    },
+    {
+      "path": "native/launcher/include/poki_launcher.h",
+      "sha256": "77c5c4d2bae8d25b0298b6492914c011ca3d8cc6372bf44ac0bcdd7bdea4c4f8",
+      "bytes": 4460
+    },
+    {
+      "path": "native/launcher/tests/soak.rs",
+      "sha256": "bdd8efda498d0076182d91d51a793cdd0eae37ab589509b04c506d2ccacd7f77",
+      "bytes": 5761
+    },
+    {
+      "path": "native/launcher/src/roles.json",
+      "sha256": "a0c744af4bf1f19a157e2b6698f04c4a636aff5d6705cbb569c1a730a1d6e6a9",
+      "bytes": 1226
+    },
+    {
+      "path": "native/launcher/src/remote.rs",
+      "sha256": "3dca22dd3005ce420632a83cdac63932b6464ffb5ee99ab8124ddc31f9102123",
+      "bytes": 11756
+    },
+    {
+      "path": "native/launcher/src/supervisor.rs",
+      "sha256": "9f69b8c2df7c872379eca3bfd527c6cbf22f2309e28efb5e5e8d2b1d05f20bea",
+      "bytes": 14273
+    },
+    {
+      "path": "native/launcher/src/device.rs",
+      "sha256": "6b99ada2f1164e6b591b6e82db0e6b09a0cd2516c0c4885cddabf94215e15414",
+      "bytes": 9915
+    },
+    {
+      "path": "native/launcher/src/traits.json",
+      "sha256": "7d33f4e3841c1b4e54bc429b90f8ecc3b0671f26f3544a53dc836dbf69d67712",
+      "bytes": 665
+    },
+    {
+      "path": "native/launcher/src/lib.rs",
+      "sha256": "2d54b8d63f0602950c2c5b564b8ee6eb17f7b4f22c6191349f3abaf3487853fc",
+      "bytes": 12476
+    },
+    {
+      "path": "native/launcher/src/ddi.rs",
+      "sha256": "377a43516318bf7b05ab05b759719ba7449eb12124e54b19380be223794a05c5",
+      "bytes": 10562
+    },
+    {
+      "path": "native/launcher/src/pair.rs",
+      "sha256": "9e9ab5712f514b72be37efb1f0374ede2deeae078ea239fc4ee9a03282a6d130",
+      "bytes": 4177
+    },
+    {
+      "path": "native/launcher/src/ax.rs",
+      "sha256": "b334eb19533e6a5ea5a0a133c907d3a53bc3ed5d959e9ad86f32325a8fc9307c",
+      "bytes": 29812
+    },
+    {
+      "path": "native/launcher/src/history.rs",
+      "sha256": "1dc656dcf287b6c125c0e43f099ccf443d2a886b8beaaaac3abbf9715cbafc80",
+      "bytes": 30745
+    },
+    {
+      "path": "native/launcher/src/ax_direct.rs",
+      "sha256": "158b8602483e4e1a4e818279b96aaa8490730b762a9143b0d9c1ea4976736138",
+      "bytes": 21312
+    },
+    {
+      "path": "native/launcher/src/signer.rs",
+      "sha256": "e2d1e471c33788d6e141d226241ea811d712a42ab407339c4eb19270f98512fb",
+      "bytes": 17877
+    },
+    {
+      "path": "native/launcher/src/tests.rs",
+      "sha256": "aa2260249f2551133358b1668ae20038d12a587696bbfbb23460adcdd1f02e5c",
+      "bytes": 32996
+    },
+    {
+      "path": "native/launcher/src/launch.rs",
+      "sha256": "690be296fb9e68d00d2a2940fd8f582f0b72d908525f77ebe3945842098e0973",
+      "bytes": 7168
+    },
+    {
+      "path": "native/patches/idevice-xctest-run-over-rsd.patch",
+      "sha256": "b80484855b655bb93f8b26d0d605eacae7ecf273c1518f15e761385187a68d08",
+      "bytes": 3716
+    },
+    {
+      "path": "native/patches/idevice-ddi-tss-transport.patch",
+      "sha256": "f0cd7dd3250ad50ec7b61933bff07c6699f4e52f8d757d51add2383c9eaf35d2",
+      "bytes": 9708
+    },
+    {
+      "path": "desktop/Cargo.lock",
+      "sha256": "0de5794e728c5f20297f27d96f27dafdfbd77dab16f919af759ad567e447966f",
+      "bytes": 204764
+    },
+    {
+      "path": "desktop/Cargo.toml",
+      "sha256": "889cf4225c6b6791e255895653b6685c695f4913b51818d77a405ed74c12b3f3",
+      "bytes": 2418
+    },
+    {
+      "path": "desktop/AGENT-PROMPT.md",
+      "sha256": "6f18600229864bf75be249abfe38f4721ed0df752bce94680b0ca4cf07bdf986",
+      "bytes": 3854
+    },
+    {
+      "path": "desktop/.gitignore",
+      "sha256": "68a8e52b5f413efcbcc3adee9ab196848431381e9c4df571f361d0b295a23554",
+      "bytes": 91
+    },
+    {
+      "path": "desktop/README.md",
+      "sha256": "fefa8ad47c697e5920d7e56c411e2c8e1b1043b249eaf95d0813002619962550",
+      "bytes": 4592
+    },
+    {
+      "path": "desktop/core/Cargo.toml",
+      "sha256": "492ee98ff74c37baa3c30a27b9dbca7dccc89f756c4c7d6eaaec2a96e2ac718d",
+      "bytes": 2153
+    },
+    {
+      "path": "desktop/app/index.html",
+      "sha256": "bd71548bf4cace6f16fcb2b2845a91c9acce98d1799ce30c2aade10a23b8e644",
+      "bytes": 350
+    },
+    {
+      "path": "desktop/app/package-lock.json",
+      "sha256": "92f56c04971c6369796a5b0f84f1a24263073c8d9212695a011973fdcbe86632",
+      "bytes": 70052
+    },
+    {
+      "path": "desktop/app/package.json",
+      "sha256": "b52e81a67a60bdb2ae78b32481b4a271b3a5b7c2aab9186225a89137193fb922",
+      "bytes": 686
+    },
+    {
+      "path": "desktop/app/tsconfig.json",
+      "sha256": "143e5a3a79ad4f4bd8951548f7f7cb14149e5e679e9ed985250aafc4d127d980",
+      "bytes": 431
+    },
+    {
+      "path": "desktop/app/vite.config.ts",
+      "sha256": "fd2475ffd0815596379ad5db0c1fecbe77c1ca6bf173aaa4b87373ab2231553e",
+      "bytes": 389
+    },
+    {
+      "path": "desktop/bridge/Cargo.toml",
+      "sha256": "9e732dea98d601e5232179fb5c818378f2e71b4e11065bd0fc3eeaab96614539",
+      "bytes": 541
+    },
+    {
+      "path": "desktop/cli/Cargo.toml",
+      "sha256": "7e74a24e1524a1cbe8e7ff3dc9d763f7a4be65e8387f3db5e49791a0a78de380",
+      "bytes": 576
+    },
+    {
+      "path": "desktop/mac/Package.swift",
+      "sha256": "044fedbc21798f1611a0e15da8bdca6c0eba9d9bd3e6c3ac6fcde7d5d5cc0891",
+      "bytes": 451
+    },
+    {
+      "path": "desktop/mac/README.md",
+      "sha256": "d55f4cce7122e8f04711db684f70486b7b2ab529244175d33c48b93e879174ac",
+      "bytes": 2005
+    },
+    {
+      "path": "desktop/core/certs/AppleRootCA.der",
+      "sha256": "b0b1730ecbc7ff4505142c49f1295e6eda6bcaed7e2c68c5be91b5a11001f024",
+      "bytes": 1215
+    },
+    {
+      "path": "desktop/core/examples/update-source-probe.rs",
+      "sha256": "794a982d873eb57f8f48452ca1d890137309c39cd1ecea626c136c1854f859d7",
+      "bytes": 1641
+    },
+    {
+      "path": "desktop/core/src/keeper.rs",
+      "sha256": "5a4f5cd438b739d59ac44ef0c3b63e26dcaa9fbbde67fba682f42607ba12a8a0",
+      "bytes": 3570
+    },
+    {
+      "path": "desktop/core/src/release_catalog.rs",
+      "sha256": "d8a8cd68e8dd7bcf6bdca286433401464a8dcfc0d36c5cf1bc5e244a4ef02d3c",
+      "bytes": 13935
+    },
+    {
+      "path": "desktop/core/src/error.rs",
+      "sha256": "439a97f2adb93196684db871b5f8c1b33b062cbf3ce1eba1ae702b3b4c3790e8",
+      "bytes": 4627
+    },
+    {
+      "path": "desktop/core/src/support.rs",
+      "sha256": "75855a38013b79006b393a9c347dec59cc5e95d1f2f9c0cbf426cf562810336d",
+      "bytes": 4060
+    },
+    {
+      "path": "desktop/core/src/release.rs",
+      "sha256": "1ccde28b5e54dbb4964f4f19b5d2a98fc861825808b4c6ce4fea8e8730570f8b",
+      "bytes": 48487
+    },
+    {
+      "path": "desktop/core/src/lib.rs",
+      "sha256": "9c04fe869b259dc9c04e05bd3561d095314f123c90acc4dead1b3726123091a4",
+      "bytes": 3304
+    },
+    {
+      "path": "desktop/core/src/paths.rs",
+      "sha256": "54240380b3730d3bec0e8f42c10d5157e32bbcce4e3fb6a057afce0405da84bc",
+      "bytes": 1950
+    },
+    {
+      "path": "desktop/core/src/pairshare.rs",
+      "sha256": "1f6c0e3c3cb2c56a5058925c591d2a4c6a6249934d5c4329128829d0e3d93c1d",
+      "bytes": 6186
+    },
+    {
+      "path": "desktop/core/src/update.rs",
+      "sha256": "f7ad78efdc447b069af1ba6f8cdbce9e5e4596a02102a55dc14ebe31594491f2",
+      "bytes": 14317
+    },
+    {
+      "path": "desktop/core/src/progress.rs",
+      "sha256": "ac27ed5d8c70d94a75cb23be0c8867aae9757a78c21b76191a287b473f7df4e0",
+      "bytes": 2935
+    },
+    {
+      "path": "desktop/core/src/agent.rs",
+      "sha256": "2c264987392ade733b1b162f61dad4e84d2b0dc2914bd5e1f9b66d5a8e6fbaed",
+      "bytes": 11826
+    },
+    {
+      "path": "desktop/core/src/relay.rs",
+      "sha256": "e6c675e4b08b33cecd6bd0d409a48f583b964399339606ed9e91c5da0be08b36",
+      "bytes": 13712
+    },
+    {
+      "path": "desktop/core/src/vault.rs",
+      "sha256": "c2292adab403714123b7f205fffcb92b88eae3173ec0e7067cfd5f53a8a09fa4",
+      "bytes": 1462
+    },
+    {
+      "path": "desktop/core/src/mcp.rs",
+      "sha256": "c82425c266553a082f5e7c7dcd53521d3a47032643466e175f117ddcbb341ffe",
+      "bytes": 14605
+    },
+    {
+      "path": "desktop/core/src/setup.rs",
+      "sha256": "9ccc85f6f1848d385d15c68c7acb53330796304a9c275fda3cc0b40fe8ca681d",
+      "bytes": 24018
+    },
+    {
+      "path": "desktop/core/src/apple/gsa.rs",
+      "sha256": "3a3cf499e4e1535d7e96cbee8bf40df72747e10fb9e4818bd4130aa7ea16c0ba",
+      "bytes": 35814
+    },
+    {
+      "path": "desktop/core/src/apple/anisette.rs",
+      "sha256": "0b97faa77e6a9408364742bdb00262a40356d9db30d24c1ca090e9106f569483",
+      "bytes": 28343
+    },
+    {
+      "path": "desktop/core/src/apple/portal.rs",
+      "sha256": "2cae89f933f916877ca3e503efa6854dd280b25dce23f6af38b866f2585c16e5",
+      "bytes": 15524
+    },
+    {
+      "path": "desktop/core/src/apple/store.rs",
+      "sha256": "491a28922988b71a35268273f93139f72503eab80a16982e70d36b82f9c6ff30",
+      "bytes": 12701
+    },
+    {
+      "path": "desktop/core/src/apple/identity.rs",
+      "sha256": "1a2dba6d6908424cdbeaa66cf5a99c52898719cdecc1314038730e502b8ef83e",
+      "bytes": 22628
+    },
+    {
+      "path": "desktop/core/src/apple/mod.rs",
+      "sha256": "c042629674b257215c9d76813998c255463612b7a98b9535bf7883d14c9629f9",
+      "bytes": 2140
+    },
+    {
+      "path": "desktop/core/src/apple/srp.rs",
+      "sha256": "73a4430a73bfae30fe0da05aead4802b3783cd9e46b2f4998ed3e4ce1bd13436",
+      "bytes": 5870
+    },
+    {
+      "path": "desktop/core/src/device/ddi.rs",
+      "sha256": "2c451f6c3d220b037a251f4fed55b833d490a9be2247736caea024c129c4bebf",
+      "bytes": 9884
+    },
+    {
+      "path": "desktop/core/src/device/mod.rs",
+      "sha256": "1f388d5cc2388863c4edc4565265f49738944ce0e98a989b395abd13274674c8",
+      "bytes": 4985
+    },
+    {
+      "path": "desktop/core/src/device/install.rs",
+      "sha256": "f6148fe763e352c54ca95eb81beb9e255bbb9a9eca4ce5d6c0d8d89bccd49b4e",
+      "bytes": 6717
+    },
+    {
+      "path": "desktop/core/src/device/info.rs",
+      "sha256": "28c4d02eea166e0c45322520c1171c7ff12088dae93a48a6c353d7f0709128e2",
+      "bytes": 2808
+    },
+    {
+      "path": "desktop/core/src/device/pairing.rs",
+      "sha256": "a967b79f0b0b47175fad595b0f517f3a945b2c3928279c790886839cd5f3897f",
+      "bytes": 11531
+    },
+    {
+      "path": "desktop/core/src/device/container.rs",
+      "sha256": "3c7bcdf7dd145ec06c930cac245fc5f6fdf331b921877a6f17952a23ee622da2",
+      "bytes": 3432
+    },
+    {
+      "path": "desktop/core/src/device/logs.rs",
+      "sha256": "275502165553277724a376f9e026f718dc09d3a7aa49cdc848692f9d57fbc7bc",
+      "bytes": 2512
+    },
+    {
+      "path": "desktop/core/src/device/devmode.rs",
+      "sha256": "051acd2142fde6fc9d586fd4280e1ef79f90800f87ee1392af8e6331096a6a3d",
+      "bytes": 3899
+    },
+    {
+      "path": "desktop/core/src/sign/profile.rs",
+      "sha256": "f13890eca6a2ae0d9c38ddf6b6c2291cee767c4f699b4c3c41263210d5d0d713",
+      "bytes": 1894
+    },
+    {
+      "path": "desktop/core/src/sign/mod.rs",
+      "sha256": "036141e2e42a22d1fbab8a394044e0df5131116abcc300804e4069060722fe33",
+      "bytes": 21678
+    },
+    {
+      "path": "desktop/core/src/sign/entitlements.rs",
+      "sha256": "5f5ada24d19a47b852917733b3d64605ed666ffc284c4d75d9f3ef9a496fcd77",
+      "bytes": 2861
+    },
+    {
+      "path": "desktop/app/public/icon.png",
+      "sha256": "482a5ff6a84c8a02340e913f764462c00534738ef81c122368430e0f724934f6",
+      "bytes": 65241
+    },
+    {
+      "path": "desktop/app/src-tauri/tauri.conf.json",
+      "sha256": "5446db16038098b895e5f3220569f8918133111f024f6827fa3d9cc61d63d124",
+      "bytes": 1706
+    },
+    {
+      "path": "desktop/app/src-tauri/entitlements.plist",
+      "sha256": "678bf32dc3176f38e5640c25a360bba1befb7ab2e8152c6043172c6ae1834f1f",
+      "bytes": 473
+    },
+    {
+      "path": "desktop/app/src-tauri/Cargo.toml",
+      "sha256": "ffed172df211d87874e80715921620609e3a2ef649911d6b2c315373a324ca93",
+      "bytes": 800
+    },
+    {
+      "path": "desktop/app/src-tauri/build.rs",
+      "sha256": "487059eaf8a947b80f20a9aacac038a5047b2ad69d2401b827376c67d6fe847f",
+      "bytes": 39
+    },
+    {
+      "path": "desktop/app/src-tauri/tauri.windows.conf.json",
+      "sha256": "33281e7e614bb6f7a446e8970e50ccd96712afddb9a6c72579cf2d0a183c7798",
+      "bytes": 99
+    },
+    {
+      "path": "desktop/app/src/mock.ts",
+      "sha256": "f45c7f02582ab9cf6140893917a059b494a135c973e52dfb3ddf06385bb2046b",
+      "bytes": 3682
+    },
+    {
+      "path": "desktop/app/src/App.tsx",
+      "sha256": "1c397cc617bfdf888621da96cba4554f9ff39375119ee1b852b0b179259e4331",
+      "bytes": 4874
+    },
+    {
+      "path": "desktop/app/src/main.tsx",
+      "sha256": "b24c0a69b28b30b311f838507bf16ac7b5af059196ce4bb8299d505b5828426d",
+      "bytes": 257
+    },
+    {
+      "path": "desktop/app/src/styles.css",
+      "sha256": "0bc3ad6e9e119ea005402d4393ce34dba505635347eafb76baf620a29465c12e",
+      "bytes": 10960
+    },
+    {
+      "path": "desktop/app/src/i18n.ts",
+      "sha256": "bdb78843d279e7d8cd0f7e9839cfb7b6d2c67c7f5a9f08b56ecc148853c4abac",
+      "bytes": 6263
+    },
+    {
+      "path": "desktop/app/src/api.ts",
+      "sha256": "103277907db06b957c682da4806912aaf6d3635c36013a6a491fedce0f9e7915",
+      "bytes": 6867
+    },
+    {
+      "path": "desktop/app/src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+      "bytes": 38
+    },
+    {
+      "path": "desktop/app/src/ui.tsx",
+      "sha256": "7cfcc9a6143ab136d2a4e0da1e8f22778f1099678ee3f4d33745b8b912250d88",
+      "bytes": 5057
+    },
+    {
+      "path": "desktop/app/public/fonts/Geist-Black.ttf",
+      "sha256": "fe536ec28d8071f87ee3a694b770de22a73ade6de89ab87a45f340363ac0a31a",
+      "bytes": 108064
+    },
+    {
+      "path": "desktop/app/public/fonts/Geist-SemiBold.ttf",
+      "sha256": "4e462ed71ed2609356fb590d8810a46e851989bae94d200f018e39009b8d2ee3",
+      "bytes": 105492
+    },
+    {
+      "path": "desktop/app/public/fonts/LICENSE-Geist.txt",
+      "sha256": "930853ee1daa68554d9e35c8a9175affb74f699fad9a5da6ee5ebe76379d9137",
+      "bytes": 4368
+    },
+    {
+      "path": "desktop/app/public/fonts/Geist-Regular.ttf",
+      "sha256": "5443f0c7e853354f2c8ce3a7a33678fb8b35958695267b930af961380240db9e",
+      "bytes": 103636
+    },
+    {
+      "path": "desktop/app/public/fonts/Geist-Medium.ttf",
+      "sha256": "abc1b5e5b7df49995f096a63d41070b8134d37062a62b7042bbc43db9549fa0e",
+      "bytes": 106024
+    },
+    {
+      "path": "desktop/app/public/fonts/Geist-Bold.ttf",
+      "sha256": "0212c10d3134d9f55ad136b88830f193fd54073caacb3d57e6dcd60f37872159",
+      "bytes": 106404
+    },
+    {
+      "path": "desktop/app/src-tauri/capabilities/default.json",
+      "sha256": "a548d45102beef931ff00aace51b0e90d6e191c6d16ea22bb27d1da9bc25e326",
+      "bytes": 450
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/icon.png",
+      "sha256": "a74d4a5eafe7a9aed657c24c90d3869c9e8e6ea8d6c9ed9ba52b5828b83804f9",
+      "bytes": 236732
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/icon.icns",
+      "sha256": "796e8a13014a0f33adbe95a5781cff777074b3992fa957d0c6e8784469fca84c",
+      "bytes": 1204149
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/Square44x44Logo.png",
+      "sha256": "917fc0a452a63f8b4c7eb525e1465ccb1a65be007228e9b70710d73e7060f0e6",
+      "bytes": 3729
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/Square71x71Logo.png",
+      "sha256": "2d80ed1d9f36683a858a3c95d0310b0320fd6ed73d858b6de0175b3498ab2209",
+      "bytes": 7671
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/Square142x142Logo.png",
+      "sha256": "a813bd58aa2f3494d3c0b13912501974924a378828844cc9e162bb10fd0bd270",
+      "bytes": 23019
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/Square284x284Logo.png",
+      "sha256": "f1906688a92168712094a88b323b3043a8e49b02971247c7f800e6829a7094fb",
+      "bytes": 79824
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/Square30x30Logo.png",
+      "sha256": "b1c73f897b27bce99c3cfa1a19834f28862614fffe248944480fb9fe23c901c5",
+      "bytes": 2038
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/Square107x107Logo.png",
+      "sha256": "c627b782abf3ff2244acd3908c06568d808f826463e00077fc55b834b3844ce1",
+      "bytes": 14576
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/icon.ico",
+      "sha256": "5fbaca8bcccbf87d578c76d293861d20bcb7e6e231f13fbeb076be79684756e7",
+      "bytes": 81006
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/Square310x310Logo.png",
+      "sha256": "9162461c148adb3a369498c5aab1f57affee7c5dca79b6e14c46b5f0423faf26",
+      "bytes": 94903
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/128x128.png",
+      "sha256": "f251ded5a02aa784c964a2f7ba03236e7da1858572655037e234b385f5af66a1",
+      "bytes": 19486
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/32x32.png",
+      "sha256": "a47bd667bf28963c9e1af5941f8e6aa89b1a36f08b010380e4567ff7adb5e53d",
+      "bytes": 2275
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/Square89x89Logo.png",
+      "sha256": "043411d186277a3caef877ea7c930e5d901faabd2f9e7bc7e6dbe4972e1c1249",
+      "bytes": 10954
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/Square150x150Logo.png",
+      "sha256": "2c361a055d43b9895e084155bfdb87239860b284835974ca76f46ec9367f51d2",
+      "bytes": 25206
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/128x128@2x.png",
+      "sha256": "482a5ff6a84c8a02340e913f764462c00534738ef81c122368430e0f724934f6",
+      "bytes": 65241
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/64x64.png",
+      "sha256": "e968b61511a6c2c7787ed024471aed1b49b185f0e8f019bb9f0555b61e6c69d2",
+      "bytes": 6498
+    },
+    {
+      "path": "desktop/app/src-tauri/icons/StoreLogo.png",
+      "sha256": "a7a880b1faee647cb24039acac555edea1817018a2393dcf856e5bbd0962d598",
+      "bytes": 4507
+    },
+    {
+      "path": "desktop/app/src-tauri/src/lib.rs",
+      "sha256": "b2b7a5c868ce29b57db93b826fa693861872834ab8544406ac66b8846cb49b50",
+      "bytes": 7011
+    },
+    {
+      "path": "desktop/app/src-tauri/src/commands.rs",
+      "sha256": "a28361274a7ece1d1da3d08a4ace0da384e632ab371156b1f02f908b339f1645",
+      "bytes": 14176
+    },
+    {
+      "path": "desktop/app/src-tauri/src/main.rs",
+      "sha256": "16c70b044967c780a3f86fd85ff4002c238c1799b84d00ca7496e66501f88ac3",
+      "bytes": 108
+    },
+    {
+      "path": "desktop/app/src/screens/Settings.tsx",
+      "sha256": "95af0f4570e96631b1f58b793b9bc2d008fc5131c56dfb15011f77e6073fed83",
+      "bytes": 5058
+    },
+    {
+      "path": "desktop/app/src/screens/Setup.tsx",
+      "sha256": "c4f6f5504e3dd36a001a3b47c796500c654ea5d5565e05bd835631388224d103",
+      "bytes": 7091
+    },
+    {
+      "path": "desktop/app/src/screens/Account.tsx",
+      "sha256": "a96ea1803cce406613e4d2e72da5b786f33a66f5274dbe8a7ea115b9c8d97c72",
+      "bytes": 4464
+    },
+    {
+      "path": "desktop/app/src/screens/Phones.tsx",
+      "sha256": "720c5a4d54bb00da5b0f38d2e2e971839faa75b085f9bccf1610f2be3fcfeac3",
+      "bytes": 3482
+    },
+    {
+      "path": "desktop/app/src/screens/Debug.tsx",
+      "sha256": "d9942990a118bc78a828e61c467e6f596c529e03973f08321f71b11ba63b7f9d",
+      "bytes": 3776
+    },
+    {
+      "path": "desktop/app/src/screens/Relay.tsx",
+      "sha256": "afd26e9ac234c2692441bf18b811b6f88e2fc84129d2eeba72cbca54527e4fde",
+      "bytes": 5572
+    },
+    {
+      "path": "desktop/bridge/src/main.rs",
+      "sha256": "576984eb39d363b8564df532ac57fcd2f598833461f1965265835b37616882ff",
+      "bytes": 26064
+    },
+    {
+      "path": "desktop/cli/src/main.rs",
+      "sha256": "a48295be7cda2c487b3e07f892e1b00504a09606c164fccb9f9a5a432358a791",
+      "bytes": 29370
+    },
+    {
+      "path": "desktop/mac/scripts/sign-check.sh",
+      "sha256": "f1051c26845c093efb106039bd2e6fa15e658f350d714cf440d9f9d06b220858",
+      "bytes": 2049
+    },
+    {
+      "path": "desktop/mac/scripts/e2e.py",
+      "sha256": "c91457391533b5ee43c71f5f3f90ca2c6389e7adb009b2f309d5ac94abe14031",
+      "bytes": 2743
+    },
+    {
+      "path": "desktop/mac/scripts/check-universal.sh",
+      "sha256": "4b55d74e554d9338f0bbf8b9c824156d4e037e29bf0da02c9effa70c56d991cf",
+      "bytes": 997
+    },
+    {
+      "path": "desktop/mac/scripts/bundle.sh",
+      "sha256": "e590eced880a12261b94ac1f5cb6f9370234dd51dfc49894e197ec6f5e0416bd",
+      "bytes": 3433
+    },
+    {
+      "path": "desktop/mac/Resources/Info.plist",
+      "sha256": "7bc20a3aa8af7eccf8a5bd8aff156f714c4ea770404b3fe060160fc9ea9e898c",
+      "bytes": 1301
+    },
+    {
+      "path": "desktop/mac/Resources/AppIcon.icns",
+      "sha256": "9b696b6db95712293a4d4f461025e362dadb4f2c500297bbe565cf4759c85d34",
+      "bytes": 972661
+    },
+    {
+      "path": "desktop/mac/Resources/AppIcon-1024.png",
+      "sha256": "5001707c38a66906eeb8f361c7b4a405c8097219d4c64a0e3b660ba1bf6030bf",
+      "bytes": 490106
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/AdvancedViews.swift",
+      "sha256": "6e7c17936eafe5e0dddb7d6a43863aa76f56f032891130ad157539d52fa0501b",
+      "bytes": 14715
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/App.swift",
+      "sha256": "d1c6df8fcf32b673395e0ea20af288bf1d91ad77a73f4b8d9ce92ade6d383b9a",
+      "bytes": 3048
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/AppModel.swift",
+      "sha256": "0b01bc68dbbbb13bfb40ba1fbc53ca4b3716e22cfbd4f4ededc5c3a753e938bc",
+      "bytes": 16760
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/Bridge.swift",
+      "sha256": "040e6e3cb4483f86396b05acac8d756aeec770a567cf1266bc1fec632643bfe7",
+      "bytes": 7381
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/Snapshots.swift",
+      "sha256": "fd1e665150d81f3d81ad8d6b1f84706eefa1b8246ecabdd874c226b796fb6171",
+      "bytes": 2573
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/Components.swift",
+      "sha256": "b9bf16e66bf81724778ee0c2a8e5062bd9389981902384f5fbf8373eb55073ef",
+      "bytes": 4861
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/SetupView.swift",
+      "sha256": "0cf26a4404cc1983872e3d4b82ea89bb04189aa51fd05e0d8a157d2ce798b11b",
+      "bytes": 16027
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/AccountView.swift",
+      "sha256": "6e65cba446c702e8119407b0a23c2c69c7ce6766d51d68c89c78eb9e2af1356b",
+      "bytes": 6153
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/Models.swift",
+      "sha256": "dcdc265b08d0b8edcf135e40e89c5a843478794f341334e87775d5a569092060",
+      "bytes": 5257
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/Glass.swift",
+      "sha256": "521846b83d9597463843642002345e887484fa61b22d4bdb1bb79daa96e2d486",
+      "bytes": 8635
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/ContentView.swift",
+      "sha256": "ce55cbc3d803c77a22d2f1c92ddf47777920b5c2b63ac3be7130f0a37b5306f5",
+      "bytes": 7979
+    },
+    {
+      "path": "desktop/mac/Sources/PokiSetup/PhonesView.swift",
+      "sha256": "676ab7bbcb8c8dcb8b28457030e01d8f923c289efe4820b8feaab14d843a970e",
+      "bytes": 5295
+    },
+    {
+      "path": "config/release-source.json",
+      "sha256": "2e4f4bf03363dcafbb613c672e6496e71f337f2e2ffc402726caa9d297b91f78",
+      "bytes": 138
+    },
+    {
+      "path": "deploy/cf-relay/worker.js",
+      "sha256": "0cf6adf2c7d713e46c75688e39dc59debad7a2c8dc9aaed6641f368350d982c9",
+      "bytes": 26322
+    },
+    {
+      "path": "bin/setup",
+      "sha256": "26b284b6b322e48e5d7a35e627b773969069fd97066a4a6cdaf0abf3ded74e98",
+      "bytes": 2320
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+      "bytes": 34523
+    },
+    {
+      "path": "BRAND.md",
+      "sha256": "38e6084c6e1292a31e9dcdd49bfbbf8fcb0a8b9c4b1b9dfbc1fd609bd48194b2",
+      "bytes": 4552
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "sha256": "77fca6bd95f4e8c61f51b49740049f515b319370e67836e5ed86618480553d08",
+      "bytes": 28566
+    }
+  ]
+}
