@@ -6,7 +6,7 @@ SRC=$(CDPATH= cd -- "${1:-.}" && pwd)
 NODE_VERSION=22.23.5-r0
 NPM_VERSION=10.9.1-r0
 LOCK=/var/lock/amore-node-runtime
-mkdir -p /var/lock
+mkdir -p /run/lock /var/lock /var/cache
 if ! mkdir "$LOCK" 2>/dev/null; then
     previous=$(cat "$LOCK/pid" 2>/dev/null || true)
     case "$previous" in

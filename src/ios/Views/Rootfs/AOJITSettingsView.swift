@@ -764,6 +764,8 @@ struct AOJITSettingsSection: View {
                         Text(AppLocalized("Install bundled Node.js and npm offline"))
                     } else if image.module == "/usr/bin/node" {
                         Text(AppLocalized("Install bundled Node.js and npm offline"))
+                    } else if image.module == "/usr/bin/node" {
+                        Text(AppLocalized("Install bundled Node.js and npm offline"))
                     } else if case .family = state {
                         Text("Install \(image.build.package) for full speed")
                     } else {
