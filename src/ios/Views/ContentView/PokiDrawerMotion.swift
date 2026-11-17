@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Independently implemented drawer geometry, following Poki's exposed-chat
-/// proportions without copying its drawing or brand assets.
+/// Solid ChatGPT-style drawer geometry. Keep the established metrics API for
+/// EdgeSwipeCatcher so its left-edge progress matches the conversation travel.
 enum PokiDrawerMetrics {
     static func travel(for width: CGFloat) -> CGFloat {
         let visibleChat = max(72, (width * 0.22).rounded())
@@ -10,8 +10,7 @@ enum PokiDrawerMetrics {
 
     static func cornerRadius(progress: CGFloat, safeAreaInsets: EdgeInsets) -> CGFloat {
         let phase = min(1, max(0, progress))
-        let restingRadius = min(60, max(34, max(safeAreaInsets.top, safeAreaInsets.bottom)))
-        return min(1, phase / 0.15) * restingRadius
+        return 16 * phase
     }
 }
 
@@ -33,7 +32,7 @@ struct PokiDrawerPanelBounds {
     }
 }
 
-/// The actual rounded viewport shared by the live chat and its glass cover.
+/// A small rounded viewport shared by the live conversation and its tap cover.
 struct PokiConversationPanel: Shape {
     var radius: CGFloat
 
@@ -48,14 +47,10 @@ struct PokiConversationPanel: Shape {
     }
 }
 
-/// Keeps the live navigation/chat tree mounted, but fades all of its pixels
-/// out as the drawer opens. At progress 1 only an independent material remains.
-///
-/// `containerSize` and `safeAreaInsets` must come from the SAME GeometryReader
-/// before any ignoresSafeArea modifier. The inner chat retains that reader's
-/// safe-area size and origin, including keyboard avoidance. Its full-bounds host
-/// clips navigation/collection-view overflow as well as the glass in one place.
-/// There is no drawingGroup, snapshot, or per-frame walk of the chat view tree.
+/// Translates a permanently mounted live chat; only a flat dimming cover is
+/// added while presenting the drawer. There are no snapshots or materials.
+/// The inner chat keeps its original safe-area layout and keyboard avoidance.
+/// Reduce Motion leaves the chat stationary and cross-fades the sidebar above.
 struct PokiDrawerConversationPanel<Chat: View>: View {
     let containerSize: CGSize
     let safeAreaInsets: EdgeInsets
@@ -82,36 +77,28 @@ struct PokiDrawerConversationPanel<Chat: View>: View {
     var body: some View {
         let phase = min(1, max(0, progress))
         let bounds = PokiDrawerPanelBounds(containerSize: containerSize, safeAreaInsets: safeAreaInsets)
-        let openRadius = PokiDrawerMetrics.cornerRadius(progress: 1, safeAreaInsets: safeAreaInsets)
-        let radius = PokiDrawerMetrics.cornerRadius(progress: phase, safeAreaInsets: safeAreaInsets)
-        let isPresenting = presentationActive || phase > 0
+        let radius = reduceMotion ? 0 : PokiDrawerMetrics.cornerRadius(progress: phase, safeAreaInsets: safeAreaInsets)
 
         ZStack {
             chat
                 .frame(width: containerSize.width, height: containerSize.height)
                 .offset(x: -bounds.centerOffset.width, y: -bounds.centerOffset.height)
-                .opacity(Double(1 - phase))
                 .allowsHitTesting(phase <= 0.001)
                 .accessibilityHidden(phase > 0.001)
 
-            if isPresenting {
-                PokiConversationCover(progress: phase, onClose: onClose)
-                    // Reduced motion cross-fades in place. The glass starts at
-                    // its final position, so its open-state geometry is identical.
-                    .clipShape(PokiConversationPanel(radius: reduceMotion ? openRadius : 0))
-                    .offset(x: reduceMotion ? drawerWidth : 0)
-            }
+            // Kept mounted: adding/removing the cover never replaces the chat.
+            PokiConversationCover(progress: phase, onClose: onClose)
         }
         .frame(width: bounds.size.width, height: bounds.size.height)
-        .clipShape(PokiConversationPanel(radius: reduceMotion ? 0 : radius))
+        .clipShape(PokiConversationPanel(radius: radius))
         .offset(x: bounds.centerOffset.width + (reduceMotion ? 0 : drawerWidth * phase),
                 y: bounds.centerOffset.height)
         .frame(width: containerSize.width, height: containerSize.height)
     }
 }
 
-/// A single glass layer over the exposed conversation; the sidebar stays solid.
-/// Reduce Motion changes positioning above, never whether this material exists.
+/// A cheap scrim over the actual conversation; the exposed right strip closes
+/// on tap and exposes the same close action to VoiceOver.
 struct PokiConversationCover: View {
     let progress: CGFloat
     let onClose: () -> Void
@@ -120,13 +107,12 @@ struct PokiConversationCover: View {
 
     var body: some View {
         Rectangle()
-            .fill(.ultraThinMaterial)
-            .opacity(Double(visibleProgress))
+            .fill(Color.black.opacity(0.16 * Double(visibleProgress)))
             .contentShape(Rectangle())
             .onTapGesture(perform: onClose)
-            .allowsHitTesting(visibleProgress > 0)
+            .allowsHitTesting(visibleProgress > 0.001)
             .accessibilityElement()
-            .accessibilityHidden(visibleProgress <= 0)
+            .accessibilityHidden(visibleProgress <= 0.001)
             .accessibilityLabel(Text(AppLocalized("Close conversations")))
             .accessibilityAddTraits(.isButton)
             .accessibilityAction { onClose() }

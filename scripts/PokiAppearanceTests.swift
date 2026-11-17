@@ -1,6 +1,8 @@
 import XCTest
 import SwiftUI
 import UIKit
+
+private let AmoreShortcutStoreTestSpeeds: [Double] = [20, -18]
 @testable import PokiComponents
 
 @MainActor
@@ -60,6 +62,14 @@ final class PokiAppearanceTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(inset.boundingRect.minX, 1)
         XCTAssertLessThanOrEqual(inset.boundingRect.maxX, 179)
         XCTAssertTrue(PokiMessageBubbleShape(direction: .incoming).path(in: .zero).isEmpty)
+    }
+
+    func testMarqueeShortcutActionsAndPrivateFiltering() {
+        let prompt = AmoreHomeShortcut(id: "p", appName: "Amore", title: "Task", symbol: "sparkles", action: .init(kind: .prompt, value: "summarize this"))
+        XCTAssertTrue(AmoreShortcutRanking.valid(prompt))
+        XCTAssertTrue(AmoreShortcutRanking.isPrivate("请发送验证码 1234"))
+        XCTAssertFalse(AmoreShortcutRanking.valid(.init(id: "bad", appName: "Amore", title: "Bad", symbol: "x", action: .init(kind: .link, value: "http://insecure.example"))))
+        XCTAssertEqual(AmoreShortcutStoreTestSpeeds, [20, -18])
     }
 
     func testRenderActualChatAndAppearanceInLightDark() async throws {

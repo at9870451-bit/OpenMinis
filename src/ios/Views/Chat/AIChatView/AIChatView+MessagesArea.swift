@@ -96,10 +96,27 @@ extension AIChatView {
             // genuine first-launch hint).
             if vm.sessionId == nil
                 && vm.messages.isEmpty
-                && !vm.isLoadingSession
-                && (totalSessionCount ?? Int.max) == 0 {
-                EmptyChatDirectoryTimeline(onBrowse: { showFileBrowser = true })
-                    .padding(.horizontal, 24)
+                && !vm.isLoadingSession {
+                VStack(spacing: 12) {
+                    AmoreHomeMarqueePanel(
+                        items: AmoreHomeShortcutStore.shared.visibleItems,
+                        revision: AmoreHomeShortcutStore.shared.revision,
+                        active: true,
+                        onAction: { action in
+                            AmoreHomeActionRouter(
+                                setInput: { vm.inputText = $0; inputFocused = true },
+                                openPage: { page in
+                                    let path = page == "rootfs" ? "minis://views/rootfs" : "minis://settings/\(page)"
+                                    if let url = URL(string: path) { _ = handleMinisURLTap(url) }
+                                }
+                            ).perform(action)
+                        }
+                    )
+                    if (totalSessionCount ?? Int.max) == 0 {
+                        EmptyChatDirectoryTimeline(onBrowse: { showFileBrowser = true })
+                            .padding(.horizontal, 24)
+                    }
+                }
             }
         }
         .overlay(alignment: .bottom) {

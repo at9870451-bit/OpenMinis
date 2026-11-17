@@ -218,6 +218,7 @@ struct AIChatView: View {
     @StateObject var speechManager = SpeechRecognitionManager.shared
     @ObservedObject private var mentionIndex = FileMentionIndex.shared
     @ObservedObject var configStore = ProviderConfigStore.shared
+    @ObservedObject private var homeShortcutStore = AmoreHomeShortcutStore.shared
     @ObservedObject private var fontSettings = FontSettings.shared
     @ObservedObject private var deepLink = DeepLinkCoordinator.shared
     @Environment(\.dismiss) private var dismiss

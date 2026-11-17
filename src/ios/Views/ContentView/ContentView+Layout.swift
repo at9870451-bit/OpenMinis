@@ -11,12 +11,11 @@
 
 import SwiftUI
 
-/// One date bucket in the sidebar. A struct (not a tuple) so it can live in
-/// `@State` and be compared cheaply by SwiftUI.
-struct DrawerSessionGroup: Identifiable, Equatable {
+/// Date buckets hold IDs; the snapshot resolves sessions only for visible rows.
+struct DrawerSessionGroup: Identifiable {
+    let id: String
     let label: String
-    let sessions: [ChatSession]
-    var id: String { label }
+    let sessionIDs: [String]
 }
 
 
@@ -157,11 +156,10 @@ extension ContentView {
             let drawerWidth = PokiDrawerMetrics.travel(for: geometry.size.width)
             let progress = min(1, max(0, drawerProgress))
             ZStack(alignment: .leading) {
-                PokiTheme.sidebar.ignoresSafeArea()
+                Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
                 historyDrawer
                     .frame(width: drawerWidth, height: geometry.size.height)
-                    .offset(x: drawerReduceMotion ? 0 : -24 * (1 - progress))
-                    .opacity(drawerReduceMotion ? progress : (progress > 0 ? 0.55 + 0.45 * progress : 0))
+                    .opacity(drawerReduceMotion ? progress : 1)
                     .allowsHitTesting(showHistoryDrawer && !drawerIsSliding)
                     .accessibilityHidden(!showHistoryDrawer)
                     .zIndex(drawerReduceMotion ? 2 : 0)
@@ -199,7 +197,10 @@ extension ContentView {
                     .onChanged { value in
                         guard showHistoryDrawer || drawerCloseStart != nil else { return }
                         guard abs(value.translation.width) > abs(value.translation.height) * 1.5 else { return }
-                        if drawerCloseStart == nil { drawerCloseStart = drawerProgress }
+                        if drawerCloseStart == nil {
+                            guard value.translation.width < 0 else { return }
+                            drawerCloseStart = drawerProgress
+                        }
                         drawerIsSliding = true
                         let fraction = (drawerCloseStart ?? 1) + value.translation.width / drawerWidth
                         drawerDragProgress = min(1, max(0, fraction))
@@ -216,14 +217,17 @@ extension ContentView {
             .onChange(of: drawerGestureActive) { active in
                 if !active, drawerCloseStart != nil { snapDrawer(open: showHistoryDrawer) }
             }
-            .background(PokiTheme.sidebar.ignoresSafeArea())
+            .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
+            .accessibilityAction(.escape) {
+                if showHistoryDrawer { snapDrawer(open: false) }
+            }
         }
         .sheet(item: $runtimePage) { page in
             NavigationStack {
                 runtimeDestination(page)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
-                            Button("Done") { runtimePage = nil }
+                            Button(AppLocalized("Done")) { runtimePage = nil }
                         }
                     }
             }
@@ -237,6 +241,7 @@ extension ContentView {
 
     func snapDrawer(open: Bool) {
         drawerCleanupTask?.cancel()
+        drawerSearchFocused = false
         if open {
             drawerPresentationActive = true
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -257,248 +262,242 @@ extension ContentView {
         }
     }
 
-    // MARK: - Poki-inspired solid history drawer
+    // MARK: - ChatGPT-style solid history drawer
 
-    @ViewBuilder
     private var historyDrawer: some View {
-        ZStack(alignment: .leading) {
-            Rectangle()
-                .fill(PokiTheme.sidebar)
-                .ignoresSafeArea()
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 12) {
-                    Button { showDrawerAccountMenu = true } label: {
-                        HStack(spacing: 10) {
-                            Image("AmoreLogo")
-                                .resizable().scaledToFit()
-                                .frame(width: 32, height: 32)
-                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                            Text("Amore")
-                                .font(.system(size: 28, weight: .bold))
-                                .foregroundStyle(PokiTheme.primaryText)
+        VStack(alignment: .leading, spacing: 0) {
+            drawerHeader
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 2) {
+                    DisclosureGroup(isExpanded: $drawerShowsFeatures) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 132), spacing: 4)], spacing: 4) {
+                            drawerNavRow(.tools)
+                            drawerNavRow(.subAgents)
+                            drawerNavRow(.skills)
+                            drawerNavRow(.memory)
+                            drawerNavRow(.rootfs)
+                            localBotNavRow
                         }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text(AppLocalized("Account")))
-                    .confirmationDialog(AppLocalized("Account"), isPresented: $showDrawerAccountMenu, titleVisibility: .visible) {
-                        Button(AppLocalized("Personalize Amore")) {
-                            snapDrawer(open: false)
-                            runtimePage = .soul
-                        }
-                        Button(AppLocalized("Settings")) {
-                            snapDrawer(open: false)
-                            activeToolSheet = .settings
-                        }
-                        Button(AppLocalized("Cancel"), role: .cancel) { }
-                    }
-                    Spacer()
-                    Button {
-                        showDrawerSearch.toggle()
-                        if !showDrawerSearch { drawerSearch = "" }
+                        .padding(.top, 6)
                     } label: {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 17, weight: .medium))
-                            .foregroundStyle(PokiTheme.sidebarInk)
-                            .frame(width: 44, height: 44)
+                        Label(AppLocalized("Features"), systemImage: "square.grid.2x2")
+                            .font(.subheadline)
+                            .foregroundStyle(.primary)
+                            .frame(minHeight: 44)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text(AppLocalized("Search chats")))
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 8)
-                .padding(.bottom, 12)
-
-                if showDrawerSearch {
-                    HStack(spacing: 8) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(PokiTheme.secondaryText)
-                        TextField("Search chats", text: $drawerSearch)
-                            .textFieldStyle(.plain)
-                            .font(.system(size: 16))
-                            .foregroundStyle(PokiTheme.primaryText)
-                            .tint(PokiTheme.tagText)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-                    }
-                    .padding(.horizontal, 14)
-                    .frame(height: 42)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(PokiTheme.surface)
-                    )
-                    .padding(.horizontal, 22)
-                    .padding(.bottom, 12)
-                }
-
-                // Runtime shortcuts remain above the history, like ChatGPT's utility entries.
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 2) {
-                    drawerNavRow(.tools)
-                    drawerNavRow(.subAgents)
-                    drawerNavRow(.skills)
-                    drawerNavRow(.memory)
-                    drawerNavRow(.rootfs)
-                    localBotNavRow
-                }
-                .padding(.horizontal, 10)
-                .padding(.bottom, 6)
-
-                Rectangle()
-                    .fill(PokiTheme.divider)
-                    .frame(height: 0.5)
+                    .tint(.secondary)
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 8)
 
-                HStack {
-                    Text(showArchivedDrawerSessions ? AppLocalized("Archived") : AppLocalized("Recent"))
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(PokiTheme.secondaryText)
-                    Spacer()
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.18)) {
-                            showArchivedDrawerSessions.toggle()
-                        }
-                    } label: {
-                        Image(systemName: showArchivedDrawerSessions ? "bubble.left.and.bubble.right" : "archivebox")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(PokiTheme.secondaryText)
-                            .frame(width: 34, height: 34)
+                    drawerHistoryHeading
+                    if drawerHistory.groups.isEmpty {
+                        Text(drawerHistory.isSearching ? AppLocalized("No results") :
+                             (showArchivedDrawerSessions ? AppLocalized("No archived chats") : AppLocalized("No conversations yet")))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 16)
                     }
-                    .buttonStyle(DrawerIconButtonStyle())
-                    .accessibilityLabel(showArchivedDrawerSessions ? AppLocalized("Show recent chats") : AppLocalized("Show archived chats"))
-                }
-                .padding(.horizontal, 18)
-                .padding(.bottom, 2)
-
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 8) {
-                        let groups = drawerGroups
-                        if groups.isEmpty && filteredDrawerSessions.isEmpty {
-                            Text(showArchivedDrawerSessions ? AppLocalized("No archived chats") : AppLocalized("No conversations yet"))
-                                .font(.system(size: 14))
-                                .foregroundStyle(PokiTheme.secondaryText)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, 20)
-                                .padding(.top, 14)
-                        } else {
-                            ForEach(groups, id: \.label) { group in
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(LocalizedStringKey(group.label))
-                                        .font(.system(size: 13, weight: .medium))
-                                        .foregroundStyle(PokiTheme.sidebarHeading)
-                                        .padding(.horizontal, 20)
-                                        .padding(.top, 6)
-                                    ForEach(group.sessions) { session in
-                                        drawerSessionRow(session)
-                                    }
-                                }
+                    ForEach(drawerHistory.groups) { group in
+                        Text(group.label)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 14)
+                            .padding(.bottom, 6)
+                            .accessibilityAddTraits(.isHeader)
+                        ForEach(group.sessionIDs, id: \.self) { id in
+                            if let session = drawerHistory.sessionsByID[id] {
+                                drawerSessionRow(session)
                             }
                         }
                     }
-                    .padding(.bottom, 10)
                 }
-                .scrollIndicators(.hidden)
-                .scrollDismissesKeyboard(.immediately)
-
-                Rectangle()
-                    .fill(PokiTheme.divider)
-                    .frame(height: 0.5)
-                    .padding(.horizontal, 18)
-
-                HStack(spacing: 12) {
-                    Button {
-                        guard !drawerIsSliding else { return }
-                        startHomeChat()
-                        snapDrawer(open: false)
-                    } label: {
-                        ViewThatFits(in: .horizontal) {
-                            Label(AppLocalized("New Conversation"), systemImage: "square.and.pencil")
-                                .font(.callout.weight(.semibold))
-                                .padding(.horizontal, 16)
-                                .frame(height: 48)
-                            Image(systemName: "square.and.pencil")
-                                .font(.body.weight(.semibold)).frame(width: 48, height: 48)
-                        }
-                        .foregroundStyle(.white)
-                    }
-                    .buttonStyle(.plain)
-                    .pokiControl(in: Capsule(), tint: PokiTheme.blue)
-                    Spacer(minLength: 0)
-                    Button {
-                        snapDrawer(open: false)
-                        activeToolSheet = .settings
-                    } label: {
-                        Image(systemName: "gearshape")
-                            .font(.system(size: 19, weight: .medium))
-                            .foregroundStyle(PokiTheme.sidebarInk)
-                            .frame(width: 48, height: 48)
-                    }
-                    .buttonStyle(.plain)
-                    .pokiControl(in: Circle())
-                    .accessibilityLabel(Text(AppLocalized("Settings")))
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 8)
-                .padding(.bottom, 6)
+                .padding(.bottom, 16)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(PokiTheme.sidebar.ignoresSafeArea())
-            .onAppear { rebuildDrawerGroups() }
-            .onChange(of: sessions) { _ in rebuildDrawerGroups() }
-            .onChange(of: drawerSearch) { _ in rebuildDrawerGroups() }
-            .onChange(of: showArchivedDrawerSessions) { _ in rebuildDrawerGroups() }
-            .onChange(of: archivedDrawerSessionIDs) { _ in rebuildDrawerGroups() }
+            .scrollIndicators(.hidden)
+            .scrollDismissesKeyboard(.interactively)
+            drawerAccountFooter
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
+        .onAppear { rebuildDrawerGroups() }
+        .onChange(of: DrawerSessionSource(sessions: sessions)) { _ in rebuildDrawerGroups() }
+        .onChange(of: drawerSearch) { _ in rebuildDrawerGroups() }
+        .onChange(of: showArchivedDrawerSessions) { _ in rebuildDrawerGroups() }
+        .onChange(of: archivedDrawerSessionIDs) { _ in rebuildDrawerGroups() }
+        .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in rebuildDrawerGroups() }
+        .onReceive(NotificationCenter.default.publisher(for: NSLocale.currentLocaleDidChangeNotification)) { _ in rebuildDrawerGroups() }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in rebuildDrawerGroups() }
+        .onReceive(NotificationCenter.default.publisher(for: .soulMdChanged)) { _ in
+            let name = SoulStore.cachedMetadata.name
+            soulName = name.isEmpty ? AppLocalized("Account") : name
+        }
+    }
+
+    private var drawerHeader: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 4) {
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+                    TextField(AppLocalized("Search chats"), text: $drawerSearch)
+                        .font(.body)
+                        .textFieldStyle(.plain)
+                        .focused($drawerSearchFocused)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                        .submitLabel(.search)
+                        .onSubmit { drawerSearchFocused = false }
+                        .accessibilityLabel(AppLocalized("Search chats"))
+                    if !drawerSearch.isEmpty {
+                        Button { drawerSearch = "" } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.secondary)
+                                .frame(minWidth: 44, minHeight: 44)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(AppLocalized("Clear search"))
+                    }
+                }
+                .padding(.leading, 12)
+                .padding(.trailing, drawerSearch.isEmpty ? 12 : 0)
+                .frame(minHeight: 44)
+                .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                Button { snapDrawer(open: false) } label: {
+                    Image(systemName: "sidebar.left")
+                        .font(.body)
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(ChatHistoryButtonStyle())
+                .accessibilityLabel(AppLocalized("Close conversations"))
+            }
+            Button {
+                guard !drawerIsSliding else { return }
+                startHomeChat()
+                snapDrawer(open: false)
+            } label: {
+                Label(AppLocalized("New Conversation"), systemImage: "square.and.pencil")
+                    .font(.body.weight(.medium))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .padding(.horizontal, 12)
+            }
+            .buttonStyle(ChatHistoryButtonStyle())
+        }
+        .foregroundStyle(.primary)
+        .padding(.horizontal, 12)
+        .padding(.top, 8)
+        .padding(.bottom, 6)
+    }
+
+    private var drawerHistoryHeading: some View {
+        HStack {
+            Text(showArchivedDrawerSessions ? AppLocalized("Archived") : AppLocalized("Recent"))
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.secondary)
+                .accessibilityAddTraits(.isHeader)
+            Spacer(minLength: 8)
+            Button { showArchivedDrawerSessions.toggle() } label: {
+                Image(systemName: showArchivedDrawerSessions ? "bubble.left.and.bubble.right" : "archivebox")
+                    .font(.subheadline)
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(ChatHistoryButtonStyle())
+            .accessibilityLabel(showArchivedDrawerSessions ? AppLocalized("Show recent chats") : AppLocalized("Show archived chats"))
+        }
+        .foregroundStyle(.secondary)
+        .padding(.leading, 20)
+        .padding(.trailing, 12)
+    }
+
+    private var drawerAccountFooter: some View {
+        Button { showDrawerAccountMenu = true } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "person.crop.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(soulName.isEmpty ? AppLocalized("Account") : soulName)
+                        .font(.body.weight(.semibold))
+                        .lineLimit(2)
+                    Text(AppLocalized("Settings"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 4)
+                Image(systemName: "ellipsis")
+                    .accessibilityHidden(true)
+            }
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(ChatHistoryButtonStyle())
+        .accessibilityLabel(AppLocalized("Account"))
+        .accessibilityHint(AppLocalized("Settings"))
+        .confirmationDialog(AppLocalized("Account"), isPresented: $showDrawerAccountMenu, titleVisibility: .visible) {
+            Button(AppLocalized("Settings")) {
+                snapDrawer(open: false)
+                activeToolSheet = .settings
+            }
+            Button(AppLocalized("Personalize Amore")) {
+                snapDrawer(open: false)
+                runtimePage = .soul
+            }
+            Button(AppLocalized("Cancel"), role: .cancel) { }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(alignment: .top) { Divider() }
+    }
+
+    // MARK: Drawer cache (event-driven, never evaluated by a drag frame)
+
+    private func rebuildDrawerGroups() {
+        let calendar = Calendar.current
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today) ?? today
+        let week = calendar.date(byAdding: .day, value: -7, to: today) ?? today
+        let query = drawerSearch.trimmingCharacters(in: .whitespacesAndNewlines)
+        var buckets = Array(repeating: [String](), count: 5)
+        var byID: [String: ChatSession] = [:]
+        byID.reserveCapacity(sessions.count)
+        for session in sessions {
+            guard archivedDrawerSessionIDs.contains(session.id) == showArchivedDrawerSessions else { continue }
+            if !query.isEmpty,
+               !(session.title ?? "").localizedCaseInsensitiveContains(query),
+               !(session.lastMessage ?? "").localizedCaseInsensitiveContains(query) { continue }
+            let bucket: Int
+            if session.isPinned { bucket = 0 }
+            else if session.updatedAt >= today { bucket = 1 }
+            else if session.updatedAt >= yesterday { bucket = 2 }
+            else if session.updatedAt >= week { bucket = 3 }
+            else { bucket = 4 }
+            buckets[bucket].append(session.id)
+            byID[session.id] = session
+        }
+        let headings = [AppLocalized("Pinned"), AppLocalized("Today"), AppLocalized("Yesterday"),
+                        AppLocalized("Last 7 Days"), AppLocalized("Earlier")]
+        let ids = ["pinned", "today", "yesterday", "week", "earlier"]
+        let groups = buckets.indices.compactMap { index -> DrawerSessionGroup? in
+            guard !buckets[index].isEmpty else { return nil }
+            return DrawerSessionGroup(id: ids[index], label: headings[index], sessionIDs: buckets[index])
+        }
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            drawerHistory = DrawerHistorySnapshot(groups: groups, sessionsByID: byID, isSearching: !query.isEmpty)
         }
     }
 
     // MARK: Drawer pieces
-
-    private var filteredDrawerSessions: [ChatSession] {
-        let archived = archivedDrawerSessionIDs
-        let source = showArchivedDrawerSessions
-            ? sessions.filter { archived.contains($0.id) }
-            : sessions.filter { !archived.contains($0.id) }
-        let query = drawerSearch.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return source }
-        return source.filter {
-            ($0.title ?? "").localizedCaseInsensitiveContains(query)
-                || ($0.lastMessage ?? "").localizedCaseInsensitiveContains(query)
-        }
-    }
-
-    /// Only called when the inputs actually change — never per drag frame.
-    private func rebuildDrawerGroups() {
-        drawerGroups = groupedDrawerSessions
-    }
-
-    private var groupedDrawerSessions: [DrawerSessionGroup] {
-        let calendar = Calendar.current
-        let now = Date()
-        var pinned: [ChatSession] = []
-        var today: [ChatSession] = []
-        var yesterday: [ChatSession] = []
-        var lastSevenDays: [ChatSession] = []
-        var earlier: [ChatSession] = []
-        for session in filteredDrawerSessions {
-            if session.isPinned {
-                pinned.append(session)
-            } else if calendar.isDateInToday(session.updatedAt) {
-                today.append(session)
-            } else if calendar.isDateInYesterday(session.updatedAt) {
-                yesterday.append(session)
-            } else if session.updatedAt >= (calendar.date(byAdding: .day, value: -7, to: now) ?? now) {
-                lastSevenDays.append(session)
-            } else {
-                earlier.append(session)
-            }
-        }
-        return [DrawerSessionGroup(label: "Pinned", sessions: pinned),
-                DrawerSessionGroup(label: "Today", sessions: today),
-                DrawerSessionGroup(label: "Yesterday", sessions: yesterday),
-                DrawerSessionGroup(label: "Last 7 Days", sessions: lastSevenDays),
-                DrawerSessionGroup(label: "Earlier", sessions: earlier)]
-            .filter { !$0.sessions.isEmpty }
-    }
 
     @ViewBuilder
     private func drawerNavRow(_ page: RuntimePage) -> some View {
@@ -508,7 +507,7 @@ extension ContentView {
             case .subAgents: return (AppLocalized("Sub Agents"), "person.2", PokiTheme.agentPurple)
             case .skills: return (AppLocalized("Skills"), "puzzlepiece.extension", PokiTheme.skillTeal)
             case .memory: return (AppLocalized("Memory"), "brain.head.profile", PokiTheme.memoryRose)
-            case .localBot: return ("SnowLuma + QQBot", "qrcode.viewfinder", PokiTheme.botCyan)
+            case .localBot: return (AppLocalized("SnowLuma + QQBot"), "qrcode.viewfinder", PokiTheme.botCyan)
             case .soul: return (AppLocalized("Personalize Amore"), "sparkles", PokiTheme.agentPurple)
             case .rootfs: return (AppLocalized("Rootfs"), "externaldrive", PokiTheme.rootfsIndigo)
             }
@@ -518,9 +517,9 @@ extension ContentView {
             snapDrawer(open: false)
             runtimePage = page
         } label: {
-            DrawerShortcutLabel(title: meta.title, symbol: meta.symbol, accent: meta.color)
+            DrawerShortcutLabel(title: meta.title, symbol: meta.symbol, accent: .primary)
         }
-        .buttonStyle(DrawerRowButtonStyle())
+        .buttonStyle(ChatHistoryButtonStyle())
     }
 
     private var localBotNavRow: some View {
@@ -529,9 +528,9 @@ extension ContentView {
             snapDrawer(open: false)
             runtimePage = .localBot
         } label: {
-            DrawerShortcutLabel(title: "SnowLuma + QQBot", symbol: "qrcode.viewfinder", accent: PokiTheme.botCyan)
+            DrawerShortcutLabel(title: AppLocalized("SnowLuma + QQBot"), symbol: "qrcode.viewfinder", accent: .primary)
         }
-        .buttonStyle(DrawerRowButtonStyle())
+        .buttonStyle(ChatHistoryButtonStyle())
     }
 
     @ViewBuilder
@@ -542,29 +541,13 @@ extension ContentView {
             snapDrawer(open: false)
             homeSessionId = session.id
         } label: {
-            HStack(spacing: 10) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(session.title?.isEmpty == false ? (session.title ?? AppLocalized("New Chat")) : AppLocalized("New Chat"))
-                        .font(.system(size: 15.5, weight: .regular))
-                        .foregroundStyle(PokiTheme.primaryText)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                    Text(session.updatedAt, style: .relative)
-                        .font(.system(size: 12))
-                        .foregroundStyle(PokiTheme.secondaryText)
-                }
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 9)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(selected ? PokiTheme.selection : Color.clear)
+            ChatHistorySessionLabel(
+                title: session.title?.isEmpty == false ? (session.title ?? AppLocalized("New Chat")) : AppLocalized("New Chat"),
+                selected: selected
             )
-            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .buttonStyle(DrawerRowButtonStyle())
+        .buttonStyle(ChatHistoryButtonStyle())
+        .accessibilityAddTraits(selected ? [.isSelected] : [])
         .padding(.horizontal, 8)
         .contextMenu {
             SessionContextMenu(

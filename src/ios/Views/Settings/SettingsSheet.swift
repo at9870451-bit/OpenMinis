@@ -37,6 +37,8 @@ private enum SettingsDestination: Hashable {
     // [T-mcp-oauth-deeplink]
     case mcpIntegrations
     case mcpServerDetail(serverId: String)
+    case developerConnection
+    case homeShortcuts
 }
 
 struct SettingsSheet: View {
@@ -81,6 +83,16 @@ struct SettingsSheet: View {
                 }
 
                 Section("Appearance") {
+                    NavigationLink {
+                        DeveloperConnectionView()
+                    } label: {
+                        Label { Text(AppLocalized("Connect developer tools")) } icon: { SettingsFeatureIcon(symbol: "point.3.connected.trianglepath.dotted", color: PokiTheme.agentPurple) }
+                    }
+                    NavigationLink {
+                        HomeShortcutsSettingsView()
+                    } label: {
+                        Label { Text(AppLocalized("Home shortcuts")) } icon: { SettingsFeatureIcon(symbol: "rectangle.3.group.bubble.left.fill", color: PokiTheme.toolOrange) }
+                    }
                     NavigationLink {
                         AppearanceSettingsView()
                     } label: {
@@ -470,6 +482,10 @@ struct SettingsSheet: View {
                     MCPIntegrationsView()
                 case .mcpServerDetail(let serverId):
                     MCPIntegrationsView(initialEditServerId: serverId)
+                case .developerConnection:
+                    DeveloperConnectionView()
+                case .homeShortcuts:
+                    HomeShortcutsSettingsView()
                 }
             }
             .onAppear {
