@@ -119,6 +119,24 @@ final class Amore134Tests: XCTestCase {
         attach(image, name: "Amore134-Actual-3D-Doll")
     }
 
+    func testEveryDefaultCapsuleHasAnIndependentRealActionCallback() {
+        for item in AmoreHomeShortcutCatalog.items(chinese: true) {
+            var inserted: String?; var destination: String?; var link: URL?
+            let router = AmoreHomeActionRouter(setInput: { inserted = $0 }, openPage: { destination = $0 }, openLink: { link = $0 })
+            router.perform(item.action)
+            switch item.action.kind {
+            case .prompt:
+                XCTAssertEqual(inserted, item.action.value, item.id)
+                XCTAssertNil(destination); XCTAssertNil(link)
+            case .page:
+                XCTAssertEqual(destination, AmoreShortcutRoutes.canonicalPage(item.action.value), item.id)
+                XCTAssertNil(inserted); XCTAssertNil(link)
+            case .link:
+                XCTAssertEqual(link?.absoluteString, item.action.value, item.id)
+            }
+        }
+    }
+
     func testSevenSettingsColorsAreDistinctAndOrdered() {
         XCTAssertEqual(SettingsIconColor.allCases.count, 7)
         XCTAssertEqual(SettingsFeature.allCases.prefix(7).map(\.iconColor), [.red, .orange, .yellow, .green, .cyan, .blue, .purple])
