@@ -102,6 +102,23 @@ final class Amore134Tests: XCTestCase {
         XCTAssertTrue(controller.scene.isPaused)
     }
 
+    func testActualDollRendersModelPixelsNotOnlyBackground() throws {
+        let controller = AmoreCompanionScene.Coordinator()
+        let surface = AmoreCompanionSurface(frame: CGRect(x: 0, y: 0, width: 240, height: 240))
+        surface.sceneView.scene = controller.scene
+        surface.sceneView.pointOfView = controller.camera
+        controller.configure(surface.sceneView, mood: .idle, pokes: 0, animate: false, dark: false)
+        surface.layoutIfNeeded()
+        let image = surface.sceneView.snapshot()
+        let cg = try XCTUnwrap(image.cgImage)
+        var rgba = [UInt8](repeating: 0, count: 240*240*4)
+        let context = try XCTUnwrap(CGContext(data: &rgba, width: 240, height: 240, bitsPerComponent: 8, bytesPerRow: 240*4, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+        context.draw(cg, in: CGRect(x: 0, y: 0, width: 240, height: 240))
+        let opaque = stride(from: 3, to: rgba.count, by: 4).filter { rgba[$0] > 200 }.count
+        XCTAssertGreaterThan(opaque, 4000, "Avatar must contain rendered doll pixels, not an empty circle")
+        attach(image, name: "Amore134-Actual-3D-Doll")
+    }
+
     func testSevenSettingsColorsAreDistinctAndOrdered() {
         XCTAssertEqual(SettingsIconColor.allCases.count, 7)
         XCTAssertEqual(SettingsFeature.allCases.prefix(7).map(\.iconColor), [.red, .orange, .yellow, .green, .cyan, .blue, .purple])

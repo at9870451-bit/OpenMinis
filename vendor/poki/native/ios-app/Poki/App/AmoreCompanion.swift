@@ -41,30 +41,41 @@ struct AmoreCompanionScene: UIViewRepresentable {
     let animate: Bool
     let dark: Bool
     func makeCoordinator() -> Coordinator { Coordinator() }
-    func makeUIView(context: Context) -> SCNView {
-        let view = SCNView(frame: .zero)
+    func makeUIView(context: Context) -> AmoreCompanionSurface {
+        let surface = AmoreCompanionSurface()
+        let view = surface.sceneView
         view.backgroundColor = .clear
         view.isOpaque = false
         view.antialiasingMode = .multisampling2X
         view.preferredFramesPerSecond = 30
         view.allowsCameraControl = false
         view.autoenablesDefaultLighting = false
-        view.rendersContinuously = false
         view.scene = context.coordinator.scene
+        view.pointOfView = context.coordinator.camera
+        view.delegate = context.coordinator
+        context.coordinator.surface = surface
+        surface.animate = animate
         context.coordinator.configure(view, mood: mood, pokes: pokes, animate: animate, dark: dark)
-        return view
+        return surface
     }
-    func updateUIView(_ view: SCNView, context: Context) {
-        context.coordinator.configure(view, mood: mood, pokes: pokes, animate: animate, dark: dark)
+    func updateUIView(_ surface: AmoreCompanionSurface, context: Context) {
+        let changed = surface.animate != animate || context.coordinator.currentMood != mood
+        surface.animate = animate
+        context.coordinator.configure(surface.sceneView, mood: mood, pokes: pokes, animate: animate, dark: dark)
+        if changed || surface.poster.image == nil { surface.refreshPoster() }
     }
-    static func dismantleUIView(_ view: SCNView, coordinator: Coordinator) {
-        view.isPlaying = false
-        view.scene?.isPaused = true
-        view.scene = nil
+    static func dismantleUIView(_ surface: AmoreCompanionSurface, coordinator: Coordinator) {
+        surface.sceneView.delegate = nil
+        surface.sceneView.isPlaying = false
+        surface.sceneView.scene?.isPaused = true
+        surface.sceneView.scene = nil
     }
 
-    final class Coordinator {
+    final class Coordinator: NSObject, SCNSceneRendererDelegate {
         let scene = SCNScene()
+        let camera = SCNNode()
+        weak var surface: AmoreCompanionSurface?
+        var currentMood: AmoreCompanionMood? { lastMood }
         let doll = SCNNode()
         let head = SCNNode()
         let arm = SCNNode()
@@ -74,11 +85,11 @@ struct AmoreCompanionScene: UIViewRepresentable {
         private var lastPokes: Int?
         private var animationStarted = false
 
-        init() {
+        override init() {
+            super.init()
             doll.name = "amore.companion"
             scene.rootNode.addChildNode(doll)
             buildDoll()
-            let camera = SCNNode()
             camera.camera = SCNCamera()
             camera.camera?.usesOrthographicProjection = true
             camera.camera?.orthographicScale = 1.45
@@ -94,6 +105,12 @@ struct AmoreCompanionScene: UIViewRepresentable {
             key.light?.intensity = 900
             key.position = SCNVector3(-2, 3, 4)
             scene.rootNode.addChildNode(key)
+        }
+        func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
+            DispatchQueue.main.async { [weak self] in
+                guard let surface = self?.surface, surface.animate else { return }
+                surface.poster.isHidden = true
+            }
         }
         private func material(_ color: UIColor, glow: Bool = false) -> SCNMaterial {
             let m = SCNMaterial()
@@ -151,6 +168,8 @@ struct AmoreCompanionScene: UIViewRepresentable {
         }
         func configure(_ view: SCNView, mood: AmoreCompanionMood, pokes: Int, animate: Bool, dark: Bool) {
             ambient.light?.intensity = dark ? 650 : 480
+            view.pointOfView = camera
+            view.rendersContinuously = animate
             view.isPlaying = animate
             scene.isPaused = !animate
             if !animate { return }
@@ -198,5 +217,34 @@ struct AmoreCompanionScene: UIViewRepresentable {
             }
             lastPokes = pokes
         }
+    }
+}
+
+/// A paused or Reduce-Motion avatar must still show its initial real model.
+/// Poster is a SceneKit-rendered image, not separate artwork or a test fake.
+final class AmoreCompanionSurface: UIView {
+    let sceneView = SCNView(frame: .zero)
+    let poster = UIImageView()
+    var animate = false
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isOpaque = false; backgroundColor = .clear
+        poster.contentMode = .scaleAspectFit
+        poster.isUserInteractionEnabled = false
+        addSubview(sceneView); addSubview(poster)
+    }
+    convenience init() { self.init(frame: .zero) }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let changed = sceneView.bounds.size != bounds.size
+        sceneView.frame = bounds; poster.frame = bounds
+        if changed || poster.image == nil { refreshPoster() }
+    }
+    func refreshPoster() {
+        guard bounds.width > 1, bounds.height > 1, sceneView.pointOfView != nil else { return }
+        poster.image = sceneView.snapshot()
+        poster.isHidden = false
+        sceneView.setNeedsDisplay()
     }
 }
