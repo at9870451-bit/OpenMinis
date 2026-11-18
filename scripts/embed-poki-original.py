@@ -9,6 +9,9 @@ for name in ['Poki.framework','WebRTC.framework']:
   if name=='WebRTC.framework':continue
   raise SystemExit('Missing '+name)
  shutil.copytree(source,frameworks/name,dirs_exist_ok=True,symlinks=True)
+# Static Swift packages keep model/catalog data in peer resource bundles.
+for resource in products.glob('*.bundle'):
+ shutil.copytree(resource, app/resource.name, dirs_exist_ok=True, symlinks=True)
 # Do not replace Amore's own Localizable values on shared keys.
 for language in framework.glob('*.lproj'):
  dest=app/language.name;dest.mkdir(exist_ok=True)
