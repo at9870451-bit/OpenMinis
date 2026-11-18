@@ -7,6 +7,7 @@ import SwiftUI
 struct AmoreHomeMarqueeSource: View {
     @ObservedObject private var store = AmoreHomeShortcutStore.shared
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.amoreDrawerProgress) private var drawerProgress
     let writing: Bool
     let setInput: (String) -> Void
     let openURL: (URL) -> Void
@@ -17,7 +18,7 @@ struct AmoreHomeMarqueeSource: View {
         AmoreHomeMarqueePanel(
             items: store.visibleItems,
             revision: store.revision,
-            active: scenePhase == .active && !showManager && editing == nil,
+            active: scenePhase == .active && drawerProgress < 0.001 && !showManager && editing == nil,
             onAction: perform,
             writing: writing,
             onManage: { showManager = true },

@@ -20,7 +20,11 @@ func AppLocalized(_ key: String) -> String { key }
 enum ChatColor { static let fieldEdge = Color(uiColor: .systemGray4) }
 enum RuntimePage: String { case tools, subAgents, skills, memory, rootfs, localBot, soul }
 enum SettingsDeepLinkTarget: Equatable { case providers, modelGroups, usage, developerConnection, appearance, mcpIntegrations, environments, storage, sharedFolders, mountedFolders, permissions, logs, background, about }
-enum BiometricAuth { static var isAvailable: Bool { true } }
+enum BiometricAuth {
+ static var isAvailable: Bool { true }
+ static var biometryDisplayName: String { "Face ID" }
+ static var biometryIconName: String { "faceid" }
+}
 struct AppLocalization { static let current = "zh-Hans" }
 enum AppBundle { static var current: Bundle { .main } }
 extension View { func appFontScale() -> some View { self } }
