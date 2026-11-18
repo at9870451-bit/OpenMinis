@@ -94,16 +94,7 @@ extension ContentView {
     /// torn down and reloaded just because the user looked at Memory.
     @ViewBuilder
     var chatStack: some View {
-        if #available(iOS 18.0, *), originalPokiChat && OriginalPokiScreen.isAvailable {
-            OriginalPokiChatEntry()
-        } else {
-            legacyAmoreChatStack
-        }
-    }
-
-    @ViewBuilder
-    private var legacyAmoreChatStack: some View {
-            NavigationStack {
+            NavigationStack(path: $navigationPath) {
                 Group {
                     if let id = homeSessionId {
                         AIChatView(sessionId: id)
@@ -119,16 +110,7 @@ extension ContentView {
                                initialGroupId: Self.extractGroupId(from: id))
                         .id(id)
                 }
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button {
-                            startHomeChat()
-                        } label: {
-                            Image(systemName: "square.and.pencil")
-                        }
-                        .accessibilityLabel(Text("New Chat"))
-                    }
-                }
+
             }
     }
 
@@ -184,7 +166,7 @@ extension ContentView {
                 ) {
                     chatStack
                         .background {
-                            EdgeSwipeCatcher(enabled: !originalPokiChat && !showHistoryDrawer && runtimePage == nil && activeToolSheet == nil,
+                            EdgeSwipeCatcher(enabled: !showHistoryDrawer && runtimePage == nil && activeToolSheet == nil,
                                 onProgress: { fraction in
                                     drawerCleanupTask?.cancel()
                                     drawerPresentationActive = true
@@ -580,9 +562,12 @@ extension ContentView {
         }
     }
 
-    private func startHomeChat() {
+    func startHomeChat() {
         homeSessionId = nil
         homeDraftId = "__new__" + UUID().uuidString
+        navigationPath = NavigationPath()
+        currentStackSessionId = nil
+        snapDrawer(open: false)
     }
 
     // MARK: - Detail View

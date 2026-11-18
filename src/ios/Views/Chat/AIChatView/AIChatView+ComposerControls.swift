@@ -107,7 +107,7 @@ extension AIChatView {
             || !vm.pastedTexts.isEmpty
         return AnyView(
             Group {
-                if hasContent {
+                if hasContent || vm.isProcessing {
                     sendButton
                 } else {
                     micButton

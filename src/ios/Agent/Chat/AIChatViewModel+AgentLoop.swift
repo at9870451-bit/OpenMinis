@@ -104,6 +104,7 @@ extension AIChatViewModel {
     }
 
     private func runAgentLoopCore(resumingAt existingMsgIdx: Int? = nil, committedBlocks: Int? = nil) async throws {
+        defer { AmoreDeviceTools.finish(sessionID: self.sessionId) }
         // REPRO-DIAG(2026-05-16): bump global round counter and emit a clear
         // BEGIN/END marker so the user can grep `ROUND \d+` to slice the log
         // by attempt. A "round" = one runAgentLoop invocation, which is

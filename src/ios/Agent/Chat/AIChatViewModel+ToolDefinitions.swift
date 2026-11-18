@@ -253,6 +253,7 @@ extension AIChatViewModel {
             tools.append(Self.userAskToolDefinition)
         }
 
+        tools.append(contentsOf: AmoreDeviceTools.definitions)
         return tools
     }
 

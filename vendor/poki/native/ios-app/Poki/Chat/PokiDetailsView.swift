@@ -348,7 +348,7 @@ struct PressedDimStyle: ButtonStyle {
 /// items, each opening its own page), with the guide that walks through them and the first run.
 struct ConnectionView: View {
     @Environment(AppModel.self) private var model
-    @Environment(ChatModel.self) private var chat
+    var stopHost: () -> Void = {}
     @State private var guiding = false
 
     private var on: Bool { model.sessionOn && !model.ownerPaused }
@@ -404,7 +404,7 @@ struct ConnectionView: View {
                     SettingsRow(title: model.setupReadyForUse ? "Set Up Again" : "Continue Setup", symbol: "checklist")
                 }
                 .accessibilityIdentifier("moreSettings.setup")
-                FirstRunAgain(row: true)
+                // Model setup belongs to Amore settings.
             } header: {
                 SettingsHeader("This iPhone")
             } footer: {
@@ -421,7 +421,7 @@ struct ConnectionView: View {
 
     private func set(_ on: Bool) {
         if !on {
-            chat.stop()
+            stopHost()
             model.pauseByOwner()
         } else if model.sessionOn {
             model.wakeRunner()

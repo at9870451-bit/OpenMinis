@@ -38,7 +38,7 @@ final class LoopbackMonitor {
     typealias Probe = (_ host: String, _ port: UInt16, _ timeout: TimeInterval) async -> ProbeResult
     private let connect: Probe
 
-    init(probe: @escaping Probe = { host, port, timeout in await Poki.probe(label: "loopback", host: host, port: port, timeout: timeout) }) {
+    init(probe: @escaping Probe = { host, port, timeout in await AmoreDeviceKit.probe(label: "loopback", host: host, port: port, timeout: timeout) }) {
         connect = probe
         // The default path's interface types change while a proxy app's tunnel is up, so "only
         // cellular" is read from two monitors that each watch one physical interface type.

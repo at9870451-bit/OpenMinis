@@ -170,6 +170,9 @@ enum DeepLinkRouter {
                 .first(where: { $0.name == "tab" })?.value
             coord.pendingSettingsTarget = .logs
 
+        case "developer-connection", "connection":
+            coord.pendingSettingsTarget = .developerConnection
+
         case "appearance":
             coord.pendingSettingsTarget = .appearance
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import AmoreDeviceKit
 import ObjectiveC
 import FileProvider
 import UserNotifications
@@ -131,6 +132,7 @@ struct MinisApp: App {
         //
         // `install` is idempotent, so the later onAppLaunch() call is a no-op.
         PokiTheme.applyGlobalAppearance()
+        AmoreDeviceTools.configureHost()
         CrashSignalHandler.install()
         // [T-crash-breadcrumbs] Rotate the previous run's breadcrumbs and start
         // this run's ring + 15 s resource sampling, before anything else runs.
@@ -313,6 +315,7 @@ struct MinisApp: App {
                 }
                 .environmentObject(shareCoordinator)
                 .modifier(AmoreAppearanceHost())
+                .modifier(AmoreDevicePrompts())
                 .tint(PokiTheme.blueText)
                 .environment(\.locale, appLanguage.isEmpty ? .current : Locale(identifier: appLanguage))
                 .dynamicTypeSize(fontSettings.appBaseScale.dynamicTypeSize)
@@ -321,6 +324,18 @@ struct MinisApp: App {
                     guard !SessionLockStore.shared.appIsLocked else {
                         shareLog.info("[Share] onOpenURL deferred — app is locked")
                         pendingURLWhileLocked = url
+                        return
+                    }
+                    if url.isFileURL, url.pathExtension.lowercased() == "mobiledevicepairing" {
+                        do {
+                            try AmoreDeviceServices.importPairing(from: url)
+                            DeepLinkRouter.handle(url: URL(string: "minis://settings/developer-connection")!, shareCoordinator: shareCoordinator)
+                        }
+                        catch { ShareFeedbackToast.show(error.localizedDescription) }
+                        return
+                    }
+                    if AmoreDeviceServices.handleSetupLink(url) {
+                        DeepLinkRouter.handle(url: URL(string: "minis://settings/developer-connection")!, shareCoordinator: shareCoordinator)
                         return
                     }
                     if BackupOpenRouter.handle(url) {
@@ -507,6 +522,7 @@ struct MinisApp: App {
     private func handleScenePhaseChange(_ phase: ScenePhase) {
         switch phase {
         case .active:
+            AmoreDeviceServices.becameActive()
             let remaining = UIApplication.shared.backgroundTimeRemaining
             if let entry = backgroundEntryDate {
                 let elapsed = Date().timeIntervalSince(entry)
@@ -695,6 +711,7 @@ struct MinisApp: App {
             }
 
         case .background:
+            AmoreDeviceServices.wentToBackground()
             backgroundEntryDate = Date()
             let remaining = UIApplication.shared.backgroundTimeRemaining
             lifecycleLog.info("[Lifecycle] → Background (remaining: \(Self.formatTimeRemaining(remaining)))")

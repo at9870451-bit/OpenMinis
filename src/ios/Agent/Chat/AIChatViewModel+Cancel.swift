@@ -131,6 +131,7 @@ extension AIChatViewModel {
     }
 
     func cancel() {
+        AmoreDeviceTools.cancel(sessionID: sessionId)
         let lastBlocks = (messages.last?.role == .assistant) ? messages.last!.blocks.count : -1
         let lastRole = messages.last.map { $0.role == .assistant ? "assistant" : "user" } ?? "nil"
         logger.info("⏹️ cancel() START session=\(self.sessionId ?? "nil") isProcessing=\(self.isProcessing) lastRole=\(lastRole) lastBlocks=\(lastBlocks) currentTask=\(self.currentTask != nil)")

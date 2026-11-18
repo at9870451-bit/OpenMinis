@@ -5,7 +5,7 @@ import Observation
 /// content stays as written. Resources still live in the existing String Catalogs.
 @Observable final class AppLocalization {
     static let shared = AppLocalization()
-    static let key = "uiLanguage"
+    static let key = "appLanguage"
     static let system = "system"
 
     var preference: String {

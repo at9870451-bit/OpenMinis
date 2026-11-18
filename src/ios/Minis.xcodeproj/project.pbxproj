@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+        AF3300000000000000000001 /* AmoreDeviceKit in Frameworks */ = {isa = PBXBuildFile; fileRef = AF3300000000000000000002 /* AmoreDeviceKit.framework */; };
+        AF3300000000000000000003 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; fileRef = AF3300000000000000000004 /* WebRTC.framework */; };
+        AF3300000000000000000005 /* WebRTC in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AF3300000000000000000004 /* WebRTC.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F13200000000000000000001 /* PokiPortAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F13200000000000000000002 /* PokiPortAssets.xcassets */; };
 		A29E50000000000000000001 /* NodeRuntime in Resources */ = {isa = PBXBuildFile; fileRef = A29E50000000000000000002 /* NodeRuntime */; };
 		97A38024E8114E1CB1F9B001 /* AmorePluginArchive in Frameworks */ = {isa = PBXBuildFile; productRef = 97A38024E8114E1CB1F9B003 /* AmorePluginArchive */; };
@@ -679,7 +682,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				AAF00F022F50A00000049557 /* FFmpeg.framework in Embed Frameworks */,
+				AF3300000000000000000005 /* WebRTC in Embed Frameworks */,
+                AAF00F022F50A00000049557 /* FFmpeg.framework in Embed Frameworks */,
 				AAF10F022F50A00000049557 /* libavcodec.framework in Embed Frameworks */,
 				AAF10F052F50A00000049557 /* libavformat.framework in Embed Frameworks */,
 				AAF10F082F50A00000049557 /* libavutil.framework in Embed Frameworks */,
@@ -725,6 +729,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+        AF3300000000000000000002 /* AmoreDeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AmoreDeviceKit.framework; path = ../../deps/AmoreDeviceKit/AmoreDeviceKit.framework; sourceTree = SOURCE_ROOT; };
+        AF3300000000000000000004 /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebRTC.framework; path = ../../deps/AmoreDeviceKit/WebRTC.framework; sourceTree = SOURCE_ROOT; };
 		F13200000000000000000002 /* PokiPortAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = PokiPortAssets.xcassets; sourceTree = SOURCE_ROOT; };
 		A29E50000000000000000002 /* NodeRuntime */ = {isa = PBXFileReference; lastKnownFileType = folder; path = NodeRuntime; sourceTree = "<group>"; };
 		0ED149397BEA7E0408C92688 /* GroupVoiceModelsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GroupVoiceModelsView.swift; sourceTree = "<group>"; };
@@ -1489,7 +1495,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				97A38024E8114E1CB1F9B001 /* AmorePluginArchive in Frameworks */,
+				AF3300000000000000000001 /* AmoreDeviceKit in Frameworks */,
+                AF3300000000000000000003 /* WebRTC in Frameworks */,
+                97A38024E8114E1CB1F9B001 /* AmorePluginArchive in Frameworks */,
 				AA9C2BF92F65996900F41633 /* SwiftMath in Frameworks */,
 				AAF00F012F50A00000049557 /* FFmpeg.framework in Frameworks */,
 				RCL000010 /* Rclone.xcframework in Frameworks */,
@@ -1559,6 +1567,8 @@
 		AA26BD0E2F2E5FA500AECF2D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+                AF3300000000000000000002 /* AmoreDeviceKit.framework */,
+                AF3300000000000000000004 /* WebRTC.framework */,
 				AAF00F002F50A00000049557 /* FFmpeg.framework */,
 				RCL000020 /* Rclone.xcframework */,
 				AAF10F002F50A00000049557 /* libavcodec.framework */,
@@ -3750,7 +3760,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -3758,8 +3768,8 @@
 					"$(inherited)",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.32;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.33;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -3774,12 +3784,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.32;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.33;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -3794,7 +3804,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -3813,7 +3823,7 @@
 					"$(BUILD_DIR)/../../SourcePackages/checkouts/swift-cmark/extensions/include",
 					"$(BUILD_DIR)/../../SourcePackages/checkouts/RealTimeCutVADLibrary/RealTimeCutVADLibrary/src/include",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3822,7 +3832,7 @@
 					"$(BUILT_PRODUCTS_DIR)/Minis.app/Frameworks",
 					"$(BUILT_PRODUCTS_DIR)/PackageFrameworks",
 				);
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(BUILT_PRODUCTS_DIR)/Minis.app/Minis.debug.dylib",
@@ -3842,7 +3852,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -3857,7 +3867,7 @@
 					"$(BUILD_DIR)/../../SourcePackages/checkouts/swift-cmark/extensions/include",
 					"$(BUILD_DIR)/../../SourcePackages/checkouts/RealTimeCutVADLibrary/RealTimeCutVADLibrary/src/include",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3866,7 +3876,7 @@
 					"$(BUILT_PRODUCTS_DIR)/Minis.app/Frameworks",
 					"$(BUILT_PRODUCTS_DIR)/PackageFrameworks",
 				);
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(BUILT_PRODUCTS_DIR)/Minis.app/Minis.debug.dylib",
@@ -3937,7 +3947,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -4000,7 +4010,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -4019,11 +4029,12 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Minis.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
+                    "$(SRCROOT)/../../deps/AmoreDeviceKit",
 					"$(SRCROOT)/../../build/frameworks",
 					"$(SRCROOT)/../../deps/frameworks",
 				);
@@ -4042,7 +4053,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -4051,7 +4062,7 @@
 				ISH_LIBS_DIR = "$(SRCROOT)/../../deps/libs";
 				"ISH_LIBS_DIR[sdk=iphonesimulator*]" = "$(SRCROOT)/../../deps/libs/iphonesimulator";
 				LIBRARY_SEARCH_PATHS = "$(ISH_LIBS_DIR)";
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				OTHER_LDFLAGS = (
 					"-lish_emu",
 					"-lish",
@@ -4065,7 +4076,8 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/MinisApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2";                SWIFT_INCLUDE_PATHS = ("$(inherited)", "$(SRCROOT)/../../deps/AmoreDeviceKit/SwiftModules", "$(SRCROOT)/../../deps/AmoreDeviceKit/ClangModules/PokiNative");
+
 			};
 			name = Debug;
 		};
@@ -4078,11 +4090,12 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Minis.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
+                    "$(SRCROOT)/../../deps/AmoreDeviceKit",
 					"$(SRCROOT)/../../build/frameworks",
 					"$(SRCROOT)/../../deps/frameworks",
 				);
@@ -4101,7 +4114,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -4110,7 +4123,7 @@
 				ISH_LIBS_DIR = "$(SRCROOT)/../../deps/libs";
 				"ISH_LIBS_DIR[sdk=iphonesimulator*]" = "$(SRCROOT)/../../deps/libs/iphonesimulator";
 				LIBRARY_SEARCH_PATHS = "$(ISH_LIBS_DIR)";
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				OTHER_LDFLAGS = (
 					"-lish_emu",
 					"-lish",
@@ -4124,7 +4137,8 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/MinisApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2";                SWIFT_INCLUDE_PATHS = ("$(inherited)", "$(SRCROOT)/../../deps/AmoreDeviceKit/SwiftModules", "$(SRCROOT)/../../deps/AmoreDeviceKit/ClangModules/PokiNative");
+
 			};
 			name = Release;
 		};
@@ -4133,19 +4147,19 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Share to Minis";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4160,19 +4174,19 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Share to Minis";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4187,19 +4201,19 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FileProvider/FileProvider.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FileProvider/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Minis Files";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.FileProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4214,19 +4228,19 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FileProvider/FileProvider.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FileProvider/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Minis Files";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.FileProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4241,7 +4255,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = AgentWidget/AgentWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgentWidget/Info.plist;
@@ -4253,7 +4267,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.AgentWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4268,7 +4282,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = AgentWidget/AgentWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgentWidget/Info.plist;
@@ -4280,7 +4294,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.app.AgentWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4294,18 +4308,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_DEBUG_DYLIB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisTestHost;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -4319,18 +4333,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_DEBUG_DYLIB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.32;
+				MARKETING_VERSION = 1.33;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openAmroe.MinisTestHost;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;

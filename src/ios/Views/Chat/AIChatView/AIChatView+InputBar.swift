@@ -117,7 +117,7 @@ extension AIChatView {
 
                 // ChatGPT-style single capsule: + on the left, the text in
                 // the middle, voice/send on the right, all on one baseline.
-                HStack(alignment: .center, spacing: 6) {
+                AmoreComposerLayout(expansion: composerNeedsExpandedLayout ? 1 : 0, spacing: 8) {
                     composerLeadingButtons
                         .fixedSize()
                     inputFieldOrWaveform
@@ -132,8 +132,7 @@ extension AIChatView {
                     guard w > 0, abs(w - inputBottomRowWidth) > 0.5 else { return }
                     inputBottomRowWidth = w
                 }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
+                .padding(6)
             })
             .contentShape(RoundedRectangle(cornerRadius: 24))
             .onTapGesture { inputFocused = true }
@@ -177,8 +176,9 @@ extension AIChatView {
                 ComposerContextGlow(tier: vm.contextUsage?.tier ?? .normal)
             }
             .frame(maxWidth: maxContentWidth)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 18)
+            .padding(.top, 6)
+            .padding(.bottom, 10)
             // [T-ios-geometry-observer-crash] onGeometryChange replaces the
             // GeometryReader scaffold (async-renderer SIGTRAP — see the
             // floating-bar site). Fires with the initial value too, so the

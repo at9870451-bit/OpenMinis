@@ -95,6 +95,7 @@ struct PokiPortrait: View {
         ZStack {
             Circle().fill(Tint.portrait)
             Image(systemName: "sparkles").font(.system(size: side * 0.42, weight: .medium)).foregroundStyle(Tint.blueText)
+                .symbolEffect(.pulse, isActive: mood == .thinking)
         }.frame(width: side, height: side).clipShape(.circle)
     }
 
@@ -191,6 +192,7 @@ struct PokiFlight: View {
 /// in the picture's face; the word for it is at the top of Poki's card and in what VoiceOver reads.
 /// On the home page the picture is over the greeting and the bar's middle is empty.
 struct PokiHead: View {
+    var displayName = "Amore"
     var sizes = HomeSizes()
     var home: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -202,7 +204,7 @@ struct PokiHead: View {
             // its place stays, and the bar keeps its height on both pages.
             ZStack {
                 if !home {
-                    Text(verbatim: "Amore")
+                    Text(verbatim: displayName)
                         .font(.caption.weight(.semibold)).foregroundStyle(Color(.label))
                         .padding(.horizontal, 12).frame(minHeight: 24)
                         .glassSurface(in: Capsule())
@@ -240,6 +242,7 @@ struct ChatTopBar: View {
     var newConversation: () -> Void
     /// A tap on Poki: the bear says hi while its card opens.
     var openDetails: () -> Void
+    var displayName = "Amore"
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// Taps on New Conversation on the home page, for a light tap in the hand.
     @State private var homeTaps = 0
@@ -276,13 +279,13 @@ struct ChatTopBar: View {
             }
             .padding(.top, (sizes.avatar - sizes.button) / 2)
             Button(action: openDetails) {
-                PokiHead(home: home).contentShape(.rect)
+                PokiHead(displayName: displayName, home: home).contentShape(.rect)
             }
             .buttonStyle(.plain)
             .allowsHitTesting(!home)
             .accessibilityHidden(home)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text(verbatim: "Poki, " + PokiStatusCopy.word(status)))
+            .accessibilityLabel(Text(verbatim: displayName + ", " + PokiStatusCopy.word(status)))
             .accessibilityAddTraits(.isButton)
             .accessibilityIdentifier("chat.header.details")
             .accessibilityShowsLargeContentViewer()

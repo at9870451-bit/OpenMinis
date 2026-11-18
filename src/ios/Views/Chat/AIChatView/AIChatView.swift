@@ -80,6 +80,7 @@ import PhotosUI
 import QuickLook
 import QuickLook
 import SwiftUI
+import AmoreDeviceKit
 import UIKit
 import UniformTypeIdentifiers
 import WebKit
@@ -222,6 +223,8 @@ struct AIChatView: View {
     @ObservedObject private var fontSettings = FontSettings.shared
     @ObservedObject private var deepLink = DeepLinkCoordinator.shared
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var composerTypeSize
+    var composerNeedsExpandedLayout: Bool { composerTypeSize >= .xxxLarge }
     @State var inputFocused: Bool = false
     /// [T-in-chat-search] The search bar is open (mirrors vm.chatSearch.isActive):
     /// it shows under the navigation bar and the composer is hidden.
@@ -791,9 +794,21 @@ struct AIChatView: View {
         // view, so this body re-renders only when its height changes.
         .safeAreaInset(edge: .top, spacing: 0) {
             VStack(spacing: 0) {
-                AIChatHeaderAvatar(isThinking: vm.isProcessing && (vm.messages.last?.shouldShowTypingIndicator ?? true))
-                    .padding(.vertical, 6)
-                    .allowsHitTesting(false)
+                AmoreConversationChrome(
+                    home: vm.messages.isEmpty,
+                    thinking: vm.isProcessing && (vm.messages.last?.shouldShowTypingIndicator ?? true),
+                    busy: vm.isProcessing, title: soulName,
+                    openThreads: { NotificationCenter.default.post(name: .amoreOpenConversations, object: nil) },
+                    newConversation: {
+                        guard !vm.isProcessing else { return }
+                        NotificationCenter.default.post(name: .newChatRequested, object: nil)
+                    },
+                    openModel: { showModelPicker = true }
+                )
+                Menu { trailingMenu } label: {
+                    Label(AppLocalized("Conversation options"), systemImage: "ellipsis")
+                        .font(.caption).padding(.horizontal, 12).padding(.vertical, 6)
+                }.accessibilityIdentifier("amore.conversationOptions")
                 topBanners
             }
                 .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
@@ -820,17 +835,7 @@ struct AIChatView: View {
         // Equatable conformance for this generic closure-holding view in the
         // .background position — the gate silently never engaged. EquatableView
         // wrapping is the only guaranteed path to ==.
-        .background(
-            ChatToolbarHost(key: chatToolbarKey, showsTrailing: !ChatNavMenuBarItem.isEnabled, title: {
-                chatNavPrincipalContent
-            }, trailing: {
-                trailingMenu
-            })
-            .equatable()
-        )
-        // [T-ios-navbar-menu-baritem] Outside the equatable host on purpose:
-        // its update pass is what refreshes the menu's action closures.
-        .background(navBarMenuInstaller)
+        .toolbar(.hidden, for: .navigationBar)
         )
     }
 

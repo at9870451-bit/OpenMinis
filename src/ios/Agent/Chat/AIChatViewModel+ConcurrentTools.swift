@@ -432,6 +432,16 @@ extension AIChatViewModel {
 
         do {
         switch tu.name {
+        case "device_control":
+            let answer = await AmoreDeviceTools.run(
+                action: toolArgs["action"] as? String ?? "status",
+                arguments: toolArgs["arguments_json"] as? String ?? "{}",
+                sessionID: self.sessionId
+            )
+            toolOutput = answer.text
+            toolSuccess = !answer.error
+            toolImageData = answer.image
+            toolImageMimeType = answer.image == nil ? nil : "image/jpeg"
         case "shell_execute":
             let (command, timeout, delay) = parseToolInput(from: argsJson)
 

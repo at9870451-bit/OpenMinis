@@ -1,0 +1,128 @@
+name: AmoreDeviceServices
+options:
+  bundleIdPrefix: app.amore.original
+  deploymentTarget:
+    iOS: '18.0'
+  createIntermediateGroups: true
+packages:
+  PokiCore:
+    path: ../ios/PokiCore
+  WebRTC:
+    url: https://github.com/stasel/WebRTC.git
+    exactVersion: 155.0.0
+  PiSwift:
+    url: https://github.com/xibbon/PiSwift.git
+    revision: f8696524cf41ca0a7f42f5b230eafa443daececd
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: '18.0'
+    SWIFT_VERSION: '5.0'
+    TARGETED_DEVICE_FAMILY: 1,2
+    SUPPORTED_PLATFORMS: iphoneos
+    SUPPORTS_MACCATALYST: false
+    CODE_SIGNING_ALLOWED: false
+    CODE_SIGNING_REQUIRED: false
+    CODE_SIGN_IDENTITY: ''
+    CODE_SIGN_ENTITLEMENTS: ''
+    ENABLE_USER_SCRIPT_SANDBOXING: false
+    DEBUG_INFORMATION_FORMAT: dwarf
+    MARKETING_VERSION: 0.1.0
+    CURRENT_PROJECT_VERSION: '1'
+targets:
+  PokiNative:
+    type: library.static
+    platform: iOS
+    sources:
+    - path: Poki/Native
+      excludes:
+      - module.modulemap
+      headerVisibility: public
+    settings:
+      base:
+        PRODUCT_NAME: PokiNative
+        PRODUCT_MODULE_NAME: PokiNative
+        DEFINES_MODULE: true
+        CLANG_ENABLE_MODULES: true
+        CLANG_ENABLE_OBJC_ARC: true
+        MODULEMAP_FILE: $(SRCROOT)/Poki/Native/module.modulemap
+        PUBLIC_HEADERS_FOLDER_PATH: include/PokiNative
+        HEADER_SEARCH_PATHS:
+        - $(inherited)
+        - $(SRCROOT)/Poki/Native
+        - $(SRCROOT)/../launcher/include
+        SKIP_INSTALL: true
+  AmoreDeviceKit:
+    type: framework.static
+    platform: iOS
+    sources:
+    - path: Poki
+      excludes:
+      - Native
+      - Runtime/Poki-Bridging-Header.h
+      - '**/*.entitlements'
+      - Info.plist
+      - App/PokiApp.swift
+      - AmorePortEntry.swift
+    - path: Shared
+    - path: ../ios-gym/check/GymScorecard.swift
+      group: Poki/Debug
+    dependencies:
+    - target: PokiNative
+      link: true
+      embed: false
+    - package: PokiCore
+    - package: WebRTC
+    - package: PiSwift
+      product: PiSwiftAgent
+    - package: PiSwift
+      product: PiSwiftAI
+    settings:
+      base:
+        PRODUCT_NAME: AmoreDeviceKit
+        PRODUCT_MODULE_NAME: AmoreDeviceKit
+        PRODUCT_BUNDLE_IDENTIFIER: com.openAmroe.app.device-services
+        MACH_O_TYPE: staticlib
+        DEFINES_MODULE: true
+        CLANG_ENABLE_MODULES: true
+        GENERATE_INFOPLIST_FILE: true
+        INFOPLIST_KEY_CFBundleDisplayName: Amore
+        INFOPLIST_KEY_CFBundleDevelopmentRegion: en
+        SWIFT_OBJC_BRIDGING_HEADER: ''
+        SWIFT_INSTALL_OBJC_HEADER: false
+        SWIFT_OBJC_INTERFACE_HEADER_NAME: AmoreDeviceKit-Swift.h
+        SKIP_INSTALL: true
+        BUILD_LIBRARY_FOR_DISTRIBUTION: false
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) POKI_APP
+        HEADER_SEARCH_PATHS:
+        - $(inherited)
+        - $(SRCROOT)/Poki/Native
+        - $(SRCROOT)/../launcher/include
+        SWIFT_INCLUDE_PATHS:
+        - $(inherited)
+        - $(SRCROOT)/Poki/Native
+        LIBRARY_SEARCH_PATHS:
+        - $(inherited)
+        - $(SRCROOT)/../launcher/target/aarch64-apple-ios/release
+        OTHER_LDFLAGS:
+        - $(inherited)
+        - -ObjC
+        - -lpoki_launcher
+        - -lc++
+        - -framework
+        - Security
+        - -framework
+        - SystemConfiguration
+        LD_RUNPATH_SEARCH_PATHS:
+        - $(inherited)
+        - '@loader_path/..'
+        - '@executable_path/Frameworks'
+        - /System/Developer/usr/lib
+        - /System/Developer/Library/PrivateFrameworks
+        - /System/Developer/Library/Frameworks
+        ASSETCATALOG_COMPILER_APPICON_NAME: ''
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: ''
+schemes:
+  AmoreDeviceKit:
+    build:
+      targets:
+        AmoreDeviceKit: all

@@ -32,6 +32,7 @@ enum SettingsDeepLinkTarget: Equatable {
     /// [T-mcp-oauth-deeplink] MCP Integrations list / a specific server's
     /// edit form (where the Authorize button lives).
     case mcpIntegrations
+    case developerConnection
     case mcpServerDetail(serverId: String)
 }
 

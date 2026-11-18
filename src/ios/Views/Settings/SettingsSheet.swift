@@ -9,6 +9,7 @@
 //
 
 import SwiftUI
+import AmoreDeviceKit
 
 // MARK: - Settings Sheet
 
@@ -50,7 +51,6 @@ struct SettingsSheet: View {
     @ObservedObject private var deepLink = DeepLinkCoordinator.shared
     @State private var navPath = NavigationPath()
     @State private var showFeedbackDialog = false
-    @AppStorage("amore.originalPokiChat") private var originalPokiChat = true
 
     var body: some View {
         NavigationStack(path: $navPath) {
@@ -84,9 +84,6 @@ struct SettingsSheet: View {
                 }
 
                 Section("Appearance") {
-                    Toggle(isOn: $originalPokiChat) {
-                        Label(AppLocalized("Use original conversation page"), systemImage: "bubble.left.and.bubble.right")
-                    }
                     NavigationLink {
                         DeveloperConnectionView()
                     } label: {
@@ -582,6 +579,8 @@ struct SettingsSheet: View {
             navPath.append(SettingsDestination.permissions)
         case .environments:
             navPath.append(SettingsDestination.environments)
+        case .developerConnection:
+            navPath.append(SettingsDestination.developerConnection)
         case .mcpIntegrations:
             navPath.append(SettingsDestination.mcpIntegrations)
         case .mcpServerDetail(let id):
@@ -1046,10 +1045,17 @@ struct SettingsFeatureIcon: View {
 }
 
 struct DeveloperConnectionView: View {
+    @AppStorage("amore.deviceControl.enabled") private var enabled = false
     var body: some View {
-        OriginalPokiScreen(page: .connection)
-            .navigationTitle(AppLocalized("Connection"))
-            .navigationBarTitleDisplayMode(.inline)
+        VStack(spacing: 0) {
+            Toggle(AppLocalized("Allow Amore Agent to control this iPhone"), isOn: Binding(
+                get: { enabled }, set: { enabled = $0; AmoreDeviceServices.setEnabled($0) }
+            ))
+            .padding(.horizontal, 20).padding(.vertical, 12)
+            AmoreDeviceConnectionPage()
+        }
+        .navigationTitle(AppLocalized("Connection"))
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

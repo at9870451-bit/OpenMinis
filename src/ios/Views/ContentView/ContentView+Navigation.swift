@@ -178,6 +178,11 @@ extension ContentView {
     ///      so voice / camera fires *inside* the new chat — never inside
     ///      the previous one.
     func handleNewChatRequest() {
+        if !isWideLayout {
+            startHomeChat()
+            if case .ensuringHome = QuickActionWorkflow.shared.state { QuickActionWorkflow.shared.markHome() }
+            return
+        }
         let newId = Self.makeNewSessionId()
         // Clear any stale flags left over from a prior quick-action
         // request that didn't run to completion (user backgrounded the

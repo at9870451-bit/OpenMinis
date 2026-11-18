@@ -318627,6 +318627,116 @@
           }
         }
       }
+    },
+    "Allow Amore Agent to control this iPhone": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Amore Agent to control this iPhone"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "允许 Amore Agent 控制此 iPhone"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "允許 Amore Agent 控制此 iPhone"
+          }
+        }
+      }
+    },
+    "Enable device control in Settings > Connection first.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable device control in Settings > Connection first."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先在“设置 > 连接”启用设备控制。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請先在「設定 > 連線」啟用裝置控制。"
+          }
+        }
+      }
+    },
+    "Allow device action?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow device action?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "允许设备操作？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "允許裝置操作？"
+          }
+        }
+      }
+    },
+    "Conversation options": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conversation options"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会话选项"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "對話選項"
+          }
+        }
+      }
+    },
+    "Device arguments must be a JSON object using the original tool schema.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Device arguments must be a JSON object using the original tool schema."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设备参数必须为符合原工具协议的 JSON 对象。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "裝置參數必須為符合原工具協定的 JSON 物件。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

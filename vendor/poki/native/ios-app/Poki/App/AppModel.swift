@@ -430,16 +430,7 @@ final class AppModel {
             await self.diskImage.ensureChecked()
             // Amore: DDI download begins only from the original explicit setup button.
         }
-        // Just installed by Poki Setup on a computer (its signing key still waits in the container, and
-        // the owner never turned Poki on or off): Poki turns on by itself, so it does not stand at Off.
-        if UserDefaults.standard.object(forKey: "wantsOn") == nil, FileManager.default.fileExists(atPath: SelfSigner.handedIdentity.path) {
-            wantsOn = true
-            log.add("session", "installed by Poki Setup: Poki turns on by itself")
-        }
-        // The installer on the Mac reads the hello and may leave a sealed model key while Poki is in front.
-        handoffTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
-            Task { @MainActor in if self?.inFront == true { self?.handoffTick() } }
-        }
+        // Amore owns providers and installation; no second-model handoff polling.
         // An agent whose session began before this launch is named from its connector.
         SessionStore.shared.connectorAgent = { [identity] hash in
             identity.secrets.first { $0.hash == hash }.map { $0.named ? $0.name : ($0.agent ?? $0.name) }
@@ -1033,6 +1024,8 @@ final class AppModel {
         } else { beginSession() }
     }
 
+    var hostLocalAgentAvailable: () -> Bool = { false }
+
     private func checkSessionStartPreconditions() -> (pairing: String, relay: RelayAddress?)? {
         guard !sessionOn else { return nil }
         problem = nil
@@ -1045,7 +1038,7 @@ final class AppModel {
         #endif
         // The chat's own model loop needs no relay; agents on a computer do.
         let relay = activeRelay
-        guard relay != nil || ModelKeys.hasUsableKey else { problem = Self.noRelay; return nil }
+        guard relay != nil || hostLocalAgentAvailable() else { problem = Self.noRelay; return nil }
         return (pairing, relay)
     }
 
