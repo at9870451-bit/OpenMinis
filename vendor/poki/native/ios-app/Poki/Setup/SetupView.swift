@@ -378,7 +378,7 @@ private struct LoopbackPage: View {
             HStack(spacing: 12) {
                 Group {
                     if UIImage(named: "Proxy-\(id)") != nil {
-                        Image("Proxy-\(id)").resizable().scaledToFill()
+                        Image("Proxy-\(id)", bundle: PokiPortResources.bundle).resizable().scaledToFill()
                     } else {
                         Image(systemName: "network").resizable().scaledToFit().padding(6)
                             .foregroundStyle(Tint.sidebarInk)
