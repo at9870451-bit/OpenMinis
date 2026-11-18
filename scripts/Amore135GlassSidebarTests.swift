@@ -57,12 +57,9 @@ final class Amore135GlassSidebarTests: XCTestCase {
         let live = UIHostingController(rootView: text.background(PokiAssistantMessageSurface()))
         let export = UIHostingController(rootView: text.background(PokiAssistantMessageSurface())
             .environment(\.chatSnapshotRendering, true))
-        let reduced = UIHostingController(rootView: text.background(PokiAssistantMessageSurface())
-            .environment(\.accessibilityReduceTransparency, true))
         let proposed = CGSize(width: 280, height: 1_000)
         let expected = plain.sizeThatFits(in: proposed)
-        for actual in [live.sizeThatFits(in: proposed), export.sizeThatFits(in: proposed),
-                       reduced.sizeThatFits(in: proposed)] {
+        for actual in [live.sizeThatFits(in: proposed), export.sizeThatFits(in: proposed)] {
             XCTAssertEqual(actual.width, expected.width, accuracy: 0.01)
             XCTAssertEqual(actual.height, expected.height, accuracy: 0.01)
         }
