@@ -105,7 +105,10 @@ struct SyncMigrationDetailView: View {
         var activity: MigrationDrain.Activity? = nil
     }
 
-    var body: some View {
+    var body: some View { fusionSyncStage5 }
+
+    private var fusionSyncForm: AnyView {
+        AnyView(
         Form {
             if !tipsDismissed, vm?.migration != nil {
                 Section {
@@ -425,6 +428,11 @@ struct SyncMigrationDetailView: View {
             // deleting whole zones they no longer need.
             iCloudZonesSection
         }
+        )
+    }
+
+    private var fusionSyncStage1: AnyView {
+        AnyView(fusionSyncForm
         .scrollContentBackground(.hidden)
         .background(PokiTheme.background)
         .confirmationDialog("Request Migration", isPresented: $showRequestMigrationConfirm, titleVisibility: .visible) {
@@ -443,6 +451,11 @@ struct SyncMigrationDetailView: View {
             let etaH = max(1, count / (50 * 60))   // 50 records/min ballpark, hours
             Text(AppLocalized("About \(count) local records will upload to iCloud. Estimated time ~\(etaH) hr depending on iCloud throttling. You can pause or cancel any time."))
         }
+        )
+    }
+
+    private var fusionSyncStage2: AnyView {
+        AnyView(fusionSyncStage1
         .confirmationDialog("Cancel Migration?", isPresented: $showCancelMigrationConfirm, titleVisibility: .visible) {
             Button("Cancel Migration", role: .destructive) {
                 if #available(iOS 17.0, *) {
@@ -496,6 +509,11 @@ struct SyncMigrationDetailView: View {
         } message: {
             Text("This permanently deletes ALL legacy v1 records from iCloud. The cloud copy is gone for good — there is no undo. Other devices that haven't finished migrating yet will lose access to any legacy data they hadn't already pulled locally.\n\nOnly proceed if v2 push is at 100% AND every device of yours has finished migrating.")
         }
+        )
+    }
+
+    private var fusionSyncStage3: AnyView {
+        AnyView(fusionSyncStage2
         .sheet(isPresented: $showPauseDialog) {
             PauseSyncSheet { hours in
                 if #available(iOS 17.0, *) {
@@ -522,6 +540,11 @@ struct SyncMigrationDetailView: View {
         // SwiftUI owns this Task by view identity and cancels it deterministically on
         // teardown, so there is no graph-bound Combine sink to be released
         // mid-transaction (the crash that pattern caused — see refreshIntervalSeconds).
+        )
+    }
+
+    private var fusionSyncStage4: AnyView {
+        AnyView(fusionSyncStage3
         .task { await refreshLoop() }
         .onAppear {
             if #available(iOS 17.0, *) { SyncCore.shared.userOnSyncSheet = true }
@@ -545,6 +568,11 @@ struct SyncMigrationDetailView: View {
             updateIdleTimer()
         }
         .task { await loadZonesIfNeeded() }
+        )
+    }
+
+    private var fusionSyncStage5: AnyView {
+        AnyView(fusionSyncStage4
         .confirmationDialog(
             zoneDeleteDialogTitle,
             isPresented: Binding(
@@ -588,6 +616,7 @@ struct SyncMigrationDetailView: View {
         } message: { row in
             Text(zoneSecondConfirmMessage(for: row))
         }
+        )
     }
 
     // MARK: - iCloud Zones inventory

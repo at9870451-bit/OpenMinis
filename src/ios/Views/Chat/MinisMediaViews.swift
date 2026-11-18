@@ -1,4 +1,5 @@
 import SwiftUI
+import AmoreDeviceKit
 import AVKit
 import Photos
 import QuickLook
@@ -642,9 +643,6 @@ struct MinisOpenURLHandler: ViewModifier {
 }
 
 
-extension URL: @retroactive Identifiable {
-    public var id: String { absoluteString }
-}
 
 private struct MinisImageView: View {
     let url: URL?

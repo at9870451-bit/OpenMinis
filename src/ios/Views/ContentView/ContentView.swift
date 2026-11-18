@@ -600,7 +600,10 @@ struct ContentView: View {
     /// override where the user just chose to be.
     static let pendingBackgroundNavigationTTL: TimeInterval = 90
 
-    var body: some View {
+    var body: some View { fusionNavigationStage8 }
+
+    private var fusionNavigationCanvas: AnyView {
+        AnyView(
         GeometryReader { geo in
             let wide = isIPad && geo.size.width >= compactThreshold
             Group {
@@ -635,6 +638,12 @@ struct ContentView: View {
             // on iPhone that conversation can be open underneath it.
             .onReceive(NotificationCenter.default.publisher(for: .sessionsDeletedElsewhere), perform: handleSessionsDeletedElsewhere)
         }
+        )
+    }
+
+    private var fusionNavigationStage1: AnyView {
+        AnyView(
+fusionNavigationCanvas
         .onReceive(
             NotificationCenter.default.publisher(for: .sessionDidCreate),
             perform: handleSessionCreatedForPendingFolder
@@ -738,6 +747,12 @@ struct ContentView: View {
                 refreshSessionList()
             }
         }
+        )
+    }
+
+    private var fusionNavigationStage2: AnyView {
+        AnyView(
+fusionNavigationStage1
         .onReceive(
             // Throttle (not debounce): session-list updates are infrequent (one
             // per agent tool round, seconds apart), but a long multi-tool task
@@ -815,6 +830,12 @@ struct ContentView: View {
                 switchToSession(sessionId)
             }
         }
+        )
+    }
+
+    private var fusionNavigationStage3: AnyView {
+        AnyView(
+fusionNavigationStage2
         .fullScreenCover(isPresented: $showTerminal) {
             NavigationStack {
                 ISHTerminalView(showCloseButton: true, initCommand: localBotCommand.isEmpty ? nil : localBotCommand)
@@ -949,6 +970,12 @@ struct ContentView: View {
             }
             .presentationDetents([.medium, .large])
         }
+        )
+    }
+
+    private var fusionNavigationStage4: AnyView {
+        AnyView(
+fusionNavigationStage3
         .modifier(FolderAlertsModifier(
             folderToRename: $folderToRename,
             renameFolderText: $renameFolderText,
@@ -1023,6 +1050,12 @@ struct ContentView: View {
                 .animation(.easeInOut(duration: 0.2), value: isExporting)
             }
         }
+        )
+    }
+
+    private var fusionNavigationStage5: AnyView {
+        AnyView(
+fusionNavigationStage4
         .task {
             // [T-p1-delegate-task] Hidden child sessions never reach the
             // sidebar; they are entered from their parent's helper block.
@@ -1157,6 +1190,12 @@ struct ContentView: View {
             fetchAlarmsIfNeeded()
             await refreshRemoteDeviceSessions()
         }
+        )
+    }
+
+    private var fusionNavigationStage6: AnyView {
+        AnyView(
+fusionNavigationStage5
         .onReceive(NotificationCenter.default.publisher(for: .cloudSyncDidFetchChanges)) { _ in
             // [T-ios-state-publish-offmain-crash] cloud-sync fetch fires off-main;
             // force the @State write onto the main thread.
@@ -1257,6 +1296,12 @@ struct ContentView: View {
                 scheduleOutgoingPreviewRefresh()
             }
         }
+        )
+    }
+
+    private var fusionNavigationStage7: AnyView {
+        AnyView(
+fusionNavigationStage6
         .onChange(of: navigationPath) { _ in
             // [T-crash-breadcrumbs] Navigation depth; back at the root the
             // current page is the home list (a chat page records its own).
@@ -1361,6 +1406,12 @@ struct ContentView: View {
             }
             fetchAlarmsIfNeeded()
         }
+        )
+    }
+
+    private var fusionNavigationStage8: AnyView {
+        AnyView(
+fusionNavigationStage7
         .onChange(of: shareCoordinator.hasPendingShare) { hasPending in
             if hasPending {
                 let hadRecord = SharedContainerStore.loadPendingShare() != nil
@@ -1497,6 +1548,7 @@ struct ContentView: View {
                 }
             }
         }
+        )
     }
 
     // MARK: Stored state used by the extension files
