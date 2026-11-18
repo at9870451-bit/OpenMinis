@@ -25,6 +25,11 @@ Path(sys.argv[2]).write_text(Path(sys.argv[1]).read_text().replace('@testable im
 PY
 done
 cp "$ROOT/scripts/Amore134NavigationUITests.swift" "$HOST/UITests/"
+cp "$ROOT/scripts/Amore135HeaderUITests.swift" "$HOST/UITests/"
+cp "$ROOT/scripts/Amore135HeaderProbe.swift" "$HOST/App/"
+# Complete production UIKit menu and drawer members, never a handwritten fake.
+# Its DEBUG dependencies and all closures target inert test-host state only.
+python3 "$ROOT/scripts/extract-amore135-header-host.py" "$ROOT" "$HOST"
 # Extract, never recreate, the production route and NavigationLink component.
 # Only the destination payload is overlaid: real device services cannot run here.
 python3 - "$ROOT" "$HOST" <<'PY'
@@ -155,7 +160,12 @@ enum BiometricAuth {
  static var biometryDisplayName: String { "Face ID" }
  static var biometryIconName: String { "faceid" }
 }
-struct AppLocalization { static let current = "zh-Hans" }
+struct AppLocalization {
+ static var current: String {
+  ProcessInfo.processInfo.arguments.contains("-amore135-header-probe") ||
+   ProcessInfo.processInfo.arguments.contains("-amore135-drawer-probe") ? "en" : "zh-Hans"
+ }
+}
 enum AppBundle { static var current: Bundle { .main } }
 extension View { func appFontScale() -> some View { self } }
 struct ChatHistoryButtonStyle: ButtonStyle {
@@ -164,7 +174,11 @@ struct ChatHistoryButtonStyle: ButtonStyle {
 @main struct Amore134Components: App {
  var body: some Scene {
   WindowGroup {
-   if ProcessInfo.processInfo.arguments.contains("-amore134-navigation-probe") {
+   if ProcessInfo.processInfo.arguments.contains("-amore135-header-probe") {
+    Amore135HeaderProbe()
+   } else if ProcessInfo.processInfo.arguments.contains("-amore135-drawer-probe") {
+    Amore135DrawerProbe()
+   } else if ProcessInfo.processInfo.arguments.contains("-amore134-navigation-probe") {
     Amore134NavigationProbe()
    } else {
     Text("Amore real component host")

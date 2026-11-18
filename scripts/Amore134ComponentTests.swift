@@ -82,7 +82,7 @@ final class Amore134Tests: XCTestCase {
         for style in [UIUserInterfaceStyle.light, .dark] {
             let image = try await render(HeaderAndMarqueeProbe(), style: style)
             attach(image, name: "Amore134-Avatar-Marquee-" + (style == .dark ? "Dark" : "Light"))
-            let side = try await render(AmoreSidebarShortcuts(interactionEnabled: true, open: { _ in }).background(PokiTheme.sidebar), style: style)
+            let side = try await render(Amore135DrawerProbe(), style: style)
             attach(side, name: "Amore134-Vertical-Shortcuts-" + (style == .dark ? "Dark" : "Light"))
         }
     }
@@ -198,7 +198,9 @@ private struct HeaderAndMarqueeProbe: View {
     var body: some View {
         VStack {
             AmoreConversationChrome(home: true, thinking: false, busy: false, title: "Amore", active: true,
-                trailing: AnyView(Image(systemName: "ellipsis").foregroundStyle(PokiTheme.primaryText)),
+                // Legacy marquee snapshot only. Real UIKit menu taps/bounds are covered
+                // separately by Amore135HeaderUITests and its production-extracted host.
+                trailing: AnyView(Color.clear),
                 openThreads: {}, openModel: {})
             Spacer(minLength: 12)
             Text("Amore").font(.largeTitle.bold())
