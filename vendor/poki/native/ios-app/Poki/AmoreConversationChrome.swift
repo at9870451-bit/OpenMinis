@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// The Amore conversation owns navigation, session/model state and all actions.
 /// New conversation lives only at the bottom-left of the sidebar.
@@ -9,6 +10,9 @@ public struct AmoreConversationChrome: View {
     public var busy: Bool
     public var title: String
     public var active: Bool
+    public var portrait: UIImage?
+    public var emoji: String
+    private let trailing: AnyView
     public var openThreads: () -> Void
     public var openModel: () -> Void
     @State private var pokes = 0
@@ -16,9 +20,11 @@ public struct AmoreConversationChrome: View {
     @ScaledMetric(relativeTo: .body) private var avatar: CGFloat = 56
 
     public init(home: Bool, thinking: Bool, busy: Bool, title: String, active: Bool = true,
+                portrait: UIImage? = nil, emoji: String = "", trailing: AnyView = AnyView(Color.clear),
                 openThreads: @escaping () -> Void, openModel: @escaping () -> Void) {
         self.home = home; self.thinking = thinking; self.busy = busy
-        self.title = title; self.active = active
+        self.title = title; self.active = active; self.portrait = portrait; self.emoji = emoji
+        self.trailing = trailing
         self.openThreads = openThreads; self.openModel = openModel
     }
     public var body: some View {
@@ -37,7 +43,10 @@ public struct AmoreConversationChrome: View {
                 .accessibilityLabel(Text("Conversations"))
                 .accessibilityIdentifier("chat.threads")
                 Spacer(minLength: 8)
-                Color.clear.frame(width: 48, height: 48).accessibilityHidden(true)
+                trailing
+                    .frame(width: 48, height: 48)
+                    .contentShape(Circle())
+                    .glassSurface(in: Circle(), interactive: true)
             }
             .padding(.top, (side - 48) / 2)
             Button {
@@ -46,7 +55,7 @@ public struct AmoreConversationChrome: View {
             } label: {
                 VStack(spacing: 6) {
                     AmoreCompanionView(mood: thinking ? .thinking : busy ? .working : .idle,
-                                       side: side, pokes: pokes, active: active)
+                                       side: side, pokes: pokes, active: active, portrait: portrait, emoji: emoji)
                     Text(verbatim: title)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color(.label))

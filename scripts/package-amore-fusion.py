@@ -1,6 +1,6 @@
 from pathlib import Path
 import sys,json,subprocess,plistlib,shutil,hashlib
-app,kit=map(Path,sys.argv[1:]);info=plistlib.loads((app/'Info.plist').read_bytes());assert info['CFBundleIdentifier']=='com.openAmroe.app';assert info['CFBundleShortVersionString']=='1.34' and info['CFBundleVersion']=='34'
+app,kit=map(Path,sys.argv[1:]);info=plistlib.loads((app/'Info.plist').read_bytes());assert info['CFBundleIdentifier']=='com.openAmroe.app';assert info['CFBundleShortVersionString']=='1.35' and info['CFBundleVersion']=='35'
 assert not (app/'Frameworks/Poki.framework').exists()
 assert not (app/'Frameworks/AmoreDeviceKit.framework').exists(),'static library must not be embedded'
 for p in (kit/'Resources').iterdir():
@@ -24,8 +24,8 @@ assert 'AIChatViewModel' in symbols,'original Amore agent must remain linked'
 for framework in (app/'Frameworks').glob('*.framework'):
  subprocess.run(['codesign','--force','--sign','-','--timestamp=none',str(framework)],check=True)
  subprocess.run(['codesign','--verify','--strict',str(framework)],check=True)
-manifest=json.loads((app/'NodeRuntime/manifest.json').read_text())
-for entry in manifest['packages']:
- data=(app/'NodeRuntime'/entry['filename']).read_bytes();assert len(data)==entry['bytes'] and hashlib.sha256(data).hexdigest()==entry['sha256']
-report={'bundle':info['CFBundleIdentifier'],'version':'1.34','build':'34','minimum_iOS':info['MinimumOSVersion'],'device_services':'statically linked into Amore','standalone_poki_framework':False,'separate_ui_factory':False,'Amore_original_agent':'linked','node_apks_verified':len(manifest['packages']),'signing':'frameworks ad-hoc; app requires user distribution signing'}
+assert not (app/'NodeRuntime').exists(), 'offline Node APKs must not be bundled'
+assert not any(app.rglob('nodejs-*.apk'))
+assert hashlib.sha256((app/'alpine-rootfs.zip').read_bytes()).hexdigest()=='84f8d8acff68a28a0773298f67b3bed29c726f67fdb8c0f1cab8f01991a952cf'
+report={'bundle':info['CFBundleIdentifier'],'version':'1.35','build':'35','minimum_iOS':info['MinimumOSVersion'],'device_services':'statically linked into Amore','standalone_poki_framework':False,'separate_ui_factory':False,'Amore_original_agent':'linked','node_offline_bundled':False,'node_installation':'online_selected_alpine_mirror','signing':'frameworks ad-hoc; app requires user distribution signing'}
 Path('fusion-verification.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))

@@ -160,8 +160,8 @@ extension ConfigRegistry {
         // An image may be given as a data URI, bare base64, a `minis://`
         // resource, a path inside the minis directories, or an http(s) URL.
         // Whatever the source, it is decoded and pushed through the SAME
-        // `SoulIconImage.encode` the Settings picker uses — alpha check,
-        // square crop, 96px cap, PNG — and the RESULT is stored inline.
+        // `SoulIconImage.encode` the Settings picker uses — square crop,
+        // 96px cap, PNG — then SoulStore persists its existing sidecar.
         //
         // An address is an import source only, never the stored value: keeping
         // a path would leave the icon dangling the moment the attachment is
@@ -176,7 +176,8 @@ extension ConfigRegistry {
         // Reading stays summarized: a data URI is reported as `<image>` so
         // `minis-config get` never floods the context with base64, and the
         // same substitution keeps the confirmation sheet and the audit log
-        // clean. Clearing (empty string) restores the default sparkle.
+        // clean. Clearing removes the custom portrait (dynamic robot in the
+        // companion; legacy small SoulIconView surfaces keep their fallback).
         r.register(ClosureField(
             path: "soul.icon",
             displayName: "Soul icon",
@@ -188,11 +189,25 @@ extension ConfigRegistry {
             // assumed, and SVG is absent because it genuinely does not decode.
             description: "The Soul's identity icon — also called its avatar, its persona image, or its "
                 + "character image (中文：角色形象 / 图标 / 头像). All of those refer to THIS one setting; "
-                + "there is no separate avatar field. Shown beside the assistant name in the chat header "
-                + "and on the Soul settings card. Accepts an emoji or an image.\n"
+                + "there is no separate avatar field. Used by the companion's custom portrait and the Soul "
+                + "settings preview; appearance.companionMode controls robot/custom presentation. "
+                + "Accepts an emoji or an image.\n"
+                + "\n"
+                + "AGENT / ONLINE DESIGN\n"
+                + "  On a user request, inspect minis-model-use list and select only a configured model "
+                + "declaring image_output. Run minis-model-use --help before generation; image editing "
+                + "also requires the selected model/endpoint to support image input/editing. If unavailable, "
+                + "offer [Model settings](minis://settings/model-groups) instead of claiming success. "
+                + "Do not read personal photos without the user's explicit selection. After a successful "
+                + "generation, show the real local minis:// result, then set soul.icon to that address. "
+                + "The bridge resolves and validates the image BEFORE native confirmation; only approved "
+                + "writes save through SoulStore and emit Notification.soulMdChanged. Do not edit SOUL.md "
+                + "or SOUL.icon.png directly to bypass confirmation. A cancelled, denied, timed-out or failed "
+                + "write is NOT an applied avatar; report the actual result.\n"
                 + "\n"
                 + "EMOJI\n"
-                + "  A single emoji, e.g. \"⚡\". An empty string \"\" restores the default sparkle.\n"
+                + "  A single emoji, e.g. \"⚡\". An empty string \"\" clears the custom portrait "
+                + "and restores the dynamic robot.\n"
                 + "\n"
                 + "IMAGE — any of these forms:\n"
                 + "  • data URI (preferred for inline bytes):\n"
@@ -201,8 +216,10 @@ extension ConfigRegistry {
                 + "  • bare base64 (no data: prefix) — auto-detected, e.g. iVBORw0KGgo...\n"
                 + "  • minis:// resource, e.g. minis://attachments/icon.png or minis://workspace/icon.png\n"
                 + "  • local path inside the minis directories, e.g. /var/minis/attachments/icon.png\n"
-                + "  • https:// URL, e.g. https://example.com/icon.png (http:// also works; "
-                + "private/loopback/link-local hosts are refused)\n"
+                + "  • https:// URL, e.g. https://example.com/icon.png (http:// also works). "
+                + "Only public-looking hosts; private/loopback/link-local literal IPs, local names and "
+                + "credential URLs are refused. Each redirect is checked before following; HTTPS cannot "
+                + "downgrade to HTTP. Hostnames are not DNS-pinned: this is not complete DNS-rebinding protection.\n"
                 + "\n"
                 + "TRANSPARENCY — not required. Both transparent and opaque images are accepted "
                 + "(a JPEG or a flattened PNG is fine); the icon is displayed with rounded corners, "
@@ -210,10 +227,12 @@ extension ConfigRegistry {
                 + "when the source has it.\n"
                 + "\n"
                 + "PROCESSING — identical to picking an image in Settings → Soul: "
-                + "the image is centre-cropped to a square, downscaled to 96×96 and re-encoded as PNG, "
-                + "then stored inline. An address is only an import source — "
-                + "it is never persisted, so the file can be deleted afterwards and the icon survives "
-                + "attachment cleanup and syncing to other devices.\n"
+                + "source bytes are limited to 8 MB, remote fetches to 15 seconds; "
+                + "the image is centre-cropped to a square, downscaled to at most 96×96 and re-encoded as PNG. "
+                + "The canonical data URI is capped at 64 KiB characters; SoulStore persists its bytes in "
+                + "the EXISTING SOUL.icon.png sidecar with a SOUL.md reference (wire sync stays inline). "
+                + "An address is only an import source — it is never persisted, so the source can be "
+                + "deleted after a successful save and the icon survives attachment cleanup.\n"
                 + "\n"
                 + "READING — `get soul.icon` returns \"<image>\" for an image, never the base64.\n"
                 + "\n"
@@ -222,7 +241,7 @@ extension ConfigRegistry {
                 + "  minis-config set soul.icon '\"minis://attachments/icon.png\"'\n"
                 + "  minis-config set soul.icon '\"https://example.com/icon.png\"'\n"
                 + "  minis-config set soul.icon '\"data:image/png;base64,iVBORw0KGgo...\"'\n"
-                + "  minis-config set soul.icon '\"\"'    # back to the default sparkle\n"
+                + "  minis-config set soul.icon '\"\"'    # clear portrait; dynamic robot\n"
                 + "A long data URI is easier to pass via a file. --file reads the JSON VALUE "
                 + "(a quoted string), not the raw image — write the quoted data URI to the file first:\n"
                 + "  printf '\"%s\"' \"data:image/png;base64,$(base64 -w0 icon.png)\" > /tmp/icon-value.json\n"
@@ -250,7 +269,7 @@ extension ConfigRegistry {
             writer: { v in
                 guard case .string(let s) = v else { throw ConfigError.typeMismatch(expected: "string") }
                 let trimmed = s.trimmingCharacters(in: .whitespacesAndNewlines)
-                // Empty clears back to the default sparkle.
+                // Empty clears the custom portrait, without adding storage.
                 guard !trimmed.isEmpty else {
                     try updateMetadata { $0.icon = "" }
                     return
@@ -1232,6 +1251,16 @@ extension ConfigRegistry {
 
     @MainActor
     private static func registerAppearance(into r: ConfigRegistry) {
+        r.register(AppStorageEnumField(
+            path: "appearance.companionMode",
+            displayName: "Companion appearance",
+            description: "Companion display mode: auto (default) uses soul.icon when set, otherwise the dynamic robot; robot always shows the robot without deleting the saved icon; image prefers the custom icon and falls back to the robot when empty. Presentation only — no second avatar storage. Set the portrait with soul.icon. Agent writes require the standard native confirmation, just like other minis-config writes.",
+            userDefaultsKey: AmoreCompanionMode.storageKey,
+            cases: AmoreCompanionMode.allCases.map(\.rawValue),
+            valueLabels: ["auto": "Automatic", "robot": "Dynamic robot", "image": "Custom avatar"],
+            defaultValue: AmoreCompanionMode.auto.rawValue,
+            risk: .sensitive
+        ))
         r.register(ClosureField(
             path: "appearance.theme",
             displayName: "Theme",

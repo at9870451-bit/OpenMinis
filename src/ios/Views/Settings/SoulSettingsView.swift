@@ -1,16 +1,19 @@
 import SwiftUI
+import AmoreDeviceKit
 import PhotosUI
 
 /// Settings page for SOUL.md — Minis's persistent personality file.
 /// Lives between Skills and Memory in the Agent Runtime section.
 struct SoulSettingsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage(AmoreCompanionMode.storageKey) private var companionMode = AmoreCompanionMode.auto.rawValue
     @State private var name: String = SoulMetadata.default.name
     /// Raw emoji value loaded from SOUL.md. Not user-editable; preserved
     /// verbatim on save so we don't rewrite a value the user (or another
     /// device) may have set in the file. UI always shows `displayEmoji`.
     @State private var rawEmoji: String = SoulMetadata.default.emoji
     /// [T-soul-custom-icon] The user's identity icon: an emoji, a
-    /// `data:image/png;base64,…` URI, or empty for the default sparkle.
+    /// `data:image/png;base64,…` URI, or empty for the dynamic robot.
     @State private var icon: String = SoulMetadata.default.icon
     @State private var showIconOptions = false
     @State private var showEmojiPrompt = false
@@ -43,6 +46,29 @@ struct SoulSettingsView: View {
         Form {
             Section {
                 previewCard
+            }
+            .listRowBackground(PokiTheme.surface)
+
+            Section {
+                Picker(AppLocalized("Companion appearance"), selection: $companionMode) {
+                    Text(AppLocalized("Automatic")).tag(AmoreCompanionMode.auto.rawValue)
+                    Text(AppLocalized("Dynamic robot")).tag(AmoreCompanionMode.robot.rawValue)
+                    Text(AppLocalized("Custom avatar")).tag(AmoreCompanionMode.image.rawValue)
+                }
+                Button(action: requestAvatarDesign) {
+                    Label(AppLocalized("Let Agent design an avatar"), systemImage: "paintbrush.pointed")
+                }
+                // Do not silently discard manual edits on the way to chat.
+                .disabled(isDirty)
+                if isDirty {
+                    Text(AppLocalized("Save your changes before asking Agent to design an avatar."))
+                        .font(.footnote)
+                        .foregroundStyle(PokiTheme.secondaryText)
+                }
+            } header: {
+                Text(AppLocalized("Online avatar design"))
+            } footer: {
+                Text(AppLocalized("Ask Agent to create or revise an avatar using a configured image-output model. If none is configured, Agent will guide you to model settings. Generated images are only applied after native confirmation. Photos are never read automatically. Tap the preview to pick an image yourself; Save applies it. Clearing the custom avatar restores the dynamic robot. Display mode does not erase the saved avatar."))
             }
             .listRowBackground(PokiTheme.surface)
 
@@ -127,6 +153,10 @@ struct SoulSettingsView: View {
             }
         }
         .onAppear(perform: reload)
+        .onReceive(NotificationCenter.default.publisher(for: .soulMdChanged)) { _ in
+            // Refresh confirmed Agent changes without clobbering a manual draft.
+            if !isDirty { reload() }
+        }
         // Using .alert (not .confirmationDialog) so the dialog stays
         // centered on iPad / Mac. confirmationDialog without a source
         // rect renders as a popover anchored to the screen's top edge
@@ -181,7 +211,7 @@ struct SoulSettingsView: View {
                 // Inset inside the 52pt button so the grey disc stays visible
                 // as a ring even when the icon is an image, which otherwise
                 // fills the whole frame and hides the affordance entirely.
-                SoulIconView(icon: icon, size: SoulIconImage.renderPoints)
+                iconPreview
                     .frame(width: 44, height: 44)
                     .frame(width: 52, height: 52)
                     .background(Circle().fill(PokiTheme.surface))
@@ -225,7 +255,7 @@ struct SoulSettingsView: View {
                 }
                 Button(AppLocalized("Choose Image…")) { showPhotoPicker = true }
                 if !icon.isEmpty {
-                    Button(AppLocalized("Use Default"), role: .destructive) { icon = "" }
+                    Button(AppLocalized("Restore Dynamic Robot"), role: .destructive) { icon = "" }
                 }
                 Button(AppLocalized("Cancel"), role: .cancel) {}
             } message: {
@@ -249,6 +279,29 @@ struct SoulSettingsView: View {
             Spacer(minLength: 0)
         }
         .padding(.vertical, 4)
+    }
+
+    /// Preview the in-form icon even in Robot mode, so a manual pick is
+    /// immediately visible before Save. Empty is always the dynamic robot.
+    @ViewBuilder
+    private var iconPreview: some View {
+        if icon.isEmpty {
+            AmoreAvatarPreview(side: 44)
+        } else {
+            SoulIconView(icon: icon, size: SoulIconImage.renderPoints)
+        }
+    }
+
+    @MainActor
+    private func requestAvatarDesign() {
+        // The chat owns composition and sending; a tap is not permission to
+        // call a paid model or apply an icon. Dismiss the settings surface
+        // before broadcasting so the main chat can reveal its composer.
+        dismiss()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            NotificationCenter.default.post(name: .amoreRequestAvatarDesign, object: nil,
+                userInfo: [AmoreAvatarDesignRequest.promptKey: AmoreAvatarDesignRequest.prompt])
+        }
     }
 
     private var personalityEditor: some View {
@@ -380,6 +433,7 @@ struct SoulSettingsView: View {
         let parsed = SoulMDParser.parse(SoulStore.defaultContent)
         name = parsed.metadata.name
         rawEmoji = parsed.metadata.emoji
+        icon = parsed.metadata.icon
         style = parsed.metadata.style
         lang = parsed.metadata.lang
         bodyText = parsed.body
@@ -584,8 +638,15 @@ private struct SoulIconEditing: ViewModifier {
     /// Load, validate and normalize a picked photo into the stored form.
     private func applyPickedImage(_ item: PhotosPickerItem) async {
         defer { photoItem = nil }
-        guard let data = try? await item.loadTransferable(type: Data.self),
-              let image = UIImage(data: data) else {
+        guard let data = try? await item.loadTransferable(type: Data.self) else {
+            await MainActor.run { iconError = AppLocalized("That image couldn't be read.") }
+            return
+        }
+        guard data.count <= SoulIconSource.maxSourceBytes else {
+            await MainActor.run { iconError = AppLocalized("Choose an image smaller than 8 MB.") }
+            return
+        }
+        guard let image = UIImage(data: data) else {
             await MainActor.run { iconError = AppLocalized("That image couldn't be read.") }
             return
         }

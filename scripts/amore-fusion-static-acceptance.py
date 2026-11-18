@@ -9,7 +9,7 @@ checks={
 'no dynamic Poki UI factory remains':not any('OriginalPokiScreen' in p.read_text(errors='ignore') or 'NSClassFromString("AmorePokiEntry")' in p.read_text(errors='ignore') for p in (r/'src/ios').rglob('*.swift')),
 'Amore message and composer remain native':'AIChatView(sessionId:' in layout and (r/'src/ios/Views/Chat/AIChatView/AIChatView+InputBar.swift').exists(),
 'Amore plugin installer remains present':'installPrepared' in installer and 'installedPlugins' in installer,
-'Amore offline Node assets remain tracked':(r/'src/ios/NodeRuntime/manifest.json').is_file() and len(list((r/'src/ios/NodeRuntime').glob('*.apk')))==22,
+'Amore offline Node bundle removed':not (r/'src/ios/NodeRuntime').exists() and (r/'src/ios/Views/ContentView/NodeOnlineRuntime.swift').is_file(),
 'developer route uses Amore device page':'AmoreDeviceConnectionPage()' in settings,
 'device tools are gated by enabled provider credential':'$0.isEnabled && $0.hasAnyCredential' in read('src/ios/Views/ContentView/AmoreDeviceTools.swift'),
 }

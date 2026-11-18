@@ -25,11 +25,6 @@ struct DeveloperConnectionView: View {
                 } label: {
                     Label(AppLocalized("Runtime environment"), systemImage: "shippingbox")
                 }
-                NavigationLink {
-                    NodeOfflineRuntimeSection()
-                } label: {
-                    Label(AppLocalized("Offline Node.js and npm"), systemImage: "shippingbox.and.arrow.down")
-                }
             } header: {
                 Text(AppLocalized("Amore connection"))
             } footer: {

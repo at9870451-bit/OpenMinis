@@ -147,7 +147,7 @@ extension ContentView {
             let drawerWidth = PokiDrawerMetrics.travel(for: geometry.size.width)
             let progress = min(1, max(0, drawerProgress))
             ZStack(alignment: .leading) {
-                Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
+                PokiTheme.sidebar.ignoresSafeArea()
                 historyDrawer
                     .frame(width: drawerWidth, height: geometry.size.height)
                     .opacity(drawerReduceMotion ? progress : 1)
@@ -208,7 +208,7 @@ extension ContentView {
             .onChange(of: drawerGestureActive) { active in
                 if !active, drawerCloseStart != nil { snapDrawer(open: showHistoryDrawer) }
             }
-            .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
+            .background(PokiTheme.sidebar.ignoresSafeArea())
             .accessibilityAction(.escape) {
                 if showHistoryDrawer { snapDrawer(open: false) }
             }
@@ -269,7 +269,7 @@ extension ContentView {
                         Text(drawerHistory.isSearching ? AppLocalized("No results") :
                              (showArchivedDrawerSessions ? AppLocalized("No archived chats") : AppLocalized("No conversations yet")))
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.sidebarHeading)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 20)
                             .padding(.vertical, 16)
@@ -277,7 +277,7 @@ extension ContentView {
                     ForEach(drawerHistory.groups) { group in
                         Text(group.label)
                             .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(PokiTheme.sidebarHeading)
                             .padding(.horizontal, 20)
                             .padding(.top, 14)
                             .padding(.bottom, 6)
@@ -296,7 +296,9 @@ extension ContentView {
             drawerAccountFooter
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
+        .foregroundStyle(PokiTheme.sidebarInk)
+        .tint(PokiTheme.sidebarInk)
+        .background(PokiTheme.sidebar.ignoresSafeArea())
         .onAppear { rebuildDrawerGroups() }
         .onChange(of: DrawerSessionSource(sessions: sessions)) { _ in rebuildDrawerGroups() }
         .onChange(of: drawerSearch) { _ in rebuildDrawerGroups() }
@@ -316,9 +318,10 @@ extension ContentView {
             HStack(spacing: 4) {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(PokiTheme.sidebarHeading)
                         .accessibilityHidden(true)
-                    TextField(AppLocalized("Search chats"), text: $drawerSearch)
+                    TextField(AppLocalized("Search chats"), text: $drawerSearch,
+                              prompt: Text(AppLocalized("Search chats")).foregroundStyle(PokiTheme.sidebarHeading))
                         .font(.body)
                         .textFieldStyle(.plain)
                         .focused($drawerSearchFocused)
@@ -330,7 +333,7 @@ extension ContentView {
                     if !drawerSearch.isEmpty {
                         Button { drawerSearch = "" } label: {
                             Image(systemName: "xmark.circle.fill")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(PokiTheme.sidebarHeading)
                                 .frame(minWidth: 44, minHeight: 44)
                         }
                         .buttonStyle(.plain)
@@ -340,7 +343,7 @@ extension ContentView {
                 .padding(.leading, 12)
                 .padding(.trailing, drawerSearch.isEmpty ? 12 : 0)
                 .frame(minHeight: 44)
-                .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                .background(PokiTheme.sidebarControl, in: RoundedRectangle(cornerRadius: 12))
                 Button { snapDrawer(open: false) } label: {
                     Image(systemName: "sidebar.left")
                         .font(.body)
@@ -350,7 +353,7 @@ extension ContentView {
                 .accessibilityLabel(AppLocalized("Close conversations"))
             }
         }
-        .foregroundStyle(.primary)
+        .foregroundStyle(PokiTheme.sidebarInk)
         .padding(.horizontal, 12)
         .padding(.top, 8)
         .padding(.bottom, 6)
@@ -360,7 +363,7 @@ extension ContentView {
         HStack {
             Text(showArchivedDrawerSessions ? AppLocalized("Archived") : AppLocalized("Recent"))
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PokiTheme.sidebarHeading)
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 8)
             Button { showArchivedDrawerSessions.toggle() } label: {
@@ -371,7 +374,7 @@ extension ContentView {
             .buttonStyle(ChatHistoryButtonStyle())
             .accessibilityLabel(showArchivedDrawerSessions ? AppLocalized("Show recent chats") : AppLocalized("Show archived chats"))
         }
-        .foregroundStyle(.secondary)
+        .foregroundStyle(PokiTheme.sidebarHeading)
         .padding(.leading, 20)
         .padding(.trailing, 12)
     }
@@ -391,14 +394,17 @@ extension ContentView {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .frame(maxWidth: .infinity, minHeight: 52)
-                    .foregroundStyle(Color.white)
-                    .background(PokiTheme.blue, in: Capsule())
+                    .frame(minWidth: 132, maxWidth: 144, minHeight: 52)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .foregroundStyle(PokiTheme.sidebarActionInk)
+                    .background(PokiTheme.sidebarAction, in: Capsule())
                     .contentShape(Capsule())
             }
             .buttonStyle(.plain)
             .accessibilityLabel(AmoreSidebarText.newConversation)
             .accessibilityIdentifier("amore.sidebar.newConversation")
+
+            Spacer(minLength: 8)
 
             Button {
                 guard !drawerIsSliding else { return }
@@ -409,9 +415,9 @@ extension ContentView {
             } label: {
                 Image(systemName: "gearshape")
                     .font(.title3.weight(.medium))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(PokiTheme.sidebarInk)
                     .frame(width: 52, height: 52)
-                    .background(Color(uiColor: .secondarySystemGroupedBackground), in: Circle())
+                    .background(PokiTheme.sidebarControl, in: Circle())
                     .contentShape(Circle())
             }
             .buttonStyle(.plain)
@@ -422,8 +428,7 @@ extension ContentView {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity)
-        .background(Color(uiColor: .systemGroupedBackground))
-        .overlay(alignment: .top) { Divider() }
+        .background(PokiTheme.sidebar)
     }
 
     // MARK: Drawer cache (event-driven, never evaluated by a drag frame)

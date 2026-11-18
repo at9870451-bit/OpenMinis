@@ -12,15 +12,24 @@ struct AmoreCompanionView: View {
     var side: CGFloat
     var pokes: Int
     var active: Bool = true
+    var portrait: UIImage? = nil
+    var emoji: String = ""
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
     @State private var resting = ProcessInfo.processInfo.isLowPowerModeEnabled
 
     var body: some View {
-        AmoreCompanionScene(mood: mood, pokes: pokes,
-            animate: active && scenePhase == .active && !reduceMotion && !resting,
-            dark: colorScheme == .dark)
+        Group {
+            if portrait != nil || !emoji.isEmpty {
+                AmoreAnimatedPortrait(image: portrait, emoji: emoji, mood: mood, pokes: pokes,
+                    animate: active && scenePhase == .active && !reduceMotion && !resting)
+            } else {
+                AmoreCompanionScene(mood: mood, pokes: pokes,
+                    animate: active && scenePhase == .active && !reduceMotion && !resting,
+                    dark: colorScheme == .dark)
+            }
+        }
             .frame(width: side, height: side)
             .background(Color(uiColor: colorScheme == .dark ? UIColor(red: 0.04, green: 0.10, blue: 0.18, alpha: 1) : UIColor(red: 0.90, green: 0.95, blue: 1, alpha: 1)), in: Circle())
             .clipShape(Circle())

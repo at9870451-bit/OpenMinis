@@ -41,7 +41,7 @@ struct ChatHistorySessionLabel: View {
     var body: some View {
         Text(title)
             .font(.body)
-            .foregroundStyle(Color.primary)
+            .foregroundStyle(PokiTheme.sidebarInk)
             .lineLimit(typeSize.isAccessibilitySize ? 3 : 1)
             .truncationMode(.tail)
             .fixedSize(horizontal: false, vertical: true)
@@ -50,7 +50,7 @@ struct ChatHistorySessionLabel: View {
             .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
             .background {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(selected ? Color(uiColor: .tertiarySystemFill) : .clear)
+                    .fill(selected ? PokiTheme.sidebarSelected : .clear)
             }
             .contentShape(Rectangle())
     }
@@ -62,7 +62,7 @@ struct ChatHistoryButtonStyle: ButtonStyle {
         configuration.label
             .background {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(configuration.isPressed ? Color(uiColor: .tertiarySystemFill) : .clear)
+                    .fill(configuration.isPressed ? PokiTheme.sidebarPressed : .clear)
             }
     }
 }

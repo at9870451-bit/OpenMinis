@@ -52,7 +52,16 @@ struct MirrorEntry: Identifiable, Hashable {
     let id: String          // unique key e.g. "alpine.tuna"
     let name: String
     let baseURL: String     // e.g. "https://mirrors.tuna.tsinghua.edu.cn/alpine/"
-    let testURL: String     // full URL for HEAD request
+    var testURL: String {
+        switch category {
+        case .alpine:
+            let branch = MirrorSpeedTestViewModel.alpineBranch()
+            let repository = branch == "edge" ? "edge" : "v\(branch)"
+            return baseURL + "\(repository)/main/\(MirrorSpeedTestViewModel.alpineArchitecture())/APKINDEX.tar.gz"
+        case .pip: return baseURL + "six/"
+        case .npm: return baseURL + "is-number/7.0.0"
+        }
+    }
     let category: MirrorCategory
     let region: String      // "China", "Europe", "Asia", "Global"
     let isOfficial: Bool
@@ -77,9 +86,8 @@ extension MirrorEntry {
 
     // MARK: Alpine APK
     private static let alpineMirrors: [MirrorEntry] = {
-        let base = "v3.21/main/aarch64/APKINDEX.tar.gz"
         func m(_ id: String, _ name: String, _ url: String, _ region: String, official: Bool = false) -> MirrorEntry {
-            MirrorEntry(id: "alpine.\(id)", name: name, baseURL: url, testURL: url + base, category: .alpine, region: region, isOfficial: official)
+            MirrorEntry(id: "alpine.\(id)", name: name, baseURL: url, category: .alpine, region: region, isOfficial: official)
         }
         return [
             m("official", "Official CDN", "https://dl-cdn.alpinelinux.org/alpine/", "Global", official: true),
@@ -98,7 +106,7 @@ extension MirrorEntry {
     // MARK: Python pip
     private static let pipMirrors: [MirrorEntry] = {
         func m(_ id: String, _ name: String, _ url: String, _ region: String, official: Bool = false) -> MirrorEntry {
-            MirrorEntry(id: "pip.\(id)", name: name, baseURL: url, testURL: url, category: .pip, region: region, isOfficial: official)
+            MirrorEntry(id: "pip.\(id)", name: name, baseURL: url, category: .pip, region: region, isOfficial: official)
         }
         return [
             m("official", "Official PyPI", "https://pypi.org/simple/", "Global", official: true),
@@ -113,7 +121,7 @@ extension MirrorEntry {
     // MARK: Node.js npm
     private static let npmMirrors: [MirrorEntry] = {
         func m(_ id: String, _ name: String, _ url: String, _ region: String, official: Bool = false) -> MirrorEntry {
-            MirrorEntry(id: "npm.\(id)", name: name, baseURL: url, testURL: url, category: .npm, region: region, isOfficial: official)
+            MirrorEntry(id: "npm.\(id)", name: name, baseURL: url, category: .npm, region: region, isOfficial: official)
         }
         return [
             m("official", "Official npm", "https://registry.npmjs.org/", "Global", official: true),
@@ -330,11 +338,9 @@ final class MirrorSpeedTestViewModel: ObservableObject {
         }
 
         var request = URLRequest(url: url)
-        // Many regional APK/PyPI/npm mirrors reject HEAD (403/405) while
-        // serving normal package GET requests. Probe the same public endpoint
-        // with a bounded range so a mirror is not falsely marked unusable.
+        // Probe real metadata, never a generic landing page. Complete metadata
+        // is required for validation; this is still NOT an installation test.
         request.httpMethod = "GET"
-        request.setValue("bytes=0-1023", forHTTPHeaderField: "Range")
         request.timeoutInterval = 8
 
         let start = CFAbsoluteTimeGetCurrent()
@@ -346,8 +352,25 @@ final class MirrorSpeedTestViewModel: ObservableObject {
             let elapsed = CFAbsoluteTimeGetCurrent() - start
             let ms = Int(elapsed * 1000)
             let httpStatus = (response as? HTTPURLResponse)?.statusCode ?? 0
-            if httpStatus >= 400 {
+            guard httpStatus == 200 else {
                 return MirrorTestResult(mirror: mirror, latencyMs: nil, error: "HTTP \(httpStatus)")
+            }
+            let validMetadata: Bool
+            switch mirror.category {
+            case .alpine:
+                // Reject mirror landing pages returning HTTP 200 (e.g. Kakao).
+                validMetadata = data.starts(with: [0x1f, 0x8b])
+            case .pip:
+                let body = String(data: data, encoding: .utf8) ?? ""
+                validMetadata = body.contains("six-1.17.0-py2.py3-none-any.whl") && body.contains("sha256=")
+            case .npm:
+                let metadata = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+                let dist = metadata?["dist"] as? [String: Any]
+                validMetadata = metadata?["name"] as? String == "is-number"
+                    && dist?["tarball"] as? String != nil && dist?["integrity"] as? String != nil
+            }
+            guard validMetadata else {
+                return MirrorTestResult(mirror: mirror, latencyMs: nil, error: "Invalid package metadata")
             }
             return MirrorTestResult(mirror: mirror, latencyMs: ms, error: nil)
         } catch {
@@ -379,9 +402,10 @@ final class MirrorSpeedTestViewModel: ObservableObject {
     }
 
     /// Apply selected mirror to the rootfs config file. Backs up original as .bak first.
-    func applyMirror(for category: MirrorCategory) {
+    @discardableResult
+    func applyMirror(for category: MirrorCategory) -> Bool {
         guard let mirrorId = selectedMirrorId[category],
-              let mirror = MirrorEntry.allMirrors.first(where: { $0.id == mirrorId }) else { return }
+              let mirror = MirrorEntry.allMirrors.first(where: { $0.id == mirrorId }) else { return false }
 
         let dataPath = RootfsManager.shared.dataPath
         let configURL = dataPath.appendingPathComponent(category.configPath)
@@ -403,14 +427,13 @@ final class MirrorSpeedTestViewModel: ObservableObject {
         let content: String
         switch category {
         case .alpine:
-            content = "\(mirror.baseURL)v\(Self.alpineBranch())/main\n\(mirror.baseURL)v\(Self.alpineBranch())/community\n"
+            let branch = Self.alpineBranch()
+            let repository = branch == "edge" ? "edge" : "v\(branch)"
+            content = "\(mirror.baseURL)\(repository)/main\n\(mirror.baseURL)\(repository)/community\n"
         case .pip:
-            let host = URL(string: mirror.baseURL)?.host ?? ""
             content = """
             [global]
-            break-system-packages = true
             index-url = \(mirror.baseURL)
-            trusted-host = \(host)
 
             """
         case .npm:
@@ -420,22 +443,35 @@ final class MirrorSpeedTestViewModel: ObservableObject {
         do {
             try fm.createDirectory(at: configURL.deletingLastPathComponent(), withIntermediateDirectories: true)
             try content.write(to: configURL, atomically: true, encoding: .utf8)
+            RootfsManager.shared.ensureParentDirsInMetaDB(for: "/" + category.configPath)
+            RootfsManager.shared.ensureFakefsMetadata(for: "/" + category.configPath, isDirectory: false, mode: 0o100644)
             logger.info("Applied mirror \(mirror.name) to \(category.configPath)")
+            return true
         } catch {
             logger.error("Failed to write \(category.configPath): \(error)")
+            return false
         }
     }
 
     /// Alpine repositories must match the installed rootfs branch. Hard-coding
     /// v3.21 sends a 3.22 container to a v3.21 index, which then reports every
     /// package as missing.
-    static func alpineBranch() -> String {
+    nonisolated static func alpineBranch() -> String {
         let release = RootfsManager.shared.dataPath.appendingPathComponent("etc/alpine-release")
         if let text = try? String(contentsOf: release, encoding: .utf8) {
-            let parts = text.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: ".")
-            if parts.count >= 2 { return "\(parts[0]).\(parts[1])" }
+            let version = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if version.contains("_alpha") || version.contains("_git") || version == "edge" { return "edge" }
+            let parts = version.split(separator: ".")
+            if parts.count >= 2, Int(parts[0]) != nil, Int(parts[1]) != nil { return "\(parts[0]).\(parts[1])" }
         }
-        return "3.21"
+        return "3.21" // Bundled rootfs fallback only, never the device OS.
+    }
+
+    nonisolated static func alpineArchitecture() -> String {
+        let archURL = RootfsManager.shared.dataPath.appendingPathComponent("etc/apk/arch")
+        let arch = (try? String(contentsOf: archURL, encoding: .utf8))?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let supported = ["aarch64", "x86_64", "x86", "armhf", "armv7", "ppc64le", "s390x", "riscv64"]
+        return arch.flatMap { supported.contains($0) ? $0 : nil } ?? "aarch64"
     }
 
     /// Restore original config from .bak file.
@@ -455,6 +491,8 @@ final class MirrorSpeedTestViewModel: ObservableObject {
                 try fm.removeItem(at: configURL)
             }
             try fm.copyItem(at: bakURL, to: configURL)
+            RootfsManager.shared.ensureParentDirsInMetaDB(for: "/" + category.configPath)
+            RootfsManager.shared.ensureFakefsMetadata(for: "/" + category.configPath, isDirectory: false, mode: 0o100644)
             logger.info("Restored \(category.configPath) from .bak")
         } catch {
             logger.error("Failed to restore \(category.configPath): \(error)")
@@ -603,6 +641,8 @@ struct MirrorCategoryDetailView: View {
             }
 
             Section {
+                Text(AppLocalized("Latency checks package metadata only. A reachable mirror is not proof that packages or all dependencies install successfully."))
+                    .font(.caption).foregroundStyle(PokiTheme.secondaryText)
                 Button {
                     vm.runTest(for: category)
                 } label: {
@@ -700,7 +740,7 @@ struct MirrorCategoryDetailView: View {
                     .font(.caption.monospaced())
                     .foregroundStyle(ms < 200 ? .green : ms < 500 ? .orange : .red)
             } else {
-                Text(AppLocalized("Timeout"))
+                Text(result.error ?? AppLocalized("Failed"))
                     .font(.caption)
                     .foregroundStyle(PokiTheme.secondaryText)
             }

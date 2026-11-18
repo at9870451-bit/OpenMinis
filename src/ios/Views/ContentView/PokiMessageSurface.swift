@@ -57,20 +57,42 @@ struct PokiMessageBubbleShape: InsettableShape {
     }
 }
 
+/// Shared by live rows, context-menu previews and offscreen export hosts.
+/// Keep the key beside the surface so isolated component hosts can compile it
+/// without importing the entire chat row implementation.
+private struct ChatSnapshotRenderingKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    var chatSnapshotRendering: Bool {
+        get { self[ChatSnapshotRenderingKey.self] }
+        set { self[ChatSnapshotRenderingKey.self] = newValue }
+    }
+}
+
+/// Small, deterministic policy also usable by isolated component tests.
+enum PokiAssistantMessageSurfacePolicy {
+    static func usesOpaqueFill(reduceTransparency: Bool, snapshotRendering: Bool) -> Bool {
+        reduceTransparency || snapshotRendering
+    }
+}
+
 /// Paint only: no padding, frame, clipping or gesture on the hosted markdown.
-/// Keeping the shadow on the background shape also leaves selection handles,
-/// links, code attachments and TextKit's cell-sizing path untouched.
+/// Material/glass is clipped on this BACKGROUND only. Selection handles,
+/// links, code attachments and TextKit's cell-sizing path stay untouched.
 struct PokiAssistantMessageSurface: View {
     var isHighlighted = false
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.chatSnapshotRendering) private var snapshotRendering
 
     private var shape: PokiMessageBubbleShape {
         PokiMessageBubbleShape(direction: .incoming)
     }
 
     var body: some View {
-        shape
-            .fill(PokiTheme.assistantBubble)
+        paintedBackground
             .shadow(color: colorScheme == .light ? PokiTheme.bubbleShadow : .clear,
                     radius: 6, x: 0, y: 2)
             .overlay {
@@ -81,5 +103,32 @@ struct PokiAssistantMessageSurface: View {
             }
             .allowsHitTesting(false)
             .accessibilityHidden(true)
+    }
+
+    @ViewBuilder private var paintedBackground: some View {
+        if PokiAssistantMessageSurfacePolicy.usesOpaqueFill(
+            reduceTransparency: reduceTransparency, snapshotRendering: snapshotRendering
+        ) {
+            // Accessibility needs a predictable contrast surface; offscreen
+            // export has no live backdrop for material to sample. Both use the
+            // original opaque, adaptive system-grouped assistant bubble colour.
+            shape.fill(PokiTheme.assistantBubble)
+        } else {
+            #if compiler(>=6.2)
+            if #available(iOS 26.0, *) {
+                // No interactive glass: the surface must never own gestures.
+                Color.clear.glassEffect(.regular, in: shape).clipShape(shape)
+            } else {
+                materialBackground
+            }
+            #else
+            materialBackground
+            #endif
+        }
+    }
+
+    private var materialBackground: some View {
+        // A real system backdrop blur, not a translucent white/black fill.
+        shape.fill(.regularMaterial).clipShape(shape)
     }
 }

@@ -319059,6 +319059,282 @@
           }
         }
       }
+    },
+    "Companion appearance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Companion appearance"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "玩偶形象"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "玩偶形象"
+          }
+        }
+      }
+    },
+    "Dynamic robot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dynamic robot"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动态机器人"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "動態機器人"
+          }
+        }
+      }
+    },
+    "Custom avatar": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom avatar"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自定义头像"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自訂頭像"
+          }
+        }
+      }
+    },
+    "Let Agent design an avatar": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let Agent design an avatar"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "让 Agent 设计头像"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "讓 Agent 設計頭像"
+          }
+        }
+      }
+    },
+    "Online avatar design": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Online avatar design"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在线设计头像"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "線上設計頭像"
+          }
+        }
+      }
+    },
+    "Save your changes before asking Agent to design an avatar.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save your changes before asking Agent to design an avatar."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先保存修改，再让 Agent 设计头像。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請先儲存修改，再讓 Agent 設計頭像。"
+          }
+        }
+      }
+    },
+    "Ask Agent to create or revise an avatar using a configured image-output model. If none is configured, Agent will guide you to model settings. Generated images are only applied after native confirmation. Photos are never read automatically. Tap the preview to pick an image yourself; Save applies it. Clearing the custom avatar restores the dynamic robot. Display mode does not erase the saved avatar.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ask Agent to create or revise an avatar using a configured image-output model. If none is configured, Agent will guide you to model settings. Generated images are only applied after native confirmation. Photos are never read automatically. Tap the preview to pick an image yourself; Save applies it. Clearing the custom avatar restores the dynamic robot. Display mode does not erase the saved avatar."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用已配置的图像输出模型生成或修改头像；没有可用模型时会提示配置。新图像需经原生确认后应用，不自动读取相册。也可点预览自行选图并保存，清空后恢复动态机器人。切换显示模式不会删除头像。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用已設定的圖像輸出模型產生或修改頭像；沒有可用模型時會提示設定。新圖像須經原生確認後套用，不自動讀取相簿。亦可點預覽自行選圖並儲存，清空後恢復動態機器人。切換顯示模式不會刪除頭像。"
+          }
+        }
+      }
+    },
+    "Download and install online": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download and install online"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "联网下载并安装"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連線下載並安裝"
+          }
+        }
+      }
+    },
+    "Online Node installation or runtime verification failed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Online Node installation or runtime verification failed."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Node 在线安装或运行验证失败。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Node 線上安裝或執行驗證失敗。"
+          }
+        }
+      }
+    },
+    "Node.js, npm and npx ran successfully. AOJIT build matching is checked separately.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Node.js, npm and npx ran successfully. AOJIT build matching is checked separately."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Node.js、npm 和 npx 运行验证通过，AOJIT 构建匹配状态单独检查。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Node.js、npm 和 npx 執行驗證通過，AOJIT 建置匹配狀態另行檢查。"
+          }
+        }
+      }
+    },
+    "Another container operation is running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another container operation is running."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一个容器维护操作正在运行。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一個容器維護操作正在執行。"
+          }
+        }
+      }
+    },
+    "Could not apply the selected Alpine mirror. Nothing was installed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not apply the selected Alpine mirror. Nothing was installed."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法应用所选 Alpine 镜像，未安装任何软件包。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法套用所選 Alpine 鏡像，未安裝任何軟體套件。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

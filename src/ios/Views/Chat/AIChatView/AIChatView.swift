@@ -497,7 +497,9 @@ struct AIChatView: View {
     /// Default chat title for sessions without a generated title. Sourced
     /// from SOUL.md (`name`), falls back to "Minis". Refreshed on .soulMdChanged.
     @State var soulName: String = SoulStore.cachedMetadata.name.isEmpty
-        ? "Minis" : SoulStore.cachedMetadata.name
+        ? "Amore" : SoulStore.cachedMetadata.name
+    @ObservedObject private var companionProfile = AmoreCompanionProfile.shared
+    @AppStorage(AmoreCompanionMode.storageKey) private var companionMode = AmoreCompanionMode.auto.rawValue
 
     /// True when any sheet or fullScreenCover is presented (suppress auto-focus to avoid keyboard bugs).
     var hasOverlayPresented: Bool {
@@ -798,17 +800,16 @@ struct AIChatView: View {
                 AmoreConversationChrome(
                     home: vm.messages.isEmpty,
                     thinking: vm.isProcessing && (vm.messages.last?.shouldShowTypingIndicator ?? true),
-                    busy: vm.isProcessing, title: soulName, active: amoreDrawerProgress < 0.001,
+                    busy: vm.isProcessing, title: companionProfile.name, active: amoreDrawerProgress < 0.001,
+                    portrait: companionMode == AmoreCompanionMode.robot.rawValue ? nil : companionProfile.image,
+                    emoji: companionMode == AmoreCompanionMode.robot.rawValue ? "" : companionProfile.emoji,
+                    trailing: AnyView(trailingMenuButton
+                        .frame(width: 48, height: 48)
+                        .accessibilityLabel(Text(AppLocalized("Conversation options")))
+                        .accessibilityIdentifier("amore.conversationOptions")),
                     openThreads: { NotificationCenter.default.post(name: .amoreOpenConversations, object: nil) },
                     openModel: { showModelPicker = true }
                 )
-                HStack {
-                    Spacer()
-                    trailingMenuButton
-                        .frame(width: 44, height: 32)
-                        .accessibilityLabel(Text(AppLocalized("Conversation options")))
-                        .accessibilityIdentifier("amore.conversationOptions")
-                }.padding(.horizontal, 16)
                 topBanners
             }
                 .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
@@ -1393,6 +1394,12 @@ struct AIChatView: View {
         AnyView(chatImportContent
         .onAppear {
             wireComposerActions()
+            companionProfile.reload()
+            if let request = AmoreAvatarDraftRouter.shared.consume(for: vm.draftId,
+                    composerIsEmpty: vm.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && vm.attachments.isEmpty && vm.pastedTexts.isEmpty) {
+                vm.inputText = request
+                inputFocused = true
+            }
             // [OpenMinis#433] Back on screen with a page popped off it: this
             // new chat is in use again, so no other new chat may take it.
             ViewModelCache.shared.unparkNewChat(vm)

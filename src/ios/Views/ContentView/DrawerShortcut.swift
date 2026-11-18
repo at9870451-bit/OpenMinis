@@ -9,16 +9,24 @@ struct DrawerShortcutLabel: View {
     @ScaledMetric(relativeTo: .callout) private var minimumHeight = 48
     @Environment(\.dynamicTypeSize) private var typeSize
 
+    // Production shortcuts pass semantic primary/secondary. Resolve those to
+    // blue-panel ink, while preserving explicitly supplied coloured accents.
+    private var sidebarAccent: Color {
+        if accent == .primary { return PokiTheme.sidebarInk }
+        if accent == .secondary { return PokiTheme.sidebarHeading }
+        return accent
+    }
+
     var body: some View {
         HStack(alignment: .center, spacing: 9) {
             Image(systemName: symbol)
                 .font(.system(size: iconSize, weight: .medium))
-                .foregroundStyle(accent)
+                .foregroundStyle(sidebarAccent)
                 .frame(width: 26)
                 .accessibilityHidden(true)
             Text(title)
                 .font(.callout.weight(.medium))
-                .foregroundStyle(PokiTheme.primaryText)
+                .foregroundStyle(PokiTheme.sidebarInk)
                 .lineLimit(typeSize.isAccessibilitySize ? nil : 2)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)

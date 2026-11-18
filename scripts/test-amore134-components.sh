@@ -3,20 +3,27 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 HOST="${AMORE134_HOST:-${RUNNER_TEMP:-/tmp}/amore134-component-tests}"
 mkdir -p "$HOST/App" "$HOST/Tests" "$HOST/UITests"
-for name in AmoreTheme PokiDrawerMotion AmoreDrawerPresentation PokiComposerMaterial PokiControlSurface DrawerShortcut; do cp "$ROOT/src/ios/Views/ContentView/$name.swift" "$HOST/App/"; done
+for name in AmoreTheme PokiDrawerMotion AmoreDrawerPresentation PokiComposerMaterial PokiControlSurface DrawerShortcut PokiMessageSurface; do cp "$ROOT/src/ios/Views/ContentView/$name.swift" "$HOST/App/"; done
 for name in AmoreMarquee HomeShortcut AmoreHomeShortcutStore AmoreHomeMarqueePanel AmoreHomeShortcutCatalog AmoreHomeShortcutManager AmoreHomeMarqueeSource AmoreMarqueeClock; do cp "$ROOT/src/ios/Views/ContentView/Marquee/$name.swift" "$HOST/App/"; done
 cp "$ROOT/src/ios/Views/ContentView/Sidebar/AmoreSidebarShortcuts.swift" "$HOST/App/"
 cp "$ROOT/src/ios/Views/ContentView/Settings/SettingsFeatureIcon.swift" "$HOST/App/"
 cp "$ROOT/vendor/poki/native/ios-app/Poki/AmoreConversationChrome.swift" "$HOST/App/"
 cp "$ROOT/vendor/poki/native/ios-app/Poki/App/AmoreCompanion.swift" "$HOST/App/"
+cp "$ROOT/vendor/poki/native/ios-app/Poki/App/AmoreAnimatedPortrait.swift" "$HOST/App/"
+cp "$ROOT/vendor/poki/native/ios-app/Poki/AmoreAvatarPreview.swift" "$HOST/App/"
 cp "$ROOT/vendor/poki/native/ios-app/Poki/App/Glass.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/Chat/AIChatView/Support/ChatColors.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/ContentView/AmoreAvatarDraftRouter.swift" "$HOST/App/"
 cp "$ROOT/src/ios/Views/Chat/AIChatView/AmoreHomeActionRouter.swift" "$HOST/App/"
 cp "$ROOT/scripts/Amore134ComponentTests.swift" "$HOST/Tests/"
-python3 - "$ROOT/scripts/AmoreMarqueeReasoningTests.swift" "$HOST/Tests/AmoreMarqueeReasoningTests.swift" <<'PY'
+cp "$ROOT/scripts/Amore135CompanionTests.swift" "$HOST/Tests/"
+for name in AmoreMarqueeReasoningTests Amore135GlassSidebarTests; do
+python3 - "$ROOT/scripts/$name.swift" "$HOST/Tests/$name.swift" <<'PY'
 from pathlib import Path
 import sys
 Path(sys.argv[2]).write_text(Path(sys.argv[1]).read_text().replace('@testable import PokiComponents', '@testable import Amore134Components'))
 PY
+done
 cp "$ROOT/scripts/Amore134NavigationUITests.swift" "$HOST/UITests/"
 # Extract, never recreate, the production route and NavigationLink component.
 # Only the destination payload is overlaid: real device services cannot run here.

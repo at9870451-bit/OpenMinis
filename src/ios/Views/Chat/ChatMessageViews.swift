@@ -2,13 +2,13 @@ import SwiftUI
 
 // MARK: - Context-menu preview
 
-/// Opaque rounded-card preview shown under a message's long-press context menu.
+/// Direction-matched card shown under a message's long-press context menu.
 ///
 /// [T-ios-longpress-menu-preview-background] Cells have clear backgrounds and
 /// assistant menus attach to a zero-size Color.clear overlay. Keep an explicit
-/// opaque preview so its platter never shows messages underneath. User previews
-/// use the same blue/queued fill as their bubble; assistant previews use the
-/// adaptive white/system-grey surface.
+/// surface for the platter: users retain their blue/queued fill; assistants use
+/// the same clipped system material/glass as the live reply, with an opaque
+/// semantic fallback for Reduce Transparency and offscreen export.
 ///
 /// [T-ios-longpress-preview-full-content-card] Short previews hug their content;
 /// long ones scroll within a screen-height cap. The existing watchdog cap below
@@ -98,8 +98,8 @@ struct MessageContextMenuPreview: View {
     }
 }
 
-/// Opaque, layout-neutral background for the long-press platter. Match the
-/// message direction and queued state instead of reviving the old glass fill.
+/// Layout-neutral, direction-aware paint for the long-press platter. The
+/// assistant reuses the live material surface; user/queued fills are unchanged.
 private struct ContextMenuPreviewSurface: ViewModifier {
     let isOutgoing: Bool
     let isQueued: Bool
@@ -110,19 +110,6 @@ private struct ContextMenuPreviewSurface: ViewModifier {
         } else {
             content.background(PokiAssistantMessageSurface())
         }
-    }
-}
-
-/// [T-multi-select-share] Preserve the export environment contract. Bubble
-/// surfaces now use flat fills on every OS, including offscreen snapshots.
-private struct ChatSnapshotRenderingKey: EnvironmentKey {
-    static let defaultValue = false
-}
-
-extension EnvironmentValues {
-    var chatSnapshotRendering: Bool {
-        get { self[ChatSnapshotRenderingKey.self] }
-        set { self[ChatSnapshotRenderingKey.self] = newValue }
     }
 }
 

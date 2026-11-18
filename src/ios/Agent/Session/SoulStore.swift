@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import UIKit
+import Darwin
 
 /// [T-soul-custom-icon] Encode/decode for the Soul identity icon when the
 /// user picks an image rather than an emoji.
@@ -114,7 +115,7 @@ enum SoulIconImage {
 ///
 /// The picker path is `SoulIconImage.encode` and nothing here re-implements
 /// it: every image source below decodes to a `UIImage` and then goes through
-/// that one function, so alpha rejection, square cropping, the 96px cap and
+/// that one function, so alpha preservation, square cropping, the 96px cap and
 /// PNG re-encoding are shared by construction rather than by copy.
 ///
 /// Why resolution happens HERE and not in the field's `writer`:
@@ -277,6 +278,9 @@ enum SoulIconSource {
         guard let fileURL = AIChatViewModel.resolveMinisURL(url) else {
             throw SourceError.notFound(s)
         }
+        guard containingAllowedRoot(for: fileURL) != nil else {
+            throw SourceError.outsideAllowedDirs(s)
+        }
         return try readFile(at: fileURL, label: s)
     }
 
@@ -346,52 +350,84 @@ enum SoulIconSource {
     /// a URL it invents must not become a probe of the LAN or of link-local
     /// metadata endpoints.
     private static func download(_ s: String) async throws -> Data {
-        guard let url = URL(string: s), let scheme = url.scheme?.lowercased() else {
-            throw SourceError.badURL(s)
-        }
-        guard scheme == "http" || scheme == "https" else {
-            throw SourceError.badURL(s)
-        }
-        guard let host = url.host, !host.isEmpty else { throw SourceError.badURL(s) }
-        guard !isBlockedHost(host) else { throw SourceError.blockedHost(host) }
+        guard let url = URL(string: s) else { throw SourceError.badURL(s) }
+        try validateRemoteURL(url)
 
         var req = URLRequest(url: url)
         req.timeoutInterval = downloadTimeout
         req.httpMethod = "GET"
         req.setValue("image/*", forHTTPHeaderField: "Accept")
+        req.cachePolicy = .reloadIgnoringLocalCacheData
 
         let cfg = URLSessionConfiguration.ephemeral
         cfg.timeoutIntervalForRequest = downloadTimeout
         cfg.timeoutIntervalForResource = downloadTimeout
         cfg.httpCookieStorage = nil          // no ambient credentials
+        cfg.httpShouldSetCookies = false
         cfg.urlCredentialStorage = nil
+        cfg.urlCache = nil
         let session = URLSession(configuration: cfg)
         defer { session.invalidateAndCancel() }
 
-        let data: Data, response: URLResponse
+        // Check every redirect BEFORE following it, not after the private
+        // endpoint has already been contacted. Read incrementally so an
+        // unbounded/chunked response never buffers more than 8 MB here.
+        let delegate = DownloadDelegate()
         do {
-            (data, response) = try await session.data(for: req)
-        } catch {
-            throw SourceError.network(error.localizedDescription)
-        }
-
-        if let http = response as? HTTPURLResponse {
+            let (bytes, response) = try await session.bytes(for: req, delegate: delegate)
+            guard let http = response as? HTTPURLResponse else {
+                throw SourceError.badURL(s)
+            }
+            if let finalURL = http.url { try validateRemoteURL(finalURL) }
             guard (200...299).contains(http.statusCode) else {
                 throw SourceError.httpStatus(http.statusCode)
             }
-            // A redirect could have landed somewhere private; re-check.
-            if let finalHost = http.url?.host, isBlockedHost(finalHost) {
-                throw SourceError.blockedHost(finalHost)
+            guard response.expectedContentLength <= Int64(maxSourceBytes) else {
+                throw SourceError.tooLarge("the declared download")
             }
+            var data = Data()
+            for try await byte in bytes {
+                guard data.count < maxSourceBytes else {
+                    throw SourceError.tooLarge("the download")
+                }
+                data.append(byte)
+            }
+            // MIME is advisory; the shared image decoder is authoritative.
+            return data
+        } catch let error as SourceError {
+            throw error
+        } catch {
+            throw SourceError.network(error.localizedDescription)
         }
-        guard data.count <= maxSourceBytes else {
-            throw SourceError.tooLarge("the download is \(data.count / 1024) KB")
+    }
+
+    /// One gate shared by the initial URL and every redirect destination.
+    /// Hostname checks are lexical, NOT DNS pinning; see isBlockedHost.
+    static func validateRemoteURL(_ url: URL) throws {
+        guard let scheme = url.scheme?.lowercased(),
+              scheme == "http" || scheme == "https",
+              url.user == nil, url.password == nil,
+              let host = url.host, !host.isEmpty else {
+            throw SourceError.badURL(url.absoluteString)
         }
-        // MIME is advisory only — the real check is whether it decodes, which
-        // the caller does next. A server that mislabels a valid PNG should
-        // still work; a server that sends HTML will fail at decode with a
-        // clearer message than a MIME mismatch would give.
-        return data
+        guard !isBlockedHost(host) else { throw SourceError.blockedHost(host) }
+    }
+
+    private final class DownloadDelegate: NSObject, URLSessionTaskDelegate {
+        func urlSession(_ session: URLSession, task: URLSessionTask,
+                        willPerformHTTPRedirection response: HTTPURLResponse,
+                        newRequest request: URLRequest,
+                        completionHandler: @escaping (URLRequest?) -> Void) {
+            guard let url = request.url,
+                  (try? SoulIconSource.validateRemoteURL(url)) != nil,
+                  !(response.url?.scheme?.lowercased() == "https"
+                    && url.scheme?.lowercased() != "https") else {
+                // nil prevents the request; the caller sees the 3xx failure.
+                completionHandler(nil)
+                return
+            }
+            completionHandler(request)
+        }
     }
 
     /// Loopback, link-local, and RFC1918 space, plus the metadata addresses.
@@ -399,25 +435,57 @@ enum SoulIconSource {
     /// race against the connection's own resolution, so hostnames are allowed
     /// and the URLSession is instead denied ambient credentials.
     static func isBlockedHost(_ host: String) -> Bool {
-        let h = host.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
-        if h == "localhost" || h.hasSuffix(".localhost") || h.hasSuffix(".local") { return true }
-        if h == "::1" || h == "0:0:0:0:0:0:0:1" { return true }
-        // IPv6 unique-local / link-local
-        if h.hasPrefix("fc") || h.hasPrefix("fd") || h.hasPrefix("fe80:") { return true }
+        let h = host.lowercased()
+            .trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
+            .trimmingCharacters(in: CharacterSet(charactersIn: "."))
+        if h == "localhost" || h.hasSuffix(".localhost") || h.hasSuffix(".local")
+            || h.hasSuffix(".internal") || h.hasSuffix(".home.arpa") { return true }
+
+        if h.contains(":") {
+            // Parse bytes rather than prefixes: expanded IPv6, scoped literals
+            // and IPv4-mapped private addresses must not evade the same gate.
+            guard !h.contains("%") else { return true }
+            var address = in6_addr()
+            guard h.withCString({ inet_pton(AF_INET6, $0, &address) }) == 1 else { return true }
+            let bytes = withUnsafeBytes(of: &address) { Array($0) }
+            if bytes.prefix(12).allSatisfy({ $0 == 0 })
+                || (bytes.prefix(10).allSatisfy({ $0 == 0 }) && bytes[10] == 255 && bytes[11] == 255) {
+                return isBlockedHost(bytes.suffix(4).map { String($0) }.joined(separator: "."))
+            }
+            // Only global unicast (2000::/3); reject ULA, link/site local,
+            // multicast, unspecified and NAT64 well-known space.
+            guard bytes[0] & 0xe0 == 0x20 else { return true }
+            // Teredo and 6to4 can tunnel a private IPv4 destination.
+            if bytes[0] == 0x20 && bytes[1] == 0x02 { return true }
+            if bytes[0...3].elementsEqual([0x20, 0x01, 0x00, 0x00]) { return true }
+            return false
+        }
 
         let parts = h.split(separator: ".", omittingEmptySubsequences: false)
-        guard parts.count == 4, let a = Int(parts[0]), let b = Int(parts[1]),
-              Int(parts[2]) != nil, Int(parts[3]) != nil else {
-            return false        // a hostname, not a literal IPv4
+        if parts.count == 4, parts.allSatisfy({ part in
+            !part.isEmpty && part.allSatisfy({ $0.isASCII && $0.isNumber })
+                && (part.count == 1 || part.first != "0")
+                && (Int(part).map { (0...255).contains($0) } ?? false)
+        }), let a = Int(parts[0]), let b = Int(parts[1]) {
+            switch a {
+            case 0, 10, 127: return true
+            case 169 where b == 254: return true
+            case 172 where (16...31).contains(b): return true
+            case 192 where b == 168: return true
+            case 100 where (64...127).contains(b): return true
+            case 198 where b == 18 || b == 19: return true // benchmarking
+            case 224...255: return true // multicast / reserved / broadcast
+            default: return false
+            }
         }
-        switch a {
-        case 0, 10, 127: return true                    // this-network, private, loopback
-        case 169 where b == 254: return true            // link-local + AWS/GCP metadata
-        case 172 where (16...31).contains(b): return true
-        case 192 where b == 168: return true
-        case 100 where (64...127).contains(b): return true  // CGNAT
-        default: return false
-        }
+        // Reject legacy inet_aton spellings: 127.1, 2130706433,
+        // 0177.0.0.1 and 0x7f000001 may otherwise resolve as loopback.
+        if parts.allSatisfy({ part in
+            part.allSatisfy({ $0.isASCII && $0.isNumber }) || part.hasPrefix("0x")
+        }) { return true }
+        // No single-label intranet names. DNS names are still not pinned:
+        // a public-looking hostname can resolve/rebind to private addresses.
+        return !h.contains(".")
     }
 
     private static func isProbablyBareBase64(_ s: String) -> Bool {
@@ -1018,7 +1086,32 @@ enum SoulStore {
     }
 }
 
+/// Presentation only. Icon bytes continue to live exclusively in SoulStore.
+/// Shared with the chat's @AppStorage consumer; unknown values mean auto.
+enum AmoreCompanionMode: String, CaseIterable {
+    case auto, robot, image
+    static let storageKey = "amore.companion.mode"
+    static func resolved(_ raw: String) -> AmoreCompanionMode {
+        AmoreCompanionMode(rawValue: raw) ?? .auto
+    }
+    func usesCustomIcon(_ icon: String) -> Bool {
+        self != .robot && !icon.isEmpty
+    }
+}
+
+/// Settings emits only an editable chat request, never a model call or write.
+/// Main chat consumes userInfo["prompt"] as String and lets the user send it.
+enum AmoreAvatarDesignRequest {
+    static let promptKey = "prompt"
+    static let prompt = """
+    请帮我设计或修改 Amore 玩偶的头像。先了解我想要的形象与风格，再检查 minis-model-use list，仅使用已配置且声明 image_output 的模型；没有时请给出模型配置入口，不要伪造生成成功。除非我明确选择并提供图片，不要读取相册或其他个人照片。生成成功后展示真实本地 minis:// 图片结果；如果我希望应用头像，通过 minis-config set soul.icon 写入该 minis:// 地址，等待原生确认和保存成功后才说已更换。沿用 SOUL.md/SOUL.icon.png，不创建第二套头像存储，也不要直接改文件绕过确认。头像会中心裁成方形并规范为不超过 96px 的 PNG。
+    """
+}
+
 extension Notification.Name {
+    /// Main-thread, object nil, userInfo ["prompt": String]. Prefill only.
+    static let amoreRequestAvatarDesign = Notification.Name("AmoreRequestAvatarDesign")
+
     /// Posted on the main thread whenever SOUL.md has been (re-)written
     /// via SoulStore. Listeners refresh derived UI state.
     static let soulMdChanged = Notification.Name("MinisSoulMdChanged")

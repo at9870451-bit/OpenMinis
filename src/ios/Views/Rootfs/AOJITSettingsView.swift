@@ -515,6 +515,7 @@ final class AOJITSettingsModel: ObservableObject {
     @Published var fixing: String?
     @Published var fixError: String?
     @Published var fixNotice: String?
+    @Published var nodeRuntimeReady = false
 
     func setEnabled(_ on: Bool) {
         ISHKernel.setAOJITEnabled(on)
@@ -534,20 +535,22 @@ final class AOJITSettingsModel: ObservableObject {
         }
     }
 
-    /// Install the build the image was recorded from with apk, then re-check.
+    /// Node installs current packages online, not the historical AOJIT build.
+    /// ELF image matching is refreshed separately after installation.
     /// Only called from the confirmation dialog (AOJITSettingsSection).
     func fix(_ image: AOJITImage) {
         guard let spec = image.apkSpec, fixing == nil else { return }
         if image.module == "/usr/bin/node" {
-            guard !NodeOfflineRuntimeStore.shared.isInstalling else { return }
-            NodeOfflineRuntimeStore.shared.isInstalling = true
+            guard !NodeOnlineRuntime.shared.isInstalling else { return }
             fixing = image.id
             fixError = nil
             fixNotice = nil
+            nodeRuntimeReady = false
             Task {
-                do { fixNotice = try await NodeOfflineRuntime.shared.install() }
-                catch { fixError = error.localizedDescription }
-                NodeOfflineRuntimeStore.shared.isInstalling = false
+                do {
+                    fixNotice = try await NodeOnlineRuntime.shared.install()
+                    nodeRuntimeReady = NodeOnlineRuntime.shared.isReady
+                } catch { fixError = error.localizedDescription }
                 fixing = nil
                 refresh()
             }
@@ -675,16 +678,16 @@ struct AOJITSettingsSection: View {
         // user's container, which can replace (even downgrade) an installed
         // package. Say exactly what will be installed and let the user confirm.
         .confirmationDialog(
-            pendingFix.map { $0.module == "/usr/bin/node" ? AppLocalized("Install bundled Node.js and npm?") : AppLocalized("Install \($0.build.package)?") } ?? "",
+            pendingFix.map { $0.module == "/usr/bin/node" ? AppLocalized("Download Node.js and npm from the selected Alpine mirror?") : AppLocalized("Install \($0.build.package)?") } ?? "",
             isPresented: Binding(get: { pendingFix != nil }, set: { if !$0 { pendingFix = nil } }),
             titleVisibility: .visible,
             presenting: pendingFix
         ) { image in
-            Button(image.module == "/usr/bin/node" ? AppLocalized("Install offline") : AppLocalized("Install \(image.build.package)")) { model.fix(image) }
+            Button(image.module == "/usr/bin/node" ? AppLocalized("Download and install online") : AppLocalized("Install \(image.build.package)")) { model.fix(image) }
             Button("Cancel", role: .cancel) {}
         } message: { image in
             if image.module == "/usr/bin/node" {
-                Text(AppLocalized("Installs the Node.js and npm packages bundled with Amore without downloading from a mirror. Required dependency updates may be included. AOJIT matching is checked separately; this is not the recorded Node build."))
+                Text(AppLocalized("Requires internet. Runs apk update and apk add nodejs npm using your currently selected Alpine mirror (or the container's configured repositories). Required dependency updates may be included; existing packages are not removed and the rootfs is not reset. Node, npm and npx must all run before the runtime is ready. The mirror's current Node build is not assumed to match the recorded AOJIT build."))
             } else {
                 Text("Runs “apk add \(image.apkSpec ?? "")” in the Shell Container. If that exact build is no longer in the repository, it installs the repository's current \(image.name) build instead. Required dependency updates may be included.")
             }
@@ -712,6 +715,10 @@ struct AOJITSettingsSection: View {
                 Text(verbatim: image.name).font(.subheadline.weight(.semibold))
                 Spacer()
                 stateBadge(image)
+            }
+            if image.module == "/usr/bin/node", model.nodeRuntimeReady {
+                Text(AppLocalized("Runtime ready: node, npm and npx verified; AOJIT status is separate."))
+                    .font(.caption2).foregroundStyle(.green)
             }
             Text(image.binaries).font(.caption.monospaced()).foregroundStyle(PokiTheme.secondaryText)
             Text(image.affects).font(.caption).foregroundStyle(PokiTheme.secondaryText)
@@ -759,13 +766,7 @@ struct AOJITSettingsSection: View {
                     if model.fixing == image.id {
                         HStack(spacing: 6) { ProgressView().controlSize(.small); Text("Installing…") }
                     } else if image.module == "/usr/bin/node" {
-                        Text(AppLocalized("Install bundled Node.js and npm offline"))
-                    } else if image.module == "/usr/bin/node" {
-                        Text(AppLocalized("Install bundled Node.js and npm offline"))
-                    } else if image.module == "/usr/bin/node" {
-                        Text(AppLocalized("Install bundled Node.js and npm offline"))
-                    } else if image.module == "/usr/bin/node" {
-                        Text(AppLocalized("Install bundled Node.js and npm offline"))
+                        Text(AppLocalized("Download Node.js and npm online"))
                     } else if case .family = state {
                         Text("Install \(image.build.package) for full speed")
                     } else {
@@ -790,6 +791,8 @@ struct AOJITSettingsSection: View {
     }
 
     private func needsFix(_ image: AOJITImage) -> Bool {
+        // Even an exact Node ELF match says nothing about npm/npx working.
+        if image.module == "/usr/bin/node" { return !model.nodeRuntimeReady }
         switch model.states[image.id] {
         case .notInstalled, .mismatch, .family: return true
         default: return false
@@ -803,7 +806,12 @@ struct AOJITSettingsSection: View {
         } else {
             switch model.states[image.id] ?? .checking {
             case .checking: ProgressView().controlSize(.mini)
-            case .matched: badge("Ready", color: .green)
+            case .matched:
+                if image.module == "/usr/bin/node" {
+                    badge("AOJIT match", color: .green)
+                } else {
+                    badge("Ready", color: .green)
+                }
             case .family: badge("Partial", color: .blue)
             case .notInstalled: badge("Not installed", color: .secondary)
             case .mismatch: badge("No image", color: .orange)

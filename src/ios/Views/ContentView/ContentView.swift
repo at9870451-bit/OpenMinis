@@ -651,6 +651,24 @@ fusionNavigationCanvas
         .onReceive(NotificationCenter.default.publisher(for: .amoreOpenConversations)) { _ in
             snapDrawer(open: true)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .amoreRequestAvatarDesign)) { note in
+            guard let prompt = note.userInfo?[AmoreAvatarDesignRequest.promptKey] as? String,
+                  !prompt.isEmpty else { return }
+            activeToolSheet = nil
+            snapDrawer(open: false)
+            if isWideLayout {
+                let id = Self.makeNewSessionId()
+                AmoreAvatarDraftRouter.shared.enqueue(prompt: prompt, draftID: id)
+                selectedSessionId = id
+            } else {
+                let id = Self.makeNewSessionId()
+                AmoreAvatarDraftRouter.shared.enqueue(prompt: prompt, draftID: id)
+                navigationPath = NavigationPath()
+                currentStackSessionId = nil
+                homeSessionId = nil
+                homeDraftId = id
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .newChatRequested)) { _ in
             handleNewChatRequest()
         }

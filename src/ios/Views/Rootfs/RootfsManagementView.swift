@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RootfsManagementView: View {
     @StateObject private var viewModel = RootfsManagementViewModel()
-    @StateObject private var nodeInstall = NodeOfflineRuntimeStore.shared
+    @StateObject private var nodeInstall = NodeOnlineRuntime.shared
     @State private var showFileBrowser = false
 
     var body: some View {
@@ -74,9 +74,8 @@ struct RootfsManagementView: View {
 
             // [T-ios-aojit] AOT-compiled JIT images for the Shell Container.
             if viewModel.isInstalled {
-                NodeOfflineRuntimeSection()
-                    .disabled(viewModel.isProcessing)
                 AOJITSettingsSection()
+                    .disabled(viewModel.isProcessing)
             }
 
             // [T-container-network-dns GH#396]
@@ -244,12 +243,23 @@ class RootfsManagementViewModel: ObservableObject {
         }
     }
 
+    private func beginOperation() -> Bool {
+        guard !isProcessing, RootfsOperationGate.shared.begin() else {
+            lastOperationSuccess = false
+            resultMessage = AppLocalized("Another container operation is running.")
+            return false
+        }
+        return true
+    }
+
     func install() {
+        guard beginOperation() else { return }
         isProcessing = true
         statusMessage = "Installing rootfs..."
         resultMessage = nil
 
         DispatchQueue.global(qos: .userInitiated).async {
+            defer { RootfsOperationGate.shared.end() }
             do {
                 try RootfsManager.shared.installIfNeeded()
 
@@ -270,11 +280,13 @@ class RootfsManagementViewModel: ObservableObject {
     }
 
     func resetRootfs(keepUserData: Bool) {
+        guard beginOperation() else { return }
         isProcessing = true
         statusMessage = keepUserData ? "Backing up and resetting..." : "Resetting rootfs..."
         resultMessage = nil
 
         DispatchQueue.global(qos: .userInitiated).async {
+            defer { RootfsOperationGate.shared.end() }
             do {
                 let backup = try RootfsManager.shared.reset(keepUserData: keepUserData)
 
@@ -308,11 +320,13 @@ class RootfsManagementViewModel: ObservableObject {
             return
         }
 
+        guard beginOperation() else { return }
         isProcessing = true
         statusMessage = "Restoring user data..."
         resultMessage = nil
 
         DispatchQueue.global(qos: .userInitiated).async {
+            defer { RootfsOperationGate.shared.end() }
             do {
                 try RootfsManager.shared.restoreUserData(from: backupURL)
 
