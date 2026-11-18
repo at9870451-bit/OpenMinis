@@ -655,6 +655,7 @@ fusionNavigationCanvas
             guard let prompt = note.userInfo?[AmoreAvatarDesignRequest.promptKey] as? String,
                   !prompt.isEmpty else { return }
             activeToolSheet = nil
+            runtimePage = nil
             snapDrawer(open: false)
             if isWideLayout {
                 let id = Self.makeNewSessionId()
