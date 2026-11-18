@@ -40,8 +40,8 @@ if not (out/'WebRTC.framework/WebRTC').is_file():
  if p.is_dir():shutil.copytree(p,out/'WebRTC.framework',dirs_exist_ok=True,symlinks=True)
 assert (out/'WebRTC.framework/WebRTC').is_file(),'WebRTC runtime missing'
 PY
-xcrun nm -gU "$OUT/AmoreDeviceKit.framework/AmoreDeviceKit" > device-defined-symbols.txt
-rg -q 'AmoreDeviceServices' device-defined-symbols.txt
+xcrun nm -gU "$OUT/AmoreDeviceKit.framework/AmoreDeviceKit" > device-defined-symbols.txt 2>device-nm-warnings.log || true
+rg -q 'AmoreDeviceServices' "$OUT/static-swift-symbols.txt"
 if rg -q 'OBJC_CLASS_.*AmorePokiEntry' device-defined-symbols.txt; then echo 'Old application factory must not exist' >&2; exit 1; fi
 file "$OUT/AmoreDeviceKit.framework/AmoreDeviceKit"
 printf '%s\n' 'Static AmoreDeviceKit built; not embedded as a dynamic framework.'

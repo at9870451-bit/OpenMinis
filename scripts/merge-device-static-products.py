@@ -19,6 +19,8 @@ combined=out/'AmoreDeviceKit-all.a'
 subprocess.run(['xcrun','libtool','-static','-o',str(combined)]+[str(x) for x in inputs],check=True)
 combined.replace(out/'AmoreDeviceKit.framework/AmoreDeviceKit')
 (out/'static-link-inputs.json').write_text(json.dumps(proof,indent=2))
-assert any('AmoreDeviceServices' in s for s in covered)
+demangled=subprocess.run(['xcrun','swift-demangle','--compact'],input='\n'.join(sorted(covered)),text=True,capture_output=True,check=True).stdout
+(out/'static-swift-symbols.txt').write_text(demangled)
+assert 'AmoreDeviceServices' in demangled, 'Device service missing from demangled Swift symbols'
 assert not any('OBJC_CLASS_$_AmorePokiEntry' in s for s in covered)
 print('Merged',len(inputs),'static products; no separate application factory')

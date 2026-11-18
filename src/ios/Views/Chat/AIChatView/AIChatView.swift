@@ -805,10 +805,13 @@ struct AIChatView: View {
                     },
                     openModel: { showModelPicker = true }
                 )
-                Menu { trailingMenu } label: {
-                    Label(AppLocalized("Conversation options"), systemImage: "ellipsis")
-                        .font(.caption).padding(.horizontal, 12).padding(.vertical, 6)
-                }.accessibilityIdentifier("amore.conversationOptions")
+                HStack {
+                    Spacer()
+                    trailingMenuButton
+                        .frame(width: 44, height: 32)
+                        .accessibilityLabel(Text(AppLocalized("Conversation options")))
+                        .accessibilityIdentifier("amore.conversationOptions")
+                }.padding(.horizontal, 16)
                 topBanners
             }
                 .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in

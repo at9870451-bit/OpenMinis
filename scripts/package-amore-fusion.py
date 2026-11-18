@@ -9,6 +9,7 @@ for p in (kit/'Resources').iterdir():
  elif not dest.exists():shutil.copyfile(p,dest)
 exe=app/info['CFBundleExecutable'];links=subprocess.check_output(['xcrun','otool','-L',str(exe)],text=True);assert 'Poki.framework' not in links and 'AmoreDeviceKit.framework' not in links
 symbols=subprocess.check_output(['xcrun','nm',str(exe)],text=True)
+symbols=subprocess.run(['xcrun','swift-demangle','--compact'],input=symbols,text=True,capture_output=True,check=True).stdout
 assert 'AmorePokiEntry' not in symbols,'separate app factory must not be linked'
 assert 'AmoreDeviceServices' in symbols,'device services must be part of Amore binary'
 assert 'AIChatViewModel' in symbols,'original Amore agent must remain linked'
