@@ -188,6 +188,12 @@ extension AIChatView {
             .onGeometryChange(for: CGRect.self) { proxy in
                 proxy.frame(in: .global)
             } action: { frame in
+                // The sidebar's visual scale must not become a new transcript
+                // bottom inset. Preserve the settled editor height until close.
+                guard amoreDrawerProgress <= 0.001 else {
+                    inputBarHeightDebounce?.cancel()
+                    return
+                }
                 let newH = frame.size.height
                 // [voice-inputbar-padding-zero] Guard against transient 0.
                 guard newH > 0 else { return }

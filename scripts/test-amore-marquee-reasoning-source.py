@@ -60,10 +60,10 @@ class SourceContracts(unittest.TestCase):
         self.assertNotIn('remove(', hidden)
         self.assertNotIn('asyncAfter', s)
 
-    def test_catalog_has_18_unique_supported_entries(self):
+    def test_catalog_has_34_unique_supported_entries(self):
         s = read(MARQUEE / 'AmoreHomeShortcutCatalog.swift')
-        entries = re.findall(r'^\s+(?:prompt|page)\("([^"\n]+)"', s, re.M)
-        self.assertEqual(len(entries), 18)
+        entries = re.findall(r'^\s+(?:prompt|page|phone)\("([^"\n]+)"', s, re.M)
+        self.assertEqual(len(entries), 34)
         self.assertEqual(len(entries), len(set(entries)))
         self.assertTrue({'new-task','summarize','code','translate','shortcuts','rootfs'} <= set(entries))
         routes = read(ROOT / 'src/ios/Shared/DeepLinkRouter.swift')
@@ -84,7 +84,7 @@ class SourceContracts(unittest.TestCase):
         for value in ['amore.home.shortcuts.v1', 'storage: UserDefaults = .standard',
                       'func update(', 'func setHidden(', 'func restoreDefaults(',
                       'replacement.hidden = items[index].hidden', '!decoded.isEmpty',
-                      'storage.integer(forKey: catalogKey) < 2']:
+                      'storage.integer(forKey: catalogKey) < 3']:
             self.assertIn(value, store)
         manager = read(MARQUEE / 'AmoreHomeShortcutManager.swift')
         for value in ['AmoreShortcutRoutes.pages', 'try store.add(item)', 'try store.update(item)',

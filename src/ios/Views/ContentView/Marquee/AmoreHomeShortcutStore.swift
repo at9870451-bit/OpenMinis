@@ -26,14 +26,17 @@ final class AmoreHomeShortcutStore: ObservableObject {
         if let data = storage.data(forKey: key),
            let decoded = try? JSONDecoder().decode([AmoreHomeShortcut].self, from: data) {
             items = AmoreHomeShortcutPolicy.sanitized(decoded)
-            if storage.integer(forKey: catalogKey) < 2, !decoded.isEmpty {
+            if storage.integer(forKey: catalogKey) < 3, !decoded.isEmpty {
+                let previousDefaultIDs: Set<String> = storage.integer(forKey: catalogKey) >= 2
+                    ? Set(Self.defaults.filter { !$0.id.hasPrefix("phone-") }.map(\.id))
+                    : ["new-task", "summarize", "settings", "rootfs"]
                 items = AmoreHomeShortcutPolicy.upgrade(items, defaults: Self.defaults,
-                    previousDefaultIDs: ["new-task", "summarize", "settings", "rootfs"])
+                    previousDefaultIDs: previousDefaultIDs)
             }
         } else {
             items = Self.defaults
         }
-        storage.set(2, forKey: catalogKey)
+        storage.set(3, forKey: catalogKey)
         persist()
     }
 

@@ -27,11 +27,11 @@ final class AmoreMarqueeReasoningTests: XCTestCase {
     func testCatalogsHaveUniqueIDsValidActionsAndBalancedRows() {
         for chinese in [false, true] {
             let items = AmoreHomeShortcutCatalog.items(chinese: chinese)
-            XCTAssertEqual(items.count, 18)
+            XCTAssertEqual(items.count, 34)
             XCTAssertEqual(Set(items.map(\.id)).count, items.count)
             XCTAssertTrue(items.allSatisfy(AmoreShortcutRanking.valid))
             let rows = AmoreHomeShortcutPolicy.rows(items)
-            XCTAssertEqual(rows.map(\.count), [9, 9])
+            XCTAssertEqual(rows.map(\.count), [17, 17])
             XCTAssertEqual(rows.flatMap { $0 }, items)
             for item in items where item.action.kind == .page && item.action.value != "shortcuts" {
                 XCTAssertNotNil(AmoreShortcutRoutes.settingsURL(for: item.action.value))
