@@ -59,7 +59,6 @@ private struct OriginalPokiLoadFailure: View {
         }.padding(24)
     }
 }
-}
 
 /// Host-only switch between the preserved Amore engine and original source UI.
 /// A separate model/database avoids rewriting old Amore conversation records.
