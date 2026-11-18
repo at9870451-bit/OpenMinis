@@ -99,7 +99,7 @@ final class CachedViewModel: ObservableObject {
     /// observes all @Published changes through the @StateObject.
     private var cancellable: AnyCancellable?
 
-    init(sessionId: String?, initialGroupId: String? = nil) {
+    init(sessionId: String?, initialGroupId: String? = nil, requiresFreshDraft: Bool = false) {
         if let sessionId {
             let (cached, isNew) = ViewModelCache.shared.getOrCreate(for: sessionId)
             self.vm = cached
@@ -117,7 +117,7 @@ final class CachedViewModel: ObservableObject {
                 }
             }
             minisLogger.info("🔑DRAFT CachedViewModel.init sessionId=\(sessionId) vm=\(cached.vmInstanceId) isNew=\(isNew)")
-        } else if let parked = ViewModelCache.shared.takeParkedNewChat(groupId: initialGroupId) {
+        } else if !requiresFreshDraft, let parked = ViewModelCache.shared.takeParkedNewChat(groupId: initialGroupId) {
             // [OpenMinis#433] The new chat the user left with unsent text: pick
             // it up again, text, pasted-text buffer and attachments included.
             self.vm = parked
@@ -207,7 +207,8 @@ struct AIChatView: View {
         // re-init a no-op when the StateObject already exists. CachedViewModel.init
         // logs its own creation (🔑DRAFT), so the redundant per-init [SessionLoad]
         // line is dropped.
-        _cached = StateObject(wrappedValue: CachedViewModel(sessionId: sessionId, initialGroupId: initialGroupId))
+        let avatarDraft = sessionId == nil && draftId != nil && draftId == AmoreAvatarDraftRouter.shared.targetDraftID
+        _cached = StateObject(wrappedValue: CachedViewModel(sessionId: sessionId, initialGroupId: initialGroupId, requiresFreshDraft: avatarDraft))
         AIChatViewModel.onAppearTimestamp = CFAbsoluteTimeGetCurrent()
     }
     @StateObject private var oauth = ClaudeOAuthManager.shared
@@ -1395,7 +1396,7 @@ struct AIChatView: View {
         .onAppear {
             wireComposerActions()
             companionProfile.reload()
-            if let request = AmoreAvatarDraftRouter.shared.consume(for: vm.draftId,
+            if let request = AmoreAvatarDraftRouter.shared.consume(for: draftId,
                     composerIsEmpty: vm.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && vm.attachments.isEmpty && vm.pastedTexts.isEmpty) {
                 vm.inputText = request
                 inputFocused = true
