@@ -704,7 +704,7 @@ struct SetupChecklist: View {
         List {
             Section {
                 ForEach(SetupStep.shown) { step in
-                    NavigationLink(value: step) { SetupStepRow(step: step) }
+                    SetupStepLink(step: step) { SetupStepRow(step: step) }
                 }
             } footer: {
                 Text(model.setupReadyForUse ? "Everything Amore needs is in place." : "Amore needs every item ticked before an agent or the chat can use this iPhone. Items tick themselves when the phone can check them.")
@@ -758,6 +758,28 @@ struct SetupStepRow: View {
             return AppLocalization.text(LocalizedStringResource("Needed"))
         default: return AppLocalization.text(LocalizedStringResource("Needed"))
         }
+    }
+}
+
+/// Uses the exact original route type. The host NavigationStack registers it
+/// with amoreDeviceSetupDestinations(); original Poki stacks already register
+/// SetupStep. No disabled state is inherited from completion or tool opt-in.
+struct SetupStepLink<Content: View>: View {
+    let step: SetupStep
+    let content: Content
+
+    init(step: SetupStep, @ViewBuilder label: () -> Content) {
+        self.step = step
+        content = label()
+    }
+
+    var body: some View {
+        NavigationLink(value: step) {
+            content
+                .frame(maxWidth: .infinity, minHeight: 32, alignment: .leading)
+                .contentShape(.rect)
+        }
+        .accessibilityIdentifier("setup.step.\(step.rawValue)")
     }
 }
 
@@ -915,11 +937,17 @@ struct SetupGuide: View {
     var body: some View {
         NavigationStack {
             SetupStepPage(step: steps[index])
+                .environment(model)
+                .settingsPage()
                 .id(steps[index])
                 .toolbar {
-                    ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Close") { dismiss() }.accessibilityIdentifier("setup.guide.close")
+                    }
                     ToolbarItemGroup(placement: .bottomBar) {
-                        Button("Back", systemImage: "chevron.left") { index -= 1 }.disabled(index == 0)
+                        Button("Back", systemImage: "chevron.left") { index -= 1 }
+                            .disabled(index == 0)
+                            .accessibilityIdentifier("setup.guide.back")
                         Spacer()
                         Text("\(index + 1) of \(steps.count)").font(.footnote).foregroundStyle(Color(.secondaryLabel))
                         Spacer()

@@ -175,6 +175,7 @@ extension AIChatView {
             .overlay {
                 ComposerContextGlow(tier: vm.contextUsage?.tier ?? .normal)
             }
+            .modifier(AmoreDrawerComposerMotion())
             .frame(maxWidth: maxContentWidth)
             .padding(.horizontal, 18)
             .padding(.top, 6)

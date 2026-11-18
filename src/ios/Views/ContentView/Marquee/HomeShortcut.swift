@@ -5,7 +5,7 @@
 import Foundation
 
 struct AmoreHomeShortcut: Codable, Identifiable, Equatable, Sendable {
-    enum Kind: String, Codable, Sendable, CaseIterable { case prompt, page, link }
+    enum Kind: String, Codable, Sendable, CaseIterable, Hashable { case prompt, page, link }
     struct Action: Codable, Equatable, Sendable {
         var kind: Kind
         /// Prompt text, supported minis settings route, or HTTPS link.
@@ -59,15 +59,84 @@ enum AmoreShortcutRanking {
         return patterns.contains { text.lowercased().range(of: $0, options: .regularExpression) != nil }
     }
     static func valid(_ item: AmoreHomeShortcut) -> Bool {
-        guard !item.id.isEmpty, !item.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              item.title.count <= 100, item.action.value.count <= 8000 else { return false }
-        switch item.action.kind {
-        case .prompt: return !item.action.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        case .page: return supportedPages.contains(item.action.value)
+        !item.id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !item.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && item.title.count <= 100 && !item.symbol.isEmpty && item.symbol.count <= 100
+            && validAction(item.action)
+    }
+    static func validAction(_ action: AmoreHomeShortcut.Action) -> Bool {
+        guard action.value.count <= 8000 else { return false }
+        switch action.kind {
+        case .prompt: return !action.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        case .page: return supportedPages.contains(AmoreShortcutRoutes.canonicalPage(action.value))
         case .link:
-            guard let u = URL(string: item.action.value) else { return false }
-            return u.scheme == "https" && u.host != nil && u.user == nil && u.password == nil
+            guard let u = URL(string: action.value) else { return false }
+            return u.scheme?.lowercased() == "https" && u.host?.isEmpty == false
+                && u.user == nil && u.password == nil
         }
     }
-    static let supportedPages = ["providers", "model-groups", "skills", "memory", "storage", "logs", "appearance", "permissions", "rootfs", "developer", "mcp", "plugins", "shortcuts"]
+    static let supportedPages = AmoreShortcutRoutes.pages
+}
+
+/// Only destinations wired by DeepLinkRouter / SettingsSheet, plus the local manager.
+/// No guessed `views/*` paths; shortcuts is presented by the home source itself.
+enum AmoreShortcutRoutes {
+    static let pages = ["home", "providers", "model-groups", "usage", "skills", "soul", "tools",
+                        "memory", "storage", "mount-external", "shared-folders", "logs", "appearance",
+                        "background", "about", "permissions", "environments", "rootfs",
+                        "developer-connection", "mcp", "shortcuts"]
+    static func canonicalPage(_ page: String) -> String {
+        switch page {
+        case "developer": return "developer-connection"
+        case "mirrors": return "rootfs"
+        case "settings": return "home"
+        default: return page
+        }
+    }
+    static func settingsURL(for page: String) -> URL? {
+        let page = canonicalPage(page)
+        guard pages.contains(page), page != "shortcuts" else { return nil }
+        return URL(string: page == "home" ? "minis://settings" : "minis://settings/\(page)")
+    }
+}
+
+/// Pure presentation/data policy, independent of SwiftUI, storage and wall time.
+enum AmoreHomeShortcutPolicy {
+    static func shouldShow(messageCount: Int, input: String, attachmentCount: Int,
+                           pastedTextCount: Int, loadingVideoCount: Int,
+                           isLoading: Bool, isProcessing: Bool, isEditing: Bool) -> Bool {
+        messageCount == 0 && input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && attachmentCount == 0 && pastedTextCount == 0 && loadingVideoCount == 0
+            && !isLoading && !isProcessing && !isEditing
+    }
+    static func rows(_ items: [AmoreHomeShortcut]) -> [[AmoreHomeShortcut]] {
+        let split = (items.count + 1) / 2
+        return [Array(items.prefix(split)), Array(items.dropFirst(split))]
+    }
+    static func sanitized(_ items: [AmoreHomeShortcut]) -> [AmoreHomeShortcut] {
+        var seen = Set<String>()
+        return items.compactMap { value in
+            var item = value
+            if item.action.kind == .page { item.action.value = AmoreShortcutRoutes.canonicalPage(item.action.value) }
+            guard AmoreShortcutRanking.valid(item), seen.insert(item.id).inserted else { return nil }
+            return item
+        }
+    }
+    /// Upgrade the shipped four-item v1 catalog once. Respect edits, hides and deletions.
+    static func upgrade(_ items: [AmoreHomeShortcut], defaults: [AmoreHomeShortcut],
+                        previousDefaultIDs: Set<String>) -> [AmoreHomeShortcut] {
+        var result = sanitized(items)
+        for item in defaults {
+            if let index = result.firstIndex(where: { $0.id == item.id }) {
+                if previousDefaultIDs.contains(item.id), !result[index].edited {
+                    let hidden = result[index].hidden
+                    result[index] = item
+                    result[index].hidden = hidden
+                }
+            } else if !previousDefaultIDs.contains(item.id) {
+                result.append(item)
+            }
+        }
+        return result
+    }
 }

@@ -417,27 +417,8 @@ extension AIChatView {
                                 .layoutPriority(-1)
                         }
                         .buttonStyle(.plain)
-                        // Show the badge whenever thinking is enabled, and ALSO
-                        // when it's Off but the active model supports deep
-                        // thinking — the icon + "Off" pill is then a discoverable
-                        // entry point for turning it on (tap opens the level
-                        // sheet). The Off pill is gated on
-                        // `currentModelSupportsReasoning` so non-reasoning models
-                        // don't grow a dead toggle; an enabled level still shows
-                        // unconditionally (user may have opted in on an
-                        // unknown-capability model).
-                        if !vm.availableThinkingLevels.isEmpty,
-                           vm.currentThinkingLevel.isEnabled || vm.currentModelSupportsReasoning {
-                            thinkingLevelBadge
-                                .fixedSize()
-                                // Match the model-name line's descender
-                                // clearance so the badge sits on the same
-                                // baseline band and isn't clipped at the
-                                // navbar's bottom cutoff.
-                                // [T-navbar-title-model-gap] Match the
-                                // provider text's legacy clearance.
-                                .padding(.bottom, legacyLayout ? 1 : 4)
-                        }
+                        // Thinking intensity is now owned by the composer's +
+                        // menu, using the same VM level and model capability gate.
                     }
                 }
             }

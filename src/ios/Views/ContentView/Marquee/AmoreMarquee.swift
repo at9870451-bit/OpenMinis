@@ -86,7 +86,14 @@ final class AmoreMarqueeScrollView: UIScrollView {
     var speed: Double = 0
     var running = true { didSet { if running != oldValue { wake() } } }
     var active = true { didSet { if active != oldValue { wake() } } }
-    var stopped = false { didSet { if stopped != oldValue { wake() } } }
+    var stopped = false {
+        didSet {
+            if stopped != oldValue {
+                if stopped { clock.hold() }
+                wake()
+            }
+        }
+    }
     var start: CGFloat = 0
     var edgeFade: CGFloat = 0 { didSet { if edgeFade != oldValue { setNeedsLayout() } } }
     private(set) var stripHeight: CGFloat = 48
@@ -116,12 +123,7 @@ final class AmoreMarqueeScrollView: UIScrollView {
     private var laidWidth: CGFloat = 0
 
     private var link: CADisplayLink?
-    private var last: CFTimeInterval = 0
-    private var velocity: Double = 0
-    /// How far the row has gone by itself, kept within one period: the content's transform.
-    private var drift: Double = 0
-    private var held = false
-    private var resumeAt: CFTimeInterval = 0
+    private var clock = AmoreMarqueeClock()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -151,7 +153,7 @@ final class AmoreMarqueeScrollView: UIScrollView {
         contentRevision = revision
         if loops != self.loops {
             placed = false
-            drift = 0
+            clock.resetDrift()
             host.view.transform = .identity
         }
         self.spacing = spacing
@@ -236,47 +238,24 @@ final class AmoreMarqueeScrollView: UIScrollView {
     /// The clock runs while the row has something to do: it is in front, and it goes by itself or
     /// is still coming to rest.
     private func wake() {
-        let needed = active && loops && (running || abs(velocity) > 0.05)
+        let needed = active && loops && !stopped && (running || abs(clock.velocity) > 0.05)
         guard let link, link.isPaused == needed else { return }
         link.isPaused = !needed
-        last = 0
+        clock.resetTimestamp()
     }
 
     @objc private func tick(_ link: CADisplayLink) { advance(to: link.targetTimestamp) }
 
     /// Deterministic production tick, also exercised by simulator tests.
     func advance(to now: CFTimeInterval) {
-        let delta = last > 0 ? min(max(0, now - last), 0.1) : 0
-        last = now
-        guard loops, period > 0 else { return }
-        if isTracking || isDragging || isDecelerating || stopped {
-            // A finger is on the row, the row still glides from its flick, or a pill's menu is open:
-            // it stops going by itself at once and is the scroll view's to move.
-            held = true
-            velocity = 0
-            AmoreMarqueeLog.note(self, now, "held")
-            return
-        }
-        if held {
-            held = false
-            resumeAt = now + Self.rest
-        }
-        let target = running && now >= resumeAt ? speed : 0
-        velocity += (target - velocity) * delta * 3
-        if target == 0, abs(velocity) <= 0.05 {
-            // At rest the content sits on whole pixels, so its text is sharp.
-            velocity = 0
-            let scale = max(traitCollection.displayScale, 1)
-            drift = (drift * scale).rounded() / scale
-            host.view.transform = CGAffineTransform(translationX: -drift, y: 0)
-            AmoreMarqueeLog.note(self, now, "rest")
-            wake()
-            return
-        }
-        drift = (drift + velocity * delta).truncatingRemainder(dividingBy: period)
-        if drift < 0 { drift += period }
-        host.view.transform = CGAffineTransform(translationX: -drift, y: 0)
-        AmoreMarqueeLog.note(self, now, "auto")
+        guard active, loops, period > 0 else { return }
+        let state = clock.advance(to: now, period: Double(period), speed: speed,
+                                  running: running,
+                                  touching: isTracking || isDragging || isDecelerating || stopped,
+                                  scale: Double(traitCollection.displayScale))
+        host.view.transform = CGAffineTransform(translationX: -clock.drift, y: 0)
+        AmoreMarqueeLog.note(self, now, state)
+        if state == "rest" { wake() }
     }
 
     var animationClockPaused: Bool { link?.isPaused ?? true }
@@ -292,9 +271,9 @@ final class AmoreMarqueeScrollView: UIScrollView {
     }
 
     /// Where the row is, as the scroll view's position plus what it went by itself.
-    var shown: Double { Double(bounds.origin.x) + drift }
+    var shown: Double { Double(bounds.origin.x) + clock.drift }
     var finger: CGFloat { panGestureRecognizer.location(in: nil).x }
-    var pace: Double { velocity }
+    var pace: Double { clock.velocity }
 }
 
 /// No per-frame disk writes. Runtime counters are read only by component tests.

@@ -349,12 +349,23 @@ struct PressedDimStyle: ButtonStyle {
 struct ConnectionView: View {
     @Environment(AppModel.self) private var model
     var stopHost: () -> Void = {}
+    /// Amore's separate tool opt-in. Nil in original Poki; setup remains usable
+    /// with this off, including already-completed steps and the guide.
+    var agentControl: Binding<Bool>? = nil
     @State private var guiding = false
 
     private var on: Bool { model.sessionOn && !model.ownerPaused }
 
     var body: some View {
         List {
+            if let agentControl {
+                Section {
+                    Toggle(isOn: agentControl) {
+                        Text(verbatim: AppLocalization.text("Allow Amore Agent to control this iPhone"))
+                    }
+                    .accessibilityIdentifier("connection.amoreAgentControl")
+                }
+            }
             Section {
                 Toggle(isOn: Binding(get: { on }, set: set)) {
                     SettingsRow(title: "Automation", symbol: "hand.tap")
@@ -395,7 +406,7 @@ struct ConnectionView: View {
             Section {
                 ForEach(SetupStep.shown) { step in
                     let done = model.stepReadyForUse(step)
-                    NavigationLink(value: step) {
+                    SetupStepLink(step: step) {
                         SettingsRow(title: step.rowTitle, symbol: step.symbol, value: done ? nil : AppLocalization.text(LocalizedStringResource("Turn On")),
                                     warns: !done, accessory: done ? .done : nil)
                     }
@@ -416,6 +427,7 @@ struct ConnectionView: View {
         .onAppear { model.loopback.resume(); model.diskImage.notice() }
         .sheet(isPresented: $guiding) {
             SetupGuide(start: SetupStep.shown.first { !model.stepReadyForUse($0) })
+                .environment(model)
         }
     }
 

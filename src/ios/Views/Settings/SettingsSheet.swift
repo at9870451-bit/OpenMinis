@@ -9,6 +9,7 @@
 //
 
 import SwiftUI
+import SafariServices
 import AmoreDeviceKit
 
 // MARK: - Settings Sheet
@@ -40,6 +41,14 @@ private enum SettingsDestination: Hashable {
     case mcpServerDetail(serverId: String)
     case developerConnection
     case homeShortcuts
+    // Local shortcuts use these routes without changing the shared deep-link enum.
+    case subAgents
+    case rootfs
+    case terminal
+    case plugins
+    case cloudSync
+    case backupRestore
+    case biometricProtection
 }
 
 struct SettingsSheet: View {
@@ -49,33 +58,37 @@ struct SettingsSheet: View {
     var embedded: Bool = false
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var deepLink = DeepLinkCoordinator.shared
+    @ObservedObject private var sidebarRouter = AmoreSettingsShortcutRouter.shared
     @State private var navPath = NavigationPath()
     @State private var showFeedbackDialog = false
+    @State private var showPrivacyPolicy = false
 
     var body: some View {
         NavigationStack(path: $navPath) {
+            // Destinations belong to this eager stack child, never to a lazy List row.
+            VStack(spacing: 0) {
             List {
                 Section {
                     NavigationLink {
                         ProviderInstancesView()
                     } label: {
                         if #available(iOS 26, *) {
-                            Label("Manage Providers", systemImage: "key.circle.fill")
+                            Label { Text("Manage Providers") } icon: { SettingsFeatureIcon(symbol: "key.circle.fill", feature: .providers) }
                         } else {
-                            Label("Manage Providers", systemImage: "lock.circle.fill")
+                            Label { Text("Manage Providers") } icon: { SettingsFeatureIcon(symbol: "lock.circle.fill", feature: .providers) }
                         }
                     }
 
                     NavigationLink {
                         ModelGroupsView()
                     } label: {
-                        Label("Model Groups", systemImage: "gearshape.circle.fill")
+                        Label { Text("Model Groups") } icon: { SettingsFeatureIcon(symbol: "gearshape.circle.fill", feature: .modelGroups) }
                     }
 
                     NavigationLink {
                         UsageStatsView()
                     } label: {
-                        Label("Token Usage", systemImage: "chart.line.uptrend.xyaxis.circle.fill")
+                        Label { Text("Token Usage") } icon: { SettingsFeatureIcon(symbol: "chart.line.uptrend.xyaxis.circle.fill", feature: .usage) }
                     }
                 } header: {
                     Text("LLM Providers")
@@ -84,15 +97,12 @@ struct SettingsSheet: View {
                 }
 
                 Section("Appearance") {
-                    NavigationLink {
-                        DeveloperConnectionView()
-                    } label: {
-                        Label { Text(AppLocalized("Connect developer tools")) } icon: { SettingsFeatureIcon(symbol: "point.3.connected.trianglepath.dotted", color: PokiTheme.agentPurple) }
+                    NavigationLink(value: SettingsDestination.developerConnection) {
+                        Label { Text(AppLocalized("Connect developer tools")) } icon: { SettingsFeatureIcon(symbol: "point.3.connected.trianglepath.dotted", feature: .developerConnection) }
                     }
-                    NavigationLink {
-                        HomeShortcutsSettingsView()
-                    } label: {
-                        Label { Text(AppLocalized("Home shortcuts")) } icon: { SettingsFeatureIcon(symbol: "rectangle.3.group.bubble.left.fill", color: PokiTheme.toolOrange) }
+                    .accessibilityIdentifier("settings.developerConnection")
+                    NavigationLink(value: SettingsDestination.homeShortcuts) {
+                        Label { Text(AppLocalized("Home shortcuts")) } icon: { SettingsFeatureIcon(symbol: "rectangle.3.group.bubble.left.fill", feature: .homeShortcuts) }
                     }
                     NavigationLink {
                         AppearanceSettingsView()
@@ -100,11 +110,7 @@ struct SettingsSheet: View {
                         Label {
                             Text("Appearance")
                         } icon: {
-                            Image(systemName: "paintbrush.fill")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "paintbrush.fill", feature: .appearance)
                         }
                     }
                 }
@@ -117,11 +123,7 @@ struct SettingsSheet: View {
                         Label {
                             Text(AppLocalized("Agent Tools"))
                         } icon: {
-                            Image(systemName: "wrench.and.screwdriver.fill")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "wrench.and.screwdriver.fill", feature: .tools)
                         }
                     }
                     // [T-sub-agents-v1] Directly under Agent Tools: the two pages
@@ -133,17 +135,7 @@ struct SettingsSheet: View {
                         Label {
                             Text(AppLocalized("Sub Agents"))
                         } icon: {
-                            // [T-agent-icon] Same violet and glyph the agent block
-                            // and tool sheet use in chat, so the settings row reads
-                            // as the same feature. `glyph` is the bare figure pair
-                            // meant for a caller that already draws the disc — the
-                            // wider person.2.wave.2 reached the edge of the 21pt
-                            // circle at this section's icon size.
-                            Image(systemName: HelperAccent.glyph)
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: HelperAccent.glyph, feature: .subAgents)
                         }
                     }
                     NavigationLink {
@@ -152,11 +144,7 @@ struct SettingsSheet: View {
                         Label {
                             Text("Skills")
                         } icon: {
-                            Image(systemName: "puzzlepiece.extension")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "puzzlepiece.extension", feature: .skills)
                         }
                     }
                     NavigationLink {
@@ -165,27 +153,23 @@ struct SettingsSheet: View {
                         Label {
                             Text("Soul")
                         } icon: {
-                            Image(systemName: "sparkles")
-                                .font(.system(size: 11))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "sparkles", feature: .soul)
                         }
                     }
                     NavigationLink {
                         RootfsManagementView()
                     } label: {
-                        Label(AppLocalized("Rootfs"), systemImage: "externaldrive")
+                        Label { Text(AppLocalized("Rootfs")) } icon: { SettingsFeatureIcon(symbol: "externaldrive", feature: .rootfs) }
                     }
                     NavigationLink {
                         ISHTerminalView()
                     } label: {
-                        Label(AppLocalized("Terminal"), systemImage: "terminal")
+                        Label { Text(AppLocalized("Terminal")) } icon: { SettingsFeatureIcon(symbol: "terminal", feature: .terminal) }
                     }
                     NavigationLink {
                         AmoreMarketplaceView()
                     } label: {
-                        Label(AppLocalized("Plugin Marketplace"), systemImage: "shippingbox")
+                        Label { Text(AppLocalized("Plugin Marketplace")) } icon: { SettingsFeatureIcon(symbol: "shippingbox", feature: .plugins) }
                     }
                     NavigationLink {
                         MemoryManagementView()
@@ -193,11 +177,7 @@ struct SettingsSheet: View {
                         Label {
                             Text("Memory")
                         } icon: {
-                            Image(systemName: "brain.head.profile")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "brain.head.profile", feature: .memory)
                         }
                     }
                     NavigationLink {
@@ -206,11 +186,7 @@ struct SettingsSheet: View {
                         Label {
                             Text(AppLocalized("Context Compression"))
                         } icon: {
-                            Image(systemName: "arrow.down.right.and.arrow.up.left")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "arrow.down.right.and.arrow.up.left", feature: .contextCompression)
                         }
                     }
                     NavigationLink {
@@ -219,11 +195,7 @@ struct SettingsSheet: View {
                         Label {
                             Text("MCP Integrations")
                         } icon: {
-                            Image(systemName: "square.stack.3d.up")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "square.stack.3d.up", feature: .mcp)
                         }
                     }
                     NavigationLink {
@@ -232,11 +204,7 @@ struct SettingsSheet: View {
                         Label {
                             Text("Environment Variables")
                         } icon: {
-                            Image(systemName: "terminal")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "terminal", feature: .environments)
                         }
                     }
                 }
@@ -248,11 +216,7 @@ struct SettingsSheet: View {
                         Label {
                             Text("Storage")
                         } icon: {
-                            Image(systemName: "archivebox")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "archivebox", feature: .storage)
                         }
                     }
                     NavigationLink {
@@ -261,11 +225,7 @@ struct SettingsSheet: View {
                         Label {
                             Text("Shared Folders")
                         } icon: {
-                            Image(systemName: "folder.fill.badge.person.crop")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "folder.fill.badge.person.crop", feature: .sharedFolders)
                         }
                     }
                     NavigationLink {
@@ -274,11 +234,7 @@ struct SettingsSheet: View {
                         Label {
                             Text("Mount External Folders")
                         } icon: {
-                            Image(systemName: "externaldrive.badge.plus")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "externaldrive.badge.plus", feature: .mountedFolders)
                         }
                     }
                     if #available(iOS 17.0, *) {
@@ -290,11 +246,7 @@ struct SettingsSheet: View {
                             Label {
                                 Text("iCloud Sync")
                             } icon: {
-                                Image(systemName: "icloud")
-                                    .font(.system(size: 9))
-                                    .foregroundStyle(PokiTheme.primaryButtonText)
-                                    .frame(width: 21, height: 21)
-                                    .background(PokiTheme.primaryButton, in: Circle())
+                                SettingsFeatureIcon(symbol: "icloud", feature: .iCloud)
                             }
                         }
                     }
@@ -309,11 +261,7 @@ struct SettingsSheet: View {
                         } icon: {
                             // arrow.triangle.2.circlepath reads as a round trip
                             // rather than a one-way export.
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "arrow.triangle.2.circlepath", feature: .backup)
                         }
                     }
                 }
@@ -325,11 +273,7 @@ struct SettingsSheet: View {
                         Label {
                             Text("Permissions")
                         } icon: {
-                            Image(systemName: "lock.shield")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "lock.shield", feature: .permissions)
                         }
                     }
                     if BiometricAuth.isAvailable {
@@ -339,13 +283,7 @@ struct SettingsSheet: View {
                             Label {
                                 Text("\(BiometricAuth.biometryDisplayName) Protection")
                             } icon: {
-                                // Match SF Symbol to the device's actual sensor — Touch ID
-                                // devices showed a Face ID glyph here before.
-                                Image(systemName: BiometricAuth.biometryIconName)
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(PokiTheme.primaryButtonText)
-                                    .frame(width: 21, height: 21)
-                                    .background(PokiTheme.primaryButton, in: Circle())
+                                SettingsFeatureIcon(symbol: BiometricAuth.biometryIconName, feature: .biometric)
                             }
                         }
                     }
@@ -358,11 +296,7 @@ struct SettingsSheet: View {
                         Label {
                             Text("Logs")
                         } icon: {
-                            Image(systemName: "doc.text")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "doc.text", feature: .logs)
                         }
                     }
                 }
@@ -374,22 +308,14 @@ struct SettingsSheet: View {
                         Label {
                             Text("About Minis")
                         } icon: {
-                            Image(systemName: "info")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "info", feature: .about)
                         }
                     }
-                    Link(destination: URL(string: "https://openminis.github.io/privacy-policy.html")!) {
+                    Button { showPrivacyPolicy = true } label: {
                         Label {
                             Text("Privacy Policy")
                         } icon: {
-                            Image(systemName: "hand.raised")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "hand.raised", feature: .privacy)
                         }
                     }
                     Button {
@@ -398,29 +324,15 @@ struct SettingsSheet: View {
                         Label {
                             Text("Feedback")
                         } icon: {
-                            Image(systemName: "bubble.left.and.bubble.right.fill")
-                                .font(.system(size: 9))
-                                .foregroundStyle(PokiTheme.primaryButtonText)
-                                .frame(width: 21, height: 21)
-                                .background(PokiTheme.primaryButton, in: Circle())
+                            SettingsFeatureIcon(symbol: "bubble.left.and.bubble.right.fill", feature: .feedback)
                         }
                     }
                     .foregroundStyle(PokiTheme.primaryText)
-                    .confirmationDialog("Feedback", isPresented: $showFeedbackDialog, titleVisibility: .visible) {
-                        Button("Report a Bug (GitHub)") {
-                            if let url = Self.makeBugReportURL() { UIApplication.shared.open(url) }
-                        }
-                        Button("Feedback (Telegram)") {
-                            if let url = URL(string: "https://t.me/+2NzhOJuzRyI1YmM1") { UIApplication.shared.open(url) }
-                        }
-                        Button("Feedback (Email)") {
-                            if let url = Self.makeFeedbackEmailURL() { UIApplication.shared.open(url) }
-                        }
-                        Button("Cancel", role: .cancel) {}
-                    }
                 }
 
             }
+            }
+            .amoreDeviceSetupDestinations()
             .pokiScreen()
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -487,10 +399,33 @@ struct SettingsSheet: View {
                     DeveloperConnectionView()
                 case .homeShortcuts:
                     HomeShortcutsSettingsView()
+                case .subAgents:
+                    HelperSettingsView()
+                case .rootfs:
+                    RootfsManagementView()
+                case .terminal:
+                    ISHTerminalView()
+                case .plugins:
+                    AmoreMarketplaceView()
+                case .cloudSync:
+                    if #available(iOS 17.0, *) { CloudSyncSettingsV2View() }
+                case .backupRestore:
+                    BackupAndRestoreView()
+                case .biometricProtection:
+                    if BiometricAuth.isAvailable { FaceIDProtectionSettingsView() }
                 }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .amoreOpenSidebarDestination)) { _ in
+                // The host stores before posting. An onChange/onAppear may have
+                // already consumed it: never navigate twice for the same event.
+                if let payload = sidebarRouter.consume() { applySidebarDestination(payload) }
+            }
+            .onChange(of: sidebarRouter.pending) { _ in
+                if let payload = sidebarRouter.consume() { applySidebarDestination(payload) }
             }
             .onAppear {
                 applyPendingDeepLink()
+                if let payload = sidebarRouter.consume() { applySidebarDestination(payload) }
                 // Legacy flags — kept so older call sites keep working.
                 if deepLink.showEnvironmentVariables {
                     navPath.append(SettingsDestination.environments)
@@ -522,6 +457,62 @@ struct SettingsSheet: View {
             }
         }
         .appFontScale()
+        // The sidebar can request Feedback before the lazy last row exists.
+        .confirmationDialog("Feedback", isPresented: $showFeedbackDialog, titleVisibility: .visible) {
+            Button("Report a Bug (GitHub)") {
+                if let url = Self.makeBugReportURL() { UIApplication.shared.open(url) }
+            }
+            Button("Feedback (Telegram)") {
+                if let url = URL(string: "https://t.me/+2NzhOJuzRyI1YmM1") { UIApplication.shared.open(url) }
+            }
+            Button("Feedback (Email)") {
+                if let url = Self.makeFeedbackEmailURL() { UIApplication.shared.open(url) }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .sheet(isPresented: $showPrivacyPolicy) {
+            SettingsPrivacyBrowser(url: URL(string: "https://openminis.github.io/privacy-policy.html")!)
+                .ignoresSafeArea()
+        }
+    }
+
+    /// Contract for `amoreOpenSidebarDestination`. The host calls
+    /// AmoreSettingsShortcutRouter.shared.open(payload) before presentation;
+    /// onAppear/onChange/onReceive all consume that same replayable slot.
+    static let supportedShortcutDestinations: Set<String> = [
+        "home-shortcuts", "marquee", "context-compression", "plugin-marketplace",
+        "icloud-sync", "backup-restore", "biometric-protection", "privacy-policy", "feedback",
+        "developer-connection", "connection", "sub-agents", "rootfs", "terminal"
+    ]
+
+    func applySidebarDestination(_ route: String) {
+        let destination: SettingsDestination
+        switch route {
+        case "home-shortcuts", "marquee": destination = .homeShortcuts
+        case "context-compression": destination = .contextCompression
+        case "plugin-marketplace": destination = .plugins
+        case "icloud-sync":
+            guard #available(iOS 17.0, *) else { return }
+            destination = .cloudSync
+        case "backup-restore": destination = .backupRestore
+        case "biometric-protection":
+            guard BiometricAuth.isAvailable else { return }
+            destination = .biometricProtection
+        case "developer-connection", "connection": destination = .developerConnection
+        case "sub-agents": destination = .subAgents
+        case "rootfs": destination = .rootfs
+        case "terminal": destination = .terminal
+        case "privacy-policy":
+            showPrivacyPolicy = true
+            return
+        case "feedback":
+            navPath = NavigationPath()
+            showFeedbackDialog = true
+            return
+        default: return
+        }
+        navPath = NavigationPath()
+        navPath.append(destination)
     }
 
     /// Translate `DeepLinkCoordinator.pendingSettingsTarget` into a
@@ -690,6 +681,15 @@ struct SettingsSheet: View {
         }
         return id.isEmpty ? UIDevice.current.model : id
     }
+}
+
+/// Settings privacy opens in-app and returns to the same settings stack.
+private struct SettingsPrivacyBrowser: UIViewControllerRepresentable {
+    let url: URL
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        SFSafariViewController(url: url)
+    }
+    func updateUIViewController(_ controller: SFSafariViewController, context: Context) {}
 }
 
 // MARK: - Context Compression Settings
@@ -1032,87 +1032,19 @@ struct AmoreMarketplaceView: View {
     }
 }
 
-struct SettingsFeatureIcon: View {
-    let symbol: String
-    let color: Color
-    var body: some View {
-        Image(systemName: symbol)
-            .font(.system(size: 10, weight: .semibold))
-            .foregroundStyle(.white)
-            .frame(width: 24, height: 24)
-            .background(color, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-    }
-}
-
 struct DeveloperConnectionView: View {
-    @AppStorage("amore.deviceControl.enabled") private var enabled = false
     var body: some View {
-        VStack(spacing: 0) {
-            Toggle(AppLocalized("Allow Amore Agent to control this iPhone"), isOn: Binding(
-                get: { enabled }, set: { enabled = $0; AmoreDeviceServices.setEnabled($0) }
-            ))
-            .padding(.horizontal, 20).padding(.vertical, 12)
-            AmoreDeviceConnectionPage()
-        }
-        .navigationTitle(AppLocalized("Connection"))
-        .navigationBarTitleDisplayMode(.inline)
+        // Connection owns one List, including the opt-in; no Form/List nesting.
+        AmoreDeviceConnectionPage()
+            .navigationTitle(AppLocalized("Connection"))
+            .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 
 struct HomeShortcutsSettingsView: View {
-    @ObservedObject private var store = AmoreHomeShortcutStore.shared
-    @State private var title = ""
-    @State private var prompt = ""
-    @State private var showingAdd = false
-
     var body: some View {
-        List {
-            Section {
-                ForEach(store.items) { item in
-                    HStack(spacing: 12) {
-                        Image(systemName: item.symbol).foregroundStyle(PokiTheme.blueText).frame(width: 26)
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(item.title).foregroundStyle(PokiTheme.primaryText)
-                            Text(item.action.kind == .prompt ? AppLocalized("Prompt") : item.action.value)
-                                .font(.footnote).foregroundStyle(PokiTheme.secondaryText).lineLimit(2)
-                        }
-                        Spacer()
-                        Button { store.setVisible(item.hidden, id: item.id) } label: {
-                            Image(systemName: item.hidden ? "eye.slash" : "eye")
-                                .foregroundStyle(item.hidden ? PokiTheme.secondaryText : PokiTheme.green)
-                        }.buttonStyle(.plain)
-                    }
-                    .padding(.vertical, 4)
-                    .swipeActions { Button(role: .destructive) { store.remove(id: item.id) } label: {
-                        Label(AppLocalized("Delete"), systemImage: "trash")
-                    }}
-                }
-            } header: { Text(AppLocalized("Home shortcuts")) } footer: {
-                Text(AppLocalized("These buttons fill the existing chat composer or open an Amore page. They do not send a message automatically."))
-            }
-            Section { Button { showingAdd = true } label: {
-                Label(AppLocalized("Add shortcut"), systemImage: "plus.circle.fill")
-            }}
-        }
-        .pokiScreen().navigationTitle(AppLocalized("Home shortcuts"))
-        .sheet(isPresented: $showingAdd) {
-            NavigationStack {
-                Form {
-                    TextField(AppLocalized("Button title"), text: $title)
-                    TextField(AppLocalized("Prompt"), text: $prompt, axis: .vertical)
-                }
-                .navigationTitle(AppLocalized("Add shortcut"))
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) { Button(AppLocalized("Cancel")) { showingAdd = false } }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button(AppLocalized("Add")) {
-                            let item = AmoreHomeShortcut(id: "custom-" + UUID().uuidString, appName: "Amore", title: title, symbol: "sparkles", action: .init(kind: .prompt, value: prompt))
-                            try? store.add(item); title = ""; prompt = ""; showingAdd = false
-                        }.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    }
-                }
-            }
-        }
+        AmoreHomeShortcutManager()
+            .navigationTitle(AppLocalized("Home shortcuts"))
     }
 }

@@ -35,7 +35,7 @@ extension AIChatView {
             .font(.system(size: 17, weight: .medium))
             .foregroundStyle(ChatColors.secondaryText)
             .frame(width: 44, height: 44)
-            .accessibilityLabel(Text("Add attachment", comment: "VoiceOver label for the attachment button"))
+            .accessibilityLabel(Text(AppLocalized("More actions")))
             .background(ChatColors.inputIconBg)
             .clipShape(Circle())
             .overlay(Circle().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
@@ -46,6 +46,19 @@ extension AIChatView {
                 Button { showPhotoPicker = true } label: { Label("Choose Photos & Videos", systemImage: "photo.on.rectangle") }
                 Button { showDocumentPicker = true } label: { Label("Add File", systemImage: "doc") }
                 Divider()
+                if composerOffersThinkingLevels {
+                    Menu {
+                        composerThinkingLevelOptions
+                    } label: {
+                        Label {
+                            Text("\(AppLocalized("Thinking Intensity")) · \(vm.currentThinkingLevel.displayName)")
+                        } icon: {
+                            Image("ThinkingIcon")
+                        }
+                    }
+                    .accessibilityIdentifier("composer.thinking.menu")
+                    Divider()
+                }
                 Button {
                     vm.showSlashMenuOverInput()
                     inputFocused = true
@@ -67,6 +80,11 @@ extension AIChatView {
                 Button { showCamera = true } label: { Label("Take Photo", systemImage: "camera") }
                 Button { showPhotoPicker = true } label: { Label("Choose Photos & Videos", systemImage: "photo.on.rectangle") }
                 Button { showDocumentPicker = true } label: { Label("Add File", systemImage: "doc") }
+                // confirmationDialog cannot host a nested Menu reliably on iOS 16.
+                // Use the exact same capability-gated choices as the iOS 17 menu.
+                if composerOffersThinkingLevels {
+                    composerThinkingLevelOptions
+                }
                 Button {
                     vm.showSlashMenuOverInput()
                     inputFocused = true
@@ -78,6 +96,35 @@ extension AIChatView {
                           systemImage: voiceInputActive ? "keyboard" : "mic")
                 }
             }
+        }
+    }
+
+    /// Do not invent a second reasoning preference: these are the model entry's
+    /// DISTINCT supported wire tiers, and the VM persists session/pending config.
+    private var composerOffersThinkingLevels: Bool {
+        vm.currentModelSupportsReasoning && !vm.availableThinkingLevels.isEmpty
+    }
+
+    @ViewBuilder
+    private var composerThinkingLevelOptions: some View {
+        ForEach([ThinkingLevel.off] + vm.availableThinkingLevels.filter { $0 != .off }, id: \.self) { level in
+            let selected = vm.currentThinkingLevel == level
+            Button {
+                // Re-resolve on tap: the active model may change while a Menu is open.
+                guard vm.currentModelSupportsReasoning,
+                      level == .off || vm.availableThinkingLevels.contains(level) else { return }
+                vm.setThinkingLevel(level)
+            } label: {
+                Label {
+                    // iOS 16 confirmationDialog may discard the Label icon; the
+                    // text checkmark preserves an unambiguous selected/off state.
+                    Text("\(selected ? "✓ " : "")\(AppLocalized("Thinking Intensity")) · \(level.displayName)")
+                } icon: {
+                    Image(systemName: selected ? "checkmark.circle.fill" : (level == .off ? "circle.slash" : "circle"))
+                }
+            }
+            .accessibilityIdentifier("composer.thinking.\(level.rawValue)")
+            .accessibilityValue(Text(selected ? AppLocalized("Selected") : ""))
         }
     }
 

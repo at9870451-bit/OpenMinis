@@ -36,24 +36,23 @@ struct PokiConversationPanel: Shape {
     }
 }
 
-/// Compatibility surface used by component tests and small preview hosts.
-/// Production uses the same material inside PokiDrawerConversationPanel.
+/// Transparent, low-contrast tap shield. It blocks chat interaction while the
+/// drawer is open without blurring or removing the visible conversation.
 struct PokiConversationCover: View {
     let progress: CGFloat
     let onClose: () -> Void
+    @Environment(\.colorScheme) private var colorScheme
     var body: some View {
         Rectangle()
-            .fill(.ultraThinMaterial)
-            .opacity(Double(min(1, max(0, progress))))
+            .fill(Color.black.opacity(AmoreDrawerPresentation.dimOpacity(progress: progress, dark: colorScheme == .dark)))
             .contentShape(Rectangle())
             .onTapGesture(perform: onClose)
             .allowsHitTesting(progress > 0.001)
-            .accessibilityHidden(progress <= 0.001)
+            .accessibilityHidden(true)
     }
 }
 
-/// Keeps the live chat mounted for streaming continuity. At a fully open drawer
-/// only the independent material cover is visible; no chat pixels leak through.
+/// The same live message tree remains opaque and mounted at every drawer phase.
 struct PokiDrawerConversationPanel<Chat: View>: View {
     let containerSize: CGSize
     let safeAreaInsets: EdgeInsets
@@ -83,9 +82,9 @@ struct PokiDrawerConversationPanel<Chat: View>: View {
         let radius = PokiDrawerMetrics.cornerRadius(progress: phase, safeAreaInsets: safeAreaInsets)
         ZStack {
             chat
+                .environment(\.amoreDrawerProgress, phase)
                 .frame(width: containerSize.width, height: containerSize.height)
                 .offset(x: -bounds.centerOffset.width, y: -bounds.centerOffset.height)
-                .opacity(Double(1 - phase))
                 .allowsHitTesting(phase <= 0.001)
                 .accessibilityHidden(phase > 0.001)
             if phase > 0.001 || presentationActive {
@@ -94,7 +93,7 @@ struct PokiDrawerConversationPanel<Chat: View>: View {
         }
         .frame(width: bounds.size.width, height: bounds.size.height)
         .clipShape(PokiConversationPanel(radius: reduceMotion ? 0 : radius))
-        .offset(x: bounds.centerOffset.width + (reduceMotion ? drawerWidth : drawerWidth * phase),
+        .offset(x: bounds.centerOffset.width + drawerWidth * phase,
                 y: bounds.centerOffset.height)
         .frame(width: containerSize.width, height: containerSize.height)
     }

@@ -125,14 +125,32 @@ public enum AmoreDeviceServices {
 /// Amore NavigationStack, not a second UIHostingController or navigation root.
 @MainActor
 public struct AmoreDeviceConnectionPage: View {
+    @AppStorage("amore.deviceControl.enabled") private var enabled = false
+
     public init() {}
     public var body: some View {
-        ConnectionView(stopHost: AmoreDeviceServices.pauseAutomation)
+        // The opt-in is a section of Connection's single native List. It gates
+        // device tools, not access to setup, and never marks any setup step done.
+        ConnectionView(stopHost: AmoreDeviceServices.pauseAutomation,
+                       agentControl: Binding(get: { enabled }, set: {
+                           enabled = $0
+                           AmoreDeviceServices.setEnabled($0)
+                       }))
             .environment(AmoreDeviceServices.model)
-            .navigationDestination(for: SetupStep.self) { step in
-                SetupStepPage(step: step).environment(AmoreDeviceServices.model).settingsPage()
-            }
+    }
+}
 
+public extension View {
+    /// Attach to the eager root content *inside* the host NavigationStack, not
+    /// to a pushed ConnectionView/List. Keeps the route's exact module identity
+    /// private while registering the original SetupStep type at the real owner.
+    @MainActor
+    func amoreDeviceSetupDestinations() -> some View {
+        navigationDestination(for: SetupStep.self) { step in
+            SetupStepPage(step: step)
+                .environment(AmoreDeviceServices.model)
+                .settingsPage()
+        }
     }
 }
 

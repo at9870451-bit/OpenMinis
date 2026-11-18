@@ -7,6 +7,7 @@ struct DrawerShortcutLabel: View {
     let accent: Color
     @ScaledMetric(relativeTo: .callout) private var iconSize = 18
     @ScaledMetric(relativeTo: .callout) private var minimumHeight = 48
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         HStack(alignment: .center, spacing: 9) {
@@ -18,7 +19,7 @@ struct DrawerShortcutLabel: View {
             Text(title)
                 .font(.callout.weight(.medium))
                 .foregroundStyle(PokiTheme.primaryText)
-                .lineLimit(2)
+                .lineLimit(typeSize.isAccessibilitySize ? nil : 2)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .layoutPriority(1)

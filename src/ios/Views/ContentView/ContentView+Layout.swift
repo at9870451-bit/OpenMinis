@@ -260,24 +260,9 @@ extension ContentView {
             drawerHeader
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 2) {
-                    DisclosureGroup(isExpanded: $drawerShowsFeatures) {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 132), spacing: 4)], spacing: 4) {
-                            drawerNavRow(.tools)
-                            drawerNavRow(.subAgents)
-                            drawerNavRow(.skills)
-                            drawerNavRow(.memory)
-                            drawerNavRow(.rootfs)
-                            localBotNavRow
-                        }
-                        .padding(.top, 6)
-                    } label: {
-                        Label(AppLocalized("Features"), systemImage: "square.grid.2x2")
-                            .font(.subheadline)
-                            .foregroundStyle(.primary)
-                            .frame(minHeight: 44)
+                    AmoreSidebarShortcuts(interactionEnabled: !drawerIsSliding) { shortcut in
+                        openDrawerShortcut(shortcut)
                     }
-                    .tint(.secondary)
-                    .padding(.horizontal, 20)
 
                     drawerHistoryHeading
                     if drawerHistory.groups.isEmpty {
@@ -364,18 +349,6 @@ extension ContentView {
                 .buttonStyle(ChatHistoryButtonStyle())
                 .accessibilityLabel(AppLocalized("Close conversations"))
             }
-            Button {
-                guard !drawerIsSliding else { return }
-                startHomeChat()
-                snapDrawer(open: false)
-            } label: {
-                Label(AppLocalized("New Conversation"), systemImage: "square.and.pencil")
-                    .font(.body.weight(.medium))
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                    .padding(.horizontal, 12)
-            }
-            .buttonStyle(ChatHistoryButtonStyle())
         }
         .foregroundStyle(.primary)
         .padding(.horizontal, 12)
@@ -403,49 +376,54 @@ extension ContentView {
         .padding(.trailing, 12)
     }
 
+    /// Kept outside ScrollView: the primary action and Settings never scroll
+    /// away with history. No account menu, duplicate top action, or bottom Tab.
     private var drawerAccountFooter: some View {
-        Button { showDrawerAccountMenu = true } label: {
-            HStack(spacing: 12) {
-                Image(systemName: "person.crop.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(soulName.isEmpty ? AppLocalized("Account") : soulName)
-                        .font(.body.weight(.semibold))
-                        .lineLimit(2)
-                    Text(AppLocalized("Settings"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 4)
-                Image(systemName: "ellipsis")
-                    .accessibilityHidden(true)
-            }
-            .foregroundStyle(.primary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 12)
-            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(ChatHistoryButtonStyle())
-        .accessibilityLabel(AppLocalized("Account"))
-        .accessibilityHint(AppLocalized("Settings"))
-        .confirmationDialog(AppLocalized("Account"), isPresented: $showDrawerAccountMenu, titleVisibility: .visible) {
-            Button(AppLocalized("Settings")) {
+        HStack(alignment: .center, spacing: 10) {
+            Button {
+                guard !drawerIsSliding else { return }
+                drawerSearchFocused = false
+                startHomeChat()
                 snapDrawer(open: false)
+            } label: {
+                Label(AmoreSidebarText.newConversation, systemImage: "plus")
+                    .font(.body.weight(.semibold))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .foregroundStyle(Color.white)
+                    .background(PokiTheme.blue, in: Capsule())
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(AmoreSidebarText.newConversation)
+            .accessibilityIdentifier("amore.sidebar.newConversation")
+
+            Button {
+                guard !drawerIsSliding else { return }
+                drawerSearchFocused = false
+                snapDrawer(open: false)
+                DeepLinkCoordinator.shared.pendingSettingsTarget = .home
                 activeToolSheet = .settings
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .frame(width: 52, height: 52)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground), in: Circle())
+                    .contentShape(Circle())
             }
-            Button(AppLocalized("Personalize Amore")) {
-                snapDrawer(open: false)
-                runtimePage = .soul
-            }
-            Button(AppLocalized("Cancel"), role: .cancel) { }
+            .buttonStyle(.plain)
+            .accessibilityLabel(AppLocalized("Settings"))
+            .accessibilityIdentifier("amore.sidebar.settings")
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(alignment: .top) { Divider() }
+        .disabled(drawerIsSliding)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity)
+        .background(Color(uiColor: .systemGroupedBackground))
+        .overlay(alignment: .top) { Divider() }
     }
 
     // MARK: Drawer cache (event-driven, never evaluated by a drag frame)
@@ -490,38 +468,43 @@ extension ContentView {
 
     // MARK: Drawer pieces
 
-    @ViewBuilder
     private func drawerNavRow(_ page: RuntimePage) -> some View {
-        let meta: (title: String, symbol: String, color: Color) = {
-            switch page {
-            case .tools: return (AppLocalized("Agent Tools"), "wrench.and.screwdriver", PokiTheme.toolOrange)
-            case .subAgents: return (AppLocalized("Sub Agents"), "person.2", PokiTheme.agentPurple)
-            case .skills: return (AppLocalized("Skills"), "puzzlepiece.extension", PokiTheme.skillTeal)
-            case .memory: return (AppLocalized("Memory"), "brain.head.profile", PokiTheme.memoryRose)
-            case .localBot: return (AppLocalized("SnowLuma + QQBot"), "qrcode.viewfinder", PokiTheme.botCyan)
-            case .soul: return (AppLocalized("Personalize Amore"), "sparkles", PokiTheme.agentPurple)
-            case .rootfs: return (AppLocalized("Rootfs"), "externaldrive", PokiTheme.rootfsIndigo)
-            }
-        }()
-        Button {
-            guard !drawerIsSliding else { return }
-            snapDrawer(open: false)
-            runtimePage = page
+        let shortcut = AmoreSidebarShortcut(runtimePage: page)
+        return Button {
+            openDrawerShortcut(shortcut)
         } label: {
-            DrawerShortcutLabel(title: meta.title, symbol: meta.symbol, accent: .primary)
+            DrawerShortcutLabel(title: shortcut.title, symbol: shortcut.symbol, accent: .primary)
         }
         .buttonStyle(ChatHistoryButtonStyle())
+        .accessibilityLabel(shortcut.title)
     }
 
-    private var localBotNavRow: some View {
-        Button {
-            guard !drawerIsSliding else { return }
-            snapDrawer(open: false)
-            runtimePage = .localBot
-        } label: {
-            DrawerShortcutLabel(title: AppLocalized("SnowLuma + QQBot"), symbol: "qrcode.viewfinder", accent: .primary)
+    private var localBotNavRow: some View { drawerNavRow(.localBot) }
+
+    /// Reuse real runtime destinations and the in-process settings coordinator.
+    /// Missing coordinator cases go through the shared settings-router contract,
+    /// never UIApplication.open(minis://...) or a placeholder action.
+    private func openDrawerShortcut(_ shortcut: AmoreSidebarShortcut) {
+        guard !drawerIsSliding, shortcut.isAvailable else { return }
+        drawerSearchFocused = false
+        snapDrawer(open: false)
+        switch shortcut.destination {
+        case .runtime(let page):
+            runtimePage = page
+        case .settings(let target):
+            DeepLinkCoordinator.shared.pendingSettingsTarget = target
+            activeToolSheet = .settings
+        case .terminal:
+            showTerminal = true
+        case .settingsNotification(let destination):
+            AmoreSettingsShortcutRouter.shared.open(destination)
+            activeToolSheet = .settings
+            NotificationCenter.default.post(
+                name: .amoreOpenSidebarDestination,
+                object: destination,
+                userInfo: ["destination": destination]
+            )
         }
-        .buttonStyle(ChatHistoryButtonStyle())
     }
 
     @ViewBuilder

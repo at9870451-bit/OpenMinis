@@ -149,6 +149,7 @@ final class CachedViewModel: ObservableObject {
 // MARK: - Main View
 
 struct AIChatView: View {
+    @Environment(\.amoreDrawerProgress) var amoreDrawerProgress
     var sessionId: String? = nil
     /// The draft ID from the parent (e.g. "__new__<UUID>") for notification correlation.
     var draftId: String? = nil
@@ -797,12 +798,8 @@ struct AIChatView: View {
                 AmoreConversationChrome(
                     home: vm.messages.isEmpty,
                     thinking: vm.isProcessing && (vm.messages.last?.shouldShowTypingIndicator ?? true),
-                    busy: vm.isProcessing, title: soulName,
+                    busy: vm.isProcessing, title: soulName, active: amoreDrawerProgress < 0.001,
                     openThreads: { NotificationCenter.default.post(name: .amoreOpenConversations, object: nil) },
-                    newConversation: {
-                        guard !vm.isProcessing else { return }
-                        NotificationCenter.default.post(name: .newChatRequested, object: nil)
-                    },
                     openModel: { showModelPicker = true }
                 )
                 HStack {

@@ -1,6 +1,6 @@
 from pathlib import Path
 import sys,json,subprocess,plistlib,shutil,hashlib
-app,kit=map(Path,sys.argv[1:]);info=plistlib.loads((app/'Info.plist').read_bytes());assert info['CFBundleIdentifier']=='com.openAmroe.app';assert info['CFBundleShortVersionString']=='1.33' and info['CFBundleVersion']=='33'
+app,kit=map(Path,sys.argv[1:]);info=plistlib.loads((app/'Info.plist').read_bytes());assert info['CFBundleIdentifier']=='com.openAmroe.app';assert info['CFBundleShortVersionString']=='1.34' and info['CFBundleVersion']=='34'
 assert not (app/'Frameworks/Poki.framework').exists()
 assert not (app/'Frameworks/AmoreDeviceKit.framework').exists(),'static library must not be embedded'
 for p in (kit/'Resources').iterdir():
@@ -27,5 +27,5 @@ for framework in (app/'Frameworks').glob('*.framework'):
 manifest=json.loads((app/'NodeRuntime/manifest.json').read_text())
 for entry in manifest['packages']:
  data=(app/'NodeRuntime'/entry['filename']).read_bytes();assert len(data)==entry['bytes'] and hashlib.sha256(data).hexdigest()==entry['sha256']
-report={'bundle':info['CFBundleIdentifier'],'version':'1.33','build':'33','minimum_iOS':info['MinimumOSVersion'],'device_services':'statically linked into Amore','standalone_poki_framework':False,'separate_ui_factory':False,'Amore_original_agent':'linked','node_apks_verified':len(manifest['packages']),'signing':'frameworks ad-hoc; app requires user distribution signing'}
+report={'bundle':info['CFBundleIdentifier'],'version':'1.34','build':'34','minimum_iOS':info['MinimumOSVersion'],'device_services':'statically linked into Amore','standalone_poki_framework':False,'separate_ui_factory':False,'Amore_original_agent':'linked','node_apks_verified':len(manifest['packages']),'signing':'frameworks ad-hoc; app requires user distribution signing'}
 Path('fusion-verification.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))

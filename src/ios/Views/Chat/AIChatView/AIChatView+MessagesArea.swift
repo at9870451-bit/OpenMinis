@@ -87,36 +87,36 @@ extension AIChatView {
                     .contentShape(Rectangle())
                     .onTapGesture { inputFocused = false }
             }
-            // Empty-chat onboarding tip: a single card explaining the
-            // per-session vs cross-session /var/minis/ layout. Only shown
-            // on a true draft (vm.sessionId == nil) — opening an existing
-            // session would otherwise flash the card during the brief
-            // window before its messages load. Returning users with any
-            // prior chat skip the tip even on a fresh draft (so it's a
-            // genuine first-launch hint).
-            if vm.sessionId == nil
-                && vm.messages.isEmpty
-                && !vm.isLoadingSession {
+            // True blank-chat home, including an already-created empty session.
+            // Never cover message content, a loading session, attachment/paste
+            // drafts or a non-empty composer. Tapping only fills the REAL VM.
+            if AmoreHomeShortcutPolicy.shouldShow(
+                messageCount: vm.messages.count, input: vm.inputText,
+                attachmentCount: vm.attachments.count, pastedTextCount: vm.pastedTexts.count,
+                loadingVideoCount: vm.loadingVideoCount, isLoading: vm.isLoadingSession,
+                isProcessing: vm.isProcessing, isEditing: vm.editingMessageIndex != nil
+            ) {
                 VStack(spacing: 12) {
-                    AmoreHomeMarqueePanel(
-                        items: AmoreHomeShortcutStore.shared.visibleItems,
-                        revision: AmoreHomeShortcutStore.shared.revision,
-                        active: true,
-                        onAction: { action in
-                            AmoreHomeActionRouter(
-                                setInput: { vm.inputText = $0; inputFocused = true },
-                                openPage: { page in
-                                    let path = page == "rootfs" ? "minis://views/rootfs" : "minis://settings/\(page)"
-                                    if let url = URL(string: path) { _ = handleMinisURLTap(url) }
-                                }
-                            ).perform(action)
-                        }
+                    AmoreHomeMarqueeSource(
+                        writing: inputFocused,
+                        setInput: { prompt in
+                            // The surface can be tapped during a model/session update.
+                            // Don't overwrite text the user just entered in that frame.
+                            guard vm.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+                            vm.inputText = prompt
+                            inputFocused = true
+                        },
+                        openURL: { url in _ = handleMinisURLTap(url) }
                     )
-                    if (totalSessionCount ?? Int.max) == 0 {
+                    .id(vm.sessionId ?? "amore-blank-draft")
+                    if vm.sessionId == nil, (totalSessionCount ?? Int.max) == 0 {
                         EmptyChatDirectoryTimeline(onBrowse: { showFileBrowser = true })
                             .padding(.horizontal, 24)
                     }
                 }
+                .padding(.bottom, inputBarHeight)
+                .frame(maxWidth: maxContentWidth)
+                .accessibilityIdentifier("chat.blankHome.shortcuts")
             }
         }
         .overlay(alignment: .bottom) {
