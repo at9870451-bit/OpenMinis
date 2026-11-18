@@ -46,6 +46,7 @@ extension AIChatView {
         // the intrinsic icon size so the system wraps it in the same round
         // glass as a plain toolbar icon (fixes the earlier capsule).
         return ChatTrailingMenuButton(
+            fillsRoundHeader: true,
             messagesEmpty: vm.messages.isEmpty,
             hasSession: vm.sessionId != nil,
             isForcePulling: isForcePulling,

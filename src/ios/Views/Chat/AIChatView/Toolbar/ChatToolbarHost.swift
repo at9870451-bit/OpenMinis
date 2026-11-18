@@ -495,6 +495,10 @@ private struct ChatTrailingMenu: View, Equatable {
 /// button's intrinsic size so the system container wraps it like a plain
 /// toolbar icon).
 struct ChatTrailingMenuButton: UIViewRepresentable {
+    /// The fused header provides its own 48pt round glass. The UIKit control
+    /// must occupy that slot; an intrinsic glyph-only view loses edge taps to
+    /// SwiftUI's wrapper before point(inside:) is asked.
+    var fillsRoundHeader: Bool = false
     let messagesEmpty: Bool
     let hasSession: Bool
     let isForcePulling: Bool
@@ -621,7 +625,7 @@ struct ChatTrailingMenuButton: UIViewRepresentable {
     /// as a plain toolbar icon (a representable otherwise accepts the full
     /// proposed width -> stretched capsule, the 2026-07-17 regression).
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: UIButton, context: Context) -> CGSize? {
-        uiView.intrinsicContentSize
+        fillsRoundHeader ? CGSize(width: 48, height: 48) : uiView.intrinsicContentSize
     }
 
     func updateUIView(_ button: UIButton, context: Context) {

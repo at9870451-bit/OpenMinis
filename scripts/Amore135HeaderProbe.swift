@@ -61,6 +61,7 @@ struct Amore135HeaderProbe: View {
 
     private var menu: some View {
         ChatTrailingMenuButton(
+            fillsRoundHeader: true,
             messagesEmpty: empty, hasSession: true, isForcePulling: false,
             iCloudSyncEnabled: true, memoryEnabled: true,
             speakEnabled: speak, showEnhancedCacheToggle: true, enhancedCacheEnabled: cache,

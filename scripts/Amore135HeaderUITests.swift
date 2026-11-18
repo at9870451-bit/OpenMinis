@@ -192,21 +192,26 @@ final class Amore135HeaderUITests: XCTestCase {
         XCTAssertTrue(menuItem("New Chat").waitForExistence(timeout: 5), "Tap must open a real UIKit menu, not a fake ellipsis image")
     }
 
+    private func labelPredicate(_ label: String) -> NSPredicate {
+        // UIKit combines a submenu's title and current-value subtitle in AX.
+        // Accept only the exact title or its normal separator, not a broad
+        // contains query that could tap a different action.
+        NSPredicate(format: "(label == %@ OR label BEGINSWITH %@ OR label BEGINSWITH %@) AND (elementType == %d OR elementType == %d)",
+            label, label + ", ", label + "\n", XCUIElement.ElementType.button.rawValue,
+            XCUIElement.ElementType.menuItem.rawValue)
+    }
+
     private func menuItem(_ label: String) -> XCUIElement {
         // One live query survives async presentation and both UIKit AX roles.
-        let predicate = NSPredicate(format: "label == %@ AND (elementType == %d OR elementType == %d)",
-                                    label, XCUIElement.ElementType.button.rawValue,
-                                    XCUIElement.ElementType.menuItem.rawValue)
+        let predicate = labelPredicate(label)
         return app.descendants(matching: .any).matching(predicate).firstMatch
     }
 
     private func visibleMenuItem(_ label: String, requireHittable: Bool = true) -> XCUIElement {
         // Native menus may scroll on small phones. Do not assume all original actions
         // fit in one screenshot. Scroll only the presented menu, never the host state.
-        for _ in 0..<12 {
-            let predicate = NSPredicate(format: "label == %@ AND (elementType == %d OR elementType == %d)",
-                                        label, XCUIElement.ElementType.button.rawValue,
-                                        XCUIElement.ElementType.menuItem.rawValue)
+        for _ in 0..<6 {
+            let predicate = labelPredicate(label)
             let candidates = app.descendants(matching: .any).matching(predicate).allElementsBoundByIndex
             if let visible = candidates.first(where: { $0.isHittable }) { return visible }
             if !requireHittable, let visible = candidates.first(where: { $0.frame.intersects(app.frame) }) { return visible }
@@ -220,6 +225,9 @@ final class Amore135HeaderUITests: XCTestCase {
                 start.press(forDuration: 0.05, thenDragTo: end)
             }
         }
+        let debug = XCTAttachment(string: app.debugDescription)
+        debug.name = "Amore135-menu-tree-" + label
+        debug.lifetime = .keepAlways; add(debug)
         XCTFail("Original UIKit action not visible after menu scrolling: \(label)")
         return menuItem(label)
     }
