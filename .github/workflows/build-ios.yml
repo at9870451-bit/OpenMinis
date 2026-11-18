@@ -15,6 +15,7 @@ jobs:
   build:
     name: Build iOS IPA (arm64 device)
     needs: [components, node_runtime, original_poki]
+    needs: [components, node_runtime, original_poki]
     runs-on: macos-26
     timeout-minutes: 115
     steps:
@@ -22,6 +23,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Verify immutable Amore plus original Poki source snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream' \
+            https://github.com/at9870451-bit/amore-ios/releases/download/rootfs-v1/Amore-1.32-Poki-Original-Source.tar.gz -o /tmp/amore-source.tar.gz
+          echo 'a2c0b18e04ed60970b8c102dcc539c9709e64b93e8f3c8806f4925f418b0d2c8  /tmp/amore-source.tar.gz' | shasum -a 256 -c -
+          tar -xzf /tmp/amore-source.tar.gz -C "$RUNNER_TEMP"
+          mkdir -p /tmp/amore-seed
+          tar -xzf /tmp/amore-source.tar.gz -C /tmp/amore-seed
+          test -f /tmp/amore-seed/vendor/poki/UPSTREAM.json
 
       - name: Setup Go (pin 1.25.5 per deps/rclone-mobile/go.mod)
         uses: actions/setup-go@v5
@@ -136,7 +150,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: at9870451-bit/OpenMinis
-          ref: 3994c488edb49111f750e061d58c0290c6e06cab
+          ref: 3ce06ba3f8b4cf08189a4d323e4834adde4d5570
       - name: Prepare tools
         run: brew install xcodegen ripgrep
       - name: Cache native sources
@@ -169,5 +183,5 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: at9870451-bit/OpenMinis
-          ref: 3994c488edb49111f750e061d58c0290c6e06cab
+          ref: 3ce06ba3f8b4cf08189a4d323e4834adde4d5570
       - run: bash scripts/test-original-poki-host.sh
