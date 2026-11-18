@@ -8,7 +8,7 @@ import PokiCore
 public enum AmoreDeviceServices {
     private static var retained: AppModel?
     private static var hostModelAvailable: () -> Bool = { false }
-    private static var stopHostAgent: () -> Void = {}
+    private static var stopHostAgent: (String?) -> Void = { _ in }
     private static var activeSession: () -> String? = { nil }
     private static var approvalObservers: [(String?) -> Void] = []
     private static var taskOwner: String?
@@ -32,7 +32,7 @@ public enum AmoreDeviceServices {
     }
     public static func configure(modelAvailable: @escaping () -> Bool,
                                  activeSessionID: @escaping () -> String?,
-                                 stopAgent: @escaping () -> Void) {
+                                 stopAgent: @escaping (String?) -> Void) {
         hostModelAvailable = modelAvailable
         activeSession = activeSessionID
         stopHostAgent = stopAgent
@@ -50,7 +50,7 @@ public enum AmoreDeviceServices {
     }
     public static func setEnabled(_ enabled: Bool) {
         UserDefaults.standard.set(enabled, forKey: "amore.deviceControl.enabled")
-        if !enabled, let retained { retained.pauseByOwner() }
+        if !enabled { pauseAutomation() }
     }
     public static func finishTask(sessionID: String?) {
         guard let taskOwner, taskOwner == sessionID else { return }
@@ -63,8 +63,9 @@ public enum AmoreDeviceServices {
         self.taskOwner = nil
     }
     public static func pauseAutomation() {
-        stopHostAgent()
+        let owner = taskOwner
         taskOwner = nil
+        stopHostAgent(owner)
         retained?.pauseByOwner()
     }
     public static var toolCatalogJSON: String { PokiCore.toolCatalogJSON }
@@ -83,6 +84,9 @@ public enum AmoreDeviceServices {
             return Answer(text: "Unsupported device tool.", jpeg: nil, isError: true, waitingForOwner: false)
         }
         let session = sessionID ?? activeSession()
+        if name != "status", let taskOwner, taskOwner != session {
+            return Answer(text: "The device is busy with another Amore conversation. Wait for that task or stop it first.", jpeg: nil, isError: true, waitingForOwner: false)
+        }
         if name != "status", taskOwner != session {
             taskOwner = session
             model.chatTaskBegan()

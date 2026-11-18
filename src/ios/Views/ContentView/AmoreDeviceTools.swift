@@ -18,8 +18,8 @@ enum AmoreDeviceTools {
     static func configureHost() {
         AmoreDeviceServices.configure(modelAvailable: {
             ProviderConfigStore.shared.instances.contains { $0.isEnabled && $0.hasAnyCredential }
-        }, activeSessionID: { AIChatViewModel.activeSessionId }, stopAgent: {
-            if let id = AIChatViewModel.activeSessionId,
+        }, activeSessionID: { AIChatViewModel.activeSessionId }, stopAgent: { owner in
+            if let id = owner ?? AIChatViewModel.activeSessionId,
                let vm = ViewModelCache.shared.get(for: id) { vm.cancel() }
         })
     }

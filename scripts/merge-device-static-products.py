@@ -6,12 +6,15 @@ def symbols(path):
  p=subprocess.run(['xcrun','nm','-gjU',str(path)],text=True,capture_output=True,check=True)
  return {s.strip() for s in p.stdout.splitlines() if s.strip() and not s.endswith(':')}
 covered=symbols(primary);inputs=[primary];proof=[]
-for file in sorted(list(products.glob('*.o'))+list(products.glob('*.a')))+[launcher]:
+for file in sorted(list(products.glob('*.o'))+list(products.glob('*.a'))):
  if not file.is_file():continue
  defined=symbols(file);novel=defined-covered
  added=bool(novel)
  proof.append({'file':file.name,'sha256':hashlib.sha256(file.read_bytes()).hexdigest(),'new_symbols':len(novel),'included':added})
  if added:inputs.append(file);covered.update(defined)
+assert launcher.is_file()
+inputs.append(launcher)
+proof.append({'file':launcher.name,'sha256':hashlib.sha256(launcher.read_bytes()).hexdigest(),'included':True,'reason':'Rust C ABI archive linked once; no nm scan of Rust LLVM members'})
 combined=out/'AmoreDeviceKit-all.a'
 subprocess.run(['xcrun','libtool','-static','-o',str(combined)]+[str(x) for x in inputs],check=True)
 combined.replace(out/'AmoreDeviceKit.framework/AmoreDeviceKit')

@@ -55,6 +55,8 @@ targets:
     type: framework.static
     platform: iOS
     sources:
+    - path: AmoreDeviceKit.h
+      headerVisibility: public
     - path: Poki
       excludes:
       - Native
