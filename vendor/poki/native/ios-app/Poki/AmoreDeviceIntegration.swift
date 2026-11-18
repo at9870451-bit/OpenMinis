@@ -41,10 +41,11 @@ public enum AmoreDeviceServices {
         approvalObservers.append(observer)
     }
     public static var pendingApprovalID: String? { retained?.approvals.first?.id }
-    public static func resolveCurrentApproval(_ approved: Bool) {
-        if let approval = retained?.approvals.first { retained?.resolve(approval, approved: approved) }
+    public static func resolveApproval(id: String, approved: Bool) {
+        guard let approval = retained?.approvals.first(where: { $0.id == id }), approval.expires > Date() else { return }
+        retained?.resolve(approval, approved: approved)
     }
-    public static func currentApprovalText() -> String? { retained?.approvals.first?.summary }
+    public static func approvalText(id: String) -> String? { retained?.approvals.first(where: { $0.id == id })?.summary }
     public static var isEnabled: Bool {
         UserDefaults.standard.bool(forKey: "amore.deviceControl.enabled")
     }

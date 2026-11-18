@@ -216,6 +216,8 @@ struct ChatSendButton: View {
                 .accessibilityLabel(Text("Send", comment: "VoiceOver label for the send button"))
             }
         }
+        .frame(minWidth: 44, minHeight: 44)
+        .contentShape(Circle())
         // [T-stop-confirm] Close the confirmation when what it would stop
         // is gone. Observed on the publisher rather than via onChange so a
         // turn that ends and is immediately followed by a queued one

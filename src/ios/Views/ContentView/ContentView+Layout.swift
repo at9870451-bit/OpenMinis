@@ -530,6 +530,8 @@ extension ContentView {
         Button {
             guard !drawerIsSliding else { return }
             snapDrawer(open: false)
+            navigationPath = NavigationPath()
+            currentStackSessionId = nil
             homeSessionId = session.id
         } label: {
             ChatHistorySessionLabel(
