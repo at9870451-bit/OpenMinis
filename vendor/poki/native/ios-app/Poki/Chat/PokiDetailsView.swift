@@ -167,6 +167,9 @@ struct PokiDetailsView: View {
                     AdvancedSettingsView()
                 case .agents:
                     AgentsAndRelayView(path: $path)
+                case .updates:
+                    Text("Self-updating is disabled in the embedded Amore module. Install signed Amore updates through your existing signing method.")
+                        .navigationTitle("Amore")
                 case .approvals:
                     ApprovalsSettingsView()
                 case .appearance:

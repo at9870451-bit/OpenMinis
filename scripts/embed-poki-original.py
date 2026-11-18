@@ -22,6 +22,11 @@ for language in framework.glob('*.lproj'):
 # AppIconStore's upstream catalogue uses plain resource names, not assets.
 for source in (products/'Poki.framework').glob('*.png'):
  if not (app/source.name).exists():shutil.copyfile(source,app/source.name)
+# The original chat loads its harness from Bundle.main, not the framework.
+for source in framework.rglob('agent-system.md'):
+ shutil.copyfile(source, app/'agent-system.md')
+if not (app/'agent-system.md').is_file():
+ raise SystemExit('Original chat harness resource missing; IPA packaging refused')
 info=plistlib.loads((framework/'Info.plist').read_bytes())
 assert info['CFBundleExecutable']=='Poki'
 print('Original module embedded:',frameworks/'Poki.framework','minimum iOS',info.get('MinimumOSVersion'))

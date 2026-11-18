@@ -1,4 +1,5 @@
 import Foundation
+import PokiNative
 
 /// The port of this iPhone's remote pairing service. iOS does not keep it at 49152: it gives the
 /// service the next free port whenever it starts it, and names that port only in the service's

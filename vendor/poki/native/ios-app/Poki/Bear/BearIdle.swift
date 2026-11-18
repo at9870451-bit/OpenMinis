@@ -1,3 +1,4 @@
+import Foundation
 import RealityKit
 import simd
 
