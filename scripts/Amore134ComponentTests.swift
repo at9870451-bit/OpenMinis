@@ -87,6 +87,28 @@ final class Amore134Tests: XCTestCase {
         }
     }
 
+    func testLiveGlassReplyAndCustomPortraitSnapshots() async throws {
+        let portrait = UIGraphicsImageRenderer(size: CGSize(width: 96, height: 96)).image { context in
+            UIColor.systemTeal.setFill(); context.fill(CGRect(x: 0, y: 0, width: 96, height: 96))
+            UIColor.systemIndigo.setFill(); UIBezierPath(ovalIn: CGRect(x: 20, y: 20, width: 56, height: 56)).fill()
+        }
+        for style in [UIUserInterfaceStyle.light, .dark] {
+            let sample = ZStack {
+                LinearGradient(colors: [.blue.opacity(0.4), .purple.opacity(0.25), .cyan.opacity(0.4)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                VStack(spacing: 28) {
+                    AmoreConversationChrome(home: false, thinking: false, busy: false, title: "Custom image preview", active: false, portrait: portrait, openThreads: {}, openModel: {})
+                    Text("AI reply · glass background\n回复文字与选择行为保持不变。\nhttps://example.com")
+                        .foregroundStyle(PokiTheme.primaryText).padding(18)
+                        .background(PokiAssistantMessageSurface())
+                    Text("Opaque export fallback").padding(18)
+                        .background(PokiAssistantMessageSurface()).environment(\.chatSnapshotRendering, true)
+                    Spacer()
+                }.padding(.top, 65).padding(.horizontal, 16)
+            }.ignoresSafeArea()
+            attach(try await render(sample, style: style), name: "Amore135-Glass-Custom-Avatar-" + (style == .dark ? "Dark" : "Light"))
+        }
+    }
+
     func testActualCompanionAnimationAndLifecyclePause() {
         let controller = AmoreCompanionScene.Coordinator()
         let view = SCNView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))

@@ -254,8 +254,14 @@ SNAPSHOTS="${AMORE134_SNAPSHOTS:-$ROOT/amore134-component-snapshots}"
 [[ ! -e "$RESULT" ]] || { echo "ERROR: $RESULT exists; set AMORE134_RESULT_BUNDLE to a fresh path." >&2; exit 1; }
 xcrun simctl boot "$DEST" 2>/dev/null || true
 xcrun simctl bootstatus "$DEST" -b
+TEST_FILTERS=()
+if [[ -n "${AMORE_TEST_ONLY:-}" ]]; then
+  while IFS= read -r selected; do
+    [[ -z "$selected" ]] || TEST_FILTERS+=("-only-testing:$selected")
+  done <<< "$AMORE_TEST_ONLY"
+fi
 set +e
-xcodebuild test -project "$HOST/Amore134Components.xcodeproj" -scheme Amore134Components -destination "platform=iOS Simulator,id=$DEST" -parallel-testing-enabled NO -derivedDataPath "$HOST/build" -resultBundlePath "$RESULT" CODE_SIGNING_ALLOWED=NO 2>&1 | tee "$LOG"
+xcodebuild test -project "$HOST/Amore134Components.xcodeproj" -scheme Amore134Components -destination "platform=iOS Simulator,id=$DEST" -parallel-testing-enabled NO -derivedDataPath "$HOST/build" -resultBundlePath "$RESULT" "${TEST_FILTERS[@]}" CODE_SIGNING_ALLOWED=NO 2>&1 | tee "$LOG"
 STATUS=${PIPESTATUS[0]}
 set -e
 if [[ -d "$RESULT" ]]; then

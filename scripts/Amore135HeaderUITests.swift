@@ -76,7 +76,7 @@ final class Amore135HeaderUITests: XCTestCase {
         assertToggle("saver=true")
         openMenu()
         visibleMenuItem("Keep Screen On").tap()
-        visibleMenuItem("Keep Screen On").tap()
+        visibleMenuItem("Keep Screen On", exactTitle: true).tap()
         assertAction("setKeepAwake", count: 1, total: 3)
         assertToggle("awake=true")
     }
@@ -207,11 +207,13 @@ final class Amore135HeaderUITests: XCTestCase {
         return app.descendants(matching: .any).matching(predicate).firstMatch
     }
 
-    private func visibleMenuItem(_ label: String, requireHittable: Bool = true) -> XCUIElement {
+    private func visibleMenuItem(_ label: String, requireHittable: Bool = true, exactTitle: Bool = false) -> XCUIElement {
         // Native menus may scroll on small phones. Do not assume all original actions
         // fit in one screenshot. Scroll only the presented menu, never the host state.
         for _ in 0..<6 {
-            let predicate = labelPredicate(label)
+            let predicate = exactTitle
+                ? NSPredicate(format: "label == %@ AND (elementType == %d OR elementType == %d)", label, XCUIElement.ElementType.button.rawValue, XCUIElement.ElementType.menuItem.rawValue)
+                : labelPredicate(label)
             let candidates = app.descendants(matching: .any).matching(predicate).allElementsBoundByIndex
             if let visible = candidates.first(where: { $0.isHittable }) { return visible }
             if !requireHittable, let visible = candidates.first(where: { $0.frame.intersects(app.frame) }) { return visible }
