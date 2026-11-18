@@ -5,7 +5,15 @@ assert not (app/'Frameworks/Poki.framework').exists()
 assert not (app/'Frameworks/AmoreDeviceKit.framework').exists(),'static library must not be embedded'
 for p in (kit/'Resources').iterdir():
  dest=app/p.name
- if p.is_dir():shutil.copytree(p,dest,dirs_exist_ok=True)
+ if p.name.endswith('.lproj'):
+  dest.mkdir(parents=True,exist_ok=True)
+  for resource in p.iterdir():
+   target=dest/resource.name
+   if resource.suffix=='.strings' and target.exists():
+    merged=plistlib.loads(resource.read_bytes());merged.update(plistlib.loads(target.read_bytes()))
+    target.write_bytes(plistlib.dumps(merged,fmt=plistlib.FMT_BINARY))
+   elif not target.exists():shutil.copyfile(resource,target)
+ elif p.is_dir():shutil.copytree(p,dest,dirs_exist_ok=True)
  elif not dest.exists():shutil.copyfile(p,dest)
 exe=app/info['CFBundleExecutable'];links=subprocess.check_output(['xcrun','otool','-L',str(exe)],text=True);assert 'Poki.framework' not in links and 'AmoreDeviceKit.framework' not in links
 symbols=subprocess.check_output(['xcrun','nm',str(exe)],text=True)
