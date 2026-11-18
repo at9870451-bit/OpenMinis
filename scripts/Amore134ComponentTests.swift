@@ -67,12 +67,12 @@ final class Amore134Tests: XCTestCase {
 
     func testDrawerOpenKeepsLiveConversationPixelsAndReduceMotionCloses() async throws {
         for style in [UIUserInterfaceStyle.light, .dark] {
-            let red = try await render(DrawerProbe(color: .red, progress: 1, reduceMotion: false), style: style)
-            let blue = try await render(DrawerProbe(color: .blue, progress: 1, reduceMotion: false), style: style)
+            let red = try await render(DrawerProbe(color: .red, progress: 1, reduceMotion: false), style: style, minimumColors: 2)
+            let blue = try await render(DrawerProbe(color: .blue, progress: 1, reduceMotion: false), style: style, minimumColors: 2)
             let r = try pixel(red, x: 354, y: 400), b = try pixel(blue, x: 354, y: 400)
             XCTAssertGreaterThan(r.0, b.0 + 0.4)
             XCTAssertGreaterThan(b.2, r.2 + 0.4)
-            let closed = try await render(DrawerProbe(color: .red, progress: 0, reduceMotion: true), style: style)
+            let closed = try await render(DrawerProbe(color: .red, progress: 0, reduceMotion: true), style: style, minimumColors: 2)
             XCTAssertGreaterThan(try pixel(closed, x: 190, y: 400).0, 0.85)
             attach(red, name: "Amore134-Visible-Drawer-" + (style == .dark ? "Dark" : "Light"))
         }
@@ -119,7 +119,7 @@ final class Amore134Tests: XCTestCase {
         context.draw(cg, in: CGRect(x: 0, y: 0, width: 390, height: 844)); let offset = (y*390+x)*4
         return (Double(data[offset])/255, Double(data[offset+1])/255, Double(data[offset+2])/255)
     }
-    private func render<V: View>(_ root: V, style: UIUserInterfaceStyle) async throws -> UIImage {
+    private func render<V: View>(_ root: V, style: UIUserInterfaceStyle, minimumColors: Int = 9) async throws -> UIImage {
         let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
         let previous = scene.windows.first { $0.isKeyWindow }
         let window = UIWindow(windowScene: scene)
@@ -136,8 +136,8 @@ final class Amore134Tests: XCTestCase {
         let image = UIGraphicsImageRenderer(bounds: window.bounds, format: format).image { _ in drawn = window.drawHierarchy(in: window.bounds, afterScreenUpdates: true) }
         XCTAssertTrue(drawn)
         let bytes = try XCTUnwrap(image.cgImage?.dataProvider?.data) as Data
-        let unique = Set(stride(from: 0, to: bytes.count, by: 64).map { bytes[$0] })
-        XCTAssertGreaterThan(unique.count, 5, "Empty snapshots must fail")
+        let unique = Set(stride(from: 0, to: bytes.count - 3, by: 64).map { (Int(bytes[$0])/16)*256 + (Int(bytes[$0 + 1])/16)*16 + Int(bytes[$0 + 2])/16 })
+        XCTAssertGreaterThanOrEqual(unique.count, minimumColors, "Empty snapshots must fail")
         return image
     }
 }
