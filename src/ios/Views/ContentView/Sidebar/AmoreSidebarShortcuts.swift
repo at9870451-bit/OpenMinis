@@ -397,6 +397,7 @@ enum AmoreSidebarText {
     }
 
     static var newConversation: String { text("New Conversation", "新会话", "新會話") }
+    static var newConversationShort: String { text("New Chat", "新会话", "新會話") }
     static var about: String { text("About Amore", "关于 Amore", "關於 Amore") }
     static var edit: String { text("Edit / Choose Shortcuts", "修改/选择快捷功能", "修改/選擇快捷功能") }
     static var editHint: String { text("Choose, remove and reorder sidebar shortcuts", "选择、删除并排序侧栏快捷入口", "選擇、刪除並排序側欄快捷入口") }

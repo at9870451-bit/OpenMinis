@@ -153,11 +153,16 @@ final class Amore135HeaderUITests: XCTestCase {
             let settings = app.buttons["amore.sidebar.settings"]
             XCTAssertTrue(newChat.isHittable)
             XCTAssertTrue(settings.isHittable)
-            XCTAssertGreaterThanOrEqual(newChat.frame.width, 132)
-            XCTAssertGreaterThanOrEqual(newChat.frame.height, 52)
+            XCTAssertEqual(newChat.frame.width, 132, accuracy: 0.5, "New Chat must stay compact at lower left")
+            XCTAssertEqual(newChat.frame.height, 52, accuracy: 0.5, "Single-line label must not grow or overflow the capsule")
+            XCTAssertLessThan(newChat.frame.minX, 20)
             XCTAssertGreaterThanOrEqual(settings.frame.width, 52)
             XCTAssertGreaterThanOrEqual(settings.frame.height, 52)
             XCTAssertLessThan(newChat.frame.maxX, settings.frame.minX)
+            let shortLabel = newChat.staticTexts["New Chat"]
+            XCTAssertTrue(shortLabel.exists)
+            XCTAssertLessThan(shortLabel.frame.height, 30, "Default English label must fit one line")
+            XCTAssertTrue(newChat.frame.insetBy(dx: -0.5, dy: -0.5).contains(shortLabel.frame))
             XCTAssertGreaterThan(newChat.frame.minY, app.frame.midY)
             let original = newChat.frame
             attach("Amore135-full-drawer-\(appearance)-top")

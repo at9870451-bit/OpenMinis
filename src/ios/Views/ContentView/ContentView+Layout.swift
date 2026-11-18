@@ -389,13 +389,15 @@ extension ContentView {
                 startHomeChat()
                 snapDrawer(open: false)
             } label: {
-                Label(AmoreSidebarText.newConversation, systemImage: "plus")
-                    .font(.body.weight(.semibold))
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .frame(minWidth: 132, maxWidth: 144, minHeight: 52)
-                    .fixedSize(horizontal: true, vertical: false)
+                HStack(spacing: 8) {
+                    Image(systemName: "plus").font(.body.weight(.semibold))
+                    Text(AmoreSidebarText.newConversationShort)
+                        .font(.body.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+                    .padding(.horizontal, 14)
+                    .frame(width: 132, height: 52)
                     .foregroundStyle(PokiTheme.sidebarActionInk)
                     .background(PokiTheme.sidebarAction, in: Capsule())
                     .contentShape(Capsule())
