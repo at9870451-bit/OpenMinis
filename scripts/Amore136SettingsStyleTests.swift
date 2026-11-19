@@ -107,6 +107,60 @@ final class Amore136SettingsStyleTests: XCTestCase {
         }
     }
 
+    func testMountedSettingsGlassSnapshotsFollowAppearance() async throws {
+        // Production paint and icons mounted in a real List. This is a component
+        // host, not the full SettingsSheet or a device-service acceptance test.
+        for dark in [false, true] {
+            let style: UIUserInterfaceStyle = dark ? .dark : .light
+            let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
+            let prior = scene.windows.first { $0.isKeyWindow }
+            let window = UIWindow(windowScene: scene)
+            window.frame = CGRect(x: 0, y: 0, width: 390, height: 844)
+            window.overrideUserInterfaceStyle = style
+            let root = NavigationStack {
+                List {
+                    Section("Appearance") {
+                        Label { Text("Theme · Follow System") } icon: { SettingsFeatureIcon(symbol: "paintbrush", feature: .appearance) }
+                    }.amoreSettingsGlassRows()
+                    Section("Agent Runtime") {
+                        Label { Text("Model providers") } icon: { SettingsFeatureIcon(symbol: "server.rack", feature: .providers) }
+                        Label { Text("Local device status") } icon: { SettingsFeatureIcon(symbol: "iphone", feature: .developerConnection) }
+                        Label { Text("Device approvals") } icon: { SettingsFeatureIcon(symbol: "checkmark.shield", feature: .permissions) }
+                        Label { Text("Workflow output") } icon: { SettingsFeatureIcon(symbol: "rectangle.stack", feature: .tools) }
+                    }.amoreSettingsGlassRows()
+                    Section("Storage") {
+                        Label { Text("Runtime environment") } icon: { SettingsFeatureIcon(symbol: "shippingbox", feature: .rootfs) }
+                        Label { Text("Storage management") } icon: { SettingsFeatureIcon(symbol: "internaldrive", feature: .storage) }
+                    }.amoreSettingsGlassRows()
+                    Section("About") {
+                        Label { Text("About Amore") } icon: { SettingsFeatureIcon(symbol: "info", feature: .about) }
+                    }.amoreSettingsGlassRows()
+                }.amoreSettingsGlass().navigationTitle("Settings")
+            }.environment(\.colorScheme, dark ? .dark : .light)
+            let host = UIHostingController(rootView: root)
+            window.rootViewController = host
+            host.loadViewIfNeeded(); host.view.frame = window.bounds
+            window.makeKeyAndVisible(); window.layoutIfNeeded()
+            try await Task.sleep(nanoseconds: 450_000_000)
+            host.view.layoutIfNeeded(); window.layoutIfNeeded()
+            let format = UIGraphicsImageRendererFormat(); format.scale = 1
+            var painted = false
+            let image = UIGraphicsImageRenderer(bounds: window.bounds, format: format).image { _ in
+                painted = window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
+            }
+            XCTAssertTrue(painted)
+            let bytes = try XCTUnwrap(image.cgImage?.dataProvider?.data) as Data
+            let colors = Set(stride(from: 0, to: bytes.count - 3, by: 64).map {
+                (Int(bytes[$0]) / 16) * 256 + (Int(bytes[$0 + 1]) / 16) * 16 + Int(bytes[$0 + 2]) / 16
+            })
+            XCTAssertGreaterThan(colors.count, 15, "Blank/solid screenshots must fail")
+            let item = XCTAttachment(image: image)
+            item.name = "Amore136-Production-Settings-Style-" + (dark ? "Dark" : "Light")
+            item.lifetime = .keepAlways; add(item)
+            window.isHidden = true; window.rootViewController = nil; prior?.makeKey()
+        }
+    }
+
     // Native material/glass backdrop sampling and real List/Form tap routing
     // require a mounted window + simulator UI taps; the opaque renderer above
     // intentionally makes NO claim to validate live blur, SetupStep pushes,
