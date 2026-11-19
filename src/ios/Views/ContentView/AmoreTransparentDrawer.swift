@@ -61,6 +61,8 @@ struct AmoreTransparentDrawer<Chat: View, Sidebar: View>: View {
                 .environment(\.amoreDrawerProgress, phase)
                 .frame(width: size.width, height: size.height)
                 .allowsHitTesting(phase < 0.001 && !presentationActive)
+                .disabled(phase >= 0.001 || presentationActive)
+                .accessibilityElement(children: phase >= 0.001 || presentationActive ? .ignore : .contain)
                 .accessibilityHidden(phase >= 0.001 || presentationActive)
 
             if phase > 0.001 || presentationActive {
