@@ -10,7 +10,7 @@ struct DrawerShortcutLabel: View {
     @Environment(\.dynamicTypeSize) private var typeSize
 
     // Production shortcuts pass semantic primary/secondary. Resolve those to
-    // blue-panel ink, while preserving explicitly supplied coloured accents.
+    // theme-aware drawer ink, while preserving explicitly supplied coloured accents.
     private var sidebarAccent: Color {
         if accent == .primary { return PokiTheme.sidebarInk }
         if accent == .secondary { return PokiTheme.sidebarHeading }

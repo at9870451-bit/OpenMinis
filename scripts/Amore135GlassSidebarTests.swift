@@ -8,31 +8,27 @@ import UIKit
 /// name when copying into a differently named component host.
 @MainActor
 final class Amore135GlassSidebarTests: XCTestCase {
-    func testSidebarStaysBlueInBothAppearances() {
-        check(PokiTheme.uiSidebar, style: .light, hex: 0xE0EDFF)
-        check(PokiTheme.uiSidebar, style: .dark, hex: 0x1852A0)
-        check(PokiTheme.uiSidebarInk, style: .light, hex: 0x173763)
-        check(PokiTheme.uiSidebarInk, style: .dark, hex: 0xFFFFFF)
+    func testSidebarSurfaceIsClearInBothAppearances() {
         for style in [UIUserInterfaceStyle.light, .dark] {
-            let c = components(PokiTheme.uiSidebar, style: style)
-            XCTAssertEqual(c[3], 1, accuracy: 0.0001)
-            XCTAssertGreaterThan(c[2], c[0])
-            XCTAssertGreaterThan(c[2], c[1])
+            XCTAssertEqual(components(PokiTheme.uiSidebar, style: style)[3], 0)
+            let expected = components(UIColor.label, style: style)
+            XCTAssertEqual(components(PokiTheme.uiSidebarInk, style: style), expected)
+            XCTAssertEqual(components(PokiTheme.uiSidebarHeading, style: style), expected)
+            XCTAssertLessThan(components(PokiTheme.uiSidebarSelected, style: style)[3], 0.2)
+            XCTAssertLessThan(components(PokiTheme.uiSidebarPressed, style: style)[3], 0.2)
         }
     }
 
-    func testPrimaryAndSecondaryInkMeetAAInEveryDrawerState() {
-        let backgrounds = [PokiTheme.uiSidebar, PokiTheme.uiSidebarControl,
-                           PokiTheme.uiSidebarSelected, PokiTheme.uiSidebarPressed]
+    func testSemanticInkMeetsAAOnSupportedChatFallback() {
         for style in [UIUserInterfaceStyle.light, .dark] {
-            for background in backgrounds {
+            for background in [UIColor.systemBackground, PokiTheme.uiBackground] {
                 for ink in [PokiTheme.uiSidebarInk, PokiTheme.uiSidebarHeading] {
                     XCTAssertGreaterThanOrEqual(contrast(ink, background, style: style), 4.5)
                 }
             }
-            XCTAssertGreaterThanOrEqual(contrast(PokiTheme.uiSidebarActionInk,
-                                                PokiTheme.uiSidebarAction, style: style), 4.5)
         }
+        // Actual transparency over varying transcript pixels is tested by
+        // Amore139DrawerTests; alpha compositing cannot use opaque WCAG math.
     }
 
     func testLiveMaterialAndOpaqueExportAccessibilityPolicy() {

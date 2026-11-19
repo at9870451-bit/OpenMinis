@@ -146,41 +146,31 @@ extension ContentView {
         GeometryReader { geometry in
             let drawerWidth = PokiDrawerMetrics.travel(for: geometry.size.width)
             let progress = min(1, max(0, drawerProgress))
-            ZStack(alignment: .leading) {
-                PokiTheme.sidebar.ignoresSafeArea()
+            AmoreTransparentDrawer(
+                size: geometry.size, drawerWidth: drawerWidth, progress: progress,
+                presentationActive: drawerPresentationActive,
+                reduceMotion: drawerReduceMotion,
+                onClose: { snapDrawer(open: false) }
+            ) {
+                chatStack
+                    .background {
+                        EdgeSwipeCatcher(enabled: !showHistoryDrawer && runtimePage == nil && activeToolSheet == nil,
+                            onProgress: { fraction in
+                                drawerCleanupTask?.cancel()
+                                drawerPresentationActive = true
+                                drawerIsSliding = true
+                                drawerDragProgress = fraction
+                            }, onEnd: { fraction, velocity in
+                                drawerIsSliding = false
+                                let projected = fraction + velocity / max(1, drawerWidth) / 6
+                                snapDrawer(open: projected > 0.45)
+                            })
+                            .allowsHitTesting(false)
+                    }
+            } sidebar: {
                 historyDrawer
-                    .frame(width: drawerWidth, height: geometry.size.height)
-                    .opacity(drawerReduceMotion ? progress : 1)
                     .allowsHitTesting(showHistoryDrawer && !drawerIsSliding)
                     .accessibilityHidden(!showHistoryDrawer)
-                    .zIndex(drawerReduceMotion ? 2 : 0)
-
-                PokiDrawerConversationPanel(
-                    containerSize: geometry.size,
-                    safeAreaInsets: geometry.safeAreaInsets,
-                    drawerWidth: drawerWidth,
-                    progress: progress,
-                    presentationActive: drawerPresentationActive,
-                    reduceMotion: drawerReduceMotion,
-                    onClose: { snapDrawer(open: false) }
-                ) {
-                    chatStack
-                        .background {
-                            EdgeSwipeCatcher(enabled: !showHistoryDrawer && runtimePage == nil && activeToolSheet == nil,
-                                onProgress: { fraction in
-                                    drawerCleanupTask?.cancel()
-                                    drawerPresentationActive = true
-                                    drawerIsSliding = true
-                                    drawerDragProgress = fraction
-                                }, onEnd: { fraction, velocity in
-                                    drawerIsSliding = false
-                                    let projected = fraction + velocity / max(1, drawerWidth) / 6
-                                    snapDrawer(open: projected > 0.45)
-                                })
-                                .allowsHitTesting(false)
-                        }
-                }
-                .zIndex(1)
             }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 16, coordinateSpace: .global)
@@ -208,7 +198,6 @@ extension ContentView {
             .onChange(of: drawerGestureActive) { active in
                 if !active, drawerCloseStart != nil { snapDrawer(open: showHistoryDrawer) }
             }
-            .background(PokiTheme.sidebar.ignoresSafeArea())
             .accessibilityAction(.escape) {
                 if showHistoryDrawer { snapDrawer(open: false) }
             }
@@ -253,7 +242,7 @@ extension ContentView {
         }
     }
 
-    // MARK: - ChatGPT-style solid history drawer
+    // MARK: - Transparent live-conversation history overlay
 
     private var historyDrawer: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -298,7 +287,6 @@ extension ContentView {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .foregroundStyle(PokiTheme.sidebarInk)
         .tint(PokiTheme.sidebarInk)
-        .background(PokiTheme.sidebar.ignoresSafeArea())
         .onAppear { rebuildDrawerGroups() }
         .onChange(of: DrawerSessionSource(sessions: sessions)) { _ in rebuildDrawerGroups() }
         .onChange(of: drawerSearch) { _ in rebuildDrawerGroups() }
@@ -343,7 +331,10 @@ extension ContentView {
                 .padding(.leading, 12)
                 .padding(.trailing, drawerSearch.isEmpty ? 12 : 0)
                 .frame(minHeight: 44)
-                .background(PokiTheme.sidebarControl, in: RoundedRectangle(cornerRadius: 12))
+                .background {
+                    RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial).opacity(0.55)
+                        .allowsHitTesting(false)
+                }
                 Button { snapDrawer(open: false) } label: {
                     Image(systemName: "sidebar.left")
                         .font(.body)
@@ -428,7 +419,6 @@ extension ContentView {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity)
-        .background(PokiTheme.sidebar)
     }
 
     // MARK: Drawer cache (event-driven, never evaluated by a drag frame)
