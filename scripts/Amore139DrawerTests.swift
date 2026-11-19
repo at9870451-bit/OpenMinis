@@ -10,7 +10,7 @@ final class Amore139DrawerTests: XCTestCase {
         XCTAssertFalse(AmoreDrawerSurfacePolicy.opaque(reduceTransparency: false, increasedContrast: false))
         XCTAssertTrue(AmoreDrawerSurfacePolicy.opaque(reduceTransparency: true, increasedContrast: false))
         XCTAssertTrue(AmoreDrawerSurfacePolicy.opaque(reduceTransparency: false, increasedContrast: true))
-        XCTAssertLessThan(AmoreDrawerSurfacePolicy.materialOpacity, 0.5)
+        XCTAssertEqual(AmoreDrawerSurfacePolicy.materialOpacity, 1.0, "Backdrop filtering must not be mixed with sharp, unblurred text")
     }
 
     func testConversationPixelsRemainBehindDrawerAcrossAllPhases() async throws {
@@ -22,9 +22,35 @@ final class Amore139DrawerTests: XCTestCase {
                 // not the formerly exposed conversation strip on the right.
                 let r = try pixel(red, x: 110, y: 400)
                 let b = try pixel(blue, x: 110, y: 400)
-                XCTAssertGreaterThan(r.0 - b.0, 0.35, "Live red pixels disappeared at phase \(progress)")
-                XCTAssertGreaterThan(b.2 - r.2, 0.35, "Live blue pixels disappeared at phase \(progress)")
+                XCTAssertGreaterThan(r.0 - b.0, 0.10, "Live red pixels disappeared at phase \(progress)")
+                XCTAssertGreaterThan(b.2 - r.2, 0.10, "Live blue pixels disappeared at phase \(progress)")
             }
+        }
+    }
+
+    func testNativeBackdropBlursFineTextEdgesRatherThanAlphaBlendingThem() async throws {
+        for dark in [false, true] {
+            func patterned(_ progress: CGFloat) -> some View {
+                AmoreTransparentDrawer(size: CGSize(width: 390, height: 844), drawerWidth: 306,
+                    progress: progress, presentationActive: progress > 0,
+                    reduceMotion: false, onClose: {}) {
+                    HStack(spacing: 0) {
+                        ForEach(0..<130, id: \.self) { index in
+                            (index.isMultiple(of: 2) ? Color.black : Color.white).frame(width: 3)
+                        }
+                    }
+                } sidebar: { Color.clear }
+            }
+            let closed = try await render(patterned(0), dark: dark)
+            let opened = try await render(patterned(1), dark: dark)
+            func edgeContrast(_ image: UIImage) throws -> Double {
+                let v = try (80..<240).map { x in try pixel(image, x: x, y: 400).0 }
+                return v.max()! - v.min()!
+            }
+            let original = try edgeContrast(closed)
+            let filtered = try edgeContrast(opened)
+            XCTAssertGreaterThan(original, 0.9, "Positive control must contain real sharp edges")
+            XCTAssertLessThan(filtered, original * 0.35, "Glass must filter glyph-sized edges, not leave overlapping sharp text")
         }
     }
 

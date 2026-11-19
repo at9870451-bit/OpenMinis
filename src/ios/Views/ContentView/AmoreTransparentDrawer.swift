@@ -6,7 +6,9 @@ enum AmoreDrawerSurfacePolicy {
     static func opaque(reduceTransparency: Bool, increasedContrast: Bool) -> Bool {
         reduceTransparency || increasedContrast
     }
-    static let materialOpacity = 0.30
+    // Render the actual backdrop filter at full effect. Lowering the view's
+    // opacity mixes unblurred text back in and makes both text layers collide.
+    static let materialOpacity = 1.0
 }
 
 struct AmoreDrawerBackdrop: View {
@@ -20,10 +22,10 @@ struct AmoreDrawerBackdrop: View {
                 reduceTransparency: reduceTransparency, increasedContrast: contrast == .increased) {
                 Color(uiColor: .systemBackground)
             } else {
-                // Partial native material, NOT an opaque colour with a glass label.
-                // The one live conversation remains visible through this surface.
+                // Native ultra-thin material transmits the live transcript's
+                // colours while blurring its glyphs. No opaque blue paint and
+                // no low-alpha layer that reintroduces sharp text underneath.
                 Rectangle().fill(.ultraThinMaterial)
-                    .opacity(AmoreDrawerSurfacePolicy.materialOpacity)
             }
         }
         .allowsHitTesting(false)
