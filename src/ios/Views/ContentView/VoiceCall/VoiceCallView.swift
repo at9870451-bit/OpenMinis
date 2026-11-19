@@ -30,12 +30,12 @@ struct VoiceCallView: View {
                             .background(.white.opacity(0.1), in: Circle())
                     }.accessibilityLabel(AppLocalized("Show call transcript"))
                 }
-                Text(AppLocalized(manager.state.title)).font(.headline)
+                Text(AppLocalized(String.LocalizationValue(manager.state.title))).font(.headline)
                     .accessibilityIdentifier("voice.call.state")
                 Spacer(minLength: 12)
                 VoiceCallWaveform(state: manager.state, level: manager.level, reduceMotion: reduceMotion)
                     .frame(height: 180)
-                    .accessibilityLabel(AppLocalized(manager.state.title))
+                    .accessibilityLabel(AppLocalized(String.LocalizationValue(manager.state.title)))
                     .padding(.horizontal, 16)
                 if let error = manager.errorMessage {
                     Text(error).font(.callout).foregroundStyle(.orange)
@@ -104,7 +104,7 @@ struct VoiceCallView: View {
             Image(systemName: symbol).font(.title3)
                 .frame(width: 56, height: 56)
                 .background(active ? .blue.opacity(0.65) : .white.opacity(0.13), in: Circle())
-        }.buttonStyle(.plain).accessibilityLabel(AppLocalized(label))
+        }.buttonStyle(.plain).accessibilityLabel(AppLocalized(String.LocalizationValue(label)))
     }
 }
 

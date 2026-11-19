@@ -91,7 +91,7 @@ extension AIChatViewModel {
         // send with no voice session records "text". Attachment-only sends say
         // nothing about typing. (text is also written eagerly on switch-to-text
         // in the composer; saveInputModePreference no-ops when unchanged.)
-        if !text.isEmpty {
+        if includeComposerAttachments && !text.isEmpty {
             SpeechRecognitionManager.saveInputModePreference(voiceUsedInComposition ? "voice" : "text")
         }
 
@@ -222,7 +222,8 @@ extension AIChatViewModel {
         // planned here synchronously, files written to the planned ids by
         // consumePastedDraft below. Attaching cards after the first render
         // never showed them on device.
-        let pastePlanned = planPastedCards(for: text)
+        let pastePlanned: (plan: [Int: String], metas: [AttachmentMeta]) = includeComposerAttachments
+            ? planPastedCards(for: text) : ([:], [])
         let displayText = text.isEmpty && pendingAttachments.isEmpty ? "" : text
         let userMsg = ChatMessage(role: .user, content: displayText)
         userMsg.awaitingHistoryEntry = true  // [T-edit-anchor-link] cleared when the entry lands

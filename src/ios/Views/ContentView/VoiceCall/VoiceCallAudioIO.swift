@@ -57,7 +57,7 @@ final class VoiceCallAudioIO: NSObject, VADDelegate {
                 vad.setSileroModel(.v5); vad.setSamplerate(.SAMPLERATE_16)
                 // 32ms frames: fast conversational end point, not dictation's 5s.
                 vad.setThresholdWithVadStartDetectionProbability(0.6, vadEndDetectionProbability: 0.45,
-                    voiceStartVadTrueRatio: 0.7, voiceEndFalseRatio: 0.9,
+                    voiceStartVadTrueRatio: 0.7, voiceEndVadFalseRatio: 0.9,
                     voiceStartFrameCount: 7, voiceEndFrameCount: 22)
                 vad.delegate = self
                 self.controlLock.lock(); self.live = true; self.muted = false; self.epoch &+= 1; self.controlLock.unlock()
@@ -214,7 +214,7 @@ final class VoiceCallAudioIO: NSObject, VADDelegate {
         if let next = VADWrapper() {
             next.setSileroModel(.v5); next.setSamplerate(.SAMPLERATE_16)
             next.setThresholdWithVadStartDetectionProbability(0.6, vadEndDetectionProbability: 0.45,
-                voiceStartVadTrueRatio: 0.7, voiceEndFalseRatio: 0.9,
+                voiceStartVadTrueRatio: 0.7, voiceEndVadFalseRatio: 0.9,
                 voiceStartFrameCount: 7, voiceEndFrameCount: 22)
             next.delegate = self; vad = next
         }
