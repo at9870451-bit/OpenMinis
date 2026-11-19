@@ -239,6 +239,15 @@ final class AppModel {
     private(set) var sessionStarting = false
     private var pendingPrepareForTask = false
     private let requiresDiskImageCheck: Bool
+    // These describe real preparation, not the unauthenticated Remote Pairing hello.
+    private(set) var amoreVerificationStage = AmoreDeviceVerificationStage.notChecked
+    private(set) var amoreVerificationError: String?
+    private(set) var amoreVerificationAttemptAt: Date?
+    private(set) var amorePreparationInProgress = false
+    private(set) var amorePreparationResult: String?
+    private(set) var amoreDeviceCallsInFlight = 0
+    private var amoreExecutionGeneration = 0
+    private var pairingVerifiedRoute: PairingVerificationContext?
 
     /// No task is running, so an install (which ends Poki) disturbs nothing: no agent step under way,
     /// no approval waiting, and a minute since the agent last did something.
@@ -940,17 +949,26 @@ final class AppModel {
 
     @discardableResult
     func verifyPairing(force: Bool = false) async -> Bool {
-        if Self.onSimulator {
-            if loopback.isWorking { servicesSilent = false }
-            return true
+        guard !Self.onSimulator else {
+            // Simulator probes never establish real-device trust.
+            amoreVerificationStage = .unavailable
+            return false
         }
-        guard let path = pairingPath, loopback.isWorking else { return true }
+        guard let path = pairingPath, loopback.isWorking else {
+            amoreVerificationStage = .unavailable
+            amoreVerificationError = pairingPath == nil ? "No pairing record is available." : "The service channel is not ready for full verification."
+            return false
+        }
         let route = pairingRoute
         if pairingGateRoute != route { pairingVerifyGate.reset(); pairingGateRoute = route }
         if let pairingCheck, pairingCheckContext == route { return await pairingCheck.value }
-        guard pairingVerifyGate.permits(at: Date()) else { return false }
-        if !force, pairingTrouble == nil, !servicesSilent, let at = pairingVerifiedAt, Date().timeIntervalSince(at) < 600 { return true }
+        guard pairingVerifyGate.permits(at: Date()) else { amoreVerificationStage = .backoff; return false }
+        if !force, pairingVerifiedRoute == route, amoreVerificationStage == .verified,
+           pairingTrouble == nil, !servicesSilent, let at = pairingVerifiedAt, Date().timeIntervalSince(at) < 600 { return true }
         pairingCheck?.cancel()
+        amoreVerificationStage = .verifying
+        amoreVerificationError = nil
+        amoreVerificationAttemptAt = Date()
         let requestID = UUID()
         pairingCheckIdentity = requestID; pairingCheckContext = route
         let task = Task { @MainActor [weak self] () -> Bool in
@@ -969,12 +987,19 @@ final class AppModel {
                 self.servicesSilent = false
                 self.loopback.pairingVerified()
                 self.pairingVerifiedAt = Date()
+                self.pairingVerifiedRoute = route
+                self.amoreVerificationStage = .verified
+                self.amoreVerificationError = nil
                 return true
             } catch {
                 guard !Task.isCancelled, self.pairingCheckIdentity == requestID, self.pairingRoute == route else { return false }
                 self.pairingVerifyGate.failed(at: Date())
                 let text = error.localizedDescription
                 let code = (error as? SignerError)?.code
+                self.pairingVerifiedRoute = nil
+                self.amoreVerificationStage = .failed
+                self.amoreVerificationError = AmoreDeviceDiagnostic.safe("\(code ?? "verification"): \(text)")
+                self.problem = "完整配对 / 开发服务验证未完成（不是 hello 探测）。\n" + (self.amoreVerificationError ?? "")
                 if code == "pairing" {
                     if self.pairingTrouble == nil { self.log.add("pairing", "check: refused: \(text)") }
                     self.pairingTrouble = text.replacingOccurrences(of: " Pair again in Poki's setup.", with: "")
@@ -994,7 +1019,7 @@ final class AppModel {
                     self.loopback.pairingHandshakeFailed()
                     return false
                 }
-                return true
+                return false
             }
         }
         pairingCheck = task
@@ -1107,8 +1132,7 @@ final class AppModel {
         }
         guard !Task.isCancelled else { return false }
         if !verified {
-            problem = "The developer disk image is not downloaded yet (Setup > Pair). It is needed once."
-            Task { await diskImage.download() }
+            problem = "The developer disk image is not available or did not pass its file checks. Open Setup and explicitly download/prepare it; no image was downloaded by this device call."
             return false
         }
         return true
@@ -1226,6 +1250,8 @@ final class AppModel {
     }
 
     func stopSession() {
+        amoreExecutionGeneration &+= 1
+        cancelPasscodeHeadsUp()
         pairingCheck?.cancel(); pairingCheck = nil; pairingCheckIdentity = nil; pairingCheckContext = nil
         pairingVerifyGate.reset()
         sessionStartTask?.cancel()
@@ -1401,6 +1427,8 @@ final class AppModel {
 
     private func closeBecausePokiOpened() {
         guard automationPath == .inProcess, sessionOn, !runnerPaused, inProcessSession == .open, !inProcessWarming,
+              AmoreDeviceExecutionPolicy.mayCloseForForeground(taskActive: chatTaskActive, callsInFlight: amoreDeviceCallsInFlight,
+                                                               preparingByOwner: amorePreparationInProgress),
               stepUnderWay == nil, approvals.isEmpty, !probeDriven, endingTasks == 0 else { return }
         log.add("runner", "Poki is in front: closing the automation session at once; the banner goes with it")
         closeInProcess("Poki in front", keepingSession: idleSessionPolicy == .pauseAutomation)
@@ -1629,6 +1657,9 @@ final class AppModel {
             pairingTrouble = nil
             servicesSilent = false
             pairingVerifiedAt = Date()
+            pairingVerifiedRoute = pairingRoute
+            amoreVerificationStage = .verified
+            amoreVerificationError = nil
             // The disk image mounted and the runner is starting, so Developer Mode is on; a running
             // runner means UI Automation is on too. Setup's confirm steps tick themselves (a pairing
             // file from Poki Setup then needs nothing more on the phone).
@@ -1638,8 +1669,14 @@ final class AppModel {
             if status.state == "launching", runner.state != "launching" { launchingSince = Date() }
         case "failed" where status.code == "handshake":
             servicesSilent = true
+            pairingVerifiedRoute = nil
+            amoreVerificationStage = .failed
+            amoreVerificationError = AmoreDeviceDiagnostic.safe(status.detail ?? "Full Remote Pairing handshake failed.")
             loopback.pairingHandshakeFailed()
         case "failed" where status.code == "pairing":
+            pairingVerifiedRoute = nil
+            amoreVerificationStage = .failed
+            amoreVerificationError = AmoreDeviceDiagnostic.safe(status.detail ?? "The phone refused the pairing.")
             if pairingTrouble == nil { log.add("pairing", "refused: \(status.detail ?? "")") }
             pairingTrouble = status.detail ?? "The phone refused the pairing."
         default: break
@@ -1657,8 +1694,8 @@ final class AppModel {
             activity.update { $0.handoff = nil; $0.phase = .idle; $0.headline = "Ready for the agent" }
         }
         if status.code == "ddi_bad", runner.code != "ddi_bad" {
-            log.add("ddi", "the phone would not install the disk image: downloading it again")
-            diskImage.redownload()
+            log.add("ddi", "the phone refused the disk image; keeping files and waiting for explicit Setup repair")
+            problem = "The developer disk image was refused. Open Setup to review and explicitly prepare a compatible image; Amore did not delete or redownload it."
         }
         runner = status
         host.update(runner: coreState(of: status))
@@ -1977,6 +2014,10 @@ final class AppModel {
     func runTool(_ name: String, arguments: String, localSession: String? = nil, expectedApps: Set<String>? = nil) async -> PokiCore.ToolAnswer {
         if name == "status" || name == "routines" { return await core.callTool(name, arguments: arguments, localSession: localSession) }
         if probeDriven { return await core.callTool(name, arguments: arguments, localSession: localSession, expectedApps: expectedApps) }
+        let generation = amoreExecutionGeneration
+        guard !Task.isCancelled else {
+            return PokiCore.ToolAnswer(text: "not_sent: Device task cancelled. Nothing was sent.", jpeg: nil, isError: true)
+        }
         if !sessionOn {
             if !sessionStarting { startSession() }
             if let task = sessionStartTask { await task.value }
@@ -1988,12 +2029,140 @@ final class AppModel {
             let why = problem ?? "Poki is off."
             return PokiCore.ToolAnswer(text: "not_sent: Poki could not turn on: \(why) Nothing was sent. Tell the owner what to fix.", jpeg: nil, isError: true)
         }
+        guard !Task.isCancelled, generation == amoreExecutionGeneration else {
+            return PokiCore.ToolAnswer(text: "not_sent: Device task cancelled. Nothing was sent.", jpeg: nil, isError: true)
+        }
+        // Keep the task's session through scene callbacks even before toolStarted.
+        // Core still owns readiness waits, approvals and all actual actions.
+        amoreDeviceCallsInFlight += 1
+        defer { amoreDeviceCallsInFlight -= 1 }
+        wakeRunner(asked: "Amore \(name) requested automation")
+        if passcodeConfirmationPending {
+            return PokiCore.ToolAnswer(text: "not_sent: \(AppLocalization.text(Self.passcodeConfirmationMessage)) Nothing was sent.", jpeg: nil, isError: true)
+        }
         lastAgentActivity = Date(); lastStepAt = Date()
         return await core.callTool(name, arguments: arguments, localSession: localSession, expectedApps: expectedApps)
     }
 
     /// After Stop: waits until the phone has finished the action a stopped call had already sent.
     func phoneSettles(within seconds: Double) async -> Bool { await core.settle(timeout: seconds) }
+
+    /// Cancelling the host task must clear its lifecycle bit too. A mere runner
+    /// pause left chatTaskActive latched, including for anonymous conversations.
+    func cancelAmoreDeviceTask() {
+        amoreExecutionGeneration &+= 1
+        cancelPasscodeHeadsUp()
+        sessionStartTask?.cancel()
+        pendingPrepareForTask = false
+        chatTaskActive = false
+        lastShot = nil
+        pauseByOwner()
+    }
+
+    /// Explicit user action only: no look/do, app switching, taps, pairing creation,
+    /// downloads or approval decisions. It uses the same session/DDI/open gates.
+    @discardableResult
+    func prepareAmoreAutomationByOwner() async -> String {
+        guard !amorePreparationInProgress, !chatTaskActive, amoreDeviceCallsInFlight == 0,
+              approvals.isEmpty, stepUnderWay == nil else { return "设备正在处理任务或审批；请先结束任务。" }
+        guard AmoreDeviceServices.isEnabled else { return "请先明确开启设备控制；未启动任何自动化。" }
+        guard inFront, UIApplication.shared.applicationState == .active else { return "请在前台准备自动化；未启动任何操作。" }
+        guard !Self.onSimulator else { return "模拟器不能验证本机真实配对、DDI 或 iOS 授权。" }
+        guard setup.loopback != .none, pairingPath != nil else { return "请在原 Setup 中明确选择路径并完成配对；未创建或删除配对。" }
+        amorePreparationInProgress = true
+        amoreExecutionGeneration &+= 1
+        let generation = amoreExecutionGeneration
+        amorePreparationResult = nil
+        defer { amorePreparationInProgress = false }
+        let outcome: String
+        do {
+            if requiresDiskImageCheck {
+                await diskImage.ensureChecked()
+                guard !Task.isCancelled, generation == amoreExecutionGeneration else { throw CancellationError() }
+                guard diskImage.hasFiles else {
+                    let result = "已有开发镜像文件未就绪。请在原 Setup → Pairing 中明确下载；本次准备没有自动下载、创建配对或发送界面动作。"
+                    amorePreparationResult = result
+                    return result
+                }
+            }
+            if !usesLocalProcessTransport {
+                // A hello only locates the service. It cannot satisfy this check.
+                if !loopback.isWorking {
+                    loopback.check()
+                    for _ in 0..<40 {
+                        try Task.checkCancellation()
+                        guard generation == amoreExecutionGeneration else { throw CancellationError() }
+                        if loopback.isWorking { break }
+                        try await Task.sleep(for: .milliseconds(200))
+                    }
+                }
+                pairingVerifyGate.reset() // One explicit retry, not a hello-driven loop.
+                guard await verifyPairing(force: true) else {
+                    let result = "完整验证未通过；未打开自动化。" + (amoreVerificationError ?? "请查看握手与完整验证的独立阶段。")
+                    amorePreparationResult = result
+                    return result
+                }
+            }
+            try Task.checkCancellation()
+            guard generation == amoreExecutionGeneration else { throw CancellationError() }
+            if !sessionOn {
+                startSession()
+                if let task = sessionStartTask { await task.value }
+            }
+            try Task.checkCancellation()
+            guard generation == amoreExecutionGeneration else { throw CancellationError() }
+            // Continue remains a separate explicit consent in the existing notice.
+            // For the runner path it starts the session; for in-process it resumes the held open.
+            if sessionOn { wakeRunner(asked: "the owner requested one preparation and verification") }
+            let deadline = Date().addingTimeInterval(90)
+            while Date() < deadline {
+                try Task.checkCancellation()
+                guard generation == amoreExecutionGeneration else { throw CancellationError() }
+                if amoreAutomationReady { break }
+                if !sessionOn, !sessionStarting, !passcodeConfirmationPending { break }
+                if runner.state == "failed" || inProcessSession == .passcodeMissed { break }
+                if case .failed(let code, _) = inProcessSession, code != "open_under_way", code != "open_poki_first" { break }
+                try await Task.sleep(for: .milliseconds(250))
+            }
+            outcome = amoreAutomationReady
+                ? "本次准备验证完成：开发服务 / DDI 与自动化会话真实就绪。未调用 look/do，未发送界面动作；敏感操作仍须原审批。待机会关闭或暂停会话，当前状态以本页为准。"
+                : "本次准备未完成：\(amorePreparationPhase)。\(problem ?? "请查看运行器 detail/fix 与进程内阶段；未发送界面动作。")"
+        } catch {
+            outcome = "准备已取消；未发送界面动作。"
+        }
+        amorePreparationResult = AmoreDeviceDiagnostic.safe(outcome)
+        return amorePreparationResult ?? outcome
+    }
+
+    var amoreAutomationReady: Bool {
+        sessionOn && !runnerPaused && !ownerPaused && runner.isRunning && coreState(of: runner).isRunning
+    }
+    var amoreCoreReadiness: String { String(describing: host.currentRunner) }
+    var amoreProcessState: String {
+        switch inProcessSession {
+        case .idle: return sessionKept ? "kept; Automation Mode paused" : "idle"
+        case .closing(let reopen): return "closing; reopen=\(reopen)"
+        case .opening: return "opening"
+        case .open: return "open"
+        case .waitingForPasscode: return "waiting for iOS passcode"
+        case .passcodeMissed: return "iOS automation permission not granted; no automatic retry"
+        case .failed(let code, let detail): return AmoreDeviceDiagnostic.safe("failed: \(code): \(detail)")
+        }
+    }
+    var amorePreparationPhase: String {
+        if passcodeConfirmationPending { return "等待用户在 Connection 点 Continue（尚未授权启动）" }
+        if !sessionOn { return sessionStarting ? "检查完整配对与开发镜像文件" : "自动化会话未开启" }
+        if runnerPaused { return "待机；下一次设备任务才会打开自动化" }
+        if !runner.isRunning { return "启动器：\(runner.title)" }
+        if automationPath == .inProcess, !hasOpenInProcessSession { return "启动器已就绪；进程内会话：\(amoreProcessState)" }
+        return amoreAutomationReady ? "自动化会话已验证就绪（并非工具已执行）" : "自动化尚未就绪"
+    }
+    var amoreDeviceLifecycleDiagnostic: String {
+        "automationPath=\(automationPath.rawValue); front=\(inFront); taskActive=\(chatTaskActive); callsInFlight=\(amoreDeviceCallsInFlight); runnerPaused=\(runnerPaused); ownerPaused=\(ownerPaused); warming=\(inProcessWarming); opensInFlight=\(inProcessOpensInFlight); passcodeConsentPending=\(passcodeConfirmationPending); declined=\(InProcessWDA.automationDeclined)"
+    }
+    var amoreVerificationRetryAt: Date? {
+        pairingVerifyGate.permits(at: Date()) ? nil : pairingVerifyGate.nextAttempt
+    }
 
     // MARK: Approvals
 

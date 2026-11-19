@@ -143,40 +143,16 @@ extension AIChatView {
         )
     }
 
-    /// Trailing control: voice when the capsule is empty, Send as soon as
-    /// there is anything to send (text, attachment, pasted chunk). Gated on
-    /// content presence, NOT on canSend — with no model selected canSend is
-    /// false even with typed text, and the send button must still appear.
+    /// Independent dictation + one Call/Send/Queue/Stop slot. The primary
+    /// control reads content presence separately from model readiness, so a
+    /// draft with no selected model never turns into an accidental phone call.
     var composerTrailingButtons: AnyView {
-        let hasContent = !vm.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            || !vm.attachments.isEmpty
-            || vm.loadingVideoCount > 0
-            || !vm.pastedTexts.isEmpty
-        return AnyView(
-            HStack(spacing: 2) {
-                // Dictation and calling are distinct controls in every state.
-                micButton
-                phoneCallButton
-                if hasContent || vm.isProcessing { sendButton }
-            }
-        )
-    }
-
-    private var phoneCallButton: some View {
-        Button { prepareVoiceCall() } label: {
-            Image(systemName: "phone.fill")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(preparingVoiceCall ? ChatColors.secondaryText : ChatColors.accent)
-                .frame(width: 44, height: 44)
-                .background(ChatColors.inputIconBg, in: Circle())
-                .overlay(Circle().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
-                .overlay { if preparingVoiceCall { ProgressView().controlSize(.mini) } }
-        }
-        .buttonStyle(.plain)
-        .disabled(preparingVoiceCall || vm.isProcessing || remoteDeviceId != nil)
-        .accessibilityLabel(AppLocalized("Start real-time voice call"))
-        .accessibilityHint(AppLocalized("Opens a call using this conversation. This is not dictation."))
-        .accessibilityIdentifier("composer.voiceCall")
+        AnyView(HStack(spacing: 2) {
+            // Dictation stays independent. The primary slot changes between
+            // Call, Send/Queue and Stop; it never adds a second send control.
+            micButton
+            sendButton
+        })
     }
 
     private func prepareVoiceCall() {
@@ -452,7 +428,13 @@ extension AIChatView {
                        canEnqueue: canEnqueue,
                        isWaitingToSendVoice: isWaitingToSendVoice,
                        onSend: { performSend() },
-                       onEnqueue: { performEnqueue() })
+                       onEnqueue: { performEnqueue() },
+                       offersVoiceCall: remoteDeviceId == nil,
+                       hasComposerContent: !vm.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                           || !vm.attachments.isEmpty || vm.loadingVideoCount > 0 || !vm.pastedTexts.isEmpty,
+                       isDictating: voiceInputActive || speechManager.state == .recording,
+                       isPreparingVoiceCall: preparingVoiceCall,
+                       onVoiceCall: { prepareVoiceCall() })
     }
 
     /// Either the multi-line text field or the audio waveform, depending on

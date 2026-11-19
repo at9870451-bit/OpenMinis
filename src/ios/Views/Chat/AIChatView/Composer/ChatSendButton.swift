@@ -44,6 +44,12 @@ struct ChatSendButton: View {
     var isWaitingToSendVoice: Bool = false
     let onSend: () -> Void
     let onEnqueue: () -> Void
+    // Defaults preserve other original toolbar/preview callers.
+    var offersVoiceCall: Bool = false
+    var hasComposerContent: Bool = false
+    var isDictating: Bool = false
+    var isPreparingVoiceCall: Bool = false
+    var onVoiceCall: () -> Void = {}
 
     @ObservedObject private var jobs = AgentJobRegistry.shared
     /// [T-scheduled-active-session] The tracker's ACTIVE conversations — the
@@ -105,6 +111,13 @@ struct ChatSendButton: View {
         vm.isProcessing || hasRunningSubAgent || (vm.sessionId.map(tracker.isBusy) ?? false)
     }
 
+    private var primaryAction: AmoreComposerPrimaryAction {
+        .resolve(waitingForVoice: isWaitingToSendVoice, processing: vm.isProcessing, busy: isBusy,
+                 canSend: canSend, canEnqueue: canEnqueue, offersCall: offersVoiceCall,
+                 hasContent: hasComposerContent, voiceInputActive: isDictating,
+                 preparingCall: isPreparingVoiceCall)
+    }
+
     var body: some View {
         Group {
             // [T-voice-send-lock] First, before every other state: while the send
@@ -113,7 +126,7 @@ struct ChatSendButton: View {
             // happening, which reads as "the tap did not register". Not a control:
             // nothing to press, so nothing to press twice. Same 34 pt footprint as
             // the glyphs below, so the row does not move.
-            if isWaitingToSendVoice {
+            if primaryAction == .transcribing {
                 ZStack {
                     Image(systemName: "circle.fill")
                         .font(.system(size: 34))
@@ -124,7 +137,7 @@ struct ChatSendButton: View {
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text("Transcribing, then sending…", comment: "Voice input: status while a tapped Send waits for speech recognition to finish"))
-            } else if vm.isProcessing && canEnqueue {
+            } else if primaryAction == .queue {
                 returnModeMenu(primaryAction: onEnqueue) {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.system(size: 34))
@@ -133,7 +146,7 @@ struct ChatSendButton: View {
                 }
                 .accessibilityLabel(Text("Add to queue", comment: "VoiceOver label for the send button while a reply is generating"))
                 .accessibilityHint(Text("Queues this message to send after the current reply finishes", comment: "VoiceOver hint for the queue button"))
-            } else if isBusy && !canSend {
+            } else if primaryAction == .stop {
                 // Stop. When only a sub agent is running, cancelling stops it
                 // rather than a (non-existent) reply — vm.cancel() covers both,
                 // and the label says which one the user is stopping.
@@ -200,6 +213,29 @@ struct ChatSendButton: View {
                         ? Text("Stop sub agents", comment: "VoiceOver label for the stop button while only background sub agents are running")
                         : Text("Stop scheduled tasks", comment: "VoiceOver label for the stop button while the conversation only waits on its scheduled tasks"))
                 .accessibilityHint(Text("Stops the reply that is being generated", comment: "VoiceOver hint for the stop button"))
+            } else if primaryAction == .preparingCall {
+                ProgressView().controlSize(.small)
+                    .frame(width: 44, height: 44)
+                    .accessibilityLabel(AppLocalized("Preparing real-time voice call"))
+                    .accessibilityIdentifier("composer.voiceCall.preparing")
+            } else if primaryAction == .call {
+                Button {
+                    // A held system tap must re-read state after typing or a
+                    // background job starts; it must not open a stale call.
+                    guard primaryAction == .call else { return }
+                    onVoiceCall()
+                } label: {
+                    Image(systemName: "phone.fill")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(ChatColors.accent)
+                        .frame(width: 44, height: 44)
+                        .background(ChatColors.inputIconBg, in: Circle())
+                        .overlay(Circle().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(AppLocalized("Start real-time voice call"))
+                .accessibilityHint(AppLocalized("Opens a call using this conversation. This is not dictation."))
+                .accessibilityIdentifier("composer.voiceCall")
             } else {
                 // Typing while a sub agent runs must still be sendable: the user
                 // may want to redirect it, and the parent loop is free to answer.

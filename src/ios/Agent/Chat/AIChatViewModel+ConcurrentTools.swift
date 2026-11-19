@@ -445,15 +445,23 @@ extension AIChatViewModel {
         try Task.checkCancellation()
         switch tu.name {
         case "device_control":
-            let answer = await AmoreDeviceTools.run(
-                action: toolArgs["action"] as? String ?? "status",
-                arguments: toolArgs["arguments_json"] as? String ?? "{}",
-                sessionID: self.sessionId
-            )
-            toolOutput = answer.text
+            let request = try AmoreDeviceToolRequest(toolArgs)
+            if request.action == "do", truncationRepairTag != nil {
+                throw AmoreDeviceToolRequest.Invalid.request("Device action arguments were truncated in transit. Send a new complete call; partial device actions are never repaired and sent.")
+            }
+            let pending = AmoreDeviceToolPresentation.pending(action: request.action)
+            if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count,
+               messages[msgIdx].blocks[blockIdx].toolUseId == tu.id {
+                messages[msgIdx].blocks[blockIdx].content = pending
+            }
+            ctLogger.info("[DeviceToolLifecycle] DISPATCHED toolId=\(tu.id.prefix(20)) action=\(request.action)")
+            let answer = await AmoreDeviceTools.run(request: request, sessionID: self.sessionId)
+            toolOutput = AmoreDeviceToolPresentation.completed(output: answer.text,
+                success: !answer.error, waitingForOwner: answer.waitingForOwner)
             toolSuccess = !answer.error
             toolImageData = answer.image
             toolImageMimeType = answer.image == nil ? nil : "image/jpeg"
+            ctLogger.info("[DeviceToolLifecycle] RETURNED toolId=\(tu.id.prefix(20)) action=\(request.action) success=\(!answer.error) waitingForOwner=\(answer.waitingForOwner)")
         case "shell_execute":
             let (command, timeout, delay) = parseToolInput(from: argsJson)
 
@@ -1099,6 +1107,16 @@ extension AIChatViewModel {
                 messages[msgIdx].blocks[blockIdx].content = toolOutput
                 messages[msgIdx].blocks[blockIdx].toolStatus = .cancelled
             }
+        }
+
+        // Device results must replace the live placeholder as well as the
+        // model/history copy. Otherwise the expanded card stays "Tool: device_control"
+        // even after a real answer. Catch/cancel paths use the same final body.
+        if tu.name == "device_control", msgIdx < messages.count,
+           blockIdx < messages[msgIdx].blocks.count,
+           messages[msgIdx].blocks[blockIdx].toolUseId == tu.id {
+            messages[msgIdx].blocks[blockIdx].content = toolOutput.isEmpty
+                ? "Device tool returned no readable result; do not claim an action was executed." : toolOutput
         }
 
         let toolDuration: TimeInterval? = {

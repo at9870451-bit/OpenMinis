@@ -48,6 +48,15 @@ public final class AmoreDeviceStatusStore {
         model.loopback.retryProtocolCheck()
     }
     public func stopAutomationSession() { AmoreDeviceServices.stopAutomationSession() }
+    public var canPrepareAutomation: Bool {
+        !model.amorePreparationInProgress && !model.sessionStarting && AmoreDeviceServices.isEnabled
+    }
+    /// Call only after a user gesture/confirmation. Refresh and page appearance
+    /// deliberately never call this method.
+    public func prepareAutomationByOwner() async {
+        _ = await model.prepareAmoreAutomationByOwner()
+        refreshRevision &+= 1
+    }
     public var diagnosticText: String {
         let snapshot = model.amoreStatusSnapshot
         var lines = ["Amore local connection diagnostic", "iOS \(ProcessInfo.processInfo.operatingSystemVersionString)",
@@ -55,11 +64,20 @@ public final class AmoreDeviceStatusStore {
                      "transport: \(snapshot.transport?.rawValue ?? "none")",
                      "sessionOn: \(snapshot.sessionOn); runner: \(snapshot.runnerState); code: \(snapshot.runnerCode ?? "none")",
                      "Wi-Fi: \(model.loopback.wifiUp); cellular: \(model.loopback.cellularUp)",
-                     "DDI mounted: \(snapshot.localDDIMounted); pairing present: \(snapshot.pairingPresent)"]
+                     "DDI mounted: \(snapshot.localDDIMounted); DDI files checked: \(model.diskImage.hasFiles); pairing present: \(snapshot.pairingPresent)",
+                     "automationReady: \(snapshot.automationReady); phase: \(snapshot.preparationPhase)",
+                     "full verification: \(snapshot.verificationStage.rawValue); attempt: \(model.amoreVerificationAttemptAt?.description ?? "never"); accepted: \(snapshot.pairingVerifiedAt?.description ?? "never")",
+                     "verification error: \(snapshot.verificationError ?? "none"); retry not before: \(model.amoreVerificationRetryAt?.description ?? "now")",
+                     "runner detail: \(snapshot.runnerDetail ?? "none"); fix: \(snapshot.runnerFix ?? "none"); attempt: \(snapshot.runnerAttempt.map(String.init) ?? "none")",
+                     "in-process state: \(snapshot.processState); core readiness: \(model.amoreCoreReadiness)",
+                     model.amoreDeviceLifecycleDiagnostic,
+                     "owner preparation: \(snapshot.preparationResult ?? "not requested")",
+                     "problem: \(snapshot.problem ?? "none")",
+                     "Hello/handshakeOK is service reachability only; it is NOT authenticated pairing or automation readiness."]
         if let value = loopbackInterface() { lines.append("interface: \(value.interface) \(value.address)") }
         if let result = model.loopback.lastHandshake { lines.append(result.summary) }
         lines.append(model.loopback.lastPortSearch)
-        return lines.joined(separator: "\n")
+        return AmoreDeviceDiagnostic.safe(lines.joined(separator: "\n"))
     }
     public var handshakeDetail: String? { model.loopback.lastHandshake?.summary }
     public var lastProbeAt: Date? { model.loopback.checkedAt }
@@ -80,10 +98,17 @@ extension AppModel {
                                                developerMode: setup.developerMode, sessionOn: sessionOn,
                                                runnerRunning: runner.isRunning, inProcessOpen: hasOpenInProcessSession,
                                                inProcess: automationPath == .inProcess, channelWorking: channel,
-                                               preparing: sessionStarting || preparingPhone)
+                                               preparing: sessionStarting || preparingPhone || amorePreparationInProgress,
+                                               automationReady: amoreAutomationReady,
+                                               pairingVerified: amoreVerificationStage == .verified)
         return AmoreDeviceStatus(state: state, transport: transport, sessionOn: sessionOn,
                                  automationEnabled: AmoreDeviceServices.isEnabled, runnerState: runner.state,
-                                 runnerCode: runner.code, inProcessOpen: hasOpenInProcessSession,
+                                 runnerCode: runner.code, runnerDetail: runner.detail.map(AmoreDeviceDiagnostic.safe),
+                                 runnerFix: runner.fix.map(AmoreDeviceDiagnostic.safe), runnerAttempt: runner.attempt,
+                                 automationReady: amoreAutomationReady, preparationPhase: amorePreparationPhase,
+                                 preparationInProgress: amorePreparationInProgress, preparationResult: amorePreparationResult,
+                                 verificationStage: amoreVerificationStage, verificationError: amoreVerificationError,
+                                 processState: amoreProcessState, inProcessOpen: hasOpenInProcessSession,
                                  loopbackWorking: loopback.isWorking, loopbackText: loopback.text,
                                  pairingPresent: pairingPath != nil, pairingVerifiedAt: pairingVerifiedAt,
                                  pairingProblem: pairingTrouble, developerModeConfirmed: setup.developerMode,

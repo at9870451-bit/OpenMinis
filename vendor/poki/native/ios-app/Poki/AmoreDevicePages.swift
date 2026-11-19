@@ -5,6 +5,7 @@ import SwiftUI
 public struct AmoreDeviceStatusView: View {
     private let store = AmoreDeviceServices.statusStore
     @State private var confirmStop = false
+    @State private var confirmPreparation = false
     public init() {}
     public var body: some View {
         let status = store.snapshot
@@ -13,9 +14,15 @@ public struct AmoreDeviceStatusView: View {
                 LabeledContent("连接状态", value: status.title)
                 LabeledContent("对象", value: "当前这台 iPhone / iPad")
                 LabeledContent("自动化会话", value: status.sessionOn ? "已开启（不等于已连接）" : "未开启")
-                LabeledContent("Runner", value: status.runnerState)
-                LabeledContent("进程内会话", value: status.inProcessOpen ? "已打开" : "未打开")
-                LabeledContent("外部回环探测", value: status.loopbackText)
+                LabeledContent("自动化可执行", value: status.automationReady ? "会话已就绪（不代表操作已执行）" : "尚未就绪")
+                LabeledContent("当前阶段", value: status.preparationPhase)
+                LabeledContent("Runner", value: status.runnerState + (status.runnerCode.map { " / \($0)" } ?? ""))
+                if let detail = status.runnerDetail { Text("Runner detail：\(detail)").font(.caption).textSelection(.enabled) }
+                if let fix = status.runnerFix { Text("建议：\(fix)").font(.caption).foregroundStyle(.orange) }
+                LabeledContent("进程内会话", value: status.processState)
+                LabeledContent("完整配对 / 开发服务验证", value: status.verificationStage.title)
+                if let error = status.verificationError { Text(error).font(.caption).foregroundStyle(.orange).textSelection(.enabled) }
+                LabeledContent("服务通道探测（非完整验证）", value: status.loopbackText)
                 LabeledContent("配对记录", value: status.pairingPresent ? "存在（不等于已验证）" : "缺少")
                 if let at = status.pairingVerifiedAt {
                     LabeledContent("最近配对验证") { Text(at, style: .date) + Text(" ") + Text(at, style: .time) }
@@ -23,6 +30,21 @@ public struct AmoreDeviceStatusView: View {
                 LabeledContent("DeveloperMode", value: status.developerModeConfirmed ? "已确认（上次状态）" : "等待用户开启")
                 LabeledContent("本机开发镜像", value: status.localDDIMounted ? "已挂载" : "未挂载 / 不可访问")
                 if let problem = status.pairingProblem ?? status.problem { Text(problem).foregroundStyle(.orange) }
+            }
+            Section("准备并验证自动化") {
+                Text("这是您主动触发的单次准备：完整验证配对与开发服务，检查已有开发镜像并打开真实自动化会话。iOS 可能要求您确认 / 输入系统密码；不会配对、下载镜像、替您审批，也不调用 look/do 或点击、输入、切换应用。仅 hello 成功不表示已连接或能执行。")
+                    .font(.footnote).foregroundStyle(.secondary)
+                Button(status.preparationInProgress ? "正在准备并验证…" : "准备并验证自动化", systemImage: "checkmark.shield") {
+                    confirmPreparation = true
+                }
+                .disabled(!store.canPrepareAutomation)
+                .accessibilityIdentifier("amore.deviceStatus.prepareAutomation")
+                if AmoreDeviceServices.model.passcodeConfirmationPending {
+                    Text(AppModel.passcodeHeadsUpMessage).font(.footnote)
+                    Button("Continue") { AmoreDeviceServices.model.continueAfterPasscodeHeadsUp() }
+                    Button("取消授权", role: .cancel) { AmoreDeviceServices.model.cancelPasscodeHeadsUp() }
+                }
+                if let result = status.preparationResult { Text(result).font(.caption).textSelection(.enabled) }
             }
             Section("Remote Pairing 握手诊断") {
                 Text("VPN 已连接、TCP 接通和开发服务握手完成是三个不同状态。握手检查不读取配对密钥、不安装开发镜像、不发起自动配对。")
@@ -69,6 +91,10 @@ public struct AmoreDeviceStatusView: View {
         .navigationTitle("本机连接状态")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { store.refresh() }
+        .confirmationDialog("仅准备并验证真实自动化会话？可能挂载已经准备好的开发镜像并由 iOS 请求系统授权；不执行界面操作。", isPresented: $confirmPreparation, titleVisibility: .visible) {
+            Button("准备并验证一次") { Task { await store.prepareAutomationByOwner() } }
+            Button("取消", role: .cancel) { }
+        }
         .confirmationDialog("停止当前自动化会话？当前设备任务将停止，配对和开发镜像保留。", isPresented: $confirmStop, titleVisibility: .visible) {
             Button("停止并解锁路径", role: .destructive) { store.stopAutomationSession() }
             Button("取消", role: .cancel) { }

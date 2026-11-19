@@ -245,9 +245,8 @@ final class OpenAIAgentProvider: AgentProvider {
         return AsyncThrowingStream { continuation in
             let task = Task {
                 var emittedTextStart = false
-                var hasToolCalls = false
-                // Track parallel tool calls by index: [index: (id, name, accumulatedJSON)]
-                var toolCallAccum: [Int: (id: String, name: String, json: String)] = [:]
+                // Pure, fail-closed reducer shared by finish_reason / [DONE].
+                var toolCompletion = AmoreToolCallCompletion()
                 // Accumulate reasoning_content from thinking models (Kimi, DeepSeek, QwQ, etc.)
                 var reasoningContent = ""
                 // True once we've seen ANY reasoning field on the wire — even an empty
@@ -255,14 +254,6 @@ final class OpenAIAgentProvider: AgentProvider {
                 // round-trip that empty value back as history rather than fabricating
                 // placeholder text the model would learn to imitate.
                 var sawReasoningFieldEver = false
-                // [T-openai-done-overwrite] GH#263. Set once a finish_reason chunk
-                // has yielded `.done`. OpenRouter (and OpenAI) always follow it
-                // with `data: [DONE]`, and the [DONE] branch used to yield a
-                // SECOND `.done(.endTurn)` — which the consumer let win, so a
-                // truncated reply (`length` → .maxTokens) or a content-filter
-                // block (.refusal) was reported as "Model returned an empty
-                // response". The first terminal reason is the real one.
-                var emittedDone = false
                 // [T-openrouter-reasoning-details] Count of opaque
                 // `reasoning.encrypted` items seen, for the finish log line.
                 var encryptedReasoningChunks = 0
@@ -311,8 +302,32 @@ final class OpenAIAgentProvider: AgentProvider {
                     }
                 }
 
+                // Validate the entire pending batch BEFORE yielding any executable
+                // toolCallComplete. A missing/invalid argument must never become {}.
+                func completeTurn(_ terminal: AmoreToolCallCompletion.Terminal) throws {
+                    guard let completion = try toolCompletion.complete(at: terminal) else { return }
+                    emitParsed(thinkParser.finishTurn())
+                    for call in completion.calls {
+                        continuation.yield(.toolCallComplete(
+                            id: call.id, name: call.name, args: call.args, metadata: nil
+                        ))
+                    }
+                    if sawReasoningFieldEver || !reasoningContent.isEmpty {
+                        continuation.yield(.reasoningContent(reasoningContent))
+                    }
+                    let reason: AgentStopReason
+                    switch completion.reason {
+                    case .endTurn: reason = .endTurn
+                    case .toolUse: reason = .toolUse
+                    case .maxTokens: reason = .maxTokens
+                    case .refusal: reason = .refusal
+                    }
+                    continuation.yield(.done(stopReason: reason))
+                }
+
                 do {
                     for try await line in lineStream {
+                        try Task.checkCancellation()
                         diagLineCount += 1
                         if diagFirstLines.count < diagCaptureLimit {
                             diagFirstLines.append(line.count > 240 ? String(line.prefix(240)) + "…" : line)
@@ -320,19 +335,9 @@ final class OpenAIAgentProvider: AgentProvider {
                         guard let payload = Self.ssePayload(from: line) else { continue }
                         diagDataLineCount += 1
                         if payload == "[DONE]" {
-                            // Flush the think parser's tail (cross-chunk tag
-                            // fragment / withheld trailing whitespace).
-                            emitParsed(thinkParser.finishTurn())
-                            if sawReasoningFieldEver || !reasoningContent.isEmpty {
-                                continuation.yield(.reasoningContent(reasoningContent))
-                            }
-                            // A proxy that sends no finish_reason still needs
-                            // [DONE] to end the turn.
-                            if !emittedDone {
-                                let reason: AgentStopReason = hasToolCalls ? .toolUse : .endTurn
-                                continuation.yield(.done(stopReason: reason))
-                                emittedDone = true
-                            }
+                            // Explicit terminal even when a compatible proxy omits
+                            // finish_reason; the same one-shot validator is used.
+                            try completeTurn(.done)
                             break
                         }
 
@@ -377,7 +382,10 @@ final class OpenAIAgentProvider: AgentProvider {
                             continuation.yield(.usage(u))
                         }
 
-                        guard let choices = event["choices"] as? [[String: Any]],
+                        // Retain usage/model handling above after the first
+                        // terminal, but never reopen calls or emit a second done.
+                        guard !toolCompletion.isTerminal,
+                              let choices = event["choices"] as? [[String: Any]],
                               let choice = choices.first else { continue }
 
                         let finishReason = choice["finish_reason"] as? String
@@ -498,30 +506,15 @@ final class OpenAIAgentProvider: AgentProvider {
                             // arguments have streamed in).
                             emitParsed(thinkParser.resolveAtToolBoundary())
                             for tc in toolCalls {
-                                guard let index = tc["index"] as? Int else { continue }
-                                let fn = tc["function"] as? [String: Any] ?? [:]
-
-                                // Guard against empty id/name: DeepSeek V4 Flash sends
-                                // id:"" name:"" on every arguments delta chunk (unlike
-                                // OpenAI, which omits them after the first chunk). Since
-                                // `"" as? String` binds successfully, an unguarded check
-                                // would treat each delta as a NEW tool call and overwrite
-                                // the valid accumulator entry with empty values.
-                                if let id = tc["id"] as? String, !id.isEmpty,
-                                   let name = fn["name"] as? String, !name.isEmpty {
-                                    // New tool call start
-                                    emittedTextStart = false
-                                    hasToolCalls = true
-                                    toolCallAccum[index] = (id: id, name: name, json: "")
-                                    continuation.yield(.contentBlockStart(.toolUse(id: id, name: name)))
-                                    diagYieldedAnyContent = true
-                                }
-
-                                if let argDelta = fn["arguments"] as? String,
-                                   var entry = toolCallAccum[index] {
-                                    entry.json += argDelta
-                                    toolCallAccum[index] = entry
-                                    continuation.yield(.toolInputDelta(name: entry.name, accumulated: entry.json))
+                                for update in try toolCompletion.accumulate(tc) {
+                                    switch update {
+                                    case .start(let id, let name):
+                                        emittedTextStart = false
+                                        continuation.yield(.contentBlockStart(.toolUse(id: id, name: name)))
+                                        diagYieldedAnyContent = true
+                                    case .input(let name, let accumulated):
+                                        continuation.yield(.toolInputDelta(name: name, accumulated: accumulated))
+                                    }
                                 }
                             }
                         }
@@ -536,45 +529,17 @@ final class OpenAIAgentProvider: AgentProvider {
                         // emitting an empty-args ({}) tool call and orphaning the
                         // real argument deltas in later chunks.
                         if let fr = finishReason, !fr.isEmpty {
-                            // Flush the think parser's tail (idempotent — the
-                            // [DONE] handler may flush again harmlessly).
-                            emitParsed(thinkParser.finishTurn())
-                            logger.info("SSE finish_reason=\(fr) hasToolCalls=\(hasToolCalls) emittedTextStart=\(emittedTextStart) reasoningLen=\(reasoningContent.count) encryptedReasoningChunks=\(encryptedReasoningChunks)")
-                            // Emit completed tool calls
-                            for (_, entry) in toolCallAccum.sorted(by: { $0.key < $1.key }) {
-                                let args = Self.parseJsonToDict(entry.json)
-                                if args.isEmpty {
-                                    Self.diagEmptyToolArgs(rawJson: entry.json, toolName: entry.name, toolId: entry.id, model: self.model.id, source: "chatCompletions.finishReason")
-                                }
-                                continuation.yield(.toolCallComplete(
-                                    id: entry.id, name: entry.name, args: args, metadata: nil
-                                ))
-                            }
-                            toolCallAccum.removeAll()
-
-                            // Emit accumulated reasoning content from thinking models.
-                            // Also emit when the field appeared on the wire as an empty
-                            // string (DeepSeek V4) so the assistant turn round-trips an
-                            // empty `reasoning_content` instead of nil → placeholder.
-                            if sawReasoningFieldEver || !reasoningContent.isEmpty {
-                                continuation.yield(.reasoningContent(reasoningContent))
-                            }
-
-                            let reason: AgentStopReason
-                            switch fr {
-                            case "tool_calls": reason = .toolUse
-                            case "length": reason = .maxTokens
-                            case "content_filter":
+                            logger.info("SSE finish_reason=\(fr) hasToolCalls=\(toolCompletion.hasToolCalls) emittedTextStart=\(emittedTextStart) reasoningLen=\(reasoningContent.count) encryptedReasoningChunks=\(encryptedReasoningChunks)")
+                            if fr == "content_filter" {
                                 logger.warning("[OpenAIStream] finish_reason=content_filter — OpenAI safety system blocked this response")
-                                reason = .refusal
-                            default: reason = hasToolCalls ? .toolUse : .endTurn
                             }
-                            if !emittedDone {
-                                continuation.yield(.done(stopReason: reason))
-                                emittedDone = true
-                            }
+                            try completeTurn(.finishReason(fr))
                         }
                     }
+                    try Task.checkCancellation()
+                    // A network EOF is NOT a model terminal and must not execute
+                    // even syntactically complete pending device operations.
+                    try toolCompletion.endOfStream()
                     // Empty-stream diagnostic. The "no content, no stop reason"
                     // detector higher up will throw transientError on this
                     // outcome; before that fires, dump what actually came over
@@ -2771,3 +2736,153 @@ struct ResponsesFunctionCallAssembler {
     }
 }
 // END ResponsesFunctionCallAssembler
+
+// BEGIN AmoreToolCallCompletion
+/// Chat-Completions only. Kept in this already-built source file so the host
+/// Xcode Sources list needs no unrelated project change. Foundation-only and
+/// side-effect free; the isolated SPM tests compile this exact marked block.
+///
+/// Only an explicit nonempty finish_reason or [DONE] authorizes completion.
+/// Validate ALL calls before returning ANY; errors seal/discard the batch.
+/// A transport EOF is never permission to execute a pending operation.
+struct AmoreToolCallCompletion {
+    enum Terminal {
+        case finishReason(String)
+        case done
+    }
+    enum StopReason {
+        case endTurn, toolUse, maxTokens, refusal
+    }
+    enum Update {
+        case start(id: String, name: String)
+        case input(name: String, accumulated: String)
+    }
+    struct Call {
+        let id: String
+        let name: String
+        let args: [String: Any]
+    }
+    struct Completion {
+        let calls: [Call]
+        let reason: StopReason
+    }
+    struct Failure: LocalizedError {
+        let message: String
+        var errorDescription: String? {
+            "OpenAI Chat Completions: \(message). Pending tool calls were not executed."
+        }
+    }
+    private struct Pending {
+        var id = ""
+        var name = ""
+        var json = ""
+        var sawArguments = false
+        var announced = false
+    }
+    private var pending: [Int: Pending] = [:]
+    private(set) var isTerminal = false
+    private(set) var hasToolCalls = false
+
+    private mutating func reject(_ message: String) -> Failure {
+        isTerminal = true
+        pending.removeAll()
+        return Failure(message: message)
+    }
+
+    /// Empty identity strings on argument deltas (DeepSeek) do not reset the
+    /// buffer. Split id/name chunks are retained; conflicting reuse fails closed.
+    mutating func accumulate(_ delta: [String: Any]) throws -> [Update] {
+        guard !isTerminal else { return [] }
+        guard let index = delta["index"] as? Int, index >= 0 else {
+            throw reject("tool delta is missing a valid index")
+        }
+        if let type = delta["type"] as? String, !type.isEmpty, type != "function" {
+            throw reject("unsupported tool delta type at index \(index)")
+        }
+        hasToolCalls = true
+        var entry = pending[index] ?? Pending()
+        let fn = delta["function"] as? [String: Any] ?? [:]
+        if let id = delta["id"] as? String, !id.isEmpty {
+            guard entry.id.isEmpty || entry.id == id else {
+                throw reject("conflicting tool id at index \(index)")
+            }
+            entry.id = id
+        }
+        if let name = fn["name"] as? String, !name.isEmpty {
+            guard entry.name.isEmpty || entry.name == name else {
+                throw reject("conflicting tool name at index \(index)")
+            }
+            entry.name = name
+        }
+        let argumentDelta = fn["arguments"] as? String
+        if let raw = fn["arguments"], !(raw is NSNull), argumentDelta == nil {
+            throw reject("tool arguments must be a JSON string at index \(index)")
+        }
+        if let argumentDelta {
+            entry.sawArguments = true
+            entry.json += argumentDelta
+        }
+        var updates: [Update] = []
+        let wasAnnounced = entry.announced
+        if !entry.announced, !entry.id.isEmpty, !entry.name.isEmpty {
+            entry.announced = true
+            updates.append(.start(id: entry.id, name: entry.name))
+        }
+        if entry.announced, argumentDelta != nil || (!wasAnnounced && entry.sawArguments) {
+            updates.append(.input(name: entry.name, accumulated: entry.json))
+        }
+        pending[index] = entry
+        return updates
+    }
+
+    /// Exactly one successful terminal batch (and done reason) per stream.
+    /// Literal {} is valid; absent/blank/truncated/non-object JSON never becomes
+    /// an empty dictionary. This validates wire shape, not a tool's own schema.
+    mutating func complete(at terminal: Terminal) throws -> Completion? {
+        guard !isTerminal else { return nil }
+        let reason: StopReason
+        switch terminal {
+        case .finishReason(let value):
+            guard !value.isEmpty else { return nil }
+            switch value {
+            case "tool_calls": reason = .toolUse
+            case "length": reason = .maxTokens
+            case "content_filter": reason = .refusal
+            default: reason = hasToolCalls ? .toolUse : .endTurn
+            }
+        case .done:
+            reason = hasToolCalls ? .toolUse : .endTurn
+        }
+        var calls: [Call] = []
+        var ids = Set<String>()
+        for (index, entry) in pending.sorted(by: { $0.key < $1.key }) {
+            guard !entry.id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  !entry.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw reject("incomplete tool identity at index \(index)")
+            }
+            guard ids.insert(entry.id).inserted else {
+                throw reject("duplicate tool id at index \(index)")
+            }
+            guard entry.sawArguments,
+                  !entry.json.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw reject("missing tool arguments at index \(index)")
+            }
+            guard let object = try? JSONSerialization.jsonObject(with: Data(entry.json.utf8), options: []),
+                  let args = object as? [String: Any] else {
+                throw reject("incomplete or invalid JSON object arguments at index \(index)")
+            }
+            calls.append(Call(id: entry.id, name: entry.name, args: args))
+        }
+        isTerminal = true
+        pending.removeAll()
+        return Completion(calls: calls, reason: reason)
+    }
+
+    /// EOF without a model terminal preserves existing text-only behavior, but
+    /// explicitly fails ALL pending tools, even when their JSON looks complete.
+    mutating func endOfStream() throws {
+        guard !isTerminal, !pending.isEmpty else { return }
+        throw reject("stream ended before finish_reason or [DONE]")
+    }
+}
+// END AmoreToolCallCompletion

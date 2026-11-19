@@ -11,7 +11,7 @@ public enum AmoreDeviceServices {
     private static var stopHostAgent: (String?) -> Void = { _ in }
     private static var activeSession: () -> String? = { nil }
     private static var approvalObservers: [(String?) -> Void] = []
-    private static var taskOwner: String?
+    private static var taskLease = AmoreDeviceTaskLease()
     static var model: AppModel {
         if let retained { return retained }
         AppLocalization.publish()
@@ -54,20 +54,18 @@ public enum AmoreDeviceServices {
         if !enabled { stopAutomationSession() }
     }
     public static func finishTask(sessionID: String?) {
-        guard let taskOwner, taskOwner == sessionID else { return }
+        guard taskLease.release(sessionID ?? activeSession()) else { return }
         retained?.finishTask()
-        self.taskOwner = nil
     }
     public static func cancelTask(sessionID: String?) {
-        guard let taskOwner, taskOwner == sessionID else { return }
-        retained?.pauseByOwner()
-        self.taskOwner = nil
+        guard taskLease.release(sessionID ?? activeSession()) else { return }
+        retained?.cancelAmoreDeviceTask()
     }
     public static func pauseAutomation() {
-        let owner = taskOwner
-        taskOwner = nil
+        let owner = taskLease.owner
+        taskLease.reset()
         stopHostAgent(owner)
-        retained?.pauseByOwner()
+        retained?.cancelAmoreDeviceTask()
     }
     /// Explicit OFF is not Pause. End the session, unlock transport selection,
     /// keep pairing/DDI data, and stop only Amore's own built-in tunnel.
@@ -91,12 +89,16 @@ public enum AmoreDeviceServices {
             return Answer(text: "Unsupported device tool.", jpeg: nil, isError: true, waitingForOwner: false)
         }
         let session = sessionID ?? activeSession()
-        if name != "status", let taskOwner, taskOwner != session {
-            return Answer(text: "The device is busy with another Amore conversation. Wait for that task or stop it first.", jpeg: nil, isError: true, waitingForOwner: false)
-        }
-        if name != "status", taskOwner != session {
-            taskOwner = session
-            model.chatTaskBegan()
+        if name != "status" {
+            guard !model.amorePreparationInProgress else {
+                return Answer(text: "not_sent: The owner is preparing and verifying automation in Connection. Wait for that result; no action was sent.", jpeg: nil, isError: true, waitingForOwner: true)
+            }
+            switch taskLease.claim(session) {
+            case .busy:
+                return Answer(text: "The device is busy with another Amore conversation. Wait for that task or stop it first.", jpeg: nil, isError: true, waitingForOwner: false)
+            case .began: model.chatTaskBegan()
+            case .continued: break
+            }
         }
         let result = await model.runTool(name, arguments: arguments, localSession: session)
         return Answer(text: result.text, jpeg: result.jpeg, isError: result.isError, waitingForOwner: result.waitingForOwner)

@@ -398,7 +398,7 @@ extension ContentView {
                 }
                     .padding(.horizontal, 14)
                     .frame(width: 132, height: 52)
-                    .foregroundStyle(PokiTheme.sidebarInk)
+                    .amoreDrawerFooterGlass(in: Capsule())
                     .contentShape(Capsule())
             }
             .buttonStyle(.plain)
@@ -416,8 +416,8 @@ extension ContentView {
             } label: {
                 Image(systemName: "gearshape")
                     .font(.title3.weight(.medium))
-                    .foregroundStyle(PokiTheme.sidebarInk)
                     .frame(width: 52, height: 52)
+                    .amoreDrawerFooterGlass(in: Circle())
                     .contentShape(Circle())
             }
             .buttonStyle(.plain)

@@ -1,5 +1,19 @@
 import Foundation
 
+public enum AmoreDeviceVerificationStage: String, Sendable {
+    case notChecked, verifying, verified, failed, backoff, unavailable
+    public var title: String {
+        switch self {
+        case .notChecked: "尚未完整验证"
+        case .verifying: "正在完整 pair-verify / 开发服务验证"
+        case .verified: "完整验证已通过（非 hello）"
+        case .failed: "完整验证失败"
+        case .backoff: "完整验证失败，等待重试间隔"
+        case .unavailable: "当前路径尚不能完整验证"
+        }
+    }
+}
+
 /// A read-only, local snapshot. Availability/configuration never means connected.
 public struct AmoreDeviceStatus: Equatable, Sendable {
     public enum State: String, Sendable { case currentDevice, disconnected, needsPairing, waitingDeveloperMode, localChannel, preparing }
@@ -20,6 +34,16 @@ public struct AmoreDeviceStatus: Equatable, Sendable {
     public let automationEnabled: Bool
     public let runnerState: String
     public let runnerCode: String?
+    public let runnerDetail: String?
+    public let runnerFix: String?
+    public let runnerAttempt: Int?
+    public let automationReady: Bool
+    public let preparationPhase: String
+    public let preparationInProgress: Bool
+    public let preparationResult: String?
+    public let verificationStage: AmoreDeviceVerificationStage
+    public let verificationError: String?
+    public let processState: String
     public let inProcessOpen: Bool
     public let loopbackWorking: Bool
     public let loopbackText: String
@@ -36,8 +60,8 @@ public struct AmoreDeviceStatus: Equatable, Sendable {
     public var isConnectedToCurrentDevice: Bool { state == .currentDevice }
     public var title: String {
         switch state {
-        case .currentDevice: "当前本机"
-        case .disconnected: "未连接"
+        case .currentDevice: "本机自动化会话已就绪"
+        case .disconnected: "自动化未就绪"
         case .needsPairing: "需配对"
         case .waitingDeveloperMode: "等待 DeveloperMode"
         case .localChannel: "本地通道"
@@ -48,9 +72,11 @@ public struct AmoreDeviceStatus: Equatable, Sendable {
     /// mounted DDI, or working TCP probe alone never establishes automation.
     public static func classify(pairingPresent: Bool, pairingRejected: Bool, developerMode: Bool,
                                 sessionOn: Bool, runnerRunning: Bool, inProcessOpen: Bool,
-                                inProcess: Bool, channelWorking: Bool, preparing: Bool) -> State {
+                                inProcess: Bool, channelWorking: Bool, preparing: Bool,
+                                automationReady: Bool? = nil, pairingVerified: Bool = false) -> State {
         if !pairingPresent || pairingRejected { return .needsPairing }
-        if sessionOn && runnerRunning && (inProcess ? inProcessOpen : channelWorking) { return .currentDevice }
+        let ready = automationReady ?? (inProcess ? inProcessOpen : channelWorking)
+        if sessionOn && runnerRunning && ready && (inProcess ? inProcessOpen : (channelWorking && pairingVerified)) { return .currentDevice }
         if !developerMode { return .waitingDeveloperMode }
         if preparing { return .preparing }
         if channelWorking { return .localChannel }

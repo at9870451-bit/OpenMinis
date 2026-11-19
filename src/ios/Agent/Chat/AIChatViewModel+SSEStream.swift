@@ -1231,6 +1231,8 @@ extension AIChatViewModel {
             return "Browser: \((args["action"] as? String) ?? "?")..."
         case "read_image":
             return "Reading image \((args["path"] as? String) ?? "?")..."
+        case "device_control":
+            return "device_control · \((args["action"] as? String) ?? "pending") — waiting for dispatch/result"
         default:
             return "Tool: \(name)"
         }

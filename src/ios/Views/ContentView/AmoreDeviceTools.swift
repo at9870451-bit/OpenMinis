@@ -8,7 +8,7 @@ enum AmoreDeviceTools {
     static var definitions: [AgentToolDefinition] {
         guard AmoreDeviceServices.isEnabled else { return [] }
         return [AgentToolDefinition(name: "device_control",
-            description: "Control this iPhone through the user's paired developer connection. Use status to inspect readiness. look reads the screen and can return a screenshot; do sends the original structured actions. Requires Settings > Connection enabled and real pairing/DDI/approvals. Never bypass passcode, consent or permissions. The tool returns the original device errors and no fake success. The actions JSON follows the device schema returned by action=help.",
+            description: "Control this iPhone through the user's paired developer connection. Use status to inspect readiness. look reads the screen and can return a screenshot; do sends the original structured actions. Requires Settings > Connection enabled and real pairing/DDI/approvals. Never bypass passcode, consent or permissions. The tool returns the original device errors and no fake success. help and status only inspect and do NOT perform the requested action. A 50ms service handshake is not automation readiness. After inspecting, continue with look and then do when the user requested an action; report not_sent/errors instead of claiming completion. For do supply arguments_json with an actions array; for example {\"actions\":[{\"button\":\"home\"}]}. The original action schema is returned by action=help. This wrapper exposes only help/status/look/do, not routines.",
             parameters: [
                 "action": AgentToolParam(type: .string, description: "Device action", enumValues: ["help", "status", "look", "do"]),
                 "arguments_json": AgentToolParam(type: .string, description: "A JSON object for the underlying look/do tool, using the exact schema from action=help. Defaults to {} for status."),
@@ -25,15 +25,15 @@ enum AmoreDeviceTools {
     }
     static func finish(sessionID: String?) { AmoreDeviceServices.finishTask(sessionID: sessionID) }
     static func cancel(sessionID: String?) { AmoreDeviceServices.cancelTask(sessionID: sessionID) }
-    static func run(action: String, arguments: String, sessionID: String?) async -> (text: String, image: Data?, error: Bool) {
-        guard AmoreDeviceServices.isEnabled else { return (AppLocalized("Enable device control in Settings > Connection first."), nil, true) }
-        if action == "help" { return (AmoreDeviceServices.toolInstructions + "\n\n" + AmoreDeviceServices.toolCatalogJSON, nil, false) }
-        guard ["status", "look", "do"].contains(action),
-              let data = arguments.data(using: .utf8),
-              (try? JSONSerialization.jsonObject(with: data)) is [String: Any] else {
-            return (AppLocalized("Device arguments must be a JSON object using the original tool schema."), nil, true)
+    static func run(request: AmoreDeviceToolRequest, sessionID: String?) async -> (text: String, image: Data?, error: Bool, waitingForOwner: Bool) {
+        guard AmoreDeviceServices.isEnabled else {
+            return (AppLocalized("Enable device control in Settings > Connection first."), nil, true, false)
         }
-        let answer = await AmoreDeviceServices.execute(action, arguments: arguments, sessionID: sessionID)
-        return (answer.text, answer.jpeg, answer.isError)
+        if request.action == "help" {
+            return ("Schema/instructions only. No device action was sent. This wrapper supports help, status, look and do.\n"
+                + AmoreDeviceServices.toolInstructions + "\n\n" + AmoreDeviceServices.toolCatalogJSON, nil, false, false)
+        }
+        let answer = await AmoreDeviceServices.execute(request.action, arguments: request.argumentsJSON, sessionID: sessionID)
+        return (answer.text, answer.jpeg, answer.isError, answer.waitingForOwner)
     }
 }
