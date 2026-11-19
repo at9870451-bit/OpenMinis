@@ -83,8 +83,11 @@ struct Amore139DrawerProbe: View {
                     },
                 including: open ? .all : .subviews
             )
-            .onChange(of: gestureActive) { active in
-                if !active, closeStart != nil { snap(open: open) }
+            .overlay(alignment: .topTrailing) {
+                Text("fixture open=\(open);drag=\(dragProgress.map { String(describing: $0) } ?? "none")")
+                    .font(.caption2)
+                    .accessibilityIdentifier("transparent.rootState")
+                    .allowsHitTesting(false)
             }
         }
         // A launch argument actually forces SwiftUI's scheme; AppleInterfaceStyle

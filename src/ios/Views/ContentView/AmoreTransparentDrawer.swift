@@ -85,6 +85,7 @@ struct AmoreTransparentDrawer<Chat: View, Sidebar: View>: View {
                     .offset(x: reduceMotion ? 0 : -drawerWidth * (1 - phase))
                     .opacity(reduceMotion ? phase : 1)
                     .allowsHitTesting(phase >= 0.999)
+                    .accessibilityAddTraits(.isModal)
                     .accessibilityHidden(phase < 0.999)
             }
         }
