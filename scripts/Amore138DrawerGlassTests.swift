@@ -74,42 +74,38 @@ final class Amore138DrawerGlassTests: XCTestCase {
         }
     }
 
-    func testRealOpaquePaintHonoursEachAccessibilityEnvironmentInBothSchemes() throws {
+    func testRealOpaquePaintInBothSchemes() throws {
+        // Policy tests cover Reduce Transparency/Increase Contrast independently.
+        // ImageRenderer receives a normal-contrast colour scheme; UIKit's
+        // performAsCurrent alone cannot inject the SwiftUI contrast environment.
         for dark in [false, true] {
-            for reduceTransparency in [false, true] {
-                // Each accessibility setting alone must select real opaque paint.
-                let increasedContrast = !reduceTransparency
-                let traits = UITraitCollection(traitsFrom: [
-                    UITraitCollection(userInterfaceStyle: dark ? .dark : .light),
-                    UITraitCollection(accessibilityContrast: increasedContrast ? .high : .normal)
-                ])
-                let root = AmoreDrawerFooterGlass(shape: Capsule(), forceOpaque: true)
-                    .frame(width: 80, height: 60)
-                    .environment(\.colorScheme, dark ? .dark : .light)
-                    // The real accessibility decision is covered by the policy
-                    // matrix. System accessibility environment values are read-only.
-                var rendered: CGImage?
-                traits.performAsCurrent {
-                    let renderer = ImageRenderer(content: root)
-                    renderer.scale = 1
-                    rendered = renderer.uiImage?.cgImage
-                }
-                let image = try XCTUnwrap(rendered)
-                var pixel = [UInt8](repeating: 0, count: 4)
-                let context = try XCTUnwrap(CGContext(data: &pixel, width: 1, height: 1,
-                    bitsPerComponent: 8, bytesPerRow: 4,
-                    space: CGColorSpaceCreateDeviceRGB(),
-                    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue |
-                        CGBitmapInfo.byteOrder32Big.rawValue))
-                // Centre only: avoid the curved shape edge and semantic outline.
-                context.translateBy(x: -40, y: -30)
-                context.draw(image, in: CGRect(x: 0, y: 0, width: 80, height: 60))
-                let expected = components(UIColor.secondarySystemBackground, traits: traits)
-                for index in 0..<3 {
-                    XCTAssertEqual(Double(pixel[index]) / 255, expected[index], accuracy: 0.012)
-                }
-                XCTAssertEqual(pixel[3], 255)
+            let traits = UITraitCollection(traitsFrom: [
+                UITraitCollection(userInterfaceStyle: dark ? .dark : .light),
+                UITraitCollection(accessibilityContrast: .normal)
+            ])
+            let root = AmoreDrawerFooterGlass(shape: Capsule(), forceOpaque: true)
+                .frame(width: 80, height: 60)
+                .environment(\.colorScheme, dark ? .dark : .light)
+            var rendered: CGImage?
+            traits.performAsCurrent {
+                let renderer = ImageRenderer(content: root)
+                renderer.scale = 1
+                rendered = renderer.uiImage?.cgImage
             }
+            let image = try XCTUnwrap(rendered)
+            var pixel = [UInt8](repeating: 0, count: 4)
+            let context = try XCTUnwrap(CGContext(data: &pixel, width: 1, height: 1,
+                bitsPerComponent: 8, bytesPerRow: 4,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue |
+                    CGBitmapInfo.byteOrder32Big.rawValue))
+            context.translateBy(x: -40, y: -30)
+            context.draw(image, in: CGRect(x: 0, y: 0, width: 80, height: 60))
+            let expected = components(UIColor.secondarySystemBackground, traits: traits)
+            for index in 0..<3 {
+                XCTAssertEqual(Double(pixel[index]) / 255, expected[index], accuracy: 0.012)
+            }
+            XCTAssertEqual(pixel[3], 255)
         }
     }
 
