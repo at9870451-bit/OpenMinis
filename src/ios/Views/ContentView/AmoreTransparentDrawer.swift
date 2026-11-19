@@ -75,14 +75,16 @@ struct AmoreTransparentDrawer<Chat: View, Sidebar: View>: View {
                     .accessibilityIdentifier("amore.drawer.dismiss")
             }
 
-            sidebar
-                .frame(width: drawerWidth, height: size.height, alignment: .leading)
-                .background { AmoreDrawerBackdrop().ignoresSafeArea(.container, edges: .vertical) }
-                .contentShape(Rectangle())
-                .offset(x: reduceMotion ? 0 : -drawerWidth * (1 - phase))
-                .opacity(reduceMotion ? phase : 1)
-                .allowsHitTesting(phase >= 0.999)
-                .accessibilityHidden(phase < 0.999)
+            if phase > 0.001 || presentationActive {
+                sidebar
+                    .frame(width: drawerWidth, height: size.height, alignment: .leading)
+                    .background { AmoreDrawerBackdrop().ignoresSafeArea(.container, edges: .vertical) }
+                    .contentShape(Rectangle())
+                    .offset(x: reduceMotion ? 0 : -drawerWidth * (1 - phase))
+                    .opacity(reduceMotion ? phase : 1)
+                    .allowsHitTesting(phase >= 0.999)
+                    .accessibilityHidden(phase < 0.999)
+            }
         }
         .frame(width: size.width, height: size.height, alignment: .leading)
         .contentShape(Rectangle())
