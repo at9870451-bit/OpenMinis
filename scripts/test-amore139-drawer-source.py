@@ -21,9 +21,12 @@ class TransparentDrawerSourceTests(unittest.TestCase):
   s=(C/'AmoreTransparentDrawer.swift').read_text()
   self.assertIn('reduceTransparency || increasedContrast',s)
   self.assertIn('Color(uiColor: .systemBackground)',s)
-  self.assertIn('static let materialOpacity = 1.0',s)
-  self.assertIn('.allowsHitTesting(false)',s)
-  self.assertNotIn('.opacity(AmoreDrawerSurfacePolicy.materialOpacity)',s)
+  backdrop=s.split('struct AmoreDrawerBackdrop: View',1)[1].split('struct AmoreTransparentDrawer<',1)[0]
+  self.assertNotIn('.opacity(',backdrop)
+  self.assertIn('.allowsHitTesting(false)',backdrop)
+  self.assertIn('.allowsHitTesting(!drawerIsPresented)',s)
+  self.assertIn('.disabled(drawerIsPresented)',s)
+  self.assertIn('.accessibilityHidden(drawerIsPresented)',s)
  def test_keep_existing_history_and_actions(self):
   s=(C/'ContentView+Layout.swift').read_text()
   for token in ['drawerHistory.groups','drawerSessionRow(session)','rebuildDrawerGroups()',

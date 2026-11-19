@@ -6,9 +6,6 @@ enum AmoreDrawerSurfacePolicy {
     static func opaque(reduceTransparency: Bool, increasedContrast: Bool) -> Bool {
         reduceTransparency || increasedContrast
     }
-    // Render the actual backdrop filter at full effect. Lowering the view's
-    // opacity mixes unblurred text back in and makes both text layers collide.
-    static let materialOpacity = 1.0
 }
 
 struct AmoreDrawerBackdrop: View {
@@ -56,30 +53,31 @@ struct AmoreTransparentDrawer<Chat: View, Sidebar: View>: View {
 
     var body: some View {
         let phase = AmoreDrawerPresentation.phase(progress)
+        let drawerIsPresented = phase > 0.001 || presentationActive
+        let visibleDrawerWidth = reduceMotion && phase > 0.001 ? drawerWidth : drawerWidth * phase
         ZStack(alignment: .leading) {
             chat
                 .environment(\.amoreDrawerProgress, phase)
                 .frame(width: size.width, height: size.height)
-                .allowsHitTesting(phase < 0.001 && !presentationActive)
-                .disabled(phase >= 0.001 || presentationActive)
-                .accessibilityElement(children: phase >= 0.001 || presentationActive ? .ignore : .contain)
-                .accessibilityHidden(phase >= 0.001 || presentationActive)
+                .allowsHitTesting(!drawerIsPresented)
+                .disabled(drawerIsPresented)
+                .accessibilityHidden(drawerIsPresented)
 
-            if phase > 0.001 || presentationActive {
+            if drawerIsPresented {
                 // Transparent dismiss target above chat and below the sidebar.
                 // Sidebar controls consume their own touches; the exposed right
                 // strip dismisses without pressing the transcript underneath.
                 Color.clear
-                    .frame(width: max(0, size.width - drawerWidth * phase), height: size.height)
+                    .frame(width: max(0, size.width - visibleDrawerWidth), height: size.height)
                     .contentShape(Rectangle())
-                    .onTapGesture(perform: onClose)
-                    .offset(x: drawerWidth * phase)
-                    .allowsHitTesting(phase > 0.001 || presentationActive)
+                    .onTapGesture {
+                        if phase > 0.001 { onClose() }
+                    }
+                    .offset(x: visibleDrawerWidth)
                     .accessibilityHidden(true)
-                    .accessibilityIdentifier("amore.drawer.dismiss")
             }
 
-            if phase > 0.001 || presentationActive {
+            if drawerIsPresented {
                 sidebar
                     .frame(width: drawerWidth, height: size.height, alignment: .leading)
                     .background { AmoreDrawerBackdrop().ignoresSafeArea(.container, edges: .vertical) }

@@ -10,7 +10,6 @@ final class Amore139DrawerTests: XCTestCase {
         XCTAssertFalse(AmoreDrawerSurfacePolicy.opaque(reduceTransparency: false, increasedContrast: false))
         XCTAssertTrue(AmoreDrawerSurfacePolicy.opaque(reduceTransparency: true, increasedContrast: false))
         XCTAssertTrue(AmoreDrawerSurfacePolicy.opaque(reduceTransparency: false, increasedContrast: true))
-        XCTAssertEqual(AmoreDrawerSurfacePolicy.materialOpacity, 1.0, "Backdrop filtering must not be mixed with sharp, unblurred text")
     }
 
     func testConversationPixelsRemainBehindDrawerAcrossAllPhases() async throws {
