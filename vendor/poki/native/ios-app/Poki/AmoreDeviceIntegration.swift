@@ -23,7 +23,7 @@ public enum AmoreDeviceServices {
             case .approvalRequested, .approvalEnded:
                 Task { @MainActor in
                     await Task.yield()
-                    for observer in approvalObservers { observer(value.approvals.first?.id) }
+                    for observer in approvalObservers { observer(pendingApprovalID) }
                 }
             default: break
             }
@@ -40,9 +40,9 @@ public enum AmoreDeviceServices {
     public static func observeApprovals(_ observer: @escaping (String?) -> Void) {
         approvalObservers.append(observer)
     }
-    public static var pendingApprovalID: String? { retained?.approvals.first?.id }
+    public static var pendingApprovalID: String? { retained?.approvals.first(where: { $0.expires > Date() && retained?.approvalWasSubmitted($0.id) != true })?.id }
     public static func resolveApproval(id: String, approved: Bool) {
-        guard let approval = retained?.approvals.first(where: { $0.id == id }), approval.expires > Date() else { return }
+        guard let approval = retained?.approvals.first(where: { $0.id == id }) else { return }
         retained?.resolve(approval, approved: approved)
     }
     public static func approvalText(id: String) -> String? { retained?.approvals.first(where: { $0.id == id })?.summary }

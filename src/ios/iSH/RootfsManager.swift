@@ -28,7 +28,18 @@ class RootfsManager {
     /// must refuse to start a shell until the app is relaunched — there is no
     /// in-process way to un-boot or re-mount the kernel. Never cleared within a
     /// process lifetime; it is reset naturally on the next cold launch.
-    private(set) var didResetWhileBooted = false
+    private let resetStateLock = NSLock()
+    private var resetWhileBooted = false
+    private(set) var didResetWhileBooted: Bool {
+        get {
+            resetStateLock.lock(); defer { resetStateLock.unlock() }
+            return resetWhileBooted
+        }
+        set {
+            resetStateLock.lock(); defer { resetStateLock.unlock() }
+            resetWhileBooted = newValue
+        }
+    }
 
     private init() {}
 
@@ -167,12 +178,15 @@ class RootfsManager {
     }
 
     func installIfNeeded() throws {
-        if FileManager.default.fileExists(atPath: rootfsPath.path) && !isInstalled {
+        // One validation per installation attempt; do not re-read .arch twice.
+        // No persistent success cache: explicit resets must still be detected.
+        let installed = isInstalled
+        if FileManager.default.fileExists(atPath: rootfsPath.path) && !installed {
             logger.warning("[Rootfs] arch tag missing or mismatched — will delete and reinstall \(currentArch). archTag=\(archTagDiagnostic()) path=\(rootfsPath.path)")
             try discardOldRootfs()
         }
 
-        guard !isInstalled else {
+        guard !installed else {
             logger.info("[Rootfs] already installed (\(currentArch)) at \(rootfsPath.path)")
             return
         }
@@ -370,20 +384,22 @@ class RootfsManager {
 
     /// Overlay default configuration files from the bundle onto the rootfs.
     /// Runs on every boot so app updates with new defaults take effect.
-    func applyDefaultMountOverlay() {
+    @discardableResult
+    func applyDefaultMountOverlay() -> Bool {
         let totalStart = CFAbsoluteTimeGetCurrent()
         logger.info("[DefaultMount] applyDefaultMountOverlay() called")
 
         guard let overlayURL = Bundle.main.url(forResource: "default_mount", withExtension: nil) else {
-            logger.info("[DefaultMount] No default_mount found in bundle")
-            return
+            logger.error("[DefaultMount] No default_mount found in bundle")
+            return false
         }
 
         let fm = FileManager.default
         guard let enumerator = fm.enumerator(at: overlayURL, includingPropertiesForKeys: [.isRegularFileKey]) else {
-            return
+            return false
         }
 
+        var completed = true
         var fileCount = 0
         var copyTotalMs: Double = 0
         var metaDbTotalMs: Double = 0
@@ -435,10 +451,12 @@ class RootfsManager {
 
                 // Register in fakefs meta.db so iSH kernel can see the file
                 let metaStart = CFAbsoluteTimeGetCurrent()
-                ensureParentDirsInMetaDB(for: relativePath)
-                ensureFakefsMetadata(for: relativePath, isDirectory: false, mode: fakefsMode)
+                let parentsOK = ensureParentDirsInMetaDB(for: relativePath)
+                let fileOK = ensureFakefsMetadata(for: relativePath, isDirectory: false, mode: fakefsMode)
+                if !parentsOK || !fileOK { completed = false }
                 metaDbTotalMs += (CFAbsoluteTimeGetCurrent() - metaStart) * 1000
             } catch {
+                completed = false
                 logger.error("[DefaultMount] ERROR \(relativePath): \(error)")
             }
         }
@@ -451,7 +469,7 @@ class RootfsManager {
         // no write) so the whole subtree is read-only to the guest. Idempotent:
         // ensureFakefsMetadata updates the stat row in place each boot.
         for dir in [Self.mcpCliLibDir, "\(Self.mcpCliLibDir)/transport", "\(Self.mcpCliLibDir)/utils"] {
-            ensureFakefsMetadata(for: dir, isDirectory: true, mode: 0o040555)
+            if !ensureFakefsMetadata(for: dir, isDirectory: true, mode: 0o040555) { completed = false }
         }
 
         // Remove PEP 668 EXTERNALLY-MANAGED marker so pip install works without
@@ -464,6 +482,7 @@ class RootfsManager {
         let avgCopyMs = fileCount > 0 ? copyTotalMs / Double(fileCount) : 0
         let avgMetaMs = fileCount > 0 ? metaDbTotalMs / Double(fileCount) : 0
         logger.info("[DefaultMount] Done. \(fileCount) file(s) overlaid in \(String(format: "%.1f", totalMs))ms — copy: \(String(format: "%.1f", copyTotalMs))ms (avg \(String(format: "%.2f", avgCopyMs))ms/file), metaDB: \(String(format: "%.1f", metaDbTotalMs))ms (avg \(String(format: "%.2f", avgMetaMs))ms/file), marker: \(String(format: "%.1f", markerMs))ms")
+        return completed
     }
 
     /// [T-aojit-restore] Copy the regular files of a bundle directory into the
@@ -510,12 +529,17 @@ class RootfsManager {
         sqlite3_bind_blob(stmt, index, utf8, Int32(utf8.count), Self.SQLITE_TRANSIENT)
     }
 
-    func ensureFakefsMetadata(for linuxPath: String, isDirectory: Bool, mode: UInt32? = nil) {
+    @discardableResult
+    func ensureFakefsMetadata(for linuxPath: String, isDirectory: Bool, mode: UInt32? = nil) -> Bool {
         let metaDBPath = rootfsPath.appendingPathComponent("meta.db").path
         var db: OpaquePointer?
         guard sqlite3_open_v2(metaDBPath, &db, SQLITE_OPEN_READWRITE, nil) == SQLITE_OK,
-              let db else { return }
+              let db else {
+            if let db { sqlite3_close(db) }
+            return false
+        }
         defer { sqlite3_close(db) }
+        sqlite3_busy_timeout(db, 1500)
 
         let effectiveMode: UInt32 = mode ?? (isDirectory ? 0o040755 : 0o100644)
         var statBytes: [UInt8] = Array(repeating: 0, count: 16)
@@ -524,54 +548,53 @@ class RootfsManager {
             for i in 0..<4 { statBytes[i] = src[i] }
         }
 
-        // If the path already exists, update its stat row in place so we can
-        // refresh mode bits (e.g. when a newer app version ships an updated
-        // default_mount file with different permissions).
+        // Preserve the existing inode when updating bundled defaults.
         var checkStmt: OpaquePointer?
         guard sqlite3_prepare_v2(db, "SELECT inode FROM paths WHERE path = ?", -1, &checkStmt, nil) == SQLITE_OK,
-              let checkStmt else { return }
+              let checkStmt else { return false }
         defer { sqlite3_finalize(checkStmt) }
-
         bindPathBlob(checkStmt, index: 1, path: linuxPath)
-        if sqlite3_step(checkStmt) == SQLITE_ROW {
+        let checkResult = sqlite3_step(checkStmt)
+        if checkResult == SQLITE_ROW {
             let existingInode = sqlite3_column_int64(checkStmt, 0)
             var updateStmt: OpaquePointer?
             guard sqlite3_prepare_v2(db, "UPDATE stats SET stat = ? WHERE inode = ?", -1, &updateStmt, nil) == SQLITE_OK,
-                  let updateStmt else { return }
+                  let updateStmt else { return false }
             defer { sqlite3_finalize(updateStmt) }
             sqlite3_bind_blob(updateStmt, 1, statBytes, Int32(statBytes.count), Self.SQLITE_TRANSIENT)
             sqlite3_bind_int64(updateStmt, 2, existingInode)
-            sqlite3_step(updateStmt)
-            return
+            return sqlite3_step(updateStmt) == SQLITE_DONE
         }
+        guard checkResult == SQLITE_DONE else { return false }
 
         var insertStatStmt: OpaquePointer?
         guard sqlite3_prepare_v2(db, "INSERT INTO stats (stat) VALUES (?)", -1, &insertStatStmt, nil) == SQLITE_OK,
-              let insertStatStmt else { return }
+              let insertStatStmt else { return false }
         defer { sqlite3_finalize(insertStatStmt) }
-
         sqlite3_bind_blob(insertStatStmt, 1, statBytes, Int32(statBytes.count), Self.SQLITE_TRANSIENT)
-        guard sqlite3_step(insertStatStmt) == SQLITE_DONE else { return }
+        guard sqlite3_step(insertStatStmt) == SQLITE_DONE else { return false }
 
         var insertPathStmt: OpaquePointer?
         guard sqlite3_prepare_v2(db, "INSERT OR REPLACE INTO paths (path, inode) VALUES (?, last_insert_rowid())", -1, &insertPathStmt, nil) == SQLITE_OK,
-              let insertPathStmt else { return }
+              let insertPathStmt else { return false }
         defer { sqlite3_finalize(insertPathStmt) }
-
         bindPathBlob(insertPathStmt, index: 1, path: linuxPath)
-        sqlite3_step(insertPathStmt)
+        return sqlite3_step(insertPathStmt) == SQLITE_DONE
     }
 
-    func ensureParentDirsInMetaDB(for linuxPath: String) {
+    @discardableResult
+    func ensureParentDirsInMetaDB(for linuxPath: String) -> Bool {
         var current = (linuxPath as NSString).deletingLastPathComponent
         var dirs: [String] = []
         while current != "/" && !current.isEmpty {
             dirs.append(current)
             current = (current as NSString).deletingLastPathComponent
         }
+        var completed = true
         for dir in dirs.reversed() {
-            ensureFakefsMetadata(for: dir, isDirectory: true)
+            if !ensureFakefsMetadata(for: dir, isDirectory: true) { completed = false }
         }
+        return completed
     }
 
     /// Remove a path (and, if it's a directory subtree, all of its descendants)

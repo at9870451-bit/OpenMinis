@@ -26,7 +26,7 @@ struct MemoryManagementView: View {
                 Text(AppLocalized("settings_memory_global_enabled_footer"))
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             ForEach(memoryFiles) { file in
                 NavigationLink {
@@ -58,12 +58,9 @@ struct MemoryManagementView: View {
             .onDelete { offsets in
                 deleteFiles(at: offsets)
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
         }
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle("Memory")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

@@ -132,9 +132,10 @@ actor ISHExecutionCoordinator {
         lineCallback: @escaping (String) -> Void,
         pidCallback: @escaping (Int32) -> Void
     ) async throws -> ISHCommandResult {
-        guard ISHKernel.shared.isBooted else {
-            throw ISHCoordinatorError.kernelNotBooted
-        }
+        // Includes hooks and overlay, not merely the native isBooted flag.
+        // All shell callers (including on-demand bash) share the same flight.
+        try await AmoreKernelReadiness.shared.ensureReady()
+        try Task.checkCancellation()
 
         // Register ourselves in the in-flight table purely for
         // stop/preempt visibility — we do NOT wait for prior entries.

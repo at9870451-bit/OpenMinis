@@ -71,9 +71,7 @@ struct LogManagementView: View {
                 logsBody
             }
         }
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle("Logs")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -112,7 +110,7 @@ struct LogManagementView: View {
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             Section("Log Files") {
                 if vm.runningFiles.isEmpty {
@@ -141,7 +139,7 @@ struct LogManagementView: View {
                     }
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             if !vm.crashFiles.isEmpty {
                 Section("Crash Reports") {
@@ -166,7 +164,7 @@ struct LogManagementView: View {
                         vm.load()
                     }
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
 
             // [T-crash-diag-export] Breadcrumbs, crash contexts and MetricKit
@@ -178,7 +176,7 @@ struct LogManagementView: View {
                     Label("Crash Diagnostics", systemImage: "stethoscope")
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             if #available(iOS 17.0, *) {
                 Section {
@@ -193,7 +191,7 @@ struct LogManagementView: View {
                         }
                     }
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
 
             if !vm.logFiles.isEmpty {
@@ -212,13 +210,10 @@ struct LogManagementView: View {
                     Text("Total log storage: \(vm.format(vm.totalSize))")
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
         }
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .toolbar {
             if !vm.logFiles.isEmpty && tab == "logs" {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -261,9 +256,7 @@ struct LogDetailView: View {
                 LogTextView(text: content)
             }
         }
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle(name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

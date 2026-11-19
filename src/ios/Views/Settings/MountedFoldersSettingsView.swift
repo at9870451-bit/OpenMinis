@@ -36,7 +36,7 @@ struct MountedFoldersSettingsView: View {
             Section {
                 InfoBanner()
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             if model.entries.isEmpty {
                 Section {
@@ -54,7 +54,7 @@ struct MountedFoldersSettingsView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 24)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             } else {
                 Section {
                     ForEach(model.entries) { entry in
@@ -93,13 +93,10 @@ struct MountedFoldersSettingsView: View {
                             .foregroundStyle(.orange)
                     }
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
         }
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle("Mount External Folders")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -361,7 +358,7 @@ private struct AddMountSheet: View {
                             .font(.caption2)
                         .foregroundStyle(PokiTheme.secondaryText)
                     }
-                    .listRowBackground(PokiTheme.surface)
+                    .amoreSettingsGlassRows()
                 }
 
                 Section(header: Text("Mount name")) {
@@ -372,7 +369,7 @@ private struct AddMountSheet: View {
                         .font(.caption)
                         .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
 
                 Section {
                     Toggle(isOn: $allowWrite) {
@@ -393,12 +390,9 @@ private struct AddMountSheet: View {
                         .font(.caption)
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
-            .scrollContentBackground(.hidden)
-            .background(PokiTheme.background)
-            .foregroundStyle(PokiTheme.primaryText)
-            .tint(PokiTheme.primaryButton)
+            .amoreSettingsGlass()
             .navigationTitle("New Mount")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

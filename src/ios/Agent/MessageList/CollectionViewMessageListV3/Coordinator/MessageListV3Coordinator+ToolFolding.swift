@@ -65,7 +65,8 @@ extension CollectionViewMessageListV3.Coordinator {
         /// those rows (fresh block ids), so it still folds at once.
         func planToolFolds(messages: [ChatMessage])
             -> (runs: [UUID: [ToolFoldRun]], deferred: Bool) {
-            guard ToolFoldPlanner.isEnabled, let vm else { return ([:], false) }
+            let hideOutput = AmoreWorkflowOutput.isHidden
+            guard (ToolFoldPlanner.isEnabled || hideOutput), let vm else { return ([:], false) }
             let browsing = scrollMode == .userBrowsing
             let runningId = vm.toolFoldRunningMessageId
             var runsByMessage: [UUID: [ToolFoldRun]] = [:]
@@ -80,11 +81,14 @@ extension CollectionViewMessageListV3.Coordinator {
             }
             for message in messages where message.role == .assistant {
                 let isRunning = message.id == runningId
-                let horizon = ToolFoldPlanner.foldHorizon(for: message, runningMessageId: runningId,
-                                                          separators: vm.toolFoldSeparators)
+                let horizon = hideOutput ? message.blocks.count : ToolFoldPlanner.foldHorizon(
+                    for: message, runningMessageId: runningId, separators: vm.toolFoldSeparators)
                 guard horizon > 0 else { continue }
-                // [T-share-fold-tools] The same runs the share export folds.
-                let folded = ToolFoldPlanner.foldedRuns(in: Array(message.blocks.prefix(horizon)))
+                // Workflow folding is UI-only; sharing/export keeps the original
+                // planner and every real tool result. Errors/approvals are barriers.
+                let blocks = Array(message.blocks.prefix(horizon))
+                let folded = hideOutput ? AmoreWorkflowOutput.foldedRuns(in: blocks)
+                    : ToolFoldPlanner.foldedRuns(in: blocks)
                 guard !folded.isEmpty else { continue }
                 var runs: [ToolFoldRun] = []
                 for run in folded {

@@ -692,7 +692,9 @@ struct ToolGroupRowView: View {
     /// `estimateItemHeight`), with no first-measure correction.
     static let rowHeight: CGFloat = 28
 
-    private var title: String { AppLocalized("Ran \(toolCount) tools") }
+    private var title: String {
+        toolCount == 0 ? AppLocalized("Deep Thinking") : AppLocalized("Ran \(toolCount) tools")
+    }
     private var failedText: String { AppLocalized("\(failedCount) failed") }
     private var cancelledText: String { AppLocalized("\(cancelledCount) cancelled") }
     private var durationText: String? { duration.map(Self.durationText) }

@@ -33,12 +33,12 @@ struct ConfigAuditView: View {
                     }
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             if entries.isEmpty {
                 Text("No config changes recorded yet.")
                     .foregroundStyle(PokiTheme.secondaryText)
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             } else {
                 ForEach(entries) { entry in
                     // [T-config-readable] Tap a record for its details: the
@@ -49,13 +49,10 @@ struct ConfigAuditView: View {
                         auditRow(entry)
                     }
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
         }
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .listStyle(.insetGrouped)
         .onAppear { reload() }
         .onChange(of: log.revision) { _ in reload() }

@@ -150,6 +150,7 @@ extension AIChatViewModel {
 
     /// Stop all speech and reset paused state.
     func stopSpeech() {
+        voiceCallDelegate?.stopCallSpeech()
         speechSynthesizer.stopSpeaking(at: .immediate)
         VoiceOutputPlayer.shared.stopAll()
         speechPaused = false
@@ -167,6 +168,7 @@ extension AIChatViewModel {
     /// can't wipe another chat's in-flight speech, which the old global
     /// `stopSpeech()` did (queue hijack + text loss across concurrent sessions).
     func stopSpeechForThisSession() {
+        voiceCallDelegate?.stopCallSpeech()
         speechSynthesizer.stopSpeaking(at: .immediate)
         VoiceOutputPlayer.shared.stopSession(sessionId ?? "")
         speechPaused = false
@@ -203,6 +205,10 @@ extension AIChatViewModel {
         // two of the three read-aloud entry points doing this. Setting
         // `speakEnabled` persists via `VoiceOutputState.isEnabled`'s didSet.
         if !speakEnabled { speakEnabled = true }
+        if let call = voiceCallDelegate {
+            if call.callSpeechEnabled, !text.isEmpty { call.enqueueCallSpeech(text) }
+            return
+        }
         guard canSpeakNow, !text.isEmpty else {
             VoiceLog.log("speakText SKIP — canSpeakNow=\(canSpeakNow) capturing=\(VoiceModePreference.shared.isCapturing) empty=\(text.isEmpty)")
             return
@@ -333,6 +339,10 @@ extension AIChatViewModel {
     func speakQueued(_ rawText: String) {
         // Strip emoji / non-speakable glyphs before TTS.
         let text = VoiceTextSanitizer.sanitize(rawText)
+        if let call = voiceCallDelegate {
+            if call.callSpeechEnabled, !text.isEmpty { call.enqueueCallSpeech(text) }
+            return
+        }
         guard canSpeakNow, !text.isEmpty else {
             VoiceLog.log("speakQueued SKIP — speakEnabled=\(speakEnabled) isCapturing=\(AudioSessionCoordinator.shared.isCapturing) empty=\(text.isEmpty)")
             return
@@ -367,13 +377,15 @@ extension AIChatViewModel {
     private var canSpeakNow: Bool {
         // Enabled AND not muted AND not capturing. `canPlay` folds in the temporary
         // mute (capsule speaker) on top of the full on/off `isEnabled`.
-        VoiceOutputState.shared.canPlay && !VoiceModePreference.shared.isCapturing
+        if let call = voiceCallDelegate { return call.callSpeechEnabled }
+        return VoiceOutputState.shared.canPlay && !VoiceModePreference.shared.isCapturing && !AudioSessionCoordinator.shared.isVoiceCalling
     }
 
     /// True when a configured cloud TTS model is selected (not the offline System
     /// provider). Snapshotted once per reply (`replyUsesCloudTTS`) so a mid-reply
     /// provider change can't split one reply across two engines playing at once.
     private var useCloudTTS: Bool {
+        if voiceCallDelegate != nil { return false } // call owns ordered TTS over the duplex engine
         if let snap = replyUsesCloudTTS { return snap }
         let v = !(VoiceProviderResolver.outputProvider() is SystemVoiceProvider)
         replyUsesCloudTTS = v

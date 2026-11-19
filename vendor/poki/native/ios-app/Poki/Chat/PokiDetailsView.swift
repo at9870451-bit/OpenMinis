@@ -366,6 +366,13 @@ struct ConnectionView: View {
                     .accessibilityIdentifier("connection.amoreAgentControl")
                 }
             }
+            if agentControl != nil {
+                Section {
+                    NavigationLink { AmoreDeviceStatusView() } label: {
+                        LabeledContent("本机连接状态", value: model.amoreStatusSnapshot.title)
+                    }
+                }
+            }
             Section {
                 Toggle(isOn: Binding(get: { on }, set: set)) {
                     SettingsRow(title: "Automation", symbol: "hand.tap")
@@ -424,7 +431,10 @@ struct ConnectionView: View {
         }
         .navigationTitle(AppLocalization.text("Connection"))
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { model.loopback.resume(); model.diskImage.notice() }
+        .onAppear {
+            if model.usesLocalProcessTransport { model.loopback.pause() } else { model.loopback.resume() }
+            model.diskImage.notice()
+        }
         .sheet(isPresented: $guiding) {
             SetupGuide(start: SetupStep.shown.first { !model.stepReadyForUse($0) })
                 .environment(model)

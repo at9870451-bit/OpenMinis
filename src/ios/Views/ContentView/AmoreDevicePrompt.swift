@@ -22,12 +22,14 @@ final class AmoreDevicePromptStore: ObservableObject {
 }
 
 struct AmoreDevicePrompts: ViewModifier {
+    var isCallSurface = false
+    @ObservedObject private var call = VoiceCallPresentationStore.shared
     @StateObject private var store = AmoreDevicePromptStore.shared
     @ObservedObject private var appLock = SessionLockStore.shared
     func body(content: Content) -> some View {
         content.alert(AppLocalized("Allow device action?"), isPresented: Binding(
-            get: { !appLock.appIsLocked && store.request != nil },
-            set: { shown in if !shown, !appLock.appIsLocked, let id = store.request?.id { store.resolve(id, approved: false) } }
+            get: { !appLock.appIsLocked && (isCallSurface || !call.isPresented) && store.request != nil },
+            set: { shown in if !shown, !appLock.appIsLocked, (isCallSurface || !call.isPresented), let id = store.request?.id { store.resolve(id, approved: false) } }
         ), presenting: store.request) { request in
             Button(AppLocalized("Don’t Allow"), role: .cancel) { store.resolve(request.id, approved: false) }
             Button(AppLocalized("Allow")) { store.resolve(request.id, approved: true) }

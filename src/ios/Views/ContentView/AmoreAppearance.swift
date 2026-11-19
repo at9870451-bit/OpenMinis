@@ -102,6 +102,6 @@ struct AmoreAppearanceSection: View {
         } footer: {
             Text(AppLocalized("Automatic follows the iPhone’s appearance setting."))
         }
-        .listRowBackground(PokiTheme.settingsCard)
+        .amoreSettingsGlassRows()
     }
 }

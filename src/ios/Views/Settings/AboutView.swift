@@ -108,7 +108,7 @@ struct AboutView: View {
                 .padding(.vertical, 12)
                 .listRowBackground(Color.clear)
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             // MARK: - Links
             Section("Links") {
@@ -141,12 +141,9 @@ struct AboutView: View {
                     }
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
         }
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle("About")
         .navigationBarTitleDisplayMode(.inline)
     }

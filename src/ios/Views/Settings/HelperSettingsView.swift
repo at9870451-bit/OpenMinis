@@ -43,7 +43,7 @@ struct HelperSettingsView: View {
                 Text(AppLocalized("Delegate self-contained sub-tasks to a sub agent that works in its own hidden session and reports back. The same tool also lets the assistant check on or stop what it started. Several agents can run at once, so a large fan-out uses correspondingly more of your quota. On by default; when off, it is not offered to the model at all."))
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             Section {
                 ForEach(roster) { def in
@@ -85,17 +85,14 @@ struct HelperSettingsView: View {
                 }
                 .font(.caption)
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
             // Greyed out but still editable when the switch is off: off means
             // "not offered to the model", not "cannot be configured" — same
             // rule the other tool switches follow.
             .opacity(agentsEnabled ? 1 : 0.5)
         }
         .environment(\.editMode, $editMode)
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle(AppLocalized("Sub Agents"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $editorTarget) { target in
@@ -221,7 +218,7 @@ struct SubAgentEditorView: View {
                             .foregroundStyle(PokiTheme.danger)
                     }
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
 
                 Section {
                     if isBuiltIn {
@@ -240,7 +237,7 @@ struct SubAgentEditorView: View {
                          : AppLocalized("Describe when this sub agent should be used. Keep it short — details go in Instructions."))
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
 
                 Section {
                     TextField(AppLocalized("Instructions"), text: $instructions, axis: .vertical)
@@ -260,7 +257,7 @@ struct SubAgentEditorView: View {
                          : AppLocalized("These instructions apply only to this sub agent."))
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
 
                 Section {
                     Picker(AppLocalized("Model"), selection: $modelGroupId) {
@@ -276,7 +273,7 @@ struct SubAgentEditorView: View {
                     Text(AppLocalized("Auto lets the assistant choose per task: the same model as the conversation, your Default group for hard reasoning, or your light group for simple well-defined work. Pick a specific Model Group instead to run this sub agent on it every time."))
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
 
                 // [T-subagent-thinking-override] Same shape as a Model Group's
                 // own Session Defaults section: a toggle for "set one at all",
@@ -329,12 +326,9 @@ struct SubAgentEditorView: View {
                          : AppLocalized("Every run of this sub agent uses this level, overriding the Model Group's own default. Models that cannot reason this hard are clamped to their own ceiling."))
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
-            .scrollContentBackground(.hidden)
-            .background(PokiTheme.background)
-            .foregroundStyle(PokiTheme.primaryText)
-            .tint(PokiTheme.primaryButton)
+            .amoreSettingsGlass()
             .navigationTitle(existing == nil ? AppLocalized("New Sub Agent") : AppLocalized("Edit Sub Agent"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

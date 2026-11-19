@@ -320,7 +320,8 @@ final class VoiceOutputPlayer: NSObject, ObservableObject {
     /// session's speech without touching concurrent sessions'.
     func enqueue(_ text: String, sessionId: String) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard VoiceOutputPreferences.isEnabled, !trimmed.isEmpty else { return }
+        guard VoiceOutputPreferences.isEnabled, !trimmed.isEmpty,
+              !AudioSessionCoordinator.shared.isVoiceCalling else { return }
 
         let unit = Unit(seq: nextSeq, text: trimmed, ownerSessionId: sessionId); nextSeq += 1
         queue.append(unit)

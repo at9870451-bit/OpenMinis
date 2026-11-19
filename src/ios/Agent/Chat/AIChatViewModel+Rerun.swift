@@ -268,21 +268,12 @@ extension AIChatViewModel {
         isProcessing = true
         forceScrollToBottom.send()
 
-        ensureKernelBooted()
         beginBackgroundProcessing()
 
         currentTask = Task { [weak self] in
             guard let self else { return }
 
-            while self.kernelStatus == .booting {
-                try? await Task.sleep(nanoseconds: 100_000_000)
-            }
-            if case .failed(let msg) = self.kernelStatus {
-                self.errorMessage = "Kernel not available: \(msg)"
-                self.isProcessing = false
-                self.endBackgroundProcessing()
-                return
-            }
+            // Real tools own the on-demand kernel readiness wait.
 
             // Concurrency gate: wait for a processing slot
             let retryFromSid = self.sessionId ?? "unknown"

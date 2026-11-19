@@ -47,7 +47,7 @@ struct SoulSettingsView: View {
             Section {
                 previewCard
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             Section {
                 Picker(AppLocalized("Companion appearance"), selection: $companionMode) {
@@ -70,7 +70,7 @@ struct SoulSettingsView: View {
             } footer: {
                 Text(AppLocalized("Ask Agent to create or revise an avatar using a configured image-output model. If none is configured, Agent will guide you to model settings. Generated images are only applied after native confirmation. Photos are never read automatically. Tap the preview to pick an image yourself; Save applies it. Clearing the custom avatar restores the dynamic robot. Display mode does not erase the saved avatar."))
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             Section(AppLocalized("Identity")) {
                 LabeledContent(AppLocalized("Name")) {
@@ -89,7 +89,7 @@ struct SoulSettingsView: View {
                     }
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             Section {
                 personalityEditor
@@ -99,7 +99,7 @@ struct SoulSettingsView: View {
             } footer: {
                 bodyLengthFooter
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             Section {
                 Button(role: .destructive) {
@@ -129,7 +129,7 @@ struct SoulSettingsView: View {
                     }
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             if let saveError {
                 Section {
@@ -137,13 +137,10 @@ struct SoulSettingsView: View {
                         .font(.footnote)
                         .foregroundStyle(PokiTheme.danger)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
         }
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle(AppLocalized("Soul"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

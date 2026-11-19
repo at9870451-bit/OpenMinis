@@ -137,16 +137,13 @@ struct ToolsSettingsView: View {
                 Text(AppLocalized("Browse the web in the in-app browser: open pages, read them, click and type. Stable and on by default. When off, the tool is removed from every conversation — the model does not see it at all."))
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
             userAskSections
             // [T-sub-agents-v1] No Agents section here, and deliberately not
             // even a read-only pointer row: the switch belongs to the Sub Agents
             // page, next to the definitions it governs.
         }
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle(AppLocalized("Agent Tools"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -187,7 +184,7 @@ struct ToolsSettingsView: View {
                 }
             }
         }
-        .listRowBackground(PokiTheme.surface)
+        .amoreSettingsGlassRows()
     }
 
     /// toolRow's icon column (22) plus its spacing (10): where its title starts.

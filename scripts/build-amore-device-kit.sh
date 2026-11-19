@@ -16,6 +16,8 @@ cargo build --release --locked --target aarch64-apple-ios --manifest-path "$LAUN
 (cd "$APP" && xcodegen generate --spec project-fusion.yml)
 xcodebuild build -project "$APP/AmoreDeviceServices.xcodeproj" -scheme AmoreDeviceKit -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath "$DERIVED" ARCHS=arm64 ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= 2>&1 | tee device-swift.log
 mkdir -p "$OUT/SwiftModules" "$OUT/Resources" "$OUT/ClangModules/PokiNative"
+ditto "$PRODUCTS/AmoreTunnel.appex" "$OUT/AmoreTunnel.appex"
+cp "$APP/AmoreTunnel/AmoreTunnel.entitlements" "$OUT/AmoreTunnel.entitlements"
 ditto "$PRODUCTS/AmoreDeviceKit.framework" "$OUT/AmoreDeviceKit.framework"
 # Static Xcode frameworks do not automatically absorb every transitive product.
 # Merge the original C/Rust and SwiftPM object products into one linkable archive.

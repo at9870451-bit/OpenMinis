@@ -42,6 +42,9 @@ pub struct Config {
     /// own session on the image. None: no such fallback.
     #[serde(default)]
     pub ddi_marker: Option<PathBuf>,
+    /// Explicit no-network path: only use the DDI already mounted by the owner.
+    #[serde(default)]
+    pub local_only: bool,
 }
 
 /// The longest a disk image mount may take (Apple's signing server plus the upload).
@@ -218,6 +221,12 @@ impl Launcher {
         me.set("connecting", attempt, json!({}));
         let mut pairing = Pairing::read(&config.pairing_file, config.host_name.as_deref())?;
         let kind = pairing.kind().name();
+        if config.local_only {
+            if !config.in_process || !config.ddi_marker.as_deref().is_some_and(Path::is_file) {
+                return Err(Failure::new("the local process path needs an already-mounted developer disk image; no VPN, certificate or pairing was installed").code("local_ddi_missing"));
+            }
+            return Self::hold_in_process(&me, attempt, json!({"runner": "in-process", "code": "local_ddi"}), commands).await;
+        }
         me.set("pairing", attempt, json!({"pairing": kind}));
         let mut device = match Device::open(config.device_address, &mut pairing, Duration::from_secs(20)).await {
             Ok(device) => device,

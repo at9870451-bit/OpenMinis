@@ -2,7 +2,9 @@ import Foundation
 
 /// What the user has done in setup, kept across launches.
 struct SetupState: Codable, Equatable {
-    enum Loopback: String, Codable { case none, builtIn, proxy }
+    /// `inProcess` uses an already-mounted DDI without a VPN; `builtIn` uses the
+    /// app's NetworkExtension tunnel, and `proxy` keeps external compatibility.
+    enum Loopback: String, Codable { case none, builtIn, proxy, inProcess }
     var pairingFile: String?
     var developerMode = false
     var uiAutomation = false

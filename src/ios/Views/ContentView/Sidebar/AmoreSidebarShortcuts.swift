@@ -30,6 +30,9 @@ enum AmoreSidebarShortcut: String, CaseIterable, Identifiable {
 
     var isAvailable: Bool {
         switch self {
+        // Keep the persisted IDs and decoder lossless for older preferences,
+        // but retired footer actions cannot appear in the drawer/candidates.
+        case .privacyPolicy, .feedback: return false
         case .cloudSync:
             if #available(iOS 17.0, *) { return true }
             return false
@@ -231,7 +234,10 @@ struct AmoreSidebarShortcutEditor: View {
 
     init(selection: Binding<String>) {
         _selection = selection
-        _draft = State(initialValue: AmoreSidebarShortcutPreferences.decode(selection.wrappedValue))
+        // Only the two deliberately retired footer IDs are hidden here;
+        // do not drop platform-dependent choices or rewrite saved data on open.
+        _draft = State(initialValue: AmoreSidebarShortcutPreferences.decode(selection.wrappedValue)
+            .filter { $0 != .privacyPolicy && $0 != .feedback })
     }
 
     private var available: [AmoreSidebarShortcut] {

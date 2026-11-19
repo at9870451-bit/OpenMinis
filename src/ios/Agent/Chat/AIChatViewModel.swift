@@ -1251,8 +1251,10 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     /// is reflected everywhere. `voiceStateCancellable` (set in init) forwards the
     /// global object's changes to this VM so views observing `vm.speakEnabled`
     /// still refresh.
+    weak var voiceCallDelegate: (any VoiceCallSpeechDelegate)?
+
     var speakEnabled: Bool {
-        get { VoiceOutputState.shared.isEnabled }
+        get { voiceCallDelegate?.callSpeechEnabled == true || VoiceOutputState.shared.isEnabled }
         set { VoiceOutputState.shared.isEnabled = newValue }
     }
     /// When enabled, uses 1-hour cache TTL instead of 5-minute for Anthropic requests.

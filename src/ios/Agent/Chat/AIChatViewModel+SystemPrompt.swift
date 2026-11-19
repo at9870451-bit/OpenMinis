@@ -54,11 +54,12 @@ extension AIChatViewModel {
         // is preserved inside SystemPromptBuilder.identityTemplate so we
         // don't regress model behavior that depended on it.
         (helperConfig != nil ? helperIdentitySection : SystemPromptBuilder.identitySection())
-            + "You should proactively use shell commands to accomplish the user's tasks — installing packages (apk add), "
+            + AmoreToolPolicy.directAnswerRule + "\n\n"
+            + "When tools are genuinely necessary, use shell commands to accomplish the user's tasks — installing packages (apk add), "
             + "writing and running scripts, managing files, networking, and any other operations a Linux terminal can perform.\n\n"
             + "Available tools:\n"
             + "- shell_execute: Run any shell command. Each invocation is an isolated process with stdout/stderr captured. "
-            + "Prefer this for most tasks — it is a real Linux environment with persistent filesystem. "
+            + "For tasks that genuinely require a shell, this is a real Linux environment with persistent filesystem. "
             + "Common tools (python3, pip, curl, wget, git, ssh, etc.) can be installed via apk add; Python packages via pip install. "
             + "Use `which <cmd>` to check if a tool is already installed before running apk add — many packages persist across sessions. "
             + "When you need to wait before checking results (e.g. polling, waiting for a process), use the `delay` parameter instead of `sleep` in the command — "
@@ -95,7 +96,7 @@ extension AIChatViewModel {
             // enumValues use, so a name can never appear in one and not the other.
             + ((isHelper || !Self.toolEnabled(.agents)) ? "" : Self.subAgentRosterSection())
             + "- memory_write: Save a memory entry to today's daily log (YYYY-MM-DD.md). Use proactively to note user preferences, project patterns, and important context.\n"
-            + "- memory_get: Recall memories with keyword search. Check memory at the start of new topics to leverage past knowledge.\n"
+            + "- memory_get: Recall memories with keyword search only when prior personal/project context is relevant to the task. Never look up memory just to answer a greeting or a self-contained question.\n"
             // [T-user-ask-prompt-consolidated] The only user_ask text in the
             // system prompt, and only when the tool is in this run (switch on,
             // not a sub agent). Everything else travels with the tool itself.
@@ -247,7 +248,7 @@ extension AIChatViewModel {
             + "- memory_write writes to today's daily log (YYYY-MM-DD.md) — use it for session notes, key facts, project context, things learned, and action items.\n"
             + "- GLOBAL.md (/var/minis/memory/GLOBAL.md) stores persistent preferences, settings, and general-purpose conventions. To read it, use file_read (NOT memory_get). To update it, use file_read first then file_edit. If GLOBAL.md does not exist yet, use file_write to create it directly.\n"
             + "- IMPORTANT: Only write to GLOBAL.md when the user explicitly asks (e.g. 'remember this globally', 'save to global memory'). Before editing, deduplicate and clean up — avoid ambiguity, repetition, or daily-log-style entries. GLOBAL.md should contain only concise, reusable knowledge (preferences, settings, conventions), NOT session logs or transient context.\n"
-            + "- Use memory_get to recall past knowledge before starting tasks — check if there are relevant memories that can help.\n"
+            + "- Use memory_get when the task needs prior knowledge about the user or project; do not make a memory call for greetings, translation, rewriting, simple supplied arithmetic or general explanations.\n"
             + "- Proactively save memories (via memory_write to daily log) when you discover user preferences or important patterns — don't wait to be asked.\n"
             + "- When the user says 'remember this' or similar, use memory_write to persist to the daily log. Only write to GLOBAL.md if the user specifically asks for global/persistent storage.\n"
             + "- What NOT to remember: passwords, API keys, tokens, secrets, or any sensitive credentials. Warn the user about the risk first; only proceed if they explicitly confirm.\n"

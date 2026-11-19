@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 import NetworkExtension
 import PokiCore
 
@@ -38,10 +39,15 @@ final class LoopbackTunnel {
     // Read the embedded id: signing tools can rewrite bundle identifiers.
     private let providerID: String? = {
         guard let plugins = Bundle.main.builtInPlugInsURL else { return nil }
-        return Bundle(url: plugins.appendingPathComponent("PokiTunnel.appex"))?.bundleIdentifier
+        return Bundle(url: plugins.appendingPathComponent("AmoreTunnel.appex"))?.bundleIdentifier
     }()
 
-    var available: Bool { providerID != nil }
+    /// This is a packaging preflight only, never proof of a valid entitlement.
+    /// The embedded AmoreTunnel needs a matching developer profile and iOS consent.
+    /// The real capability check remains NE preferences/start errors below.
+    var available: Bool {
+        providerID != nil
+    }
     var connected: Bool { state == .connected }
 
     init() {
@@ -85,7 +91,11 @@ final class LoopbackTunnel {
         state = .failed(message)
         throw failure(message)
         #else
-        guard let providerID else { throw failure("This build has no local VPN. Choose an external connection, or install the build with the local VPN and supported signing.") }
+        guard available, let providerID else {
+            let message = "This build has no provisioned PacketTunnel extension. A supported Apple NetworkExtension entitlement, signed extension and explicit iOS permission are required. Use the in-process no-VPN path or the existing external fallback."
+            state = .failed(message)
+            throw failure(message)
+        }
         guard !busy else { throw failure("A local connection change is already in progress. Try again when it finishes.") }
         busy = true
         defer { busy = false; stopAfterBringUp = false }
@@ -98,13 +108,20 @@ final class LoopbackTunnel {
                 return
             }
             guard manager.connection.status != .disconnecting else { throw failure("The local connection is still stopping. Try again in a moment.") }
+            // Refuse even an explicit connect if another tunnel may be active.
+            // utun also covers VPNs which publish no proxy settings. Conservative
+            // false positives are preferable to replacing the owner's VPN.
+            guard !anotherVPNIsOn() else {
+                yieldToAnotherVPN()
+                throw failure("Another VPN may be active. Amore did not replace it. Use the in-process path or the external fallback.")
+            }
             let configuration = NETunnelProviderProtocol()
             configuration.providerBundleIdentifier = providerID
             configuration.serverAddress = "On this iPhone"
             configuration.disconnectOnSleep = false
             configuration.includeAllNetworks = false
             manager.protocolConfiguration = configuration
-            manager.localizedDescription = "Poki local connection"
+            manager.localizedDescription = "Amore local connection"
             manager.isEnabled = true
             // Never on demand: iOS must not bring Poki's tunnel up by itself (it could displace another VPN).
             // Only the owner's connect, or Poki's own retry after its tunnel failed, dials it.
@@ -252,6 +269,17 @@ final class LoopbackTunnel {
 
     /// The interfaces iOS keeps scoped network settings for, one per active network or tunnel.
     private func anotherVPNIsOn() -> Bool {
+        var interfaces: UnsafeMutablePointer<ifaddrs>?
+        if getifaddrs(&interfaces) == 0 {
+            defer { freeifaddrs(interfaces) }
+            var current = interfaces
+            while let entry = current {
+                let name = String(cString: entry.pointee.ifa_name)
+                if (name.hasPrefix("utun") || name.hasPrefix("ppp") || name.hasPrefix("ipsec")),
+                   entry.pointee.ifa_flags & UInt32(IFF_UP) != 0 { return true }
+                current = entry.pointee.ifa_next
+            }
+        }
         guard let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as? [String: Any],
               let scoped = settings["__SCOPED__"] as? [String: Any] else { return false }
         return OtherVPN.isOn(interfaces: Array(scoped.keys))

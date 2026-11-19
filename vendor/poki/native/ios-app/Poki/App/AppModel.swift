@@ -305,6 +305,8 @@ final class AppModel {
     func addApprovalObserver(_ observer: @escaping (String) -> Void) { approvalObservers.append(observer) }
     /// Approvals the chat model is checking, or that needed nobody; `approvals` are the owner's.
     private var checking: [PendingApproval] = []
+    private var submittedApprovalIDs: Set<String> = []
+    func approvalWasSubmitted(_ id: String) -> Bool { submittedApprovalIDs.contains(id) }
     func addShellObserver(_ observer: @escaping (ShellEvent) -> Void) { shellObservers.append(observer) }
     /// A Debug probe drives PokiCore on the simulator without a runner session (the chat's end-to-end check).
     private(set) var probeDriven = false
@@ -725,7 +727,7 @@ final class AppModel {
         warmInProcess("Poki came to the front")
         openWhileInFront("Poki came to the front")
         closeBecausePokiOpened()
-        loopback.resume()
+        if usesLocalProcessTransport { loopback.pause() } else { loopback.resume() }
         // Swiped away, ended by iOS, or Poki turned on from the background (where iOS starts none):
         // the Live Activity comes back while Poki is on, so the next thing that needs the owner pops up.
         if sessionOn, !activity.isRunning {
@@ -784,7 +786,7 @@ final class AppModel {
         InProcessWDA.gate.withLock { $0.inFront = false }
         // The idle time counts from here: Poki in front was not idle (it stands by only away from it).
         if sessionOn { lastAgentActivity = max(lastAgentActivity, Date()) }
-        sessionOn ? loopback.resume(every: 6) : loopback.pause()
+        sessionOn && !usesLocalProcessTransport ? loopback.resume(every: 6) : loopback.pause()
         if pairingUnderWay { log.add("pairing", "Poki in the background while pairing; keep-alive \(pairingKeepAlive.isOn ? "playing" : "off")") }
     }
     private var inFront = true
@@ -849,12 +851,14 @@ final class AppModel {
 
     // MARK: Session
 
+    var usesLocalProcessTransport: Bool { setup.loopback == .inProcess }
+
     func chooseConnection(_ method: SetupState.Loopback) {
         guard !connectionInUse, !tunnel.busy else { return }
-        if method == .proxy { tunnel.disconnect() }
+        if method != .builtIn { tunnel.disconnect() } // only our own manager, never another VPN
         setup.loopback = method
         setup.proxyApp = nil
-        loopback.check()
+        if usesLocalProcessTransport { loopback.pause() } else { loopback.check() }
     }
 
     /// A sign-in from a client outside the relay's known list, waiting for the owner (an alert in the
@@ -979,6 +983,17 @@ final class AppModel {
             problem = "Choose and enable a local connection first (Setup)."
             return
         }
+        if setup.loopback == .inProcess {
+            guard automationPath == .inProcess else { problem = "This connection requires in-process automation."; return }
+            guard pairingPath != nil, pairingTrouble == nil else { problem = "Pair this iPhone explicitly in Setup first."; return }
+            guard setup.developerMode else { problem = "Waiting for Developer Mode. Enable it yourself in iOS Settings."; return }
+            guard Self.localDDIMounted else {
+                problem = "The no-VPN path requires the developer disk image already mounted on this iPhone. Use explicit developer setup first; Amore did not install pairing, certificates, a VPN or an image."
+                return
+            }
+            beginSession()
+            return
+        }
         if setup.loopback == .builtIn, !tunnel.connected {
             guard reconnectLocal else {
                 problem = "The local connection is off. Turn Poki on to reconnect, or choose an external connection in Setup."
@@ -1062,7 +1077,7 @@ final class AppModel {
 
     private func beginSession() {
         guard let (pairing, relay) = checkSessionStartPreconditions() else { return }
-        if !inFront { loopback.resume(every: 6) }
+        if !inFront && !usesLocalProcessTransport { loopback.resume(every: 6) }
         log.add("session", "turned on")
         background.start()
         ApprovalNotice.requestPermission()
@@ -1071,7 +1086,8 @@ final class AppModel {
         log.add("activity", activity.isRunning ? "Live Activity started" : "Live Activity not running: \(activity.lastError ?? "unknown reason")")
         sessionOn = true
         wantsOn = true
-        launcherConfig = LauncherConfig(pairing_file: pairing, ddi_dir: AppFiles.ddiDirectory.path, in_process: automationPath == .inProcess, ddi_marker: Self.ddiMarker)
+        launcherConfig = LauncherConfig(pairing_file: pairing, ddi_dir: AppFiles.ddiDirectory.path, in_process: automationPath == .inProcess, ddi_marker: Self.ddiMarker,
+                                        local_only: setup.loopback == .inProcess)
         lastAgentActivity = Date()
         // Away from Poki the runner (and with it iOS's automation banner) starts only when an agent asks.
         standBy(reason: nil)
@@ -1477,6 +1493,8 @@ final class AppModel {
     /// of "Checking pairing". Back: the launcher tries at once instead of waiting out its backoff
     /// (the runner dies with the tunnel, so every drop costs a restart).
     func loopbackChanged(from old: LoopbackMonitor.State, to new: LoopbackMonitor.State) {
+        // The local session/relay does not depend on the external 10.7.0.1 route.
+        guard !usesLocalProcessTransport else { return }
         let wasWorking = old.isWorking
         // 10.7.0.1 answers with no connection chosen in Setup: something outside Poki (a proxy app set
         // up before, or by Poki Setup) provides it. The external connection is the recorded choice, so
@@ -1532,6 +1550,7 @@ final class AppModel {
         if status.code == "passcode" {
             return .starting("the phone is asking the owner for the passcode (iOS does this once before the first automation after a restart or a force quit); the Live Activity tells the owner; the runner starts the moment it is entered. Call again in about 10 s; nothing is lost and no action is needed from you")
         }
+        if usesLocalProcessTransport { return status.coreState }
         let preLaunch = ["connecting", "pairing", "tunnel", "waiting_network", "standby", "idle"].contains(status.state)
         if preLaunch, !loopback.isWorking, loopback.state != .checking || status.state == "waiting_network" {
             if loopback.cellularRefused {
@@ -1728,6 +1747,7 @@ final class AppModel {
                 record(approval, approved: approved)
             }
             approvals.removeAll { $0.id == id }
+            submittedApprovalIDs.remove(id)
             checking.removeAll { $0.id == id }
             log.add("approval", "ended \(id): \(approved.map { $0 ? "approved" : "denied" } ?? "expired or replaced")")
             if approved == nil, !ApprovalClassifier.modelAnswered(id) { problem = "An approval ran out before you answered, so that step was not done. The agent can ask again." }
@@ -1970,12 +1990,22 @@ final class AppModel {
         }
     }
 
+    private func claimApproval(_ id: String) -> Bool {
+        guard let current = approvals.first(where: { $0.id == id }),
+              AmorePendingApproval.canResolve(id: id, pendingIDs: Set(approvals.map(\.id)),
+                                               expires: current.expires, submitted: submittedApprovalIDs.contains(id), at: Date()) else { return false }
+        submittedApprovalIDs.insert(id)
+        return true
+    }
+
     func resolve(_ approval: PendingApproval, approved: Bool) {
+        guard claimApproval(approval.id) else { return }
         core.resolveApproval(id: approval.id, approved: approved)
     }
 
-    /// Don’t Ask Again on an approval's card: this step goes through and approvals are off from now on.
+    /// An expired or stale card cannot change future approval policy either.
     func stopAsking(_ approval: PendingApproval) {
+        guard approval.offersStopAsking, claimApproval(approval.id) else { return }
         turnApprovalsOff()
         core.resolveApproval(id: approval.id, approved: true)
     }
@@ -2053,11 +2083,10 @@ final class AppModel {
     /// sent at once can land on it (iOS then opens Poki). So the Live Activity's decisions reach
     /// PokiCore after a short pause, the app's own buttons at once.
     func decide(_ decision: ApprovalDecision) {
-        // Don’t Ask Again is the owner's word about all later steps too, so it counts for a card whose
-        // approval has already ended.
+        guard let current = approvals.first(where: { $0.id == decision.approvalID }),
+              !decision.stopAsking || current.offersStopAsking,
+              claimApproval(decision.approvalID) else { return }
         if decision.stopAsking { turnApprovalsOff() }
-        // A tap on an approval that already ended (answered in the app, or timed out) does nothing.
-        guard approvals.contains(where: { $0.id == decision.approvalID }) else { return }
         log.add("approval", "\(decision.approved ? "allowed" : "denied") \(decision.approvalID) on the Live Activity\(decision.stopAsking ? ", asking off" : "")")
         activity.update { state in
             guard state.approval?.id == decision.approvalID else { return }
@@ -2066,6 +2095,7 @@ final class AppModel {
         }
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(Self.islandCollapse))
+            guard approvals.contains(where: { $0.id == decision.approvalID && $0.expires > Date() }) else { return }
             core.resolveApproval(id: decision.approvalID, approved: decision.approved)
         }
     }

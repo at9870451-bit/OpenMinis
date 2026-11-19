@@ -167,7 +167,13 @@ extension AIChatViewModel {
             return "main:\(sessionId?.prefix(8) ?? "none")"
         }()
         let perfStarted = PerfProbe.toolBefore(tool: tu.name, job: perfJobId)
-        defer { PerfProbe.toolAfter(tool: tu.name, job: perfJobId, started: perfStarted) }
+        let firstToolTrace = AmorePerformanceTrace.beginFirstTool()
+        defer {
+            PerfProbe.toolAfter(tool: tu.name, job: perfJobId, started: perfStarted)
+            if let id = firstToolTrace {
+                AmorePerformanceTrace.endFirstTool(id)
+            }
+        }
         // [T-crash-breadcrumbs] Tool name only - never its arguments.
         let crumbTool = String(tu.name.prefix(40))
         CrashBreadcrumbs.record("tool.start", detail: crumbTool)
@@ -431,6 +437,12 @@ extension AIChatViewModel {
         }()
 
         do {
+        // Boot only for tools that actually touch the Linux filesystem. Browser,
+        // memory, user_ask and device approvals remain on their existing paths.
+        if ["shell_execute", "file_read", "file_write", "file_edit", "read_image"].contains(tu.name) {
+            try await ensureKernelReadyForTool()
+        }
+        try Task.checkCancellation()
         switch tu.name {
         case "device_control":
             let answer = await AmoreDeviceTools.run(

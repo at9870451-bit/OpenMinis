@@ -153,14 +153,53 @@ extension AIChatView {
             || vm.loadingVideoCount > 0
             || !vm.pastedTexts.isEmpty
         return AnyView(
-            Group {
-                if hasContent || vm.isProcessing {
-                    sendButton
-                } else {
-                    micButton
-                }
+            HStack(spacing: 2) {
+                // Dictation and calling are distinct controls in every state.
+                micButton
+                phoneCallButton
+                if hasContent || vm.isProcessing { sendButton }
             }
         )
+    }
+
+    private var phoneCallButton: some View {
+        Button { prepareVoiceCall() } label: {
+            Image(systemName: "phone.fill")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(preparingVoiceCall ? ChatColors.secondaryText : ChatColors.accent)
+                .frame(width: 44, height: 44)
+                .background(ChatColors.inputIconBg, in: Circle())
+                .overlay(Circle().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
+                .overlay { if preparingVoiceCall { ProgressView().controlSize(.mini) } }
+        }
+        .buttonStyle(.plain)
+        .disabled(preparingVoiceCall || vm.isProcessing || remoteDeviceId != nil)
+        .accessibilityLabel(AppLocalized("Start real-time voice call"))
+        .accessibilityHint(AppLocalized("Opens a call using this conversation. This is not dictation."))
+        .accessibilityIdentifier("composer.voiceCall")
+    }
+
+    private func prepareVoiceCall() {
+        guard !showVoiceCall, !preparingVoiceCall, !vm.isProcessing, remoteDeviceId == nil,
+              !lockStore.appIsLocked,
+              vm.sessionId.map({ !lockStore.isVisuallyLocked($0) }) ?? true else { return }
+        inputFocused = false
+        speechManager.stopRecording()
+        if voiceInputActive {
+            if voiceVM.hasUntranscribedAudio {
+                preparingVoiceCall = true
+                voiceVM.finishCaptureForSend { ready in
+                    preparingVoiceCall = false
+                    guard ready else { return }
+                    // Keep the finalized dictation in its existing input draft.
+                    voiceVM.stopListening(); voiceInputActive = false
+                    showVoiceCall = true
+                }
+                return
+            }
+            voiceVM.stopListening(); voiceInputActive = false
+        }
+        showVoiceCall = true
     }
 
     /// [T-ios-de-voice-toolbar] Fixed controls in `inputBottomRow`: two 34pt

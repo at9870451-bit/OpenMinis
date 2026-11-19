@@ -651,6 +651,18 @@ extension CollectionViewMessageListV3.Coordinator {
                 }
                 .store(in: &subscriptions)
 
+            NotificationCenter.default.publisher(for: .amoreWorkflowOutputDidChange)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] _ in
+                    guard let self, let vm = self.vm, !vm.isLoadingSession else { return }
+                    // Presentation only. Do not clear messages/history/snapshots.
+                    // New compact groups start closed; the user may expand them.
+                    self.expandedToolGroups.removeAll()
+                    self.applySnapshot(messages: vm.messages, caller: "workflowOutputPreference")
+                    self.reconfigureAllCells()
+                }
+                .store(in: &subscriptions)
+
             // [T-user-ask-notsent-merge] A rejected user_ask joined a run of
             // not-sent calls: its row leaves the list (the run's lead shows the
             // count). Same deferral as a tool-fold re-plan while streaming

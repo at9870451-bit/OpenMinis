@@ -369,6 +369,8 @@ struct AIChatView: View {
         nonmutating set { voiceMode.isVoiceActive = newValue }
     }
     @StateObject var voiceVM = VoiceInputViewModel()
+    @State var showVoiceCall = false
+    @State var preparingVoiceCall = false
     /// Global read-replies state — observed so the voice-mode "Read replies" toggle
     /// reflects enabled/muted in lockstep with the global voice-output capsule.
     @ObservedObject var voiceOutput = VoiceOutputState.shared
@@ -505,7 +507,7 @@ struct AIChatView: View {
     /// True when any sheet or fullScreenCover is presented (suppress auto-focus to avoid keyboard bugs).
     var hasOverlayPresented: Bool {
         showFileBrowser || showBrowserSheet || showTerminal || showCamera
-            || showPhotoPicker || showDocumentPicker || showModelPicker
+            || showPhotoPicker || showDocumentPicker || showModelPicker || showVoiceCall
     }
 
     /// Tracks whether this ChatView is the currently visible screen.
@@ -1042,6 +1044,9 @@ struct AIChatView: View {
 
     private var chatMediaContent: AnyView {
         AnyView(chatPermissionContent
+        .fullScreenCover(isPresented: $showVoiceCall) {
+            VoiceCallView(conversation: vm)
+        }
         .fullScreenCover(item: $previewVideoFile) { fileURL in
             MinisVideoFullscreenPlayer(fileURL: fileURL)
         }

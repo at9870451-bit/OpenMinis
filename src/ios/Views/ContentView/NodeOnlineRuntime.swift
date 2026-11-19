@@ -70,7 +70,7 @@ final class NodeOnlineRuntime: ObservableObject {
             throw Self.failure(AppLocalized("Online Node installation or runtime verification failed.") + "\n" + String(log.suffix(2400)))
         }
         isReady = true
-        return AppLocalized("Node.js, npm and npx ran successfully. AOJIT build matching is checked separately.") + "\n" + String(log.suffix(1600))
+        return AppLocalized("Runtime ready: node, npm and npx verified; AOJIT status is separate.") + "\n" + String(log.suffix(1600))
     }
 
     private static func failure(_ message: String) -> NSError {

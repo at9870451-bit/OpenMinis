@@ -13,6 +13,8 @@ packages:
   PiSwift:
     url: https://github.com/xibbon/PiSwift.git
     revision: f8696524cf41ca0a7f42f5b230eafa443daececd
+  PokiLoopback:
+    path: ../ios/PokiLoopback
 settings:
   base:
     IPHONEOS_DEPLOYMENT_TARGET: '18.0'
@@ -123,8 +125,42 @@ targets:
         - /System/Developer/Library/Frameworks
         ASSETCATALOG_COMPILER_APPICON_NAME: ''
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: ''
+  AmoreTunnel:
+    type: app-extension
+    platform: iOS
+    sources:
+    - path: AmoreTunnel
+      excludes:
+      - '*.entitlements'
+    - path: Shared/TunnelStopSignal.swift
+    dependencies:
+    - package: PokiLoopback
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.openAmroe.app.localtunnel
+        PRODUCT_NAME: AmoreTunnel
+        PRODUCT_MODULE_NAME: AmoreTunnel
+        APPLICATION_EXTENSION_API_ONLY: true
+        GENERATE_INFOPLIST_FILE: false
+        CODE_SIGN_ENTITLEMENTS: AmoreTunnel/AmoreTunnel.entitlements
+        SKIP_INSTALL: true
+        MARKETING_VERSION: '1.36'
+        CURRENT_PROJECT_VERSION: '36'
+        LD_RUNPATH_SEARCH_PATHS:
+        - $(inherited)
+        - '@executable_path/../../Frameworks'
+    info:
+      path: AmoreTunnel/Info.plist
+      properties:
+        CFBundleDisplayName: Amore Local Connection
+        CFBundleShortVersionString: '1.36'
+        CFBundleVersion: '36'
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
 schemes:
   AmoreDeviceKit:
     build:
       targets:
         AmoreDeviceKit: all
+        AmoreTunnel: all

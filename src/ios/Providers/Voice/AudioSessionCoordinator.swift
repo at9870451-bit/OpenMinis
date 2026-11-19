@@ -33,13 +33,17 @@ final class AudioSessionCoordinator {
         case replyTTS = 1
         case mediaAttachment = 2
         case capture = 3
+        case voiceCall = 4
     }
 
     private let logger = AppLogger(category: "AudioSession")
     private var active: Set<Intent> = []
 
     /// True while the mic is capturing — reply TTS is suppressed in this state.
-    var isCapturing: Bool { active.contains(.capture) }
+    var isCapturing: Bool { active.contains(.capture) || active.contains(.voiceCall) }
+    var isVoiceCalling: Bool { active.contains(.voiceCall) }
+    private var voiceCallSpeaker = true
+    private var voiceCallOwner: UUID?
 
     // MARK: - Public API
 
@@ -120,6 +124,34 @@ final class AudioSessionCoordinator {
         apply(reason: "foreground")
     }
 
+    /// The asynchronous barrier does not park the UI thread on mediaserverd.
+    func beginVoiceCallAndWait(owner: UUID) async -> Bool {
+        guard !active.contains(.capture), voiceCallOwner == nil || voiceCallOwner == owner else { return false }
+        voiceCallOwner = owner
+        beginInternal(.voiceCall)
+        let applied: Bool = await withCheckedContinuation { continuation in
+            let result = AudioActivationResult(continuation)
+            Self.sessionQueue.async { result.finish(Self.lastApplyError == nil) }
+            DispatchQueue.global().asyncAfter(deadline: .now() + 3) { result.finish(false) }
+        }
+        return applied && voiceCallOwner == owner
+    }
+    func endVoiceCall(owner: UUID) {
+        guard voiceCallOwner == owner else { return }
+        voiceCallOwner = nil
+        end(.voiceCall)
+    }
+    func setVoiceCallSpeaker(_ speaker: Bool, owner: UUID) {
+        guard voiceCallOwner == owner else { return }
+        voiceCallSpeaker = speaker
+        guard active.contains(.voiceCall) else { return }
+        apply(reason: "voice-call-route")
+        Self.sessionQueue.async {
+            do { try AVAudioSession.sharedInstance().overrideOutputAudioPort(speaker ? .speaker : .none) }
+            catch { AppLogger(category: "AudioSession").error("Voice call route change failed: \(error.localizedDescription)") }
+        }
+    }
+
     // MARK: - Core (the ONLY setCategory/setActive site)
 
     private var sessionActive = false
@@ -150,6 +182,8 @@ final class AudioSessionCoordinator {
 
     private func profile(for intent: Intent) -> (AVAudioSession.Category, AVAudioSession.Mode, AVAudioSession.CategoryOptions) {
         switch intent {
+        case .voiceCall:
+            return (.playAndRecord, .voiceChat, voiceCallSpeaker ? [.defaultToSpeaker, .allowBluetooth] : [.allowBluetooth])
         case .capture:
             return (.record, .measurement, [])
         case .mediaAttachment:
@@ -380,5 +414,15 @@ final class AudioSessionCoordinator {
         @unknown default:
             break
         }
+    }
+}
+
+private final class AudioActivationResult: @unchecked Sendable {
+    private let lock = NSLock()
+    private var continuation: CheckedContinuation<Bool, Never>?
+    init(_ continuation: CheckedContinuation<Bool, Never>) { self.continuation = continuation }
+    func finish(_ value: Bool) {
+        lock.lock(); let next = continuation; continuation = nil; lock.unlock()
+        next?.resume(returning: value)
     }
 }

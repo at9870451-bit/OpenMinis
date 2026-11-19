@@ -9,7 +9,6 @@
 //
 
 import SwiftUI
-import SafariServices
 import AmoreDeviceKit
 
 // MARK: - Settings Sheet
@@ -40,6 +39,8 @@ private enum SettingsDestination: Hashable {
     case mcpIntegrations
     case mcpServerDetail(serverId: String)
     case developerConnection
+    case localDeviceStatus
+    case deviceApprovals
     case homeShortcuts
     // Local shortcuts use these routes without changing the shared deep-link enum.
     case subAgents
@@ -52,6 +53,7 @@ private enum SettingsDestination: Hashable {
 }
 
 struct SettingsSheet: View {
+    @AppStorage(AmoreWorkflowOutput.key) private var hideWorkflowOutput = false
     @Binding var showTerminal: Bool
     /// When shown as a bottom-tab page instead of a sheet, hide the Done
     /// button — there is nothing to dismiss.
@@ -60,8 +62,6 @@ struct SettingsSheet: View {
     @ObservedObject private var deepLink = DeepLinkCoordinator.shared
     @ObservedObject private var sidebarRouter = AmoreSettingsShortcutRouter.shared
     @State private var navPath = NavigationPath()
-    @State private var showFeedbackDialog = false
-    @State private var showPrivacyPolicy = false
 
     var body: some View {
         NavigationStack(path: $navPath) {
@@ -72,35 +72,38 @@ struct SettingsSheet: View {
                     NavigationLink {
                         ProviderInstancesView()
                     } label: {
-                        if #available(iOS 26, *) {
-                            Label { Text("Manage Providers") } icon: { SettingsFeatureIcon(symbol: "key.circle.fill", feature: .providers) }
-                        } else {
-                            Label { Text("Manage Providers") } icon: { SettingsFeatureIcon(symbol: "lock.circle.fill", feature: .providers) }
-                        }
+                        Label { Text("Manage Providers") } icon: { SettingsFeatureIcon(symbol: "key", feature: .providers) }
                     }
 
                     NavigationLink {
                         ModelGroupsView()
                     } label: {
-                        Label { Text("Model Groups") } icon: { SettingsFeatureIcon(symbol: "gearshape.circle.fill", feature: .modelGroups) }
+                        Label { Text("Model Groups") } icon: { SettingsFeatureIcon(symbol: "square.stack.3d.up", feature: .modelGroups) }
                     }
 
                     NavigationLink {
                         UsageStatsView()
                     } label: {
-                        Label { Text("Token Usage") } icon: { SettingsFeatureIcon(symbol: "chart.line.uptrend.xyaxis.circle.fill", feature: .usage) }
+                        Label { Text("Token Usage") } icon: { SettingsFeatureIcon(symbol: "chart.line.uptrend.xyaxis", feature: .usage) }
                     }
                 } header: {
                     Text("LLM Providers")
                 } footer: {
                     Text("Configure which models the agent uses, manage API keys & OAuth for each provider, and create model groups for fallback or load balancing.")
                 }
+                .amoreSettingsGlassRows()
 
                 Section("Appearance") {
                     NavigationLink(value: SettingsDestination.developerConnection) {
                         Label { Text(AppLocalized("Connect developer tools")) } icon: { SettingsFeatureIcon(symbol: "point.3.connected.trianglepath.dotted", feature: .developerConnection) }
                     }
                     .accessibilityIdentifier("settings.developerConnection")
+                    NavigationLink(value: SettingsDestination.localDeviceStatus) {
+                        Label { Text(AppLocalized("Local device connection status")) } icon: { SettingsFeatureIcon(symbol: "iphone.gen3.radiowaves.left.and.right", feature: .developerConnection) }
+                    }.accessibilityIdentifier("settings.localDeviceStatus")
+                    NavigationLink(value: SettingsDestination.deviceApprovals) {
+                        Label { Text(AppLocalized("Device action approvals")) } icon: { SettingsFeatureIcon(symbol: "checkmark.shield", feature: .permissions) }
+                    }.accessibilityIdentifier("settings.deviceApprovals")
                     NavigationLink(value: SettingsDestination.homeShortcuts) {
                         Label { Text(AppLocalized("Home shortcuts")) } icon: { SettingsFeatureIcon(symbol: "rectangle.3.group.bubble.left.fill", feature: .homeShortcuts) }
                     }
@@ -110,12 +113,23 @@ struct SettingsSheet: View {
                         Label {
                             Text("Appearance")
                         } icon: {
-                            SettingsFeatureIcon(symbol: "paintbrush.fill", feature: .appearance)
+                            SettingsFeatureIcon(symbol: "paintbrush", feature: .appearance)
                         }
                     }
                 }
+                .amoreSettingsGlassRows()
 
                 Section("Agent Runtime") {
+                    Toggle(isOn: Binding(get: { hideWorkflowOutput }, set: { value in
+                        AmoreWorkflowOutput.setHidden(value)
+                        hideWorkflowOutput = value
+                    })) {
+                        Label { Text(AppLocalized("Hide workflow output")) } icon: { SettingsFeatureIcon(symbol: "rectangle.stack.badge.minus", feature: .tools) }
+                    }
+                    .accessibilityIdentifier("settings.hideWorkflowOutput")
+                    Text(AppLocalized("Collapse completed tool output and reasoning. Final replies, errors and pending approvals stay visible; history is not deleted."))
+                        .font(.footnote).foregroundStyle(.secondary)
+
                     // [T-tools-granular-switches] First row: per-tool switches.
                     NavigationLink {
                         ToolsSettingsView()
@@ -208,6 +222,7 @@ struct SettingsSheet: View {
                         }
                     }
                 }
+                .amoreSettingsGlassRows()
 
                 Section("Storage") {
                     NavigationLink {
@@ -265,6 +280,7 @@ struct SettingsSheet: View {
                         }
                     }
                 }
+                .amoreSettingsGlassRows()
 
                 Section("Permissions") {
                     NavigationLink {
@@ -288,6 +304,7 @@ struct SettingsSheet: View {
                         }
                     }
                 }
+                .amoreSettingsGlassRows()
 
                 Section("Logs") {
                     NavigationLink {
@@ -300,6 +317,7 @@ struct SettingsSheet: View {
                         }
                     }
                 }
+                .amoreSettingsGlassRows()
 
                 Section("About") {
                     NavigationLink {
@@ -311,29 +329,12 @@ struct SettingsSheet: View {
                             SettingsFeatureIcon(symbol: "info", feature: .about)
                         }
                     }
-                    Button { showPrivacyPolicy = true } label: {
-                        Label {
-                            Text("Privacy Policy")
-                        } icon: {
-                            SettingsFeatureIcon(symbol: "hand.raised", feature: .privacy)
-                        }
-                    }
-                    Button {
-                        showFeedbackDialog = true
-                    } label: {
-                        Label {
-                            Text("Feedback")
-                        } icon: {
-                            SettingsFeatureIcon(symbol: "bubble.left.and.bubble.right.fill", feature: .feedback)
-                        }
-                    }
-                    .foregroundStyle(PokiTheme.primaryText)
                 }
-
+                .amoreSettingsGlassRows()
             }
             }
             .amoreDeviceSetupDestinations()
-            .pokiScreen()
+            .amoreSettingsGlass()
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -395,6 +396,10 @@ struct SettingsSheet: View {
                     MCPIntegrationsView()
                 case .mcpServerDetail(let serverId):
                     MCPIntegrationsView(initialEditServerId: serverId)
+                case .localDeviceStatus:
+                    AmoreProtectedDevicePage(approvals: false)
+                case .deviceApprovals:
+                    AmoreProtectedDevicePage(approvals: true)
                 case .developerConnection:
                     DeveloperConnectionView()
                 case .homeShortcuts:
@@ -456,24 +461,10 @@ struct SettingsSheet: View {
                 applyPendingDeepLink()
             }
         }
+        // Inherited scroll-background/ink/bar policy for pushed settings;
+        // explicit page row paint still belongs inside each List/Form.
+        .amoreSettingsGlass()
         .appFontScale()
-        // The sidebar can request Feedback before the lazy last row exists.
-        .confirmationDialog("Feedback", isPresented: $showFeedbackDialog, titleVisibility: .visible) {
-            Button("Report a Bug (GitHub)") {
-                if let url = Self.makeBugReportURL() { UIApplication.shared.open(url) }
-            }
-            Button("Feedback (Telegram)") {
-                if let url = URL(string: "https://t.me/+2NzhOJuzRyI1YmM1") { UIApplication.shared.open(url) }
-            }
-            Button("Feedback (Email)") {
-                if let url = Self.makeFeedbackEmailURL() { UIApplication.shared.open(url) }
-            }
-            Button("Cancel", role: .cancel) {}
-        }
-        .sheet(isPresented: $showPrivacyPolicy) {
-            SettingsPrivacyBrowser(url: URL(string: "https://openminis.github.io/privacy-policy.html")!)
-                .ignoresSafeArea()
-        }
     }
 
     /// Contract for `amoreOpenSidebarDestination`. The host calls
@@ -481,7 +472,7 @@ struct SettingsSheet: View {
     /// onAppear/onChange/onReceive all consume that same replayable slot.
     static let supportedShortcutDestinations: Set<String> = [
         "home-shortcuts", "marquee", "context-compression", "plugin-marketplace",
-        "icloud-sync", "backup-restore", "biometric-protection", "privacy-policy", "feedback",
+        "icloud-sync", "backup-restore", "biometric-protection",
         "developer-connection", "connection", "sub-agents", "rootfs", "terminal"
     ]
 
@@ -502,13 +493,6 @@ struct SettingsSheet: View {
         case "sub-agents": destination = .subAgents
         case "rootfs": destination = .rootfs
         case "terminal": destination = .terminal
-        case "privacy-policy":
-            showPrivacyPolicy = true
-            return
-        case "feedback":
-            navPath = NavigationPath()
-            showFeedbackDialog = true
-            return
         default: return
         }
         navPath = NavigationPath()
@@ -580,116 +564,6 @@ struct SettingsSheet: View {
         deepLink.pendingSettingsTarget = nil
     }
 
-    /// Compose the feedback mailto URL with a prefilled body that includes
-    /// app version, iOS version, and a machine identifier, plus a prompt
-    /// asking the user to attach a screenshot manually (mailto:// can't
-    /// auto-attach). Using URLComponents so the subject and body go through
-    /// proper URL encoding without hand-rolling addingPercentEncoding calls.
-    fileprivate static func makeFeedbackEmailURL() -> URL? {
-        let bundle = Bundle.main
-        let appVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
-        let build = bundle.infoDictionary?["CFBundleVersion"] as? String ?? "?"
-        let iosVersion = UIDevice.current.systemVersion
-        let device = machineIdentifier()
-
-        let body = """
-        Please describe your feedback:
-
-
-        ---
-        App Version: \(appVersion) (\(build))
-        iOS Version: \(iosVersion)
-        Device: \(device)
-
-        Screenshot (optional): Please attach a screenshot if relevant.
-        """
-
-        var components = URLComponents()
-        components.scheme = "mailto"
-        components.path = "dev@openminis.app"
-        components.queryItems = [
-            URLQueryItem(name: "subject", value: "Minis Feedback"),
-            URLQueryItem(name: "body", value: body),
-        ]
-        return components.url
-    }
-
-    /// Build the GitHub Issue URL with a bilingual bug-report template
-    /// pre-filled with platform / OS / app / device info. SwiftUI `Link`
-    /// hands the URL to UIApplication.shared.open, which routes to Safari.
-    fileprivate static func makeBugReportURL() -> URL? {
-        let bundle = Bundle.main
-        let appVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
-        let build = bundle.infoDictionary?["CFBundleVersion"] as? String ?? "?"
-        let iosVersion = UIDevice.current.systemVersion
-        let device = machineIdentifier()
-
-        let body = """
-        ## 📝 Problem Summary
-
-        <!-- Briefly describe the issue you encountered -->
-
-
-        ## 📱 Basic Information
-
-        | Field | Value |
-        |-------|-------|
-        | Platform | iOS |
-        | OS Version | iOS \(iosVersion) |
-        | Minis Version | \(appVersion) (build \(build)) |
-        | Device Model | \(device) |
-
-        ## 🔁 Steps to Reproduce
-
-        1.
-        2.
-        3.
-
-        ## ❌ Error Details
-
-        ```
-        paste error here
-        ```
-
-        ## ✅ Expected Behavior
-
-
-
-        ## 🗂️ Additional Information
-
-        """
-
-        var components = URLComponents(string: "https://github.com/OpenMinis/OpenMinis/issues/new")
-        components?.queryItems = [
-            URLQueryItem(name: "template", value: "bug_report.md"),
-            URLQueryItem(name: "title", value: "[Bug] "),
-            URLQueryItem(name: "body", value: body),
-        ]
-        return components?.url
-    }
-
-    /// Returns the hardware model identifier, e.g. "iPhone16,2".
-    /// `UIDevice.current.model` returns the generic "iPhone" / "iPad" and
-    /// isn't useful in a bug report, so we fall back to utsname.
-    private static func machineIdentifier() -> String {
-        var sys = utsname()
-        uname(&sys)
-        let id = withUnsafePointer(to: &sys.machine) {
-            $0.withMemoryRebound(to: CChar.self, capacity: Int(_SYS_NAMELEN)) {
-                String(cString: $0)
-            }
-        }
-        return id.isEmpty ? UIDevice.current.model : id
-    }
-}
-
-/// Settings privacy opens in-app and returns to the same settings stack.
-private struct SettingsPrivacyBrowser: UIViewControllerRepresentable {
-    let url: URL
-    func makeUIViewController(context: Context) -> SFSafariViewController {
-        SFSafariViewController(url: url)
-    }
-    func updateUIViewController(_ controller: SFSafariViewController, context: Context) {}
 }
 
 // MARK: - Context Compression Settings
@@ -718,6 +592,7 @@ struct ContextCompressionSettingsView: View {
             } footer: {
                 Text(AppLocalized("When a conversation approaches the model's context window, Amore replaces older turns with a rolling summary and keeps the last few turns verbatim. Turning this off keeps full history; if the window still fills up, old tool output may be collapsed rather than summarised."))
             }
+            .amoreSettingsGlassRows()
 
             Section {
                 Stepper(value: $keepRecent, in: 1...10) {
@@ -735,6 +610,7 @@ struct ContextCompressionSettingsView: View {
             } footer: {
                 Text(AppLocalized("How many of the newest turns survive compaction verbatim. When the context is critically tight, Amore always keeps at least one turn regardless of this setting."))
             }
+            .amoreSettingsGlassRows()
 
             Section {
                 thresholdRow("Under 32K", "Manual only")
@@ -747,6 +623,7 @@ struct ContextCompressionSettingsView: View {
             } footer: {
                 Text(AppLocalized("Thresholds follow the active model's context window. Smaller windows keep more headroom because the summary itself has to fit."))
             }
+            .amoreSettingsGlassRows()
 
             Section {
                 Button(AppLocalized("Restore Defaults")) {
@@ -756,7 +633,9 @@ struct ContextCompressionSettingsView: View {
             } footer: {
                 Text(AppLocalized("You can still compress a conversation by hand: long-press a message and choose “Compact Above”."))
             }
+            .amoreSettingsGlassRows()
         }
+        .amoreSettingsGlass()
         .navigationTitle(AppLocalized("Context Compression"))
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -905,12 +784,12 @@ struct AmoreMarketplaceView: View {
                         .foregroundStyle(PokiTheme.primaryText)
                 }
                 .disabled(importer.isWorking)
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
                 if importer.isWorking {
                     HStack(spacing: 10) {
                         ProgressView().tint(PokiTheme.tagText)
                         Text(importer.phaseText).font(.callout).foregroundStyle(PokiTheme.secondaryText)
-                    }.listRowBackground(PokiTheme.surface)
+                    }.amoreSettingsGlassRows()
                 }
             } header: {
                 Text(AppLocalized("Local plugins"))
@@ -940,7 +819,7 @@ struct AmoreMarketplaceView: View {
                         }.buttonStyle(.borderless)
                     }
                 }
-            }.listRowBackground(PokiTheme.surface)
+            }.amoreSettingsGlassRows()
 
             Section {
                 switch store.phase {
@@ -979,9 +858,9 @@ struct AmoreMarketplaceView: View {
                 Text(AppLocalized("Community plugins"))
             } footer: {
                 Text(AppLocalized("These repositories are not reviewed by Amore. Install only what you can audit."))
-            }.listRowBackground(PokiTheme.surface)
+            }.amoreSettingsGlassRows()
         }
-        .pokiScreen()
+        .amoreSettingsGlass()
         .navigationTitle(AppLocalized("Plugin Marketplace"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $pickerMode, onDismiss: {

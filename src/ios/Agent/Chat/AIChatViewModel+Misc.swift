@@ -9,49 +9,26 @@ extension AIChatViewModel {
 
     // MARK: - Kernel Boot
 
-    func ensureKernelBooted() {
-        guard kernelStatus == .notBooted else { return }
+    /// Legacy view-appearance hook. Intentionally passive: opening a chat is
+    /// not a request to install Linux, enumerate overlays or start a kernel.
+    /// Real tools and the terminal await the shared readiness service below.
+    func ensureKernelBooted() {}
+
+    func ensureKernelReadyForTool() async throws {
         kernelStatus = .booting
-
-        Task {
-            let bootStart = CFAbsoluteTimeGetCurrent()
-            do {
-                if !ISHKernel.shared.isBooted {
-                    let installStart = CFAbsoluteTimeGetCurrent()
-                    try RootfsManager.shared.installIfNeeded()
-                    let installElapsed = (CFAbsoluteTimeGetCurrent() - installStart) * 1000
-                    logger.info("[KernelBoot] installIfNeeded: \(String(format: "%.1f", installElapsed))ms")
-
-                    let kernelStart = CFAbsoluteTimeGetCurrent()
-                    let rootPath = RootfsManager.shared.rootfsPath.path
-                    let err = ISHKernel.shared.boot(withRootPath: rootPath)
-                    let kernelElapsed = (CFAbsoluteTimeGetCurrent() - kernelStart) * 1000
-                    logger.info("[KernelBoot] kernel boot call: \(String(format: "%.1f", kernelElapsed))ms")
-                    if err < 0 {
-                        kernelStatus = .failed("Kernel boot failed: \(err)")
-                        return
-                    }
-                    // Wire fakefs change events into the iCloud Sync v2
-                    // SessionFile dirty pipeline. Must be done after boot
-                    // (the C-side dispatch source is created by this call)
-                    // and before any bind mount, so the first realfs op
-                    // already has a consumer registered.
-                    installSessionFileChangeTracker(kernel: ISHKernel.shared)
-
-                    // Install per-session path-translate hook. Must run
-                    // before any session task is spawned so the first
-                    // /var/minis/* access already routes correctly.
-                    MinisFsRouter.shared.installHook()
-                }
-                RootfsManager.shared.applyDefaultMountOverlay()
-                Task { @MainActor in MirrorSpeedTestViewModel.shared.autoDetectOnceIfNeeded() }
-                kernelStatus = .booted
-                let totalElapsed = (CFAbsoluteTimeGetCurrent() - bootStart) * 1000
-                logger.info("[KernelBoot] TOTAL: \(String(format: "%.1f", totalElapsed))ms")
-            } catch {
-                kernelStatus = .failed(error.localizedDescription)
-                logger.error("[KernelBoot] error: \(error.localizedDescription)")
+        do {
+            try await AmoreKernelReadiness.shared.ensureReady()
+            if let sid = fsSessionId {
+                await ISHExecutionCoordinator.shared.ensureMounted(for: sid)
             }
+            try Task.checkCancellation()
+            kernelStatus = .booted
+        } catch is CancellationError {
+            kernelStatus = .notBooted
+            throw CancellationError()
+        } catch {
+            kernelStatus = .failed(error.localizedDescription)
+            throw error
         }
     }
 

@@ -31,7 +31,7 @@ extension AIChatViewModel {
     ///   means "take the draft", and is the only case that clears it. Passing
     ///   the text here keeps a background turn from reading, overwriting, or
     ///   emptying whatever the user is typing at that moment.
-    func send(overrideText: String? = nil) {
+    func send(overrideText: String? = nil, includeComposerAttachments: Bool = true) {
         settlePendingStop(before: "send")  // [T-stop-cleanup-before-new-turn]
         // Read-only mode — cannot send messages
         guard remoteDeviceId == nil else { return }
@@ -48,7 +48,7 @@ extension AIChatViewModel {
         // photo loads, or a stray still-loading placeholder) so only fully-loaded
         // files are sent. `canSend` already blocks sending while anything loads,
         // so in practice this just prunes failed chips the user left in place.
-        attachments.removeAll { $0.loadState != .ready }
+        if includeComposerAttachments { attachments.removeAll { $0.loadState != .ready } }
 
         // [T-paste-mediaref] The draft's `[Pasted#N]` literals are NO LONGER
         // expanded here. They now survive into agentHistory and the stored
@@ -62,7 +62,7 @@ extension AIChatViewModel {
         // and 1M-char paste-preview watchdog kills. The model still sees the
         // text inline at the same position; only the local storage differs.
         let text = (overrideText ?? inputText).trimmingCharacters(in: .whitespacesAndNewlines)
-        let pendingAttachments = attachments
+        let pendingAttachments = includeComposerAttachments ? attachments : []
         #if DEBUG
         logger.info("🔑DRAFT [vm=\(self.vmInstanceId)] send() text=\(text.count)ch attachments=\(pendingAttachments.count) isProcessing=\(self.isProcessing) sessionId=\(self.sessionId ?? "nil") draftId=\(self.draftId ?? "nil") inputText='\(String(self.inputText.prefix(30)))'")
         #else
@@ -128,7 +128,7 @@ extension AIChatViewModel {
                     pendingSendAttachments = pendingAttachments
                     pendingSendIsFromComposer = usingComposer
                     if usingComposer { inputText = "" }
-                    attachments = []
+                    if includeComposerAttachments { attachments = [] }
                     compactAndSend()
                     return
                 }
@@ -136,7 +136,7 @@ extension AIChatViewModel {
                 pendingSendAttachments = pendingAttachments
                 pendingSendIsFromComposer = usingComposer
                 if usingComposer { inputText = "" }
-                attachments = []
+                if includeComposerAttachments { attachments = [] }
                 showCompactBeforeSendPrompt = true
                 logger.info("[Context] Near capacity — prompting user to compact before send")
                 return
@@ -153,7 +153,7 @@ extension AIChatViewModel {
                 pendingSendAttachments = pendingAttachments
                 pendingSendIsFromComposer = usingComposer
                 if usingComposer { inputText = "" }
-                attachments = []
+                if includeComposerAttachments { attachments = [] }
                 showContextExhaustedPrompt = true
                 logger.info("[Context] Exhausted — prompting user to start new session or clear chat")
                 return
@@ -253,7 +253,7 @@ extension AIChatViewModel {
         messages.append(userMsg)
 
         // Snapshot and clear attachments synchronously so the UI clears immediately
-        clearAttachments()
+        if includeComposerAttachments { clearAttachments() }
         scrollToBottomSignal.send()
 
         isProcessing = true
@@ -261,7 +261,6 @@ extension AIChatViewModel {
         logger.info("🔄SESSION [vm=\(self.vmInstanceId)] send START session=\(self.sessionId ?? "nil")")
 
         // Ensure kernel is booted before running
-        ensureKernelBooted()
         beginBackgroundProcessing()
 
         currentTask = Task { [weak self] in
@@ -469,7 +468,7 @@ extension AIChatViewModel {
             // retry path is correct without a request-time expansion step.
             var pastedStoredParts: [String: [ContentPart]] = [:]
             if !text.isEmpty {
-                if let consumed = await self.consumePastedDraft(text, sessionId: sid,
+                if includeComposerAttachments, let consumed = await self.consumePastedDraft(text, sessionId: sid,
                                                                plannedFileIds: pastePlanned.plan) {
                     userParts.append(.text(consumed.modelText))
                     pastedStoredParts[consumed.modelText] = consumed.storedParts
@@ -517,17 +516,7 @@ extension AIChatViewModel {
                 self.agentHistory[i].dbMessageId = persistedId
             }
 
-            // Wait for kernel to finish booting
-            while self.kernelStatus == .booting {
-                try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
-            }
-
-            if case .failed(let msg) = self.kernelStatus {
-                self.errorMessage = "Kernel not available: \(msg)"
-                self.isProcessing = false
-                self.endBackgroundProcessing()
-                return
-            }
+            // Linux readiness is awaited only by a real filesystem/shell tool.
 
             // Concurrency gate: wait for a processing slot
             guard let slotLease = await self.acquireSessionSlot(sid) else { return }
@@ -733,21 +722,12 @@ extension AIChatViewModel {
         isNearBottom = true
         forceScrollToBottom.send()
 
-        ensureKernelBooted()
         beginBackgroundProcessing()
 
         currentTask = Task { [weak self] in
             guard let self else { return }
 
-            while self.kernelStatus == .booting {
-                try? await Task.sleep(nanoseconds: 100_000_000)
-            }
-            if case .failed(let msg) = self.kernelStatus {
-                self.errorMessage = "Kernel not available: \(msg)"
-                self.isProcessing = false
-                self.endBackgroundProcessing()
-                return
-            }
+            // Real tools own the on-demand kernel readiness wait.
 
             // Concurrency gate: wait for a processing slot
             let retrySid = self.sessionId ?? "unknown"
@@ -878,21 +858,12 @@ extension AIChatViewModel {
         let existingBlockCount = lastMsg.blocks.count
         isProcessing = true
 
-        ensureKernelBooted()
         beginBackgroundProcessing()
 
         currentTask = Task { [weak self] in
             guard let self else { return }
 
-            while self.kernelStatus == .booting {
-                try? await Task.sleep(nanoseconds: 100_000_000)
-            }
-            if case .failed(let msg) = self.kernelStatus {
-                self.errorMessage = "Kernel not available: \(msg)"
-                self.isProcessing = false
-                self.endBackgroundProcessing()
-                return
-            }
+            // Real tools own the on-demand kernel readiness wait.
 
             let resumeSid = self.sessionId ?? "unknown"
             guard let slotLease = await self.acquireSessionSlot(resumeSid) else { return }
@@ -1001,21 +972,12 @@ extension AIChatViewModel {
         isNearBottom = true
         forceScrollToBottom.send()
 
-        ensureKernelBooted()
         beginBackgroundProcessing()
 
         currentTask = Task { [weak self] in
             guard let self else { return }
 
-            while self.kernelStatus == .booting {
-                try? await Task.sleep(nanoseconds: 100_000_000)
-            }
-            if case .failed(let msg) = self.kernelStatus {
-                self.errorMessage = "Kernel not available: \(msg)"
-                self.isProcessing = false
-                self.endBackgroundProcessing()
-                return
-            }
+            // Real tools own the on-demand kernel readiness wait.
 
             let sid = self.sessionId ?? "unknown"
             guard let slotLease = await self.acquireSessionSlot(sid) else { return }

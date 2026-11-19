@@ -51,7 +51,7 @@ struct FaceIDProtectionSettingsView: View {
                 Text("When enabled, \(BiometricAuth.biometryDisplayName) (or device passcode) is required every time you open the app.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             if appLockEnabled {
                 Section {
@@ -70,7 +70,7 @@ struct FaceIDProtectionSettingsView: View {
                     Text("How long after leaving the app before the lock re-engages.")
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
 
             // MARK: - Per-Session Lock
@@ -97,7 +97,7 @@ struct FaceIDProtectionSettingsView: View {
                 Text("When enabled, locked sessions require \(BiometricAuth.biometryDisplayName) (or device passcode) before their contents are revealed.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             if enabled {
                 Section {
@@ -116,7 +116,7 @@ struct FaceIDProtectionSettingsView: View {
                     Text("After leaving an unlocked session, the lock re-engages once the idle window elapses.")
                     .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
 
                 Section {
                     HStack {
@@ -143,13 +143,10 @@ struct FaceIDProtectionSettingsView: View {
                         }
                     }
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
         }
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle("\(BiometricAuth.biometryDisplayName) Protection")
         .navigationBarTitleDisplayMode(.inline)
     }

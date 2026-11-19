@@ -398,8 +398,7 @@ extension ContentView {
                 }
                     .padding(.horizontal, 14)
                     .frame(width: 132, height: 52)
-                    .foregroundStyle(PokiTheme.sidebarActionInk)
-                    .background(PokiTheme.sidebarAction, in: Capsule())
+                    .foregroundStyle(PokiTheme.sidebarInk)
                     .contentShape(Capsule())
             }
             .buttonStyle(.plain)
@@ -419,7 +418,6 @@ extension ContentView {
                     .font(.title3.weight(.medium))
                     .foregroundStyle(PokiTheme.sidebarInk)
                     .frame(width: 52, height: 52)
-                    .background(PokiTheme.sidebarControl, in: Circle())
                     .contentShape(Circle())
             }
             .buttonStyle(.plain)

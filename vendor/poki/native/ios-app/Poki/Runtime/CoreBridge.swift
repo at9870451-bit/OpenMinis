@@ -92,6 +92,8 @@ struct LauncherConfig: Encodable {
     /// A file the mounted disk image puts on the phone: in-process, when the loopback refuses the
     /// connection and this file is there, the launcher hands over to Poki's own session (ESP-448).
     var ddi_marker: String? = nil
+    /// Refuse network access/mounting. An already-mounted DDI is required.
+    var local_only = false
 }
 
 /// On-device wireless pairing (iOS 27, Settings > Privacy & Security > Developer Mode > Pair).

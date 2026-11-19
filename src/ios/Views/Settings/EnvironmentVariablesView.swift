@@ -34,7 +34,7 @@ struct EnvironmentVariablesView: View {
                 Text("When enabled, any environment variable value that appears in shell-execute output is replaced with a masked form (e.g. `sk-1********ajhks`) before reaching the model. Values shorter than 8 characters become all `*`. The user-visible output in chat is unchanged.")
                 .foregroundStyle(PokiTheme.secondaryText)
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             if store.entries.isEmpty {
                 Section {
@@ -52,21 +52,18 @@ struct EnvironmentVariablesView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             } else {
                 ForEach(filteredEntries) { entry in
                     envVarRow(entry)
                 }
                 .onDelete(perform: deleteEntries)
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
         }
         .listStyle(.insetGrouped)
         .searchable(text: $searchText, prompt: "Filter by name")
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle("Environment Variables")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -286,7 +283,7 @@ private struct EnvVarFormSheet: View {
                             .foregroundStyle(PokiTheme.danger)
                     }
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
 
                 Section("Value") {
                     if EnvVarStore.isShortcutKey(key) {
@@ -307,7 +304,7 @@ private struct EnvVarFormSheet: View {
                             .onSubmit { focusedField = .note }
                     }
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
 
                 Section("Note") {
                     ZStack(alignment: .topLeading) {
@@ -324,7 +321,7 @@ private struct EnvVarFormSheet: View {
                             .scrollContentBackground(.hidden)
                     }
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
 
                 if mode == .edit, initialEnabled != nil {
                     Section {
@@ -332,7 +329,7 @@ private struct EnvVarFormSheet: View {
                             .listRowBackground(highlightEnabled && !enabled
                                                ? Color.orange.opacity(0.18) : nil)
                     }
-                    .listRowBackground(PokiTheme.surface)
+                    .amoreSettingsGlassRows()
                 }
 
                 if mode == .edit, onDelete != nil {
@@ -351,13 +348,10 @@ private struct EnvVarFormSheet: View {
                             }
                         }
                     }
-                    .listRowBackground(PokiTheme.surface)
+                    .amoreSettingsGlassRows()
                 }
             }
-            .scrollContentBackground(.hidden)
-            .background(PokiTheme.background)
-            .foregroundStyle(PokiTheme.primaryText)
-            .tint(PokiTheme.primaryButton)
+            .amoreSettingsGlass()
             .navigationTitle(mode == .add ? "Add Variable" : "Edit Variable")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -26,7 +26,7 @@ struct SharedFoldersSettingsView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             Section(AppLocalized("Folders")) {
                 ForEach(model.entries) { entry in
@@ -43,12 +43,9 @@ struct SharedFoldersSettingsView: View {
                     }
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
         }
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle("Shared Folders")
         .navigationBarTitleDisplayMode(.inline)
     }

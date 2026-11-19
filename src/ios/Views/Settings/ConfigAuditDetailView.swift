@@ -34,14 +34,14 @@ struct ConfigAuditDetailView: View {
                     }
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             if let caption = entry.caption, !caption.isEmpty {
                 Section("Note from the assistant") {
                     Text(verbatim: caption)
                         .textSelection(.enabled)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
 
             Section("What changed") {
@@ -56,14 +56,14 @@ struct ConfigAuditDetailView: View {
                         .foregroundStyle(PokiTheme.secondaryText)
                 }
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             Section("Raw change") {
                 rawBlock("Setting", entry.key)
                 rawBlock("Before", Self.prettyJSON(entry.oldValueJSON))
                 rawBlock("After", Self.prettyJSON(entry.newValueJSON))
             }
-            .listRowBackground(PokiTheme.surface)
+            .amoreSettingsGlassRows()
 
             if status == .applied {
                 Section {
@@ -74,20 +74,17 @@ struct ConfigAuditDetailView: View {
                     }
                     .disabled(reverting)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             } else if status == .reverted {
                 Section {
                     Label("Reverted", systemImage: "arrow.uturn.backward.circle.fill")
                         .foregroundStyle(PokiTheme.secondaryText)
                 }
-                .listRowBackground(PokiTheme.surface)
+                .amoreSettingsGlassRows()
             }
         }
         .listStyle(.insetGrouped)
-        .scrollContentBackground(.hidden)
-        .background(PokiTheme.background)
-        .foregroundStyle(PokiTheme.primaryText)
-        .tint(PokiTheme.primaryButton)
+        .amoreSettingsGlass()
         .navigationTitle("Change Details")
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("Revert this change?", isPresented: $confirmRevert, titleVisibility: .visible) {

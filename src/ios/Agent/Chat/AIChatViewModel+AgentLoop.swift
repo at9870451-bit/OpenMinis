@@ -207,7 +207,23 @@ extension AIChatViewModel {
         userAskDeferredThisRun = userAskDecision.deferred
         userAskAskedThisRun = false  // [T-user-ask-fallback]
         logger.info("[UserAsk] exposure=\(userAskDecision.exposed) deferred=\(userAskDecision.deferred) reason=\(userAskDecision.reason)")
-        var tools = makeAgentTools()
+        // Only a fresh, plain greeting gets a zero-tool budget. Any history,
+        // attachments, resumed work, helpers or pending questions keep tools.
+        // Exact equality, not a keyword scan: "hello, check my device" is a task.
+        let greetingParts = agentHistory.last?.parts ?? []
+        let plainGreeting = greetingParts.allSatisfy { if case .text = $0 { return true }; return false }
+        let greetingTexts: [String] = greetingParts.compactMap {
+            if case .text(let text) = $0 { return text }; return nil
+        }
+        let greetingText = greetingTexts.joined(separator: "\n")
+        let greetingHasAttachments = messages.last(where: { $0.role == .user })
+            .map { !$0.attachments.isEmpty || !$0.inputAttachments.isEmpty } ?? false
+        var directAnswerOnly = AmoreToolPolicy.omitsTools(
+            text: greetingText, priorMessageCount: max(0, agentHistory.count - 1),
+            hasAttachments: !plainGreeting || greetingHasAttachments,
+            hasPendingApproval: sessionId.map { UserAskCenter.shared.hasPendingAsk(inSession: $0) } ?? false,
+            isHelper: isHelper, isResuming: existingMsgIdx != nil)
+        var tools = directAnswerOnly ? [] : makeAgentTools()
         var helperWrapUpInjected = false
         // [T-user-ask-fallback] The text-ask nudge was sent in this run (once).
         var textAskNudgeSent = false
@@ -252,7 +268,7 @@ extension AIChatViewModel {
         // session so a repro shows whether loadSession seeded it from the
         // global default.
         AppLogger(category: "MemDiag").info("[MemDiag] inject-decision sid=\(self.sessionId?.prefix(8) ?? "nil") vm.memoryEnabled=\(self.memoryEnabled)")
-        if memoryEnabled {
+        if memoryEnabled && !directAnswerOnly {
             if let memoryFragment = Self.loadGlobalMemoryFragment() {
                 userSystemPrompt += "\n\n" + memoryFragment
             }
@@ -262,7 +278,7 @@ extension AIChatViewModel {
         }
         // Authoritative memory-status footer (overrides any earlier
         // baseSystemPrompt mentions when memory is disabled).
-        userSystemPrompt += memoryStatusFragment
+        userSystemPrompt += directAnswerOnly ? AmoreToolPolicy.noToolsThisTurn : memoryStatusFragment
 
         let promptBuildMs = (CFAbsoluteTimeGetCurrent() - loopSetupStart) * 1000
         logger.info("⏱️ [runAgentLoop] prompt build elapsed=\(String(format: "%.1f", promptBuildMs))ms history=\(self.agentHistory.count)")
@@ -1092,7 +1108,7 @@ extension AIChatViewModel {
                 // the gate from the first injection site — fallback to a
                 // new provider must respect the per-session memoryEnabled
                 // toggle the same way the initial system prompt did.
-                if memoryEnabled {
+                if memoryEnabled && !directAnswerOnly {
                     if let memoryFragment = Self.loadGlobalMemoryFragment() {
                         userSystemPrompt += "\n\n" + memoryFragment
                     }
@@ -1100,7 +1116,7 @@ extension AIChatViewModel {
                         userSystemPrompt += "\n\n" + dailyFragment
                     }
                 }
-                userSystemPrompt += memoryStatusFragment
+                userSystemPrompt += directAnswerOnly ? AmoreToolPolicy.noToolsThisTurn : memoryStatusFragment
                 fallbackTrigger += 1
                 if !fallbackReasons.isEmpty {
                     // Resync the assistant message index by its stable id before
@@ -1848,6 +1864,17 @@ extension AIChatViewModel {
                     at: .turnEnd
                 )
                 if endInjection != .none {
+                    if directAnswerOnly {
+                        // Zero tools was scoped to the greeting, not the session.
+                        directAnswerOnly = false
+                        tools = makeAgentTools()
+                        userSystemPrompt = userSystemPrompt.replacingOccurrences(
+                            of: AmoreToolPolicy.noToolsThisTurn, with: memoryStatusFragment)
+                        if memoryEnabled {
+                            if let fragment = Self.loadGlobalMemoryFragment() { userSystemPrompt += "\n\n" + fragment }
+                            if let fragment = Self.loadRecentDailyMemoryFragment() { userSystemPrompt += "\n\n" + fragment }
+                        }
+                    }
                     // [T-scheduled-preempt] The user's own message decides what
                     // happens to the interrupted task — no resume nudge after it.
                     if endInjection == .prompts { scheduledResumeNudgeOwed = false }
@@ -1887,7 +1914,7 @@ extension AIChatViewModel {
                 // user_ask and has not used it: send ONE hidden reminder and let
                 // the model ask with the card (or end without replying when it
                 // was not really a decision). Once per run; never in a sub agent.
-                if UserAskSettings.load().textAskNudge, userAskExposed, !textAskNudgeSent, !userAskAskedThisRun,
+                if !directAnswerOnly, UserAskSettings.load().textAskNudge, userAskExposed, !textAskNudgeSent, !userAskAskedThisRun,
                    helperConfig == nil, stopReason == .endTurn, !canResume, !self.userDidCancel,
                    UserAskTextAsk.endsWithDecisionRequest(assistantText) {
                     textAskNudgeSent = true

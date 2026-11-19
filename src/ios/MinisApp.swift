@@ -131,6 +131,7 @@ struct MinisApp: App {
         // makes the next one say what it was.
         //
         // `install` is idempotent, so the later onAppLaunch() call is a no-op.
+        AmorePerformanceTrace.beginColdLaunch()
         PokiTheme.applyGlobalAppearance()
         AmoreDeviceTools.configureHost()
         CrashSignalHandler.install()
@@ -228,6 +229,7 @@ struct MinisApp: App {
             ZStack {
                 PokiTheme.background.ignoresSafeArea()
                 ContentView()
+                    .onAppear { AmorePerformanceTrace.endColdLaunch() }
                     .overlay(alignment: .top) {
                         BackgroundInterruptionBanner()
                     }

@@ -8,6 +8,7 @@ struct HomeShortcutsSettingsView: View {
 
     var body: some View {
         List {
+            Group {
             Section {
                 ForEach(store.items) { item in
                     HStack(spacing: 12) {
@@ -49,15 +50,20 @@ struct HomeShortcutsSettingsView: View {
                     Label(AppLocalized("Add shortcut"), systemImage: "plus.circle.fill")
                 }
             }
+            }
+            .amoreSettingsGlassRows()
         }
-        .pokiScreen()
+        .amoreSettingsGlass()
         .navigationTitle(AppLocalized("Home shortcuts"))
         .sheet(isPresented: $showingAdd) {
             NavigationStack {
                 Form {
                     TextField(AppLocalized("Button title"), text: $title)
+                        .amoreSettingsGlassRows()
                     TextField(AppLocalized("Prompt"), text: $prompt, axis: .vertical)
+                        .amoreSettingsGlassRows()
                 }
+                .amoreSettingsGlass()
                 .navigationTitle(AppLocalized("Add shortcut"))
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
