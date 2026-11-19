@@ -36,11 +36,14 @@ final class LoopbackMonitor {
     private var running = false
     private var checkQueued = false
     private var probeEpoch = 0
+    private(set) var networkRevision = 0
+    private(set) var completedChecks = 0
     typealias Probe = (_ host: String, _ port: UInt16, _ timeout: TimeInterval) async -> ProbeResult
     private let connect: Probe
     typealias HandshakeProbe = (_ port: UInt16, _ timeout: TimeInterval) async -> RemotePairingProbeResult
     private let handshake: HandshakeProbe
     var remotePairingRequired: () -> Bool = { false }
+    var onExplicitProtocolRetry: (() -> Void)?
     private var recoveringHandshake = false
     private var cachedHandshakes: [UInt16: (Date, RemotePairingProbeResult)] = [:]
     private(set) var lastPortSearch = "尚未发现端口"
@@ -50,6 +53,7 @@ final class LoopbackMonitor {
 
     /// Explicit user refresh may restart discovery, but never pairs or mounts DDI.
     func retryProtocolCheck() {
+        onExplicitProtocolRetry?()
         probeEpoch &+= 1
         cachedHandshakes.removeAll()
         resetPortSearch()
@@ -61,13 +65,10 @@ final class LoopbackMonitor {
     /// A real launcher handshake failure invalidates TCP-only readiness. No
     /// trust record is deleted; subsequent Bonjour candidates need a handshake.
     func pairingHandshakeFailed() {
-        // A launcher EOF always invalidates the cached success for this port.
-        cachedHandshakes.removeValue(forKey: RemotePairingPort.current)
-        if !recoveringHandshake {
-            recoveringHandshake = true
-            probeEpoch &+= 1
-            cachedHandshakes.removeAll()
-        }
+        // Every failure invalidates pending probes as well as cached success.
+        recoveringHandshake = true
+        probeEpoch &+= 1
+        cachedHandshakes.removeAll()
         publish(.noAnswer, log: true)
         check()
     }
@@ -137,6 +138,7 @@ final class LoopbackMonitor {
     /// interface came or went: the path summary also changes when a proxy's tunnel rebinds.
     private func networkChanged(physical: Bool) {
         probeEpoch &+= 1
+        networkRevision &+= 1
         cachedHandshakes.removeAll()
         if physical || !isWorking { resetPortSearch() }
         if !isWorking { publish(.checking, log: false) }
@@ -193,6 +195,7 @@ final class LoopbackMonitor {
     /// port up in Bonjour (three times at most, never on cellular alone; `lookDue`) and, when one
     /// answers, uses it from here on.
     private func movedPairingPort(from port: UInt16, requireHandshake: Bool, epoch: Int) async -> ProbeResult? {
+        guard epoch == probeEpoch else { return nil }
         guard RemotePairingPort.lookDue(cellularOnly: cellularOnly, looks: portLooks, lastAt: portSearchedAt, now: Date()) else { return nil }
         portLooks += 1
         portSearchedAt = Date()
@@ -249,6 +252,7 @@ final class LoopbackMonitor {
             let port = RemotePairingPort.current
             let requireHandshake = recoveringHandshake || remotePairingRequired()
             var result = await serviceProbe(port: port, requireHandshake: requireHandshake, epoch: epoch)
+            guard epoch == probeEpoch else { running = false; check(); return }
             if result.outcome == "connected" {
                 if portLooks > 0 { resetPortSearch() }
             } else if requireHandshake {
@@ -257,6 +261,7 @@ final class LoopbackMonitor {
                 result = await movedPairingPort(from: port, requireHandshake: true, epoch: epoch) ?? result
             } else {
                 let lockdown = await connect("10.7.0.1", 62078, 1.5)
+                guard epoch == probeEpoch else { running = false; check(); return }
                 // 10.7.0.1 reaches this iPhone (lockdown answers, or the phone refused the port), and
                 // the remote pairing service is not on the port Poki uses: iOS may have moved it.
                 // Without this the page says Working while every connection is refused.
@@ -275,6 +280,7 @@ final class LoopbackMonitor {
                 check()
                 return
             }
+            completedChecks &+= 1
             let interfaceOrAcceptedTCP = tunnelInterface() != nil || result.outcome == "handshake_failed"
             let probed: State = result.outcome == "connected" ? .working(ms: result.milliseconds) : interfaceOrAcceptedTCP ? .noAnswer : .off
             let next = Self.forcedCellular || Self.forced == "noanswer" ? State.noAnswer : Self.forced == "working" ? State.working(ms: 5) : probed

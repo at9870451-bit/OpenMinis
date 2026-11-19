@@ -3,7 +3,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 HOST="${AMORE137_HOST:-${RUNNER_TEMP:-/tmp}/amore137-connection-tests}"
 mkdir -p "$HOST/Sources/AmoreDeviceKit" "$HOST/Sources/PokiNative" "$HOST/Tests/Amore137Tests"
-for f in Debug/Probe Loopback/LoopbackMonitor Loopback/RemotePairingPort Loopback/RemotePairingProbe; do
+for f in Debug/Probe Loopback/LoopbackMonitor Loopback/RemotePairingPort Loopback/RemotePairingProbe Loopback/PairingVerificationGate; do
  cp "$ROOT/vendor/poki/native/ios-app/Poki/$f.swift" "$HOST/Sources/AmoreDeviceKit/"
 done
 cp "$ROOT/scripts/Amore137ConnectionTests.swift" "$HOST/Tests/Amore137Tests/"

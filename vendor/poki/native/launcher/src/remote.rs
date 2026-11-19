@@ -613,18 +613,17 @@ mod tests {
 
     #[tokio::test]
     async fn probe_connection_refused_is_a_connect_diagnostic() {
-        // Reserve a port without listening, rather than racing another process
-        // to a port after dropping a listener or changing the global port.
-        let reserved = tokio::net::TcpSocket::new_v4().unwrap();
-        reserved.bind((std::net::Ipv4Addr::LOCALHOST, 0).into()).unwrap();
-        let addr = reserved.local_addr().unwrap();
-        let probe = probe_handshake(addr.ip(), addr.port(), Duration::from_millis(500)).await.unwrap();
+        // macOS can silently hold a bound-but-not-listening socket instead of
+        // replying with RST. Close a temporary listener to create a refused port.
+        let listener = probe_listener().await;
+        let addr = listener.local_addr().unwrap();
+        drop(listener);
+        let probe = probe_handshake(addr.ip(), addr.port(), Duration::from_secs(1)).await.unwrap();
         assert!(!probe.tcp_connected && !probe.handshake_ok);
         assert_eq!(probe.stage, "connect");
         assert_eq!(probe.code, "io");
         assert!(probe.detail.contains("ConnectionRefused"), "{}", probe.detail);
         assert_eq!(probe.port, addr.port());
-        drop(reserved);
     }
 
     #[tokio::test]

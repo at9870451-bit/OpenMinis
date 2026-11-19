@@ -80,8 +80,12 @@ final class Amore137ConnectionTests: XCTestCase {
         monitor.check(); try await awaitCheck(monitor)
         XCTAssertTrue(monitor.isWorking)
         _ = try XCTUnwrap(monitor.checkedAt)
-        succeeds = false; let failureAt = Date(); monitor.pairingHandshakeFailed()
-        try await awaitCheck(monitor, after: failureAt)
+        succeeds = false; let before = monitor.completedChecks; monitor.pairingHandshakeFailed()
+        for _ in 0..<100 {
+            if monitor.completedChecks > before { break }
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertGreaterThan(monitor.completedChecks, before)
         XCTAssertFalse(monitor.isWorking)
         XCTAssertEqual(probes, 2, "EOF must not reuse the recent successful response")
     }
@@ -93,6 +97,54 @@ final class Amore137ConnectionTests: XCTestCase {
         let first = try XCTUnwrap(monitor.checkedAt)
         monitor.retryProtocolCheck(); try await awaitCheck(monitor, after: first)
         XCTAssertGreaterThan(try XCTUnwrap(monitor.checkedAt), first)
+    }
+    func testFullVerificationBackoffDoesNotLoopOnSuccessfulHello() {
+        var gate = PairingVerificationGate()
+        let now = Date(timeIntervalSince1970: 100)
+        XCTAssertTrue(gate.permits(at: now))
+        let delays: [TimeInterval] = [10,30,60,120,120]
+        for delay in delays {
+            gate.failed(at: now)
+            XCTAssertFalse(gate.permits(at: now.addingTimeInterval(delay - 0.1)))
+            XCTAssertTrue(gate.permits(at: now.addingTimeInterval(delay)))
+        }
+        gate.reset(); XCTAssertTrue(gate.permits(at: now))
+    }
+    func testVerificationContextChangesWithPortNetworkAndRecord() {
+        let original = PairingVerificationContext(networkRevision: 1, port: 49152, transport: "proxy", pairingPath: "/test", recordRevision: 1)
+        XCTAssertNotEqual(original, PairingVerificationContext(networkRevision: 2, port: 49152, transport: "proxy", pairingPath: "/test", recordRevision: 1))
+        XCTAssertNotEqual(original, PairingVerificationContext(networkRevision: 1, port: 49158, transport: "proxy", pairingPath: "/test", recordRevision: 1))
+        XCTAssertNotEqual(original, PairingVerificationContext(networkRevision: 1, port: 49152, transport: "proxy", pairingPath: "/test", recordRevision: 2))
+    }
+    func testSecondEOFInvalidatesAnInflightSuccessfulHello() async throws {
+        var calls = 0
+        var resumeFirst: CheckedContinuation<Void,Never>?
+        let monitor = LoopbackMonitor(handshakeProbe: { port, _ in
+            calls += 1
+            if calls == 1 {
+                await withCheckedContinuation { resumeFirst = $0 }
+                return self.answer(port, ok: true)
+            }
+            return self.answer(port)
+        }, monitorNetwork: false, browsePorts: { ([],nil) }, interface: { nil })
+        monitor.remotePairingRequired = { true }
+        monitor.check()
+        for _ in 0..<100 {
+            if resumeFirst != nil { break }
+            try await Task.sleep(for: .milliseconds(5))
+        }
+        XCTAssertNotNil(resumeFirst)
+        monitor.pairingHandshakeFailed()
+        monitor.pairingHandshakeFailed()
+        resumeFirst?.resume()
+        for _ in 0..<100 {
+            if monitor.completedChecks > 0 { break }
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertGreaterThan(monitor.completedChecks,0)
+        XCTAssertGreaterThanOrEqual(calls,2)
+        XCTAssertFalse(monitor.isWorking)
+        XCTAssertFalse(monitor.lastHandshake?.handshakeOK ?? true)
     }
     func testSearchIsDeduplicatedAndBounded() async {
         var tested: [UInt16] = []

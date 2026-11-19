@@ -145,6 +145,7 @@ final class AppModel {
         try? (AppFiles.pairingFile as NSURL).setResourceValue(URLFileProtection.completeUntilFirstUserAuthentication, forKey: .fileProtectionKey)
         setup.pairingFile = AppFiles.pairingFile.path
         SetupVault.mirrorPairingFromContainer()
+        pairingRecordRevision &+= 1
         pairingTrouble = nil; pairingVerifiedAt = nil
         log.add("pairing", "pairing file from Poki Setup found")
     }
@@ -414,6 +415,7 @@ final class AppModel {
         eventsTask = Task { [weak self, core] in
             for await event in core.events { self?.handle(event) }
         }
+        loopback.onExplicitProtocolRetry = { [weak self] in self?.pairingVerifyGate.reset() }
         loopback.remotePairingRequired = { [weak self] in
             guard let path = self?.pairingPath else { return false }
             // Only inspect record TYPE locally. The probe itself never gets its bytes.
@@ -863,6 +865,7 @@ final class AppModel {
         if method != .builtIn { tunnel.disconnect() } // only our own manager, never another VPN
         setup.loopback = method
         setup.proxyApp = nil
+        pairingVerifyGate.reset()
         if usesLocalProcessTransport { loopback.pause() } else { loopback.check() }
     }
 
@@ -904,6 +907,16 @@ final class AppModel {
     }
 
     private var pairingCheck: Task<Bool, Never>?
+    private var pairingCheckIdentity: UUID?
+    private var pairingCheckContext: PairingVerificationContext?
+    private var pairingVerifyGate = PairingVerificationGate()
+    private var pairingGateRoute: PairingVerificationContext?
+    private var pairingRecordRevision: UInt64 = 0
+    private var pairingRoute: PairingVerificationContext {
+        PairingVerificationContext(networkRevision: loopback.networkRevision,
+            port: RemotePairingPort.current, transport: setup.loopback.rawValue,
+            pairingPath: pairingPath, recordRevision: pairingRecordRevision)
+    }
 
     /// Asks the phone's own services, over the loopback, whether they still take this pairing file:
     /// the same handshake the runner makes, a second or two, so a refused pairing shows on Setup and
@@ -932,13 +945,25 @@ final class AppModel {
             return true
         }
         guard let path = pairingPath, loopback.isWorking else { return true }
+        let route = pairingRoute
+        if pairingGateRoute != route { pairingVerifyGate.reset(); pairingGateRoute = route }
+        if let pairingCheck, pairingCheckContext == route { return await pairingCheck.value }
+        guard pairingVerifyGate.permits(at: Date()) else { return false }
         if !force, pairingTrouble == nil, !servicesSilent, let at = pairingVerifiedAt, Date().timeIntervalSince(at) < 600 { return true }
-        if let pairingCheck { return await pairingCheck.value }
+        pairingCheck?.cancel()
+        let requestID = UUID()
+        pairingCheckIdentity = requestID; pairingCheckContext = route
         let task = Task { @MainActor [weak self] () -> Bool in
-            guard let self else { return true }
-            defer { self.pairingCheck = nil }
+            guard let self else { return false }
+            defer {
+                if self.pairingCheckIdentity == requestID {
+                    self.pairingCheck = nil; self.pairingCheckIdentity = nil; self.pairingCheckContext = nil
+                }
+            }
             do {
                 _ = try await SignerBridge.call(["op": "udid", "device_address": "10.7.0.1", "pairing_file": path, "host_name": "Poki"])
+                guard !Task.isCancelled, self.pairingCheckIdentity == requestID, self.pairingRoute == route else { return false }
+                self.pairingVerifyGate.reset()
                 if self.pairingTrouble != nil { self.log.add("pairing", "check: accepted again") }
                 self.pairingTrouble = nil
                 self.servicesSilent = false
@@ -946,6 +971,8 @@ final class AppModel {
                 self.pairingVerifiedAt = Date()
                 return true
             } catch {
+                guard !Task.isCancelled, self.pairingCheckIdentity == requestID, self.pairingRoute == route else { return false }
+                self.pairingVerifyGate.failed(at: Date())
                 let text = error.localizedDescription
                 let code = (error as? SignerError)?.code
                 if code == "pairing" {
@@ -1199,6 +1226,8 @@ final class AppModel {
     }
 
     func stopSession() {
+        pairingCheck?.cancel(); pairingCheck = nil; pairingCheckIdentity = nil; pairingCheckContext = nil
+        pairingVerifyGate.reset()
         sessionStartTask?.cancel()
         pendingPrepareForTask = false
         wantsOn = false
@@ -1524,7 +1553,11 @@ final class AppModel {
             log.add("loopback", "dropped: 10.7.0.1 stopped answering (\(loopback.state)); the runner cannot survive this")
         } else if !wasWorking, loopback.isWorking {
             let wasSilent = servicesSilent
-            servicesSilent = false
+            if !pairingVerifyGate.permits(at: Date()) && pairingGateRoute == pairingRoute {
+                // A plain hello cannot cancel the full verification's backoff.
+                if sessionOn { host.update(runner: coreState(of: runner)) }
+                return
+            }
             let recovered = old != .checking || loopbackDropped || hasStaleLoopbackFailure
             loopbackDropped = false
             if recovered {
@@ -1590,6 +1623,7 @@ final class AppModel {
             // setup steps stay as they were until the session opens (warmInProcess).
             log.add("runner", "the loopback did not answer; using the mounted developer disk image")
         case "launching", "running":
+            loopback.pairingVerified(); pairingVerifyGate.reset()
             // The phone accepted the pairing.
             if pairingTrouble != nil { log.add("pairing", "accepted again") }
             pairingTrouble = nil
@@ -2165,6 +2199,7 @@ final class AppModel {
         pairingFileSeen = true
         SetupVault.storePairing(data)
         setup.pairingFile = AppFiles.pairingFile.path
+        pairingRecordRevision &+= 1
         pairingTrouble = nil; pairingVerifiedAt = nil
         pairingNote = AppLocalization.text(LocalizedStringResource("Pairing file received."))
         log.add("pairing", "pairing file \(how)")
@@ -2287,6 +2322,7 @@ final class AppModel {
             PairingNotice.post(pin: pin)
             log.add("pairing", "code ready\(activity.isRunning ? "" : " (no Live Activity: \(activity.lastError ?? "unknown reason"))")")
         case .paired(let url):
+            pairingRecordRevision &+= 1
             PairingNotice.clear()
             pairingKeepAlive.stop()
             background.releasePairing()
