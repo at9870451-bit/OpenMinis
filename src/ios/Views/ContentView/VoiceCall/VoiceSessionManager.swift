@@ -158,8 +158,10 @@ final class VoiceSessionManager: ObservableObject, VoiceCallSpeechDelegate, Voic
             } catch is CancellationError { }
             catch {
                 if self.machine.accepts(token) {
+                    // A failed piece makes this utterance incomplete. Pause
+                    // explicitly rather than sending only the surviving words.
+                    self.callAudioInterrupted()
                     self.errorMessage = error.localizedDescription
-                    self.publish(.listening)
                 }
             }
         }
@@ -203,7 +205,7 @@ final class VoiceSessionManager: ObservableObject, VoiceCallSpeechDelegate, Voic
                 try Task.checkCancellation()
                 guard self.isActive, token == self.speechEpoch else { return }
                 self.synthesizing = false; self.playing = true; self.publish(.speaking)
-                try self.audio.play(audio) { [weak self] in
+                try await self.audio.play(audio) { [weak self] in
                     guard let self, self.isActive, token == self.speechEpoch else { return }
                     self.playing = false; self.ttsTask = nil
                     if self.speechQueue.isEmpty {

@@ -1,6 +1,7 @@
 import XCTest
 import Combine
 import Foundation
+import AVFoundation
 @testable import Amore134Components
 
 @MainActor
@@ -148,6 +149,41 @@ final class Amore136VoiceTests: XCTestCase {
         manager.hangUp(); await settle()
         XCTAssertEqual(states.count, count)
     }
+    func testPartialSpeechDoesNotSendBeforeFinalEndpoint() async {
+        var count = 0
+        let (manager,_,agent) = fixture(transcribe: { _ in count += 1; return count == 1 ? "first part" : "second part" })
+        await manager.connect(to: agent)
+        manager.callAudioSpeechBegan(); manager.callAudioPartialSegment(wav); await settle()
+        XCTAssertTrue(agent.sent.isEmpty)
+        manager.callAudioSegment(wav); await settle()
+        XCTAssertEqual(agent.sent, ["first part second part"])
+    }
+    func testFailedASRPiecePausesInsteadOfSubmittingPartialTurn() async {
+        var count = 0
+        let (manager,audio,agent) = fixture(transcribe: { _ in
+            count += 1
+            if count == 1 { return "incomplete instruction" }
+            throw NSError(domain: "asr-test", code: 1)
+        })
+        await manager.connect(to: agent)
+        manager.callAudioSpeechBegan(); manager.callAudioPartialSegment(wav); await settle()
+        manager.callAudioSegment(wav); await settle()
+        XCTAssertTrue(agent.sent.isEmpty)
+        XCTAssertEqual(manager.state, .interrupted)
+        XCTAssertGreaterThan(audio.stops, 0)
+        XCTAssertNotNil(manager.errorMessage)
+    }
+    func testContinuousSecondTurnKeepsTheExistingContext() async {
+        let (manager,audio,agent) = fixture()
+        await manager.connect(to: agent)
+        manager.callAudioSpeechBegan(); manager.callAudioSegment(wav); await settle()
+        manager.enqueueCallSpeech("first answer"); await settle()
+        audio.completePlayback(); agent.complete(); await settle()
+        manager.callAudioSpeechBegan(); manager.callAudioSegment(wav); await settle()
+        XCTAssertEqual(agent.sent.count, 2)
+        XCTAssertEqual(agent.context, ["prior user", "prior assistant", "Hello from speech", "Hello from speech"])
+    }
+
     func testStateMachineRejectsStaleRecognitionAcrossMuteHangup() {
         var state=VoiceStateMachine();let token=state.start();state.set(.listening)
         XCTAssertTrue(state.accepts(token));state.mute(true);XCTAssertFalse(state.accepts(token))
@@ -194,6 +230,21 @@ final class Amore136VoiceWAVTests: XCTestCase {
         XCTAssertEqual(String(data: chunk.prefix(4), encoding: .ascii), "RIFF", file: file, line: line)
         XCTAssertEqual(String(data: chunk[8..<12], encoding: .ascii), "WAVE", file: file, line: line)
         XCTAssertEqual(String(data: chunk[36..<40], encoding: .ascii), "data", file: file, line: line)
+    }
+    func testRealAVFoundationDecoderProduces48kMonoPCM() throws {
+        // Synthetic 16k PCM, no mic permission or speech service is involved.
+        let wav = makeWAV(Data(repeating: 32, count: 16_000))
+        let decoded = try VoiceCallAudioDecoder.decode(wav).pcm
+        XCTAssertEqual(decoded.format.sampleRate, 48_000)
+        XCTAssertEqual(decoded.format.channelCount, 1)
+        XCTAssertEqual(decoded.format.commonFormat, .pcmFormatFloat32)
+        XCTAssertGreaterThan(decoded.frameLength, 23_000)
+        XCTAssertLessThan(decoded.frameLength, 25_000)
+        XCTAssertNotNil(decoded.floatChannelData)
+    }
+    func testRealDecoderRejectsInvalidData() {
+        XCTAssertThrowsError(try VoiceCallAudioDecoder.decode(Data()))
+        XCTAssertThrowsError(try VoiceCallAudioDecoder.decode(Data("not an audio file".utf8)))
     }
     func testWAV48SecondsSplitsInto24SecondChunksWithoutChangingPCM() {
         let payload = pcm(byteCount: 48 * 32_000)
@@ -259,7 +310,7 @@ private final class FakeCallAudio: VoiceCallAudioTransport {
     func setMuted(_ value:Bool){muted=value}
     func useSpeaker(_ enabled:Bool){speaker=enabled}
     func stopPlayback(){playbackStops += 1;completion=nil}
-    func play(_ data:Data,completed:@escaping @MainActor ()->Void)throws{played.append(data);completion=completed}
+    func play(_ data:Data,completed:@escaping @MainActor ()->Void) async throws{played.append(data);completion=completed}
     func completePlayback(){let done=completion;completion=nil;done?()}
     func stop(){stops += 1;completion=nil}
 }

@@ -24,7 +24,7 @@ PY
 HOST="$(cd "$HOST" && pwd)"
 ARTIFACTS="$(cd "$ARTIFACTS" && pwd)"
 mkdir -p "$HOST/App" "$HOST/Tests"
-for name in VoiceCallContracts VoiceCallServiceContracts VoiceStateMachine VoiceSessionManager VoiceCallWAV; do
+for name in VoiceCallContracts VoiceCallServiceContracts VoiceStateMachine VoiceSessionManager VoiceCallWAV VoiceCallAudioDecoder; do
   cp "$ROOT/src/ios/Views/ContentView/VoiceCall/$name.swift" "$HOST/App/"
 done
 cp "$ROOT/src/ios/Providers/Voice/VoiceTextSanitizer.swift" "$HOST/App/"
@@ -111,7 +111,7 @@ root, host, out = map(Path, sys.argv[1:])
 voice = Path('src/ios/Views/ContentView/VoiceCall')
 sources = [voice / (n + '.swift') for n in (
     'VoiceCallContracts', 'VoiceCallServiceContracts', 'VoiceStateMachine',
-    'VoiceSessionManager', 'VoiceCallWAV')]
+    'VoiceSessionManager', 'VoiceCallWAV', 'VoiceCallAudioDecoder')]
 sources += [Path('src/ios/Providers/Voice/VoiceTextSanitizer.swift')]
 records = []
 for relative in sources:

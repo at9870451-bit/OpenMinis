@@ -22,6 +22,7 @@ final class VoiceCallAudioIO: NSObject, VADDelegate {
     private var observers: [NSObjectProtocol] = []
     private var lastLevel: CFAbsoluteTime = 0
     private var lastSpeechStart: CFAbsoluteTime = 0
+    private var playbackEpoch: UInt64 = 0
     private var primed = false
     private let audioOwner = UUID()
     // Owned exclusively by queue/VAD callbacks: 20s speech + 0.5s pre-roll.
@@ -37,10 +38,16 @@ final class VoiceCallAudioIO: NSObject, VADDelegate {
     @MainActor
     func start() async throws {
         stop()
-        guard await AudioSessionCoordinator.shared.beginVoiceCallAndWait(owner: audioOwner) else {
+        let startGeneration = captureGeneration()
+        let activated = await AudioSessionCoordinator.shared.beginVoiceCallAndWait(owner: audioOwner)
+        // end/stop may run while mediaserverd is activating. Never reopen the
+        // microphone after Hang Up, nor release a newer start's audio lease.
+        guard startGeneration == captureGeneration() else { throw CancellationError() }
+        guard activated else {
             AudioSessionCoordinator.shared.endVoiceCall(owner: audioOwner)
             throw VoiceProviderError.audioSessionPreempted
         }
+        try Task.checkCancellation()
         engine = AVAudioEngine(); speaker = AVAudioPlayerNode()
         var startError: Error?
         let configured = noff_try_objc {
@@ -71,6 +78,10 @@ final class VoiceCallAudioIO: NSObject, VADDelegate {
         if let startError { stop(); throw startError }
         guard configured, engine.isRunning else { stop(); throw VoiceProviderError.parseError("Voice processing engine did not start") }
         observeInterruptions()
+    }
+
+    private func captureGeneration() -> UInt64 {
+        controlLock.lock(); defer { controlLock.unlock() }; return epoch
     }
 
     private func receive(_ buffer: AVAudioPCMBuffer) {
@@ -154,30 +165,20 @@ final class VoiceCallAudioIO: NSObject, VADDelegate {
     func useSpeaker(_ enabled: Bool) { AudioSessionCoordinator.shared.setVoiceCallSpeaker(enabled, owner: audioOwner) }
 
     @MainActor
-    func stopPlayback() { speaker.stop(); if engine.isRunning { speaker.play() } }
+    func stopPlayback() { playbackEpoch &+= 1; speaker.stop(); if engine.isRunning { speaker.play() } }
 
     @MainActor
-    func play(_ data: Data, completed: @escaping @MainActor () -> Void) throws {
+    func play(_ data: Data, completed: @escaping @MainActor () -> Void) async throws {
         guard primed, engine.isRunning else { throw VoiceProviderError.audioSessionPreempted }
-        let temp = FileManager.default.temporaryDirectory.appendingPathComponent("amore-call-\(UUID().uuidString).audio")
-        try data.write(to: temp)
-        defer { try? FileManager.default.removeItem(at: temp) }
-        let file = try AVAudioFile(forReading: temp)
-        guard file.length > 0, file.length < 48_000 * 120,
-              let input = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: AVAudioFrameCount(file.length)),
-              let convert = AVAudioConverter(from: file.processingFormat, to: playFormat) else {
-            throw VoiceProviderError.parseError("Invalid voice playback audio")
-        }
-        try file.read(into: input)
-        let count = AVAudioFrameCount(ceil(Double(input.frameLength) * playFormat.sampleRate / input.format.sampleRate) + 256)
-        guard let output = AVAudioPCMBuffer(pcmFormat: playFormat, frameCapacity: count) else { throw VoiceProviderError.noAudioData }
-        var consumed = false; var error: NSError?
-        convert.convert(to: output, error: &error) { _, status in
-            if consumed { status.pointee = .endOfStream; return nil }
-            consumed = true; status.pointee = .haveData; return input
-        }
-        if let error { throw error }
-        guard output.frameLength > 0 else { throw VoiceProviderError.noAudioData }
+        let token = playbackEpoch
+        let work = Task.detached(priority: .userInitiated) { try VoiceCallAudioDecoder.decode(data) }
+        let buffer = try await withTaskCancellationHandler {
+            try await work.value
+        } onCancel: { work.cancel() }
+        try Task.checkCancellation()
+        guard primed, engine.isRunning, token == playbackEpoch else { throw CancellationError() }
+        speaker.volume = SystemVoicePreferences.volume
+        let output = buffer.pcm
         speaker.scheduleBuffer(output, completionCallbackType: .dataPlayedBack) { _ in
             Task { @MainActor in completed() }
         }
@@ -188,6 +189,7 @@ final class VoiceCallAudioIO: NSObject, VADDelegate {
     func stop() {
         controlLock.lock(); live = false; epoch &+= 1; controlLock.unlock()
         observers.forEach(NotificationCenter.default.removeObserver); observers.removeAll()
+        playbackEpoch &+= 1
         speaker.stop(); engine.stop()
         if primed { _ = noff_try_objc { self.engine.inputNode.removeTap(onBus: 0) } }
         queue.sync { vad?.delegate = nil; vad = nil; converter = nil; speechSamples.removeAll(); preRoll.removeAll(); segmentOpen = false; continuedUtterance = false; segmentFrames = 0 }

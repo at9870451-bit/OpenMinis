@@ -21,7 +21,7 @@ protocol VoiceCallAudioTransport: AnyObject {
     func setMuted(_ value: Bool)
     func useSpeaker(_ enabled: Bool)
     func stopPlayback()
-    func play(_ data: Data, completed: @escaping @MainActor () -> Void) throws
+    func play(_ data: Data, completed: @escaping @MainActor () -> Void) async throws
     func stop()
 }
 @MainActor
