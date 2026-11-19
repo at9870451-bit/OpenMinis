@@ -414,6 +414,11 @@ final class AppModel {
         eventsTask = Task { [weak self, core] in
             for await event in core.events { self?.handle(event) }
         }
+        loopback.remotePairingRequired = { [weak self] in
+            guard let path = self?.pairingPath else { return false }
+            // Only inspect record TYPE locally. The probe itself never gets its bytes.
+            return !Self.isLockdownRecord(path)
+        }
         loopback.onChange = { [weak self] old, new in self?.loopbackChanged(from: old, to: new) }
         loopback.onPairingPort = { [weak self] port in self?.pairingPortFound(port) }
         loopback.onPairingPortSearchEnded = { [weak self] in self?.pairingPortSearchEnded() }
@@ -937,6 +942,7 @@ final class AppModel {
                 if self.pairingTrouble != nil { self.log.add("pairing", "check: accepted again") }
                 self.pairingTrouble = nil
                 self.servicesSilent = false
+                self.loopback.pairingVerified()
                 self.pairingVerifiedAt = Date()
                 return true
             } catch {
@@ -955,7 +961,12 @@ final class AppModel {
                     return false
                 }
                 self.log.add("pairing", "check could not finish: \(text) [\(self.networkNote)]")
-                if code == "handshake" { self.servicesSilent = true }
+                if code == "handshake" {
+                    self.servicesSilent = true
+                    self.problem = "Remote Pairing 握手未完成，尚未验证配对记录。\n" + text
+                    self.loopback.pairingHandshakeFailed()
+                    return false
+                }
                 return true
             }
         }
@@ -1007,7 +1018,8 @@ final class AppModel {
                     try Task.checkCancellation()
                     loopback.check()
                     if !(await verifyPairing()) {
-                        problem = "The phone refused the pairing (\(pairingTrouble ?? "")). Pair again in Setup."
+                        if let pairingTrouble { problem = "The phone refused the pairing (\(pairingTrouble)). Pair again in Setup." }
+                        // A handshake EOF is NOT a rejected/invalid pairing key.
                         return
                     }
                     guard await ensureDiskImageForSession(), !Task.isCancelled else { return }
@@ -1592,6 +1604,7 @@ final class AppModel {
             if status.state == "launching", runner.state != "launching" { launchingSince = Date() }
         case "failed" where status.code == "handshake":
             servicesSilent = true
+            loopback.pairingHandshakeFailed()
         case "failed" where status.code == "pairing":
             if pairingTrouble == nil { log.add("pairing", "refused: \(status.detail ?? "")") }
             pairingTrouble = status.detail ?? "The phone refused the pairing."

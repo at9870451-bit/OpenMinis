@@ -33,7 +33,7 @@ public final class AmoreDeviceStatusStore {
         if model.setup.loopback == .proxy || model.setup.loopback == .builtIn { model.loopback.check() }
     }
     public func selectTransport(_ transport: AmoreDeviceStatus.Transport) -> Bool {
-        guard !model.connectionInUse else { return false }
+        guard canChangeTransport else { return false }
         switch transport {
         case .inProcess: model.chooseConnection(.inProcess)
         case .nativeTunnel: model.chooseConnection(.builtIn)
@@ -42,7 +42,28 @@ public final class AmoreDeviceStatusStore {
         // Selection is not activation, pairing, approval or proof of connection.
         return true
     }
-    public var canChangeTransport: Bool { !model.connectionInUse }
+    public var canChangeTransport: Bool { !model.connectionInUse && !model.tunnel.busy }
+    public func retryConnectionProbe() {
+        guard !model.usesLocalProcessTransport else { return }
+        model.loopback.retryProtocolCheck()
+    }
+    public func stopAutomationSession() { AmoreDeviceServices.stopAutomationSession() }
+    public var diagnosticText: String {
+        let snapshot = model.amoreStatusSnapshot
+        var lines = ["Amore local connection diagnostic", "iOS \(ProcessInfo.processInfo.operatingSystemVersionString)",
+                     "service target: 10.7.0.1:\(RemotePairingPort.current)",
+                     "transport: \(snapshot.transport?.rawValue ?? "none")",
+                     "sessionOn: \(snapshot.sessionOn); runner: \(snapshot.runnerState); code: \(snapshot.runnerCode ?? "none")",
+                     "Wi-Fi: \(model.loopback.wifiUp); cellular: \(model.loopback.cellularUp)",
+                     "DDI mounted: \(snapshot.localDDIMounted); pairing present: \(snapshot.pairingPresent)"]
+        if let value = loopbackInterface() { lines.append("interface: \(value.interface) \(value.address)") }
+        if let result = model.loopback.lastHandshake { lines.append(result.summary) }
+        lines.append(model.loopback.lastPortSearch)
+        return lines.joined(separator: "\n")
+    }
+    public var handshakeDetail: String? { model.loopback.lastHandshake?.summary }
+    public var lastProbeAt: Date? { model.loopback.checkedAt }
+    public var portSearchDetail: String { model.loopback.lastPortSearch }
 }
 
 extension AppModel {

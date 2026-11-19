@@ -64,8 +64,9 @@ enum RemotePairingPort {
                        browse: () async -> (ports: [UInt16], problem: String?),
                        answers: (UInt16) async -> Bool) async -> Search {
         let (ports, problem) = await browse()
-        var search = Search(found: nil, listed: ports, problem: problem)
-        for port in ports where port != current {
+        let candidates = Array(Set(ports.filter { $0 != 0 })).sorted().prefix(8)
+        var search = Search(found: nil, listed: Array(candidates), problem: problem)
+        for port in candidates where port != current {
             if await answers(port) { search.found = port; break }
         }
         return search

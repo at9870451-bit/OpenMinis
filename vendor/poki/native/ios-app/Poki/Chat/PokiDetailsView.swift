@@ -401,7 +401,7 @@ struct ConnectionView: View {
                     // page). Poki's own sentences are localized; PokiCore's stay as they came.
                     if let failure = model.developerToolsFailure {
                         Text(failure).foregroundStyle(.red)
-                    } else if !on, !model.sessionStarting, let problem = model.problem {
+                    } else if !model.sessionStarting, let problem = model.problem {
                         Text(verbatim: AppLocalization.bundle.localizedString(forKey: problem, value: problem, table: nil))
                             .foregroundStyle(.red)
                     } else if !on, !model.sessionStarting, case .downloaded = model.diskImage.state {
@@ -444,7 +444,7 @@ struct ConnectionView: View {
     private func set(_ on: Bool) {
         if !on {
             stopHost()
-            model.pauseByOwner()
+            model.stopSession()
         } else if model.sessionOn {
             model.wakeRunner()
         } else {

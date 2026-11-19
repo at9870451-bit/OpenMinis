@@ -1,5 +1,6 @@
 import Foundation
 import Network
+import Darwin
 
 /// One address of this phone, as getifaddrs reports it.
 struct LocalAddress { let interface: String; let address: String; let family: Int32 }
@@ -82,13 +83,20 @@ private func isRefused(_ error: NWError) -> Bool {
     return false
 }
 
-/// The interface that carries the loopback address 10.7.0.x a proxy app's tunnel assigns, if any, and
-/// whether that interface also has an IPv6 address (tools that look for this loopback skip such
-/// interfaces, so the proxy's IPv6 tunnel interface should be off).
+/// A supported tunnel interface, not proof of a working developer service.
+/// LocalDevVPN assigns 10.7.1.1 while reflecting the DEVICE at 10.7.0.1.
+/// Keep those addresses separate: never dial the tunnel's own interface address.
 struct LoopbackInterface { let interface: String; let address: String; let ipv6: [String] }
 
 func loopbackInterface(_ addresses: [LocalAddress] = localAddresses()) -> LoopbackInterface? {
-    guard let v4 = addresses.first(where: { $0.family == AF_INET && $0.address.hasPrefix("10.7.0.") }) else { return nil }
+    guard let v4 = addresses.first(where: { entry in
+        guard entry.family == AF_INET else { return false }
+        let parts = entry.address.split(separator: ".", omittingEmptySubsequences: false)
+        let octets = parts.compactMap { UInt8($0) }
+        guard parts.count == 4, octets.count == 4, octets[0] == 10, octets[1] == 7 else { return false }
+        let tunnelInterface = entry.interface.hasPrefix("utun") || entry.interface.hasPrefix("tun")
+        return octets[2] == 0 || (tunnelInterface && octets[2] == 1 && octets[3] == 1)
+    }) else { return nil }
     let v6 = addresses.filter { $0.interface == v4.interface && $0.family == AF_INET6 }.map(\.address)
     return LoopbackInterface(interface: v4.interface, address: v4.address, ipv6: v6)
 }

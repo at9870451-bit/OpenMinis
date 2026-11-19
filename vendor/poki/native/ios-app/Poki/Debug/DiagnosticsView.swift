@@ -17,7 +17,7 @@ struct DiagnosticsView: View {
                     Text(loop.ipv6.isEmpty ? "No IPv6 on this interface" : "IPv6 present, \(loop.ipv6.joined(separator: ", "))")
                         .font(.footnote.monospaced()).foregroundStyle(loop.ipv6.isEmpty ? Color.secondary : Color.red)
                 } else {
-                    Text("No interface has a 10.7.0.x address. Check that your proxy app is on and its loopback module is enabled.")
+                    Text("No supported 10.7.0.x or LocalDevVPN 10.7.1.1 tunnel interface was found. The service target remains 10.7.0.1; an interface alone does not prove pairing works.")
                 }
             } header: {
                 Text("Proxy Loopback Interface")

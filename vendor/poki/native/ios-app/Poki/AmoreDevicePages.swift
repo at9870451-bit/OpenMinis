@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 public struct AmoreDeviceStatusView: View {
     private let store = AmoreDeviceServices.statusStore
+    @State private var confirmStop = false
     public init() {}
     public var body: some View {
         let status = store.snapshot
@@ -23,6 +24,17 @@ public struct AmoreDeviceStatusView: View {
                 LabeledContent("本机开发镜像", value: status.localDDIMounted ? "已挂载" : "未挂载 / 不可访问")
                 if let problem = status.pairingProblem ?? status.problem { Text(problem).foregroundStyle(.orange) }
             }
+            Section("Remote Pairing 握手诊断") {
+                Text("VPN 已连接、TCP 接通和开发服务握手完成是三个不同状态。握手检查不读取配对密钥、不安装开发镜像、不发起自动配对。")
+                    .font(.footnote).foregroundStyle(.secondary)
+                if let detail = store.handshakeDetail { Text(detail).font(.caption.monospaced()).textSelection(.enabled) }
+                if let at = store.lastProbeAt { LabeledContent("最近检测") { Text(at, style: .time) } }
+                Text(store.portSearchDetail).font(.caption).textSelection(.enabled)
+                Button("检查握手并重新发现端口", systemImage: "network") { store.retryConnectionProbe() }
+                    .disabled(status.transport == .inProcess)
+                    .accessibilityIdentifier("amore.connection.retryProtocol")
+                ShareLink(item: store.diagnosticText) { Label("分享连接诊断（不含配对密钥）", systemImage: "square.and.arrow.up") }
+            }
             Section("内置连接路径") {
                 ForEach(AmoreDeviceStatus.Transport.allCases) { transport in
                     Button {
@@ -37,7 +49,11 @@ public struct AmoreDeviceStatusView: View {
                     .disabled(!store.canChangeTransport)
                     .accessibilityIdentifier("amore.transport.\(transport.rawValue)")
                 }
-                Text("选择只保存路径，不会启动 VPN、安装配对/证书、上传设备信息或声称已连接。请在连接页明确开启自动化。运行中或配对时不可更改。")
+                if status.sessionOn {
+                    Button("停止自动化会话并解锁路径选择", role: .destructive) { confirmStop = true }
+                        .accessibilityIdentifier("amore.connection.stopSession")
+                }
+                Text("选择只保存路径，不会启动 VPN、安装配对/证书或声称已连接。自动化会话开启时路径锁定；停止会话后可更改，不会删除配对和开发镜像。")
                     .font(.footnote).foregroundStyle(.secondary)
             }
             Section("无需外部 VPN 的真实限制") {
@@ -53,6 +69,10 @@ public struct AmoreDeviceStatusView: View {
         .navigationTitle("本机连接状态")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { store.refresh() }
+        .confirmationDialog("停止当前自动化会话？当前设备任务将停止，配对和开发镜像保留。", isPresented: $confirmStop, titleVisibility: .visible) {
+            Button("停止并解锁路径", role: .destructive) { store.stopAutomationSession() }
+            Button("取消", role: .cancel) { }
+        }
     }
 }
 

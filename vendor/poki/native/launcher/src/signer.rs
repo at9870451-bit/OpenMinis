@@ -111,11 +111,55 @@ fn channels() -> Value {
     Value::Array([Channel::Beta].iter().map(|c| json!({"id": c.id(), "title": c.title()})).collect())
 }
 
+/// Deliberately independent of Phone, pairing files, HOME, STATE and the vault.
+fn pairing_probe_config(request: &Value) -> std::result::Result<(IpAddr, u16, Duration), Failure> {
+    if request["device_address"].as_str() != Some("10.7.0.1") {
+        return Err(fail("pairing_probe device_address must be 10.7.0.1", "config"));
+    }
+    let port = request["port"].as_u64().filter(|port| (1..=65535).contains(port))
+        .ok_or_else(|| fail("pairing_probe port must be an integer in 1..65535", "config"))? as u16;
+    let timeout_ms = match request.get("timeout_ms") {
+        None => 3000,
+        Some(value) => {
+            if let Some(ms) = value.as_u64() {
+                ms.clamp(500, 6000)
+            } else if let Some(ms) = value.as_i64() {
+                ms.clamp(500, 6000) as u64
+            } else {
+                return Err(fail("pairing_probe timeout_ms must be an integer", "config"));
+            }
+        }
+    };
+    Ok((std::net::Ipv4Addr::new(10, 7, 0, 1).into(), port, Duration::from_millis(timeout_ms)))
+}
+
+async fn pairing_probe(request: &Value) -> Out {
+    let (host, port, timeout) = pairing_probe_config(request)?;
+    let probe = crate::remote::probe_handshake(host, port, timeout).await
+        .map_err(|error| fail(error.to_string(), "config"))?;
+    Ok(pairing_probe_response(probe))
+}
+
+fn pairing_probe_response(probe: crate::remote::HandshakeProbe) -> Value {
+    // Keep this bridge schema fixed for SignerBridge.decode. Network failures
+    // remain successful bridge results, with the failing stage in the payload.
+    json!({
+        "tcp_connected": probe.tcp_connected,
+        "handshake_ok": probe.handshake_ok,
+        "stage": probe.stage,
+        "detail": probe.detail,
+        "port": probe.port,
+        "elapsed_ms": probe.elapsed_ms,
+        "host": probe.host,
+    })
+}
+
 /// Runs one request. `emit` gets progress events while it runs.
 pub async fn handle(request: Value, emit: impl Fn(Value) + Send + Sync + 'static) -> Out {
     let op = request["op"].as_str().unwrap_or("");
     let reporter = Reporter::new(move |p: Progress| emit(json!({"event": "progress", "progress": p})));
     match op {
+        "pairing_probe" => pairing_probe(&request).await,
         "configure" => {
             // Where the core keeps its non-secret files (release cache, channel, machine id).
             let dir = PathBuf::from(str_of(&request, "home")?);
@@ -393,4 +437,98 @@ async fn install(request: &Value, reporter: &Reporter) -> Out {
     }
     reporter.done("install", None);
     Ok(json!({"installed": true}))
+}
+
+#[cfg(test)]
+mod probe_tests {
+    use super::*;
+
+    fn request() -> Value {
+        // No pairing_file, host_name, home, account or vault setup is needed.
+        json!({"op": "pairing_probe", "device_address": "10.7.0.1", "port": 49152})
+    }
+
+    #[test]
+    fn probe_config_is_loopback_only_and_clamps_one_deadline() {
+        let (host, port, timeout) = pairing_probe_config(&request()).unwrap();
+        assert_eq!(host.to_string(), "10.7.0.1");
+        assert_eq!(port, 49152);
+        assert_eq!(timeout, Duration::from_millis(3000));
+        for (input, expected) in [(-100, 500), (0, 500), (499, 500), (500, 500), (3000, 3000), (6000, 6000), (6001, 6000)] {
+            let mut value = request();
+            value["timeout_ms"] = json!(input);
+            assert_eq!(pairing_probe_config(&value).unwrap().2, Duration::from_millis(expected));
+        }
+        let mut value = request();
+        value["timeout_ms"] = json!(u64::MAX);
+        assert_eq!(pairing_probe_config(&value).unwrap().2, Duration::from_millis(6000));
+        for port in [1, 65535] {
+            value["port"] = json!(port);
+            assert_eq!(pairing_probe_config(&value).unwrap().1, port);
+        }
+    }
+
+    #[test]
+    fn probe_config_rejects_redirects_bad_ports_and_wrong_types() {
+        for address in ["10.7.1.1", "127.0.0.1", "::1", "example.com", "10.7.0.1 ", ""] {
+            let mut value = request();
+            value["device_address"] = json!(address);
+            assert_eq!(pairing_probe_config(&value).unwrap_err().code, "config");
+        }
+        for port in [json!(0), json!(-1), json!(65536), json!(1.5), json!("49152"), Value::Null] {
+            let mut value = request();
+            value["port"] = port;
+            assert_eq!(pairing_probe_config(&value).unwrap_err().code, "config");
+        }
+        for timeout in [json!(1.5), json!("3000"), json!(true), Value::Null] {
+            let mut value = request();
+            value["timeout_ms"] = timeout;
+            assert_eq!(pairing_probe_config(&value).unwrap_err().code, "config");
+        }
+        for missing in ["device_address", "port"] {
+            let mut value = request();
+            value.as_object_mut().unwrap().remove(missing);
+            assert_eq!(pairing_probe_config(&value).unwrap_err().code, "config");
+        }
+    }
+
+    #[tokio::test]
+    async fn probe_handle_bad_request_is_config_not_unknown_or_vault_error() {
+        let mut value = request();
+        value["device_address"] = json!("10.7.1.1");
+        let failure = handle(value, |_| panic!("probe must not emit signing progress")).await.unwrap_err();
+        assert_eq!(failure.code, "config");
+        assert!(failure.message.contains("device_address must be 10.7.0.1"));
+    }
+
+    #[test]
+    fn probe_bridge_has_exact_seven_fields_for_success_and_network_failure() {
+        for (stage, tcp_connected, handshake_ok, code) in [
+            ("connect", false, false, "io"),
+            ("handshake", true, false, "io"),
+            ("handshake", true, false, "timeout"),
+            ("ready", true, true, "ok"),
+        ] {
+            let value = pairing_probe_response(crate::remote::HandshakeProbe {
+                tcp_connected,
+                handshake_ok,
+                stage,
+                code,
+                detail: format!("[{code}] mock; after 52 ms"),
+                port: 49153,
+                elapsed_ms: 52,
+                host: std::net::Ipv4Addr::new(10, 7, 0, 1).into(),
+            });
+            assert_eq!(value.as_object().unwrap().len(), 7);
+            assert_eq!(value, json!({
+                "tcp_connected": tcp_connected,
+                "handshake_ok": handshake_ok,
+                "stage": stage,
+                "detail": format!("[{code}] mock; after 52 ms"),
+                "port": 49153,
+                "elapsed_ms": 52,
+                "host": "10.7.0.1"
+            }));
+        }
+    }
 }

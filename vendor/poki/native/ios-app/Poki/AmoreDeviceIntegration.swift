@@ -51,7 +51,7 @@ public enum AmoreDeviceServices {
     }
     public static func setEnabled(_ enabled: Bool) {
         UserDefaults.standard.set(enabled, forKey: "amore.deviceControl.enabled")
-        if !enabled { pauseAutomation() }
+        if !enabled { stopAutomationSession() }
     }
     public static func finishTask(sessionID: String?) {
         guard let taskOwner, taskOwner == sessionID else { return }
@@ -68,6 +68,12 @@ public enum AmoreDeviceServices {
         taskOwner = nil
         stopHostAgent(owner)
         retained?.pauseByOwner()
+    }
+    /// Explicit OFF is not Pause. End the session, unlock transport selection,
+    /// keep pairing/DDI data, and stop only Amore's own built-in tunnel.
+    public static func stopAutomationSession() {
+        pauseAutomation()
+        retained?.stopSession()
     }
     public static var toolCatalogJSON: String { PokiCore.toolCatalogJSON }
     public static var toolInstructions: String { PokiCore.toolInstructions }
