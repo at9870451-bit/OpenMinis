@@ -60,7 +60,6 @@ struct AmoreTransparentDrawer<Chat: View, Sidebar: View>: View {
                 .environment(\.amoreDrawerProgress, phase)
                 .frame(width: size.width, height: size.height)
                 .allowsHitTesting(!drawerIsPresented)
-                .disabled(drawerIsPresented)
                 .accessibilityHidden(drawerIsPresented)
 
             if drawerIsPresented {
