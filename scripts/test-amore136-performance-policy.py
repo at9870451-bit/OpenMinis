@@ -83,8 +83,12 @@ class PerformancePolicyTests(unittest.TestCase):
             self.assertIn(key, gate)
         self.assertNotIn('await', gate)
         self.assertIn('var tools = directAnswerOnly ? [] : makeAgentTools()', LOOP)
-        self.assertEqual(LOOP.count('if memoryEnabled && !directAnswerOnly'), 2)
-        self.assertIn('directAnswerOnly = false\n                        tools = makeAgentTools()', LOOP)
+        # Pure Chat intentionally keeps already-injected memory context even
+        # though it exposes zero tools; ordinary zero-tool greetings still skip it.
+        self.assertEqual(LOOP.count('if memoryEnabled && (!directAnswerOnly || pureChatThisRun)'), 2)
+        self.assertIn('if directAnswerOnly && !pureChatThisRun {', LOOP)
+        self.assertIn('directAnswerOnly = false', LOOP)
+        self.assertIn('tools = makeAgentTools()', LOOP)
         self.assertIn('AmoreToolPolicy.directAnswerRule', read('Agent/Chat/AIChatViewModel+SystemPrompt.swift'))
 
     def test_open_chat_does_not_boot_or_poll_kernel(self):
