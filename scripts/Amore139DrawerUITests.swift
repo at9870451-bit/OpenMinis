@@ -15,8 +15,11 @@ final class Amore139DrawerUITests: XCTestCase {
         appendDraft("139", expected: typed)
         openHistory()
         tap("transparent.history.1")
-        assertClosed()
+        // Selecting a destination ends text editing before the chat becomes active.
+        // The draft remains stored; the next user tap explicitly re-focuses it.
+        app.typeKey(XCUIKeyboardKey.return, modifierFlags: [])
         assertState(selected: "1", draft: typed)
+        assertClosed()
 
         openHistory()
         XCTAssertEqual(app.buttons["transparent.history.1"].value as? String, "selected")
