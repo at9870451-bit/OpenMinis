@@ -1512,6 +1512,10 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     /// Included in `.sessionDidCreate` notification so the parent can correlate.
     var draftId: String?
 
+    /// Phone action turns use only PokiCore's device_control; never fall back
+    /// to computer shell/browser tools. Recomputed for every user turn.
+    var phoneOnlyThisTurn = false
+
     /// Source tag written to the session record on creation (e.g. "shortcut").
     var sessionSource: String?
 

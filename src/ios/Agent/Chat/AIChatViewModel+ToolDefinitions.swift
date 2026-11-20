@@ -28,6 +28,10 @@ extension AIChatViewModel {
     // MARK: - Tool Definitions (Canonical)
 
     func makeAgentTools() -> [AgentToolDefinition] {
+        // A per-conversation pure chat advertises NO tool schema to any provider.
+        // This includes device_control, shell/browser, memory and future tools.
+        guard !AmorePureChatMode.isEnabled(sessionID: sessionId, draftID: draftId) else { return [] }
+        if phoneOnlyThisTurn { return AmoreDeviceTools.definitions }
         // [T-memory-toggle-gates-injection-and-tools-ios] memory_get and
         // memory_write are conditionally registered. When the per-session
         // toggle is off, drop both tool definitions so the LLM never sees

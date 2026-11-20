@@ -20,6 +20,7 @@ import Foundation
 import ImageIO
 import SQLite3
 import UIKit
+import AmoreDeviceKit
 import os.log
 
 private let logger = AppLogger(category: "AIChatVM")
@@ -104,7 +105,7 @@ extension AIChatViewModel {
     }
 
     private func runAgentLoopCore(resumingAt existingMsgIdx: Int? = nil, committedBlocks: Int? = nil) async throws {
-        defer { AmoreDeviceTools.finish(sessionID: self.sessionId) }
+        defer { AmoreDeviceTools.finish(sessionID: self.sessionId); phoneOnlyThisTurn = false }
         // REPRO-DIAG(2026-05-16): bump global round counter and emit a clear
         // BEGIN/END marker so the user can grep `ROUND \d+` to slice the log
         // by attempt. A "round" = one runAgentLoop invocation, which is
@@ -218,12 +219,19 @@ extension AIChatViewModel {
         let greetingText = greetingTexts.joined(separator: "\n")
         let greetingHasAttachments = messages.last(where: { $0.role == .user })
             .map { !$0.attachments.isEmpty || !$0.inputAttachments.isEmpty } ?? false
-        var directAnswerOnly = AmoreToolPolicy.omitsTools(
+        // Pure Chat is scoped to this conversation and has no tool budget,
+        // including across provider fallback and queued turns.
+        let pureChatThisRun = AmorePureChatMode.isEnabled(sessionID: sessionId, draftID: draftId)
+        var directAnswerOnly = pureChatThisRun || AmoreToolPolicy.omitsTools(
             text: greetingText, priorMessageCount: max(0, agentHistory.count - 1),
             hasAttachments: !plainGreeting || greetingHasAttachments,
             hasPendingApproval: sessionId.map { UserAskCenter.shared.hasPendingAsk(inSession: $0) } ?? false,
             isHelper: isHelper, isResuming: existingMsgIdx != nil)
+        let phoneTaskText = greetingTexts.joined(separator: "\n")
+        phoneOnlyThisTurn = !pureChatThisRun && !isHelper && AmorePhoneTaskPolicy.isPhoneTask(
+            phoneTaskText, knownAppIDs: AmoreCapsuleApps.bundleIDs(namedIn: phoneTaskText))
         var tools = directAnswerOnly ? [] : makeAgentTools()
+        if phoneOnlyThisTurn { tools = tools.filter { $0.name == "device_control" } }
         var helperWrapUpInjected = false
         // [T-user-ask-fallback] The text-ask nudge was sent in this run (once).
         var textAskNudgeSent = false
@@ -233,6 +241,7 @@ extension AIChatViewModel {
         var helperClosingNudgeSent = false
 
         var userSystemPrompt = baseSystemPrompt
+        if phoneOnlyThisTurn { userSystemPrompt += "\n\n" + AmorePhoneTaskPolicy.instruction }
         // `var` for [T-ios-switch-model-next-request]: a mid-turn model switch
         // replaces it so the next request carries the new model's limits.
         var activeModel = ProviderConfigStore.shared.entry(for: entry.id)?.model ?? selectedModel
@@ -247,13 +256,13 @@ extension AIChatViewModel {
         // [T-p1-delegate-task] A helper inherits the PARENT session's skill
         // and MCP enablement (the user configured those for the conversation
         // that spawned it; the child session has no overrides of its own).
-        if let sid = helperConfig?.parentSessionId ?? sessionId,
+        if !pureChatThisRun, let sid = helperConfig?.parentSessionId ?? sessionId,
            let skillFragment = SkillStore.shared.skillPromptFragment(for: sid) {
             userSystemPrompt += "\n\n" + skillFragment
         }
 
         // [T-mcp-integration-ios] Inject Top-20 enabled MCP server metadata.
-        if let sid = helperConfig?.parentSessionId ?? sessionId,
+        if !pureChatThisRun, let sid = helperConfig?.parentSessionId ?? sessionId,
            let mcpFragment = MCPStore.shared.systemPromptSnippet(for: sid) {
             userSystemPrompt += "\n\n" + mcpFragment
         }
@@ -268,7 +277,7 @@ extension AIChatViewModel {
         // session so a repro shows whether loadSession seeded it from the
         // global default.
         AppLogger(category: "MemDiag").info("[MemDiag] inject-decision sid=\(self.sessionId?.prefix(8) ?? "nil") vm.memoryEnabled=\(self.memoryEnabled)")
-        if memoryEnabled && !directAnswerOnly {
+        if memoryEnabled && (!directAnswerOnly || pureChatThisRun) {
             if let memoryFragment = Self.loadGlobalMemoryFragment() {
                 userSystemPrompt += "\n\n" + memoryFragment
             }
@@ -1085,6 +1094,7 @@ extension AIChatViewModel {
                 // may since have been removed with its provider.
                 activeModel = newEntry.model
                 userSystemPrompt = baseSystemPrompt
+                if phoneOnlyThisTurn { userSystemPrompt += "\n\n" + AmorePhoneTaskPolicy.instruction }
                 if let capFragment = newEntry.model.capabilityPromptFragment {
                     userSystemPrompt += "\n\n" + capFragment
                 }
@@ -1095,12 +1105,12 @@ extension AIChatViewModel {
                 // path: a helper uses its PARENT's skill / MCP enablement.
                 // Keying on the child id here made a sub-agent that fell back
                 // lose the parent's skills and MCP servers mid-run.
-                if let sid = helperConfig?.parentSessionId ?? sessionId,
+                if !pureChatThisRun, let sid = helperConfig?.parentSessionId ?? sessionId,
                    let skillFragment = SkillStore.shared.skillPromptFragment(for: sid) {
                     userSystemPrompt += "\n\n" + skillFragment
                 }
                 // [T-mcp-integration-ios] Inject Top-20 enabled MCP metadata.
-                if let sid = helperConfig?.parentSessionId ?? sessionId,
+                if !pureChatThisRun, let sid = helperConfig?.parentSessionId ?? sessionId,
                    let mcpFragment = MCPStore.shared.systemPromptSnippet(for: sid) {
                     userSystemPrompt += "\n\n" + mcpFragment
                 }
@@ -1108,7 +1118,7 @@ extension AIChatViewModel {
                 // the gate from the first injection site — fallback to a
                 // new provider must respect the per-session memoryEnabled
                 // toggle the same way the initial system prompt did.
-                if memoryEnabled && !directAnswerOnly {
+                if memoryEnabled && (!directAnswerOnly || pureChatThisRun) {
                     if let memoryFragment = Self.loadGlobalMemoryFragment() {
                         userSystemPrompt += "\n\n" + memoryFragment
                     }
@@ -1864,10 +1874,16 @@ extension AIChatViewModel {
                     at: .turnEnd
                 )
                 if endInjection != .none {
-                    if directAnswerOnly {
+                    if directAnswerOnly && !pureChatThisRun {
                         // Zero tools was scoped to the greeting, not the session.
                         directAnswerOnly = false
+                        let queuedPhoneText = agentHistory.last?.parts.compactMap { part -> String? in
+                            if case .text(let text) = part { return text }; return nil
+                        }.joined(separator: "\n") ?? ""
+                        phoneOnlyThisTurn = AmorePhoneTaskPolicy.isPhoneTask(queuedPhoneText,
+                            knownAppIDs: AmoreCapsuleApps.bundleIDs(namedIn: queuedPhoneText))
                         tools = makeAgentTools()
+                        if phoneOnlyThisTurn { userSystemPrompt += "\n\n" + AmorePhoneTaskPolicy.instruction }
                         userSystemPrompt = userSystemPrompt.replacingOccurrences(
                             of: AmoreToolPolicy.noToolsThisTurn, with: memoryStatusFragment)
                         if memoryEnabled {

@@ -17,6 +17,8 @@ cp "$ROOT/src/ios/Views/ContentView/AmoreAvatarDraftRouter.swift" "$HOST/App/"
 cp "$ROOT/src/ios/Views/Chat/AIChatView/AmoreHomeActionRouter.swift" "$HOST/App/"
 for name in AmoreAppearance AmoreChatBackdrop; do cp "$ROOT/src/ios/Views/ContentView/$name.swift" "$HOST/App/"; done
 cp "$ROOT/src/ios/Views/ContentView/Settings/AmoreSettingsGlassStyle.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/Chat/AIChatView/Support/ChatExecutionModePolicy.swift" "$HOST/App/"
+cp "$ROOT/src/ios/Views/ContentView/AmorePhoneTaskPolicy.swift" "$HOST/App/"
 cp "$ROOT/vendor/poki/native/ios-app/Poki/AmoreDeviceStatus.swift" "$HOST/App/"
 cp "$ROOT/scripts/Amore136DeviceStateTests.swift" "$HOST/Tests/"
 python3 - "$ROOT/scripts/Amore136SettingsStyleTests.swift" "$HOST/Tests/Amore136SettingsStyleTests.swift" <<'PY'

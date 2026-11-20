@@ -271,7 +271,10 @@ private struct ChatTrailingMenu: View, Equatable {
     let keepAwakeEnabled: Bool
     /// [T-always-on-now] "Use Screen Saver" is on for this chat.
     let screenSaverNowEnabled: Bool
+    let modeSessionKey: String?
+    let pureChatEnabled: Bool
 
+    let onSetPureChatMode: (Bool) -> Void
     let onNewChat: () -> Void
     let onCompact: () -> Void
     let onClearChat: () -> Void
@@ -306,6 +309,8 @@ private struct ChatTrailingMenu: View, Equatable {
             && lhs.showUltrafast == rhs.showUltrafast
             && lhs.keepAwakeEnabled == rhs.keepAwakeEnabled
             && lhs.screenSaverNowEnabled == rhs.screenSaverNowEnabled
+            && lhs.modeSessionKey == rhs.modeSessionKey
+            && lhs.pureChatEnabled == rhs.pureChatEnabled
     }
 
     var body: some View {
@@ -319,6 +324,16 @@ private struct ChatTrailingMenu: View, Equatable {
             Button { onNewChat() } label: {
                 Label(AppLocalized("New Chat"), systemImage: "square.and.pencil")
             }
+
+            Divider()
+
+            Toggle(isOn: Binding(
+                get: { pureChatEnabled },
+                set: { onSetPureChatMode($0) }
+            )) {
+                Label(AppLocalized("纯聊天模式"), systemImage: "text.bubble")
+            }
+            .disabled(modeSessionKey == nil || (!pureChatEnabled && !ChatExecutionModePolicy.executionGateInstalled))
 
             Divider()
 
@@ -519,7 +534,10 @@ struct ChatTrailingMenuButton: UIViewRepresentable {
     let keepAwakeEnabled: Bool
     /// [T-always-on-now] "Use Screen Saver" is on for this chat.
     let screenSaverNowEnabled: Bool
+    let modeSessionKey: String?
+    let pureChatEnabled: Bool
 
+    let onSetPureChatMode: (Bool) -> Void
     let onNewChat: () -> Void
     let onCompact: () -> Void
     let onClearChat: () -> Void
@@ -560,6 +578,8 @@ struct ChatTrailingMenuButton: UIViewRepresentable {
         let showUltrafast: Bool
         let keepAwakeEnabled: Bool
         let screenSaverNowEnabled: Bool
+        let modeSessionKey: String?
+        let pureChatEnabled: Bool
     }
 
     fileprivate var key: Key {
@@ -572,7 +592,9 @@ struct ChatTrailingMenuButton: UIViewRepresentable {
             speedTier: speedTier,
             showUltrafast: showUltrafast,
             keepAwakeEnabled: keepAwakeEnabled,
-            screenSaverNowEnabled: screenSaverNowEnabled)
+            screenSaverNowEnabled: screenSaverNowEnabled,
+            modeSessionKey: modeSessionKey,
+            pureChatEnabled: pureChatEnabled)
     }
 
     final class Coordinator {
@@ -654,6 +676,20 @@ struct ChatTrailingMenuButton: UIViewRepresentable {
             UIAction(title: AppLocalized("Search in Chat"),
                      image: UIImage(systemName: "magnifyingglass"),
                      attributes: key.messagesEmpty ? [.disabled] : []) { _ in coordinator.parent.onSearchInChat() },
+        ]))
+
+        // Conversation mode lives immediately after New Chat / Share / Search;
+        // the rest of the existing groups and their ordering are unchanged.
+        // Disabled until the core dispatcher and advertisement both gate tools.
+        let modeCanChange = key.modeSessionKey != nil
+            && (key.pureChatEnabled || ChatExecutionModePolicy.executionGateInstalled)
+        groups.append(UIMenu(options: .displayInline, children: [
+            UIAction(title: AppLocalized("纯聊天模式"),
+                     image: UIImage(systemName: "text.bubble"),
+                     attributes: modeCanChange ? [] : [.disabled],
+                     state: key.pureChatEnabled ? .on : .off) { _ in
+                coordinator.parent.onSetPureChatMode(!key.pureChatEnabled)
+            },
         ]))
 
         // [T-chat-menu-compact-entry] Compact sits ABOVE Clear Chat in its own

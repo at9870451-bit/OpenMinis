@@ -60,6 +60,12 @@ extension AIChatView {
             showUltrafast: activeModelSupportsUltrafast,
             keepAwakeEnabled: keepAwakeThisChat,
             screenSaverNowEnabled: screenSaverNowThisChat,
+            // Session/draft identity is part of the UIKit menu snapshot: an
+            // agent-mode chat must not reuse another chat's checked menu.
+            modeSessionKey: vm.sessionId ?? vm.draftId,
+            pureChatEnabled: AmorePureChatMode.isEnabled(
+                sessionID: vm.sessionId, draftID: vm.draftId),
+            onSetPureChatMode: { on in requestPureChatModeFromMenu(on) },
             onNewChat: { requestNewChatFromMenu() },
             // [T-chat-menu-compact-entry] Same effect as the /compact slash
             // command (AIChatViewModel+SlashCommands case "compact").
@@ -170,6 +176,34 @@ extension AIChatView {
             initialSelection: ChatShareCells.roundSelection(unit: unit, in: startsFolded ? folded : cells),
             title: (title?.isEmpty == false ? title : nil) ?? AppLocalized("New Chat"),
             vm: vm)
+    }
+
+    // MARK: - Conversation execution mode
+
+    /// Changes only the current conversation. A running response continues
+    /// unchanged; never cancel a device action merely to flip the checkmark.
+    private func requestPureChatModeFromMenu(_ on: Bool) {
+        let result = AmorePureChatMode.setEnabled(
+            on, sessionID: vm.sessionId, draftID: vm.draftId,
+            isBusy: vm.isProcessing || vm.isCompacting ||
+                (vm.sessionId ?? vm.draftId).map { SessionActivityTracker.shared.isActive($0) } == true)
+        switch result {
+        case .changed:
+            forcePullToast = on
+                ? AppLocalized("Pure Chat Mode on. Future replies are text-only; tools are unavailable.")
+                : AppLocalized("Amore Agent on. Tools are available again for future replies.")
+        case .busy:
+            forcePullToast = AppLocalized("A task is running. Wait for it to finish before switching modes; it has not been stopped.")
+        case .gateNotInstalled:
+            forcePullToast = AppLocalized("Pure Chat Mode is unavailable until tool safety checks are installed.")
+        case .unavailable:
+            forcePullToast = AppLocalized("Create a conversation before switching modes.")
+        case .unchanged:
+            return
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            forcePullToast = nil
+        }
     }
 
     // MARK: - New Chat (menu entry)

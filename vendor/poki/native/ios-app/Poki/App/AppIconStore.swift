@@ -152,8 +152,13 @@ final class AppIconStore {
 
     /// One of the PNGs in Poki/AppIcons by its file name, at the Home Screen's 3x.
     static func carried(_ file: String) -> UIImage? {
-        guard let path = PokiPortResources.bundle.path(forResource: file, ofType: "png"), let image = UIImage(contentsOfFile: path)?.cgImage else { return nil }
-        return UIImage(cgImage: image, scale: 3, orientation: .up)
+        if let path = PokiPortResources.bundle.path(forResource: file, ofType: "png"),
+           let image = UIImage(contentsOfFile: path)?.cgImage {
+            return UIImage(cgImage: image, scale: 3, orientation: .up)
+        }
+        // The static Amore host bundles only selected original app artwork as
+        // namespaced assets; the iPhone's installed icon is still tried first.
+        return UIImage(named: "AmoreCarried-\(file)", in: PokiPortResources.bundle, compatibleWith: nil)
     }
 }
 

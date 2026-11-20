@@ -144,8 +144,8 @@ targets:
         GENERATE_INFOPLIST_FILE: false
         CODE_SIGN_ENTITLEMENTS: AmoreTunnel/AmoreTunnel.entitlements
         SKIP_INSTALL: true
-        MARKETING_VERSION: '1.38'
-        CURRENT_PROJECT_VERSION: '38'
+        MARKETING_VERSION: '1.40'
+        CURRENT_PROJECT_VERSION: '40'
         LD_RUNPATH_SEARCH_PATHS:
         - $(inherited)
         - '@executable_path/../../Frameworks'
@@ -153,8 +153,8 @@ targets:
       path: AmoreTunnel/Info.plist
       properties:
         CFBundleDisplayName: Amore Local Connection
-        CFBundleShortVersionString: '1.38'
-        CFBundleVersion: '38'
+        CFBundleShortVersionString: '1.40'
+        CFBundleVersion: '40'
         NSExtension:
           NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider

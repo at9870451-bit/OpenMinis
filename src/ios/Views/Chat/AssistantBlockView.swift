@@ -621,9 +621,13 @@ struct ToolCapsuleView: View {
 
     @ViewBuilder
     private var statusOrIcon: some View {
-        Image(systemName: icon)
-            .font(.system(size: 13))
-            .foregroundStyle(iconColor)
+        if AmoreDeviceTaskCapsule.isDeviceTool(block) {
+            AmoreDeviceTaskCapsule(block: block)
+        } else {
+            Image(systemName: icon)
+                .font(.system(size: 13))
+                .foregroundStyle(iconColor)
+        }
     }
 
     private var iconColor: Color {

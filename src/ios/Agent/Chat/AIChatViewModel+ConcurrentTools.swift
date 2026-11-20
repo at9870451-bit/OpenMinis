@@ -179,6 +179,41 @@ extension AIChatViewModel {
         CrashBreadcrumbs.record("tool.start", detail: crumbTool)
         defer { CrashBreadcrumbs.record("tool.end", detail: crumbTool) }
 
+        // Even a stale provider stream or resumed tool_use cannot bypass Pure Chat.
+        // Reject before repair, approval, network or device dispatch, and keep
+        // the tool_use/tool_result pair in history so the model can answer in text.
+        if AmorePureChatMode.isEnabled(sessionID: sessionId, draftID: draftId) {
+            let denied = "Pure Chat Mode: no tool was executed. Reply in text, or ask the user to switch to Amore Agent."
+            if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
+                messages[msgIdx].blocks[blockIdx].content = denied
+                messages[msgIdx].blocks[blockIdx].toolStatus = .failed(message: denied)
+            }
+            let snapshot = ToolSnapshot(type: .text, text: denied, mediaRef: nil, duration: nil)
+            let item = ToolSnapshotItem(id: tu.id, toolName: tu.name, snapshot: snapshot,
+                                        mediaResolver: await ChatStore.shared.mediaFileURLResolver())
+            return ToolExecOutcome(toolId: tu.id, toolName: tu.name,
+                resultPart: .toolResult(id: tu.id, name: tu.name, content: denied, isError: true),
+                snapshotEntry: (toolName: tu.name, snapshot: snapshot), snapshotItem: item,
+                cancelled: false)
+        }
+
+        // An iPhone task is routed only to the original Poki device service.
+        // Never silently execute Linux/browser/MCP/subagents as a phone fallback.
+        if phoneOnlyThisTurn && tu.name != "device_control" {
+            let denied = "not_sent: This iPhone task can use only Poki device_control. No computer tool was executed."
+            if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
+                messages[msgIdx].blocks[blockIdx].content = denied
+                messages[msgIdx].blocks[blockIdx].toolStatus = .failed(message: denied)
+            }
+            let snapshot = ToolSnapshot(type: .text, text: denied, mediaRef: nil, duration: nil)
+            let item = ToolSnapshotItem(id: tu.id, toolName: tu.name, snapshot: snapshot,
+                                        mediaResolver: await ChatStore.shared.mediaFileURLResolver())
+            return ToolExecOutcome(toolId: tu.id, toolName: tu.name,
+                resultPart: .toolResult(id: tu.id, name: tu.name, content: denied, isError: true),
+                snapshotEntry: (toolName: tu.name, snapshot: snapshot), snapshotItem: item,
+                cancelled: false)
+        }
+
         // Graceful cancel pre-check: any task that begins after the user
         // tapped Stop short-circuits with a synthetic cancellation result
         // so history stays paired.

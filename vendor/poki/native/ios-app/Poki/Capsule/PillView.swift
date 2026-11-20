@@ -43,7 +43,10 @@ struct PillView: View {
                 if let icon = AppIconStore.shared.icon(data.app.id, dark: false) {
                     Image(uiImage: icon).resizable().interpolation(.high)
                 } else {
-                    DefaultAppIcon(size: metrics.icon)
+                    Image(systemName: "app.fill")
+                        .resizable().scaledToFit().foregroundStyle(.secondary)
+                        .padding(3)
+                        .background(Color(.tertiarySystemFill))
                 }
             }
             .frame(width: metrics.icon, height: metrics.icon)
@@ -60,6 +63,11 @@ struct PillView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .background(data.onAccent ? Color.white.opacity(0.22) : Color(.label).opacity(0.08), in: .capsule)
         .accessibilityLabel(Text(verbatim: data.label))
+        .task(id: data.app.id) {
+            if AppIconStore.shared.icon(data.app.id, dark: false) == nil {
+                await AppIconStore.shared.load(data.app.id)
+            }
+        }
     }
 
     /// The capsule drawn as a picture, for the field's attachment and the bubble's inline image; each

@@ -46,6 +46,10 @@ extension AIChatViewModel {
     }
 
     var baseSystemPrompt: String {
+        if AmorePureChatMode.isEnabled(sessionID: sessionId, draftID: draftId) {
+            return (helperConfig != nil ? helperIdentitySection : SystemPromptBuilder.identitySection())
+                + "\n\n" + ChatExecutionModePolicy.pureChatInstruction
+        }
         // [T-soul-md] Layer 1 is rendered by SystemPromptBuilder, which
         // owns the "You are <name>, a capable AI assistant running on an
         // iOS device ..." identity sentence (parametric on SOUL.md's
@@ -53,7 +57,7 @@ extension AIChatViewModel {
         // Personality section from SOUL.md's body. The original wording
         // is preserved inside SystemPromptBuilder.identityTemplate so we
         // don't regress model behavior that depended on it.
-        (helperConfig != nil ? helperIdentitySection : SystemPromptBuilder.identitySection())
+        return (helperConfig != nil ? helperIdentitySection : SystemPromptBuilder.identitySection())
             + AmoreToolPolicy.directAnswerRule + "\n\n"
             + "When tools are genuinely necessary, use shell commands to accomplish the user's tasks — installing packages (apk add), "
             + "writing and running scripts, managing files, networking, and any other operations a Linux terminal can perform.\n\n"

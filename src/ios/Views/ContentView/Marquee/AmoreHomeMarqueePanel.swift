@@ -62,7 +62,10 @@ struct AmoreHomeMarqueePanel: View {
                 Button {
                     onAction(item.action)
                 } label: {
-                    Label(item.title, systemImage: item.symbol)
+                    HStack(spacing: 7) {
+                        AmoreShortcutAppIcon(item: item, size: 22)
+                        Text(item.title).lineLimit(1)
+                    }
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(PokiTheme.blueText)
                         .padding(.horizontal, 14)
