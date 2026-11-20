@@ -54,25 +54,24 @@ struct AmoreTransparentDrawer<Chat: View, Sidebar: View>: View {
     var body: some View {
         let phase = AmoreDrawerPresentation.phase(progress)
         let drawerIsPresented = phase > 0.001 || presentationActive
-        let visibleDrawerWidth = reduceMotion && phase > 0.001 ? drawerWidth : drawerWidth * phase
         ZStack(alignment: .leading) {
+            // Keep the one UIKit/SwiftUI chat hierarchy mounted and enabled.
+            // Toggling hit-testing or accessibility on its root can leave UIKit
+            // controls non-hittable after the closing spring finishes.
             chat
                 .environment(\.amoreDrawerProgress, phase)
                 .frame(width: size.width, height: size.height)
-                .allowsHitTesting(!drawerIsPresented)
-                .accessibilityHidden(drawerIsPresented)
 
             if drawerIsPresented {
-                // Transparent dismiss target above chat and below the sidebar.
-                // Sidebar controls consume their own touches; the exposed right
-                // strip dismisses without pressing the transcript underneath.
+                // Transparent hit shield above the live chat and below sidebar.
+                // UIKit subviews remain mounted; the shield consumes touches even
+                // over the left pane until an actual sidebar control handles them.
                 Color.clear
-                    .frame(width: max(0, size.width - visibleDrawerWidth), height: size.height)
+                    .frame(width: size.width, height: size.height)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         if phase > 0.001 { onClose() }
                     }
-                    .offset(x: visibleDrawerWidth)
                     .accessibilityHidden(true)
             }
 

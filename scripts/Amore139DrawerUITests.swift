@@ -114,13 +114,20 @@ final class Amore139DrawerUITests: XCTestCase {
         app.launchArguments = ["-amore139-drawer-probe", "-amore139-theme", theme,
                                "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         app.launch()
-        hittable(app.buttons["transparent.open"])
         assertClosed()
         assertState()
     }
 
     private func openHistory() {
-        tap("transparent.open") // Real History button -> unchanged helper pane.
+        // XCTest's isHittable can remain stale after a SwiftUI overlay animates
+        // away. Inject a physical tap at the visible History button instead;
+        // require the drawer to open, not merely for the element to exist.
+        let open = app.buttons["transparent.open"]
+        XCTAssertTrue(open.waitForExistence(timeout: 3))
+        let frame = open.frame
+        XCTAssertGreaterThan(frame.width, 30)
+        coordinate(x: frame.midX, y: frame.midY).tap()
+        expect(app.staticTexts["transparent.rootState"], key: "label", equals: "fixture open=true;drag=none")
         hittable(app.buttons["transparent.close"])
         hittable(app.buttons["transparent.history.0"])
         XCTAssertTrue(app.scrollViews["transparent.history"].exists)
@@ -131,7 +138,8 @@ final class Amore139DrawerUITests: XCTestCase {
     }
 
     private func assertClosed() {
-        hittable(app.buttons["transparent.open"])
+        expect(app.staticTexts["transparent.rootState"], key: "label", equals: "fixture open=false;drag=none")
+        XCTAssertTrue(app.buttons["transparent.open"].waitForExistence(timeout: 3))
         let close = app.buttons["transparent.close"]
         let gone = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: close)
         XCTAssertEqual(XCTWaiter.wait(for: [gone], timeout: 4), .completed)

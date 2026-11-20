@@ -24,9 +24,14 @@ class TransparentDrawerSourceTests(unittest.TestCase):
   backdrop=s.split('struct AmoreDrawerBackdrop: View',1)[1].split('struct AmoreTransparentDrawer<',1)[0]
   self.assertNotIn('.opacity(',backdrop)
   self.assertIn('.allowsHitTesting(false)',backdrop)
-  self.assertIn('.allowsHitTesting(!drawerIsPresented)',s)
-  self.assertIn('.disabled(drawerIsPresented)',s)
-  self.assertIn('.accessibilityHidden(drawerIsPresented)',s)
+  # Keep the sole UIKit chat tree mounted and enabled; a top-layer shield
+  # intercepts touches during presentation, then unmounts on dismissal.
+  self.assertNotIn('.disabled(drawerIsPresented)',s)
+  self.assertIn('if drawerIsPresented {',s)
+  self.assertIn('.frame(width: size.width, height: size.height)',s)
+  self.assertIn('.contentShape(Rectangle())',s)
+  self.assertIn('.onTapGesture {',s)
+  self.assertIn('.accessibilityHidden(true)',s)
  def test_keep_existing_history_and_actions(self):
   s=(C/'ContentView+Layout.swift').read_text()
   for token in ['drawerHistory.groups','drawerSessionRow(session)','rebuildDrawerGroups()',
