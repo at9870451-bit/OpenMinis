@@ -166,7 +166,8 @@ final class Amore139DrawerUITests: XCTestCase {
             predicate: NSPredicate(format: "exists == true AND hittable == true"), object: element)
         let result = XCTWaiter.wait(for: [ready], timeout: 3)
         if result != .completed {
-            XCTFail("Expected hittable identifier: \(element.identifier); probe=\(app.staticTexts[\"transparent.rootState\"].label)")
+            let state = app.staticTexts["transparent.rootState"].label
+            XCTFail("Expected hittable identifier: \(element.identifier); probe=\(state)")
         }
     }
 
