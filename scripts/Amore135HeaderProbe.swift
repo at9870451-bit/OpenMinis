@@ -68,6 +68,8 @@ struct Amore135HeaderProbe: View {
             showFastModeToggle: true, speedTier: tier,
             showUltrafast: !ProcessInfo.processInfo.arguments.contains("-amore135-fast-switch"),
             keepAwakeEnabled: awake, screenSaverNowEnabled: saver,
+            modeSessionKey: "probe-session", pureChatEnabled: false,
+            onSetPureChatMode: { _ in record("setPureChatMode") },
             onNewChat: { record("onNewChat") }, onCompact: { record("onCompact") },
             onClearChat: { record("onClearChat") }, onForceSync: { record("onForceSync") },
             onForcePull: { record("onForcePull") }, onOpenTerminal: { record("onOpenTerminal") },
