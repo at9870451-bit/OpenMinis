@@ -63,8 +63,10 @@ struct AmoreDeviceTaskCapsule: View {
         // Fits inside the existing 36pt ToolCapsuleView row, retaining its
         // detail sheet, search highlights, stop button and folding behavior.
         HStack(spacing: 5) {
-            if #available(iOS 18.0, *), let id = launched.last {
-                AmoreInstalledAppIcon(app: id, size: 20)
+            if let id = launched.last {
+                // Rendering a task must not synchronously ask UIKit for another
+                // app's icon while the phone core is launching that app.
+                AmoreFastAppIcon(appName: id, size: 20)
             } else {
                 Image(systemName: "iphone.gen3")
                     .font(.system(size: 13)).frame(width: 20, height: 20)

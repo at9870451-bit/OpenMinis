@@ -1,0 +1,413 @@
+name: Amore1.41 first-frame responsiveness and bounded phone preparation
+'on':
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Fixed fusion source SHA
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  device:
+    name: Rebuild native phone service with bounded startup
+    runs-on: macos-15-intel
+    timeout-minutes: 90
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: at9870451-bit/OpenMinis
+        ref: ${{ inputs.source_sha }}
+    - name: Tools and source checks
+      run: 'brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+
+        brew list ripgrep >/dev/null 2>&1 || brew install ripgrep
+
+        rustup update stable --no-self-update
+
+        rustup default stable
+
+        python3 scripts/amore-fusion-static-acceptance.py
+
+
+        python3 scripts/test-amore140-policy.py
+
+        python3 scripts/test-amore-app-capsules.py
+
+
+        python3 scripts/test-amore141-firstframe.py
+
+        '
+    - uses: actions/cache/restore@v4
+      with:
+        path: '~/.cargo/registry
+
+          ~/.cargo/git
+
+          vendor/poki/native/launcher/target
+
+          build-device-kit
+
+          '
+        key: amore-fusion-v4-${{ runner.arch }}-${{ inputs.source_sha }}
+        restore-keys: 'amore-fusion-v4-${{ runner.arch }}-
+
+          amore-fusion-v3-${{ runner.arch }}-
+
+          amore-fusion-v2-${{ runner.arch }}-
+
+          amore-fusion-v1-${{ runner.arch }}-
+
+          poki132-retry-xc26.3-${{ runner.arch }}-
+
+          '
+    - name: Native mock handshake EOF protocol timeout regressions
+      run: 'set -euo pipefail
+
+        bash vendor/poki/native/launcher/fetch-idevice.sh
+
+        set -o pipefail
+
+        cargo test --locked --manifest-path vendor/poki/native/launcher/Cargo.toml --lib -- --test-threads=1 2>&1 | tee device-connection-tests.log'
+    - name: Compile statically linked device services
+      run: 'set -euo pipefail
+
+        rm -rf build-device-kit deps/AmoreDeviceKit vendor/poki/native/launcher/target
+
+        bash scripts/build-amore-device-kit.sh
+
+        printf "%s\n" "${{ inputs.source_sha }}" > deps/AmoreDeviceKit/source-sha.txt
+
+        '
+    - uses: actions/upload-artifact@v4
+      with:
+        name: amore141-static-services
+        path: deps/AmoreDeviceKit
+        if-no-files-found: error
+        retention-days: 7
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: fusion-device-diagnostics
+        path: 'device-*.log
+
+          device-*.txt
+
+          deps/AmoreDeviceKit/static-link-inputs.json
+
+          '
+        if-no-files-found: warn
+    - uses: actions/cache/save@v4
+      if: always()
+      with:
+        path: '~/.cargo/registry
+
+          ~/.cargo/git
+
+          vendor/poki/native/launcher/target
+
+          build-device-kit
+
+          '
+        key: amore-fusion-v4-${{ runner.arch }}-${{ inputs.source_sha }}
+  app:
+    name: Compile Amore1.41 with original PokiCore and fast icons
+    needs:
+    - device
+    - connection
+    - components
+    - voice
+    - execution
+    - toolstream
+    - policy
+    runs-on: macos-15-intel
+    timeout-minutes: 110
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: at9870451-bit/OpenMinis
+        ref: ${{ inputs.source_sha }}
+        submodules: recursive
+    - uses: actions/download-artifact@v4
+      with:
+        name: amore141-static-services
+        path: deps/AmoreDeviceKit
+    - uses: actions/setup-go@v5
+      with:
+        go-version: 1.25.5
+        cache: false
+    - name: Tools and original runtime regression checks
+      run: 'brew install ninja llvm lld libarchive pkg-config meson
+
+        cp src/ios/Configs/ProviderCustomization.xcconfig.example src/ios/Configs/ProviderCustomization.xcconfig
+
+        python3 scripts/test-node-online-source.py
+
+        python3 scripts/test-amore136-performance-policy.py
+
+        python3 scripts/test-amore136-settings-source.py
+
+        swift scripts/Amore135AvatarPipelineTests.swift .
+
+        swift test --package-path src/ios/Packages/AmorePluginArchive 2>&1 | tee fusion-archive-tests.log
+
+        bash scripts/test-plugin-import.sh
+
+
+        python3 scripts/test-amore140-policy.py
+
+        python3 scripts/test-amore-app-capsules.py
+
+
+        python3 scripts/test-amore141-firstframe.py
+
+        '
+    - uses: actions/cache@v4
+      with:
+        path: 'deps/lame-build
+
+          deps/ffmpeg-6.1.2
+
+          deps/frameworks
+
+          deps/ish/build-ios
+
+          deps/libs
+
+          deps/include
+
+          deps/resources
+
+          deps/build/rclone
+
+          '
+        key: native-deps-v2-${{ runner.os }}-${{ runner.arch }}-xcode26.3-${{ hashFiles('deps/*.sh') }}
+    - name: Verify online-only Node source and remove stale bundle
+      run: 'python3 scripts/test-node-online-source.py
+
+        test ! -d src/ios/NodeRuntime
+
+        '
+    - name: Build native runtime
+      run: 'set -euo pipefail
+
+        chmod -R +x deps scripts
+
+        export PATH="$(brew --prefix llvm)/bin:$(brew --prefix lld)/bin:$PATH"
+
+        bash deps/build_lame.sh
+
+        bash deps/build_ffmpeg.sh
+
+        bash deps/build_ish.sh
+
+        mkdir -p deps/resources
+
+        curl -fL --retry 3 https://github.com/at9870451-bit/amore-ios/releases/download/rootfs-v1/alpine-rootfs.zip -o deps/resources/alpine-rootfs.zip
+
+        printf ''%s\n'' ''84f8d8acff68a28a0773298f67b3bed29c726f67fdb8c0f1cab8f01991a952cf  deps/resources/alpine-rootfs.zip'' | shasum -a 256 -c -
+
+        bash deps/build_rclone_ios.sh
+
+        '
+    - name: Compile fused Amore
+      run: 'set -o pipefail
+
+        xcodebuild -project src/ios/Minis.xcodeproj -scheme Minis -configuration Release -derivedDataPath build -destination ''generic/platform=iOS'' CODE_SIGNING_ALLOWED=NO
+        build 2>&1 | tee fusion-app-build.log
+
+        '
+    - name: Verify absence of embedded Poki app and package
+      run: 'set -euo pipefail
+
+        mkdir -p Payload
+
+        ditto build/Build/Products/Release-iphoneos/Minis.app Payload/Minis.app
+
+        python3 scripts/package-amore-fusion.py Payload/Minis.app deps/AmoreDeviceKit
+
+        zip -qry Amore-1.41-Launch-Responsive.ipa Payload
+
+        unzip -tq Amore-1.41-Launch-Responsive.ipa
+
+        shasum -a 256 Amore-1.41-Launch-Responsive.ipa | tee FUSION-SHA256.txt
+
+        printf ''%s\n'' ''${{ inputs.source_sha }}'' > fusion-source.txt
+
+        '
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Amore-1.41-Launch-Responsive
+        path: 'Amore-1.41-Launch-Responsive.ipa
+
+          FUSION-SHA256.txt
+
+          fusion-source.txt
+
+          fusion-verification.json
+
+          '
+        if-no-files-found: error
+        retention-days: 7
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: fusion-app-diagnostics
+        path: 'fusion-*.log
+
+          plugin-install-tests.log
+
+          '
+        if-no-files-found: warn
+  components:
+    name: Real first-frame icons and original composer UI regression
+    runs-on: macos-15-intel
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: at9870451-bit/OpenMinis
+        ref: ${{ inputs.source_sha }}
+    - name: Real UI component tests and light-dark snapshots
+      env:
+        AMORE134_TEST_LOG: ${{ github.workspace }}/amore138-components.log
+        AMORE134_SNAPSHOTS: ${{ github.workspace }}/amore138-component-snapshots
+        AMORE_TEST_ONLY: 'Amore134Tests
+
+          Amore134NavigationUITests/Amore135HeaderUITests/testDrawerRealFooterRemainsBelowScrollAndRoutesToHostStateOnly
+
+          Amore134NavigationUITests/Amore138ComposerUITests'
+      run: 'set -euo pipefail
+
+        python3 scripts/test-amore141-firstframe.py
+
+        bash scripts/test-amore138-components.sh
+
+        '
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: amore138-components
+        path: 'amore138-components.log
+
+          amore138-component-snapshots
+
+          '
+        if-no-files-found: warn
+  voice:
+    name: Real VoiceSessionManager lifecycle regression
+    runs-on: macos-15-intel
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: at9870451-bit/OpenMinis
+        ref: ${{ inputs.source_sha }}
+    - name: Prepare XcodeGen
+      run: brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+    - name: Run continuous speech and barge-in cancellation tests
+      env:
+        AMORE136_ARTIFACTS: ${{ github.workspace }}/amore136-voice-results
+      run: bash scripts/test-amore136-voice.sh
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: amore136-voice-tests
+        path: 'amore136-voice-results/*.log
+
+          amore136-voice-results/*.json
+
+          amore136-voice-results/*.txt
+
+          amore136-voice-results/attachments
+
+          '
+        if-no-files-found: warn
+        retention-days: 14
+  connection:
+    name: Actual Swift connection monitor regression
+    runs-on: macos-15-intel
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: at9870451-bit/OpenMinis
+        ref: ${{ inputs.source_sha }}
+    - name: Protocol ready, stale TCP EOF and bounded Bonjour recovery
+      run: bash scripts/test-amore137-connection.sh
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: amore137-connection-tests
+        path: amore137-connection-tests.log
+        if-no-files-found: warn
+        retention-days: 14
+  execution:
+    name: Exact production device wake and foreground lifecycle regression
+    runs-on: macos-15-intel
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: at9870451-bit/OpenMinis
+        ref: ${{ inputs.source_sha }}
+    - name: Exact production device wake and foreground lifecycle regression
+      run: bash scripts/test-amore138-device-execution.sh
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: amore138-device-execution
+        path: amore138-device-execution.log
+        if-no-files-found: warn
+        retention-days: 14
+  toolstream:
+    name: Production SSE tool completion offline fixtures
+    runs-on: macos-15-intel
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: at9870451-bit/OpenMinis
+        ref: ${{ inputs.source_sha }}
+    - name: Production SSE tool completion offline fixtures
+      run: 'AMORE138_TOOL_STREAM_HOST="$RUNNER_TEMP/amore138-tool-stream-tests" bash scripts/test-amore138-tool-stream.sh
+
+        cp "$RUNNER_TEMP/amore138-tool-stream-tests/swift-test.log" amore138-tool-stream.log
+
+        cp "$RUNNER_TEMP/amore138-tool-stream-tests/source-manifest.json" amore138-tool-stream-manifest.json'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: amore138-tool-stream
+        path: 'amore138-tool-stream.log
+
+          amore138-tool-stream-manifest.json'
+        if-no-files-found: warn
+        retention-days: 14
+  policy:
+    name: Pure chat and Poki phone-route real XCTest
+    runs-on: macos-15-intel
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: at9870451-bit/OpenMinis
+        ref: ${{ inputs.source_sha }}
+    - name: Test pure chat fail-closed and phone routing
+      run: bash scripts/test-amore140-policies.sh

@@ -58,7 +58,11 @@ class CapsuleContract(unittest.TestCase):
         backend = self.read('src/ios/Views/ContentView/AmoreDeviceTools.swift')
         self.assertIn('AmoreDeviceServices.execute(', backend)
         self.assertIn('guard AmoreDeviceServices.isEnabled', backend)
-        self.assertIn('MARKETING_VERSION = 1.40', self.read('src/ios/Minis.xcodeproj/project.pbxproj'))
+        self.assertIn('MARKETING_VERSION = 1.41', self.read('src/ios/Minis.xcodeproj/project.pbxproj'))
+        first = self.read('src/ios/Views/ContentView/Marquee/AmoreShortcutAppIcon.swift')
+        self.assertIn('AmoreFastAppIcon', first)
+        self.assertNotIn('AmoreInstalledAppIcon(', first)
+        self.assertIn('TaskApps.launches(inArguments:', self.read('vendor/poki/native/ios-app/Poki/AmoreAppCapsules.swift'))
 
 
 if __name__ == '__main__':

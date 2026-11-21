@@ -5,20 +5,15 @@ HOST="${AMORE134_HOST:-${RUNNER_TEMP:-/tmp}/amore134-component-tests}"
 mkdir -p "$HOST/App" "$HOST/Tests" "$HOST/UITests"
 for name in AmoreTheme PokiDrawerMotion AmoreDrawerPresentation PokiComposerMaterial PokiControlSurface DrawerShortcut PokiMessageSurface; do cp "$ROOT/src/ios/Views/ContentView/$name.swift" "$HOST/App/"; done
 for name in AmoreMarquee HomeShortcut AmoreHomeShortcutStore AmoreHomeMarqueePanel AmoreHomeShortcutCatalog AmoreHomeShortcutManager AmoreHomeMarqueeSource AmoreMarqueeClock; do cp "$ROOT/src/ios/Views/ContentView/Marquee/$name.swift" "$HOST/App/"; done
-# UI-host-only icon adapter: native AppIconStore/AmoreDeviceKit is built in the
-# separate device job. Preserve the production panel and all tap/scroll logic.
-cat > "$HOST/App/AmoreShortcutAppIconHost.swift" <<'SWIFT'
-import SwiftUI
-struct AmoreShortcutAppIcon: View {
- let item: AmoreHomeShortcut
- let size: CGFloat
- var body: some View {
-  Image(systemName: item.symbol)
-   .frame(width: size, height: size)
-   .accessibilityHidden(true)
- }
-}
-SWIFT
+# The first-frame icon path is pure SwiftUI and uses no native service; use
+# the exact production types rather than a stub for launch responsiveness.
+for name in AmoreShortcutAppIcon AmoreFastAppIcon; do
+ cp "$ROOT/src/ios/Views/ContentView/Marquee/$name.swift" "$HOST/App/"
+done
+mkdir -p "$HOST/App/AmoreFastIcons.xcassets"
+for name in meituan meituan-waimai xianyu; do
+ cp -R "$ROOT/src/ios/PokiPortAssets.xcassets/AmoreCarried-$name.imageset" "$HOST/App/AmoreFastIcons.xcassets/"
+done
 cp "$ROOT/src/ios/Views/ContentView/Sidebar/AmoreSidebarShortcuts.swift" "$HOST/App/"
 cp "$ROOT/src/ios/Views/ContentView/Settings/SettingsFeatureIcon.swift" "$HOST/App/"
 cp "$ROOT/vendor/poki/native/ios-app/Poki/AmoreConversationChrome.swift" "$HOST/App/"

@@ -2020,7 +2020,20 @@ final class AppModel {
         }
         if !sessionOn {
             if !sessionStarting { startSession() }
-            if let task = sessionStartTask { await task.value }
+            // A pairing/DDI check can wait on iOS for longer than a chat tool
+            // turn. Never strand the visible device_control card while waiting.
+            // Do not cancel setup or claim the launch was sent: a later user
+            // retry may use the session after its original preparation finishes.
+            let preparationDeadline = Date().addingTimeInterval(12)
+            while sessionStarting && Date() < preparationDeadline {
+                if Task.isCancelled || generation != amoreExecutionGeneration {
+                    return PokiCore.ToolAnswer(text: "not_sent: Device task cancelled before app launch.", jpeg: nil, isError: true)
+                }
+                try? await Task.sleep(for: .milliseconds(200))
+            }
+            if sessionStarting {
+                return PokiCore.ToolAnswer(text: "not_sent: iPhone automation is still preparing pairing or developer image. No app launch was sent. Check Local device status for the current stage; retry only after it is ready.", jpeg: nil, isError: true)
+            }
         }
         if passcodeConfirmationPending {
             return PokiCore.ToolAnswer(text: "not_sent: \(AppLocalization.text(Self.passcodeConfirmationMessage)) Nothing was sent.", jpeg: nil, isError: true)
