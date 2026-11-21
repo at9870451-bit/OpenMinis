@@ -10,7 +10,11 @@ for name in AmoreMarquee HomeShortcut AmoreHomeShortcutStore AmoreHomeMarqueePan
 for name in AmoreShortcutAppIcon AmoreFastAppIcon; do
  cp "$ROOT/src/ios/Views/ContentView/Marquee/$name.swift" "$HOST/App/"
 done
-mkdir -p "$HOST/App/AmoreFastIcons.xcassets"
+mkdir -p "$HOST/App/AmoreFastIcons.xcassets/AppIcon.appiconset"
+cp "$ROOT/src/ios/Assets.xcassets/AppIcon.appiconset/Icon-1024.png" "$HOST/App/AmoreFastIcons.xcassets/AppIcon.appiconset/"
+cat > "$HOST/App/AmoreFastIcons.xcassets/AppIcon.appiconset/Contents.json" <<'JSON'
+{"images":[{"filename":"Icon-1024.png","idiom":"universal","platform":"ios","size":"1024x1024"}],"info":{"author":"xcode","version":1}}
+JSON
 for name in meituan meituan-waimai xianyu; do
  cp -R "$ROOT/src/ios/PokiPortAssets.xcassets/AmoreCarried-$name.imageset" "$HOST/App/AmoreFastIcons.xcassets/"
 done
