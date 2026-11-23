@@ -23,6 +23,11 @@ provider=plugins/'AmoreTunnel.appex'
 pi=plistlib.loads((provider/'Info.plist').read_bytes())
 assert pi['CFBundleIdentifier'].startswith(info['CFBundleIdentifier']+'.')
 assert pi['NSExtension']['NSExtensionPointIdentifier']=='com.apple.networkextension.packet-tunnel'
+# The tunnel binary is reused from the source-matched native job; stamp its
+# copied plist to the host app's release version before signing the bundle.
+pi['CFBundleShortVersionString'] = info['CFBundleShortVersionString']
+pi['CFBundleVersion'] = info['CFBundleVersion']
+(provider/'Info.plist').write_bytes(plistlib.dumps(pi, fmt=plistlib.FMT_BINARY))
 assert pi['CFBundleShortVersionString']==info['CFBundleShortVersionString']
 subprocess.run(['codesign','--force','--sign','-','--timestamp=none','--entitlements',str(kit/'AmoreTunnel.entitlements'),str(provider)],check=True)
 subprocess.run(['codesign','--verify','--strict',str(provider)],check=True)

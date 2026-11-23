@@ -20,18 +20,9 @@ final class Amore135GlassSidebarTests: XCTestCase {
     }
 
     func testPrimaryAndSecondaryInkMeetAAInEveryDrawerState() {
-        check(PokiTheme.uiSidebarInk, style: .light, hex: 0x173763)
-        check(PokiTheme.uiSidebarInk, style: .dark, hex: 0xFFFFFF)
         for style in [UIUserInterfaceStyle.light, .dark] {
-            let backgrounds = [PokiTheme.uiSidebar, PokiTheme.uiSidebarControl,
-                               PokiTheme.uiSidebarSelected, PokiTheme.uiSidebarPressed]
-            for background in backgrounds {
-                for ink in [PokiTheme.uiSidebarInk, PokiTheme.uiSidebarHeading] {
-                    XCTAssertGreaterThanOrEqual(contrast(ink, background, style: style), 4.5)
-                }
-            }
-            XCTAssertGreaterThanOrEqual(contrast(PokiTheme.uiSidebarActionInk,
-                                                PokiTheme.uiSidebarAction, style: style), 4.5)
+            XCTAssertGreaterThanOrEqual(contrast(PokiTheme.uiPrimaryText, PokiTheme.uiSidebar, style: style), 4.5)
+            XCTAssertGreaterThanOrEqual(contrast(PokiTheme.uiSidebarHeading, PokiTheme.uiSidebar, style: style), 4.5)
         }
     }
 

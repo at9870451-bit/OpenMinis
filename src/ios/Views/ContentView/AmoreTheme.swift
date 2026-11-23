@@ -43,7 +43,7 @@ enum PokiTheme {
     static let uiBlueLine = pair(0xB9D8FF, 0x1D4F8F)
     // The opaque history drawer uses the exact chat canvas background.
     static let uiSidebar = uiBackground
-    static let uiSidebarHeading = uiSecondaryText
+    static let uiSidebarHeading = uiPrimaryText
     static let uiSidebarInk = uiPrimaryText
     static let uiSidebarControl = UIColor.secondarySystemGroupedBackground
     static let uiSidebarSelected = UIColor.tertiarySystemFill
