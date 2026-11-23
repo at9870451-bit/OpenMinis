@@ -8,7 +8,7 @@ import UniformTypeIdentifiers
 final class PokiComponentTests: XCTestCase {
     func testPokiPageAndSidebarColorsResolveInBothModes() async {
         check(PokiTheme.uiBackground, light: 0xF5F8FC, dark: 0x05070D)
-        check(PokiTheme.uiSidebar, light: 0xEFF4FC, dark: 0x081329)
+        check(PokiTheme.uiSidebar, light: 0xF5F8FC, dark: 0x05070D)
         check(PokiTheme.uiBlue, light: 0x0177FD, dark: 0x0177FD)
         check(PokiTheme.uiBlueText, light: 0x0177FD, dark: 0x4C9DFF)
         check(PokiTheme.uiPortrait, light: 0xE3EEFF, dark: 0x0C2748)

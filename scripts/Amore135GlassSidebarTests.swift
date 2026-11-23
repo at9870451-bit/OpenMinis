@@ -8,23 +8,23 @@ import UIKit
 /// name when copying into a differently named component host.
 @MainActor
 final class Amore135GlassSidebarTests: XCTestCase {
-    func testSidebarStaysBlueInBothAppearances() {
-        check(PokiTheme.uiSidebar, style: .light, hex: 0xE0EDFF)
-        check(PokiTheme.uiSidebar, style: .dark, hex: 0x1852A0)
-        check(PokiTheme.uiSidebarInk, style: .light, hex: 0x173763)
-        check(PokiTheme.uiSidebarInk, style: .dark, hex: 0xFFFFFF)
-        for style in [UIUserInterfaceStyle.light, .dark] {
-            let c = components(PokiTheme.uiSidebar, style: style)
-            XCTAssertEqual(c[3], 1, accuracy: 0.0001)
-            XCTAssertGreaterThan(c[2], c[0])
-            XCTAssertGreaterThan(c[2], c[1])
-        }
+    func testSidebarMatchesChatCanvasInBothAppearances() {
+        check(PokiTheme.uiSidebar, style: .light, hex: 0xF5F8FC)
+        check(PokiTheme.uiSidebar, style: .dark, hex: 0x05070D)
+        check(PokiTheme.uiBackground, style: .light, hex: 0xF5F8FC)
+        check(PokiTheme.uiBackground, style: .dark, hex: 0x05070D)
+        XCTAssertEqual(PokiTheme.uiSidebar.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light)),
+                       PokiTheme.uiBackground.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light)))
+        XCTAssertEqual(PokiTheme.uiSidebar.resolvedColor(with: UITraitCollection(userInterfaceStyle: .dark)),
+                       PokiTheme.uiBackground.resolvedColor(with: UITraitCollection(userInterfaceStyle: .dark)))
     }
 
     func testPrimaryAndSecondaryInkMeetAAInEveryDrawerState() {
-        let backgrounds = [PokiTheme.uiSidebar, PokiTheme.uiSidebarControl,
-                           PokiTheme.uiSidebarSelected, PokiTheme.uiSidebarPressed]
+        check(PokiTheme.uiSidebarInk, style: .light, hex: 0x173763)
+        check(PokiTheme.uiSidebarInk, style: .dark, hex: 0xFFFFFF)
         for style in [UIUserInterfaceStyle.light, .dark] {
+            let backgrounds = [PokiTheme.uiSidebar, PokiTheme.uiSidebarControl,
+                               PokiTheme.uiSidebarSelected, PokiTheme.uiSidebarPressed]
             for background in backgrounds {
                 for ink in [PokiTheme.uiSidebarInk, PokiTheme.uiSidebarHeading] {
                     XCTAssertGreaterThanOrEqual(contrast(ink, background, style: style), 4.5)

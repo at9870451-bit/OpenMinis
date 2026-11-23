@@ -56,7 +56,8 @@ class DrawerFooterSourceTests(unittest.TestCase):
         self.assertLess(history.index(scroll) + len(scroll), history.index("drawerAccountFooter"))
         self.assertIn(".background(PokiTheme.sidebar.ignoresSafeArea())", history)
         theme = (CONTENT / "AmoreTheme.swift").read_text()
-        self.assertIn("static let uiSidebar = pair(0xE0EDFF, 0x1852A0)", theme)
+        self.assertIn("static let uiSidebar = uiBackground", theme)
+        self.assertIn("static let uiBackground = pair(0xF5F8FC, 0x05070D)", theme)
 
     def test_geometry_single_line_and_original_semantics(self):
         for required in [".frame(width: 132, height: 52)", ".frame(width: 52, height: 52)",

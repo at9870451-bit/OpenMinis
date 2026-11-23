@@ -41,14 +41,13 @@ enum PokiTheme {
     static let uiBlueText = pair(0x0177FD, 0x4C9DFF)
     static let uiBlueSoft = pair(0xE6F1FF, 0x0C2748)
     static let uiBlueLine = pair(0xB9D8FF, 0x1D4F8F)
-    // The history drawer is solid blue in BOTH appearances, never a near-black
-    // panel or a full-height material. Keep its ink independent of label black.
-    static let uiSidebar = pair(0xE0EDFF, 0x1852A0)
-    static let uiSidebarHeading = pair(0x36537D, 0xEAF2FF)
-    static let uiSidebarInk = pair(0x173763, 0xFFFFFF)
-    static let uiSidebarControl = pair(0xF3F7FF, 0x2463B0)
-    static let uiSidebarSelected = pair(0xBDD6FA, 0x326FB8)
-    static let uiSidebarPressed = pair(0xABC9F3, 0x2A64AE)
+    // The opaque history drawer uses the exact chat canvas background.
+    static let uiSidebar = uiBackground
+    static let uiSidebarHeading = uiSecondaryText
+    static let uiSidebarInk = uiPrimaryText
+    static let uiSidebarControl = UIColor.secondarySystemGroupedBackground
+    static let uiSidebarSelected = UIColor.tertiarySystemFill
+    static let uiSidebarPressed = UIColor.quaternarySystemFill
     static let uiSidebarAction = pair(0x1763C8, 0xE0EDFF)
     static let uiSidebarActionInk = pair(0xFFFFFF, 0x173763)
     static let uiSelection = pair(0x0177FD, 0x3A8CFE, lightAlpha: 0.08, darkAlpha: 0.18)
